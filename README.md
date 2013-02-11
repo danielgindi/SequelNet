@@ -1,9 +1,9 @@
 dg.Sql
 ======
 
-My SQL abstraction/generalization/protection layer.
+My SQL abstraction/generalization/protection layer. (Well, anyone is welcome to use and improve :-)
 
-Was separated for a framework that I wrote sometime deep in the past.
+This was separated from a framework that I wrote sometime deep in the past. Since I now use it in all kinds of projects, and give it to my friends and employees to work with, I decided to make this public. Enjoy :-)
 
 The use is pretty straight-forward.
 To supply a default connector, add a dg.Sql.Connector key in the appSettings of web.config. Like this:
