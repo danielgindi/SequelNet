@@ -191,7 +191,7 @@ namespace dg.Sql.Sql.Spatial
                     {
                         SRID = reader.ReadInt32();
                         if (SRID == 0) SRID = null;
-                        stream.ReadByte(); // Byte order
+                        stream.ReadByte(); // Byte order byte
                     }
 
                     return Read(reader, SRID);
@@ -218,7 +218,6 @@ namespace dg.Sql.Sql.Spatial
 
             switch (geometryType)
             {
-                //Point
                 case WkbGeometryTypes.WkbPoint:
                     return ReadPoint(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbPointZ:
@@ -227,7 +226,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadPoint(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbPointZM:
                     return ReadPoint(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Line String
+                    
                 case WkbGeometryTypes.WkbLineString:
                     return ReadLineString(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbLineStringZ:
@@ -236,7 +235,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadLineString(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbLineStringZM:
                     return ReadLineString(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Polygon
+                    
                 case WkbGeometryTypes.WkbPolygon:
                     return ReadPolygon(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbPolygonZ:
@@ -245,7 +244,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadPolygon(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbPolygonZM:
                     return ReadPolygon(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Multi Point
+                    
                 case WkbGeometryTypes.WkbMultiPoint:
                     return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbMultiPointZ:
@@ -254,7 +253,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbMultiPointZM:
                     return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Multi Line String
+                    
                 case WkbGeometryTypes.WkbMultiLineString:
                     return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbMultiLineStringZ:
@@ -263,7 +262,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbMultiLineStringZM:
                     return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Multi Polygon
+                    
                 case WkbGeometryTypes.WkbMultiPolygon:
                     return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbMultiPolygonZ:
@@ -272,7 +271,7 @@ namespace dg.Sql.Sql.Spatial
                     return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XYM);
                 case WkbGeometryTypes.WkbMultiPolygonZM:
                     return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XYZM);
-                //Geometry Collection
+                    
                 case WkbGeometryTypes.WkbGeometryCollection:
                     return ReadGeometryCollection(reader, SRID, WkbCoordinateSystem.XY);
                 case WkbGeometryTypes.WkbGeometryCollectionZ:
@@ -368,7 +367,7 @@ namespace dg.Sql.Sql.Spatial
 
             for (int j = 0; j < geometryCount; j++)
             {
-                reader.ReadByte(); // Byte order
+                reader.ReadByte(); // Byte order byte
                 geometryType = ReadGeometryType(reader, out cs2, out SRID2);
                 if (geometryType != WkbGeometryTypes.WkbPoint)
                 {
@@ -393,7 +392,7 @@ namespace dg.Sql.Sql.Spatial
 
             for (int j = 0; j < geometryCount; j++)
             {
-                reader.ReadByte(); // Byte order
+                reader.ReadByte(); // Byte order byte
                 geometryType = ReadGeometryType(reader, out cs2, out SRID2);
                 if (geometryType != WkbGeometryTypes.WkbLineString)
                 {
@@ -418,7 +417,7 @@ namespace dg.Sql.Sql.Spatial
 
             for (int j = 0; j < geometryCount; j++)
             {
-                reader.ReadByte(); // Byte order
+                reader.ReadByte(); // Byte order byte
                 geometryType = ReadGeometryType(reader, out cs2, out SRID2);
                 if (geometryType != WkbGeometryTypes.WkbPolygon)
                 {
@@ -443,11 +442,10 @@ namespace dg.Sql.Sql.Spatial
 
             for (int j = 0; j < geometryCount; j++)
             {
-                reader.ReadByte(); // Byte order
+                reader.ReadByte(); // Byte order byte
                 geometryType = ReadGeometryType(reader, out cs2, out SRID2);
                 switch (geometryType)
                 {
-                    //Point
                     case WkbGeometryTypes.WkbPoint:
                     case WkbGeometryTypes.WkbPointZ:
                     case WkbGeometryTypes.WkbPointM:
@@ -455,7 +453,6 @@ namespace dg.Sql.Sql.Spatial
                         geometries.Add(ReadPoint(reader, SRID2, cs2));
                         break;
 
-                    //Line String
                     case WkbGeometryTypes.WkbLineString:
                     case WkbGeometryTypes.WkbLineStringZ:
                     case WkbGeometryTypes.WkbLineStringM:
@@ -463,7 +460,6 @@ namespace dg.Sql.Sql.Spatial
                         geometries.Add(ReadLineString(reader, SRID2, cs2));
                         break;
 
-                    //Polygon
                     case WkbGeometryTypes.WkbPolygon:
                     case WkbGeometryTypes.WkbPolygonZ:
                     case WkbGeometryTypes.WkbPolygonM:
@@ -471,7 +467,6 @@ namespace dg.Sql.Sql.Spatial
                         geometries.Add(ReadPolygon(reader, SRID2, cs2));
                         break;
 
-                    //Multi Point
                     case WkbGeometryTypes.WkbMultiPoint:
                     case WkbGeometryTypes.WkbMultiPointZ:
                     case WkbGeometryTypes.WkbMultiPointM:
@@ -479,7 +474,6 @@ namespace dg.Sql.Sql.Spatial
                         geometries.Add(ReadMultiPoint(reader, SRID2, cs2));
                         break;
 
-                    //Multi Line String
                     case WkbGeometryTypes.WkbMultiLineString:
                     case WkbGeometryTypes.WkbMultiLineStringZ:
                     case WkbGeometryTypes.WkbMultiLineStringM:
@@ -487,12 +481,10 @@ namespace dg.Sql.Sql.Spatial
                         geometries.Add(ReadMultiLineString(reader, SRID2, cs2));
                         break;
 
-                    //Multi Polygon
                     case WkbGeometryTypes.WkbMultiPolygon:
                         geometries.Add(ReadMultiPolygon(reader, SRID2, cs2));
                         break;
 
-                    //Geometry Collection
                     case WkbGeometryTypes.WkbGeometryCollection:
                     case WkbGeometryTypes.WkbGeometryCollectionZ:
                     case WkbGeometryTypes.WkbGeometryCollectionM:
@@ -511,7 +503,7 @@ namespace dg.Sql.Sql.Spatial
         private static WkbGeometryTypes ReadGeometryType(BinaryReader reader, out WkbCoordinateSystem coordinateSystem, out Int32? SRID)
         {
             UInt32 type = reader.ReadUInt32();
-            //Determine coordinate system
+            
             if ((type & (0x80000000 | 0x40000000)) == (0x80000000 | 0x40000000))
                 coordinateSystem = WkbCoordinateSystem.XYZM;
             else if ((type & 0x80000000) == 0x80000000)
@@ -521,7 +513,6 @@ namespace dg.Sql.Sql.Spatial
             else
                 coordinateSystem = WkbCoordinateSystem.XY;
 
-            //Has SRID
             if ((type & 0x20000000) != 0)
             {
                 SRID = reader.ReadInt32();
@@ -531,7 +522,6 @@ namespace dg.Sql.Sql.Spatial
                 SRID = null;
             }
 
-            //Get cs from prefix
             UInt32 ordinate = (type & 0xffff) / 1000;
             switch (ordinate)
             {
@@ -574,31 +564,10 @@ namespace dg.Sql.Sql.Spatial
 
         public class BigEndianBinaryReader : BinaryReader
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="BigEndianBinaryReader"/> class.
-            /// </summary>
-            /// <param name="stream">The stream.</param>
             public BigEndianBinaryReader(Stream stream) : base(stream) { }
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="BigEndianBinaryReader"/> class.
-            /// </summary>
-            /// <param name="input">The supplied stream.</param>
-            /// <param name="encoding">The character encoding.</param>
-            /// <exception cref="T:System.ArgumentNullException">encoding is null. </exception>
-            /// <exception cref="T:System.ArgumentException">The stream does not support reading, the stream is null, or the stream is already closed. </exception>
             public BigEndianBinaryReader(Stream input, Encoding encoding) : base(input, encoding) { }
 
-            /// <summary>
-            /// Reads a 2-byte signed integer from the current stream using big endian encoding
-            /// and advances the current position of the stream by two bytes.
-            /// </summary>
-            /// <returns>
-            /// A 2-byte signed integer read from the current stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             public override Int16 ReadInt16()
             {
                 byte[] byteArray = new byte[2];
@@ -609,16 +578,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt16(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads a 2-byte unsigned integer from the current stream using big endian encoding 
-            /// and advances the position of the stream by two bytes.
-            /// </summary>
-            /// <returns>
-            /// A 2-byte unsigned integer read from this stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             [CLSCompliant(false)]
             public override UInt16 ReadUInt16()
             {
@@ -630,16 +589,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToUInt16(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads a 4-byte signed integer from the current stream using big endian encoding
-            /// and advances the current position of the stream by four bytes.
-            /// </summary>
-            /// <returns>
-            /// A 4-byte signed integer read from the current stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             public override Int32 ReadInt32()
             {
                 byte[] byteArray = new byte[4];
@@ -650,17 +599,7 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt32(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads a 4-byte unsigned integer from the current stream using big endian encoding
-            /// and advances the position of the stream by four bytes.
-            /// </summary>
-            /// <returns>
-            /// A 4-byte unsigned integer read from this stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
-            [CLSCompliant(false)]
+            [CLSCompliant(false)] // To avoid the annoying CLS warning
             public override UInt32 ReadUInt32()
             {
                 byte[] byteArray = new byte[4];
@@ -671,16 +610,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToUInt32(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads an 8-byte signed integer from the current stream using big endian encoding
-            /// and advances the current position of the stream by eight bytes.
-            /// </summary>
-            /// <returns>
-            /// An 8-byte signed integer read from the current stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             public override Int64 ReadInt64()
             {
                 byte[] byteArray = new byte[8];
@@ -691,17 +620,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt64(byteArray, 0);
             }
 
-
-            /// <summary>
-            /// Reads an 8-byte unsigned integer from the current stream using big endian encoding 
-            /// and advances the position of the stream by eight bytes.
-            /// </summary>
-            /// <returns>
-            /// An 8-byte unsigned integer read from this stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             [CLSCompliant(false)]
             public override UInt64 ReadUInt64()
             {
@@ -713,16 +631,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToUInt64(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads a 4-byte floating point value from the current stream using big endian encoding
-            /// and advances the current position of the stream by four bytes.
-            /// </summary>
-            /// <returns>
-            /// A 4-byte floating point value read from the current stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             public override float ReadSingle()
             {
                 byte[] byteArray = new byte[4];
@@ -733,16 +641,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToSingle(byteArray, 0);
             }
 
-            /// <summary>
-            /// Reads an 8-byte floating point value from the current stream using big endian encoding
-            /// and advances the current position of the stream by eight bytes.
-            /// </summary>
-            /// <returns>
-            /// An 8-byte floating point value read from the current stream.
-            /// </returns>
-            /// <exception cref="T:System.ObjectDisposedException">The stream is closed. </exception>
-            /// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
-            /// <exception cref="T:System.IO.EndOfStreamException">The end of the stream is reached. </exception>
             public override double ReadDouble()
             {
                 byte[] byteArray = new byte[8];
