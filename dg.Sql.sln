@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.Connector.MySql", "dg.Sql.Connector.MySql\dg.Sql.Connector.MySql.csproj", "{1CD5F321-8826-4A75-B66D-BBAF3E15A64E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.Connector.MsSql", "dg.Sql.Connector.MsSql\dg.Sql.Connector.MsSql.csproj", "{A02C7D10-F005-4969-8332-C24C57F5E92A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.Connector.OleDb", "dg.Sql.Connector.OleDb\dg.Sql.Connector.OleDb.csproj", "{1CD5F321-8826-4A75-B66D-ABBD4E15A64E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql", "dg.Sql\dg.Sql.csproj", "{C69B5998-84AB-4C25-99BE-7010A13A2C09}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1CD5F321-8826-4A75-B66D-BBAF3E15A64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-BBAF3E15A64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-BBAF3E15A64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD5F321-8826-4A75-B66D-BBAF3E15A64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A02C7D10-F005-4969-8332-C24C57F5E92A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A02C7D10-F005-4969-8332-C24C57F5E92A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A02C7D10-F005-4969-8332-C24C57F5E92A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A02C7D10-F005-4969-8332-C24C57F5E92A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBD4E15A64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBD4E15A64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBD4E15A64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBD4E15A64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
