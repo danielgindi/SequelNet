@@ -87,6 +87,10 @@ Public Module dg
         DTE.Find.ReplaceWith = "dg.Sql.Connector.ConnectorBase"
         result = DTE.Find.Execute()
 
+        DTE.Find.FindWhat = "DCGEngine.Sql.Phrases"
+        DTE.Find.ReplaceWith = "dg.Sql.Phrases"
+        result = DTE.Find.Execute()
+
         DTE.Find.FindWhat = "TYPE == ConnectorBase.SqlServiceType.MYSQL"
         DTE.Find.ReplaceWith = "TYPE == dg.Sql.Connector.ConnectorBase.SqlServiceType.MYSQL"
         result = DTE.Find.Execute()

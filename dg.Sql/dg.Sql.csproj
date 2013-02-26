@@ -79,6 +79,7 @@
     <Compile Include="Connector\DataReaderBase.cs" />
     <Compile Include="Connector\FactoryBase.cs" />
     <Compile Include="Sql\Phrases\Spatial\GeographyContains.cs" />
+    <Compile Include="Sql\QueryHint.cs" />
     <Compile Include="Sql\Spatial\MultiPoint.cs" />
     <Compile Include="Sql\Spatial\MultiPolygon.cs" />
     <Compile Include="Sql\Spatial\MultiLineString.cs" />

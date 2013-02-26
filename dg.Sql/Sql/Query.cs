@@ -31,6 +31,7 @@ namespace dg.Sql
         private Int64 _Offset = 0;
         public bool NeedTransaction = false;
         private object _CreateIndexObject = null;
+        private QueryHint _QueryHint = QueryHint.None;
 
         public Query(TableSchema Schema)
         {
@@ -647,6 +648,11 @@ namespace dg.Sql
         public Query OffsetRows(Int64 offset)
         {
             Offset = offset;
+            return this;
+        }
+        public Query Hint(QueryHint QueryHint)
+        {
+            _QueryHint = QueryHint;
             return this;
         }
 
@@ -1560,6 +1566,22 @@ namespace dg.Sql
                                             if (Offset > 0) sb.Append(@" OFFSET " + Offset);
                                         }
                                     }
+                                }
+
+                                switch (_QueryHint)
+                                {
+                                    case QueryHint.ForUpdate:
+                                        if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
+                                        {
+                                            sb.Append(@" FOR UPDATE");
+                                        }
+                                        break;
+                                    case QueryHint.LockInSharedMode:
+                                        if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                        {
+                                            sb.Append(@" LOCK IN SHARED MODE");
+                                        }
+                                        break;
                                 }
                             }
 
