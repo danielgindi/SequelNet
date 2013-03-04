@@ -8,40 +8,51 @@ namespace dg.Sql.Phrases
     public class IfNull : BasePhrase
     {
         string FirstTableName;
-        string FirstObject;
+        object FirstObject;
         ValueObjectType FirstObjectType;
         string SecondTableName;
-        string SecondObject;
+        object SecondObject;
         ValueObjectType SecondObjectType;
 
         public IfNull(
-            string FirstTableName, string FirstObject, ValueObjectType FirstObjectType,
-            string SecondTableName, string SecondObject, ValueObjectType SecondObjectType)
+            string FirstTableName, string FirstColumnName,
+            string SecondTableName, string SecondColumnName)
         {
             this.FirstTableName = FirstTableName;
+            this.FirstObject = FirstColumnName;
+            this.FirstObjectType = ValueObjectType.ColumnName;
+            this.SecondTableName = SecondTableName;
+            this.SecondObject = SecondColumnName;
+            this.SecondObjectType = ValueObjectType.ColumnName;
+        }
+        public IfNull(
+             object FirstObject, ValueObjectType FirstObjectType,
+             object SecondObject, ValueObjectType SecondObjectType)
+        {
             this.FirstObject = FirstObject;
             this.FirstObjectType = FirstObjectType;
-            this.SecondTableName = SecondTableName;
             this.SecondObject = SecondObject;
             this.SecondObjectType = SecondObjectType;
         }
         public IfNull(
-             string FirstObject, ValueObjectType FirstObjectType,
-             string SecondObject, ValueObjectType SecondObjectType)
-            : this(null, FirstObject, FirstObjectType, null, SecondObject, SecondObjectType)
+             string FirstTableName, string FirstColumnName,
+             object SecondObject, ValueObjectType SecondObjectType)
         {
+            this.FirstTableName = FirstTableName;
+            this.FirstObject = FirstColumnName;
+            this.FirstObjectType = ValueObjectType.ColumnName;
+            this.SecondObject = SecondObject;
+            this.SecondObjectType = SecondObjectType;
         }
         public IfNull(
-             string FirstTableName, string FirstObject, ValueObjectType FirstObjectType,
-             string SecondObject, ValueObjectType SecondObjectType)
-            : this(FirstTableName, FirstObject, FirstObjectType, null, SecondObject, SecondObjectType)
+             object FirstObject, ValueObjectType FirstObjectType,
+             string SecondTableName, string SecondColumnName)
         {
-        }
-        public IfNull(
-             string FirstObject, ValueObjectType FirstObjectType,
-             string SecondTableName, string SecondObject, ValueObjectType SecondObjectType)
-            : this(null, FirstObject, FirstObjectType, SecondTableName, SecondObject, SecondObjectType)
-        {
+            this.FirstObject = FirstObject;
+            this.FirstObjectType = FirstObjectType;
+            this.SecondTableName = SecondTableName;
+            this.SecondObject = SecondColumnName;
+            this.SecondObjectType = ValueObjectType.ColumnName;
         }
         public string BuildPhrase(ConnectorBase conn)
         {
@@ -57,7 +68,7 @@ namespace dg.Sql.Phrases
                     ret += conn.encloseFieldName(FirstTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(FirstObject);
+                ret += conn.encloseFieldName((string)FirstObject);
             }
             else if (FirstObjectType == ValueObjectType.Value)
             {
@@ -74,7 +85,7 @@ namespace dg.Sql.Phrases
                     ret += conn.encloseFieldName(SecondTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(SecondObject);
+                ret += conn.encloseFieldName((string)SecondObject);
             }
             else if (SecondObjectType == ValueObjectType.Value)
             {
