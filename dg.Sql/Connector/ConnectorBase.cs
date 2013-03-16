@@ -6,6 +6,7 @@ using System.Data;
 using System.Configuration;
 using System.Reflection;
 using System.Diagnostics;
+using System.Globalization;
 
 // This class needs a little cleanup. But it's gonna break dependent code, so I'm gonna postpone it. In the meanwhile we will still use this pretty ugly code.
 
@@ -131,25 +132,34 @@ namespace dg.Sql.Connector
             if (strToEscape == null) return @"NULL";
             else return '\'' + fullEscape(strToEscape) + '\'';
         }
-        public string prepareDecimal(decimal value)
+        public virtual string PrepareValue(decimal value)
         {
-            return value.ToString();
+            return value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string prepareBoolean(bool value)
+        public virtual string PrepareValue(float value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+        public virtual string PrepareValue(double value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+        public virtual string PrepareValue(bool value)
         {
             return value ? @"1" : @"0";
         }
-        abstract public string prepareGuid(Guid value);
-        public virtual string prepareString(string value)
+        abstract public string PrepareValue(Guid value);
+        public virtual string PrepareValue(string value)
         {
             return '\'' + fullEscape(value) + '\'';
         }
+        [CLSCompliant(false)]
         public virtual string prepareValue(object value)
         {
             if (value == null || value is DBNull) return @"NULL";
             else if (value is string)
             {
-                return prepareString((string)value);
+                return PrepareValue((string)value);
             }
             else if (value is DateTime)
             {
@@ -157,11 +167,24 @@ namespace dg.Sql.Connector
             }
             else if (value is Guid)
             {
-                return prepareGuid((Guid)value);
+                return PrepareValue((Guid)value);
             }
             else if (value is bool)
             {
-                return prepareBoolean((bool)value);
+                return PrepareValue((bool)value);
+            }
+            else if (value is decimal)
+            { // Must be formatted specifically, to avoid decimal separator confusion
+                return PrepareValue((decimal)value);
+            }
+            else if (value is float)
+            {
+             // Must be formatted specifically, to avoid decimal separator confusion
+                return PrepareValue((float)value);
+            }
+            else if (value is double)
+            { // Must be formatted specifically, to avoid decimal separator confusion
+                return PrepareValue((double)value);
             }
             else if (value is dg.Sql.BasePhrase)
             {
@@ -177,46 +200,6 @@ namespace dg.Sql.Connector
         }
         abstract public string encloseFieldName(string fieldName);
         abstract public string formatDate(DateTime dateTime);
-        public virtual string sqlAddPaginationAndOrdering(string strSql,
-            int limit /* = 0 */, int offset /* = 0 */,
-            string orderBy /* = NULL */)
-        {
-            int iSelect = strSql.IndexOf(@"SELECT ", StringComparison.CurrentCultureIgnoreCase);
-            int iFrom = strSql.IndexOf(@" FROM ", StringComparison.CurrentCultureIgnoreCase);
-            int iWhere = strSql.IndexOf(@" WHERE ", StringComparison.CurrentCultureIgnoreCase);
-
-            string fields = strSql.Substring(iSelect + 7, iFrom - (iSelect + 7));
-            string tables = strSql.Substring(iFrom + 6, iWhere < 0 ? strSql.Length - (iFrom + 6) : iWhere - (iFrom + 6));
-            string where = iWhere < 0 ? string.Empty : strSql.Substring(iWhere + 7);
-            string primaryKey = fields;
-            iSelect = primaryKey.IndexOf(',');
-            if (iSelect > 0) primaryKey = primaryKey.Substring(0, iSelect);
-
-            return sqlAddPaginationAndOrdering(fields, primaryKey, tables, where, limit, offset, orderBy);
-        }
-        public virtual string sqlAddPaginationAndOrdering(
-            string selectFieldsList,
-            string primaryKeysList,
-            string tablesList,
-            string where,
-            int limit /* = 0 */, int offset /* = 0 */,
-            string orderBy /* = NULL */)
-        {
-            // The most standard technique
-
-            tablesList = tablesList.TrimStart(new char[] { ' ' });
-            if (tablesList.Length > 0) tablesList = @" FROM " + tablesList;
-            where = where.TrimStart(new char[] { ' ' });
-            if (where.Length > 0) where = @" WHERE " + where;
-            if (orderBy == null) orderBy = string.Empty;
-            orderBy = orderBy.TrimStart(new char[] { ' ' });
-            if (orderBy.Length > 0) orderBy = @" ORDER BY " + orderBy;
-
-            string sql = @"SELECT " + selectFieldsList + tablesList + where + orderBy;
-            if (limit > 0) sql += @" LIMIT " + limit;
-            if (offset > 0) sql += @" OFFSET " + offset;
-            return sql;
-        }
 
         public virtual string EscapeLike(string expression)
         {

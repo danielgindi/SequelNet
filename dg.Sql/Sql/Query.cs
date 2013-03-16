@@ -623,6 +623,12 @@ namespace dg.Sql
         {
             return GroupBy(tableName, columnName);
         }
+        public Query Distinct()
+        {
+            IsDistinct = true;
+            return this;
+        }
+        [CLSCompliant(false)]
         public Query DISTINCT()
         {
             IsDistinct = true;

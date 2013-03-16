@@ -227,13 +227,14 @@ namespace dg.Sql
             }
 
             #region Common Calculation Helpers
-            public const double AVERAGE_KM_PER_DEGREE = 111.135;
+            public const double AVERAGE_KM_PER_LATITUDE_DEGREE = 111.135;
+            public const double AVERAGE_KM_PER_LONGITUDE_DEGREE_AT_40_DEGREES = 85.0;
             public const double DEGREES_TO_RADIANS = Math.PI / 180;
             static public LineString RectForDistanceAroundLatLon(double latitude, double longitude, double distanceInKilometers)
             {
                 LineString rect = new LineString();
-                double distanceLat = distanceInKilometers / AVERAGE_KM_PER_DEGREE;
-                double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latitude));
+                double distanceLat = distanceInKilometers / AVERAGE_KM_PER_LATITUDE_DEGREE;
+                double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latitude));
                 rect.Points.Add(new Point(latitude + distanceLat, longitude + distanceLon));
                 rect.Points.Add(new Point(latitude - distanceLat, longitude - distanceLon));
                 return rect;
@@ -241,8 +242,8 @@ namespace dg.Sql
             static public LineString RectForDistanceAroundLatLon(Point latLonPoint, double distanceInKilometers)
             {
                 LineString rect = new LineString();
-                double distanceLat = distanceInKilometers / AVERAGE_KM_PER_DEGREE;
-                double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latLonPoint.X));
+                double distanceLat = distanceInKilometers / AVERAGE_KM_PER_LATITUDE_DEGREE;
+                double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latLonPoint.X));
                 rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
                 rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y - distanceLon));
                 return rect;

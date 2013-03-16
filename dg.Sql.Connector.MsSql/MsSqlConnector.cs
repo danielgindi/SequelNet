@@ -248,11 +248,11 @@ namespace dg.Sql.Connector
         {
             return strToEscape.Replace(@"'", @"''");
         }
-        public override string prepareGuid(Guid value)
+        public override string PrepareValue(Guid value)
         {
             return '\'' + value.ToString(@"D") + '\'';
         }
-        public override string prepareString(string value)
+        public override string PrepareValue(string value)
         {
             return @"N'" + fullEscape(value) + '\'';
         }
@@ -263,44 +263,6 @@ namespace dg.Sql.Connector
         public override string formatDate(DateTime dateTime)
         {
             return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
-        }
-        public override string sqlAddPaginationAndOrdering(
-            string selectFieldsList,
-            string primaryKeysList,
-            string tablesList,
-            string where,
-            int limit /* = 0 */, int offset /* = 0 */,
-            string orderBy /* = NULL */)
-        {
-            if (limit <= 0 && offset <= 0 && (orderBy == null || orderBy.Length == 0)) return @"SELECT " + selectFieldsList + @" FROM " + tablesList + @" WHERE " + where;
-            else
-            {
-                string sql = string.Empty;
-                tablesList = tablesList.TrimStart(new char[] { ' ' });
-                if (tablesList.Length > 0) tablesList = @" FROM " + tablesList;
-                where = where.TrimStart(new char[] { ' ' });
-                if (where.Length > 0) where = @" WHERE " + where;
-                if (orderBy == null) orderBy = string.Empty;
-                orderBy = orderBy.TrimStart(new char[] { ' ' });
-                if (orderBy.Length > 0) orderBy = @" ORDER BY " + orderBy;
-                if (limit <= 0 && offset <= 0)
-                {
-                    sql = @"SELECT " + selectFieldsList + tablesList + where + orderBy;
-                }
-                else if (limit > 0 && offset <= 0)
-                {
-                    sql = @"SELECT TOP " + limit + selectFieldsList + tablesList + where + orderBy;
-                }
-                else if (limit > 0 || offset > 0)
-                {
-                    if (orderBy.Length > 0) orderBy = @" OVER (" + orderBy + @")";
-                    sql = @"WITH orderedTable AS (SELECT " + selectFieldsList + @",ROW_NUMBER() " + orderBy + " AS '__ROWID'" + tablesList + where + @") SELECT * FROM orderedTable WHERE ";
-                    if (limit > 0 && offset > 0) sql += @"__ROWID BETWEEN " + (offset + 1) + @" AND " + (offset + 1 + limit);
-                    else if (limit > 0) sql += @"__ROWID BETWEEN 1 AND " + (limit + 1);
-                    else sql += @"__ROWID > " + offset;
-                }
-                return sql;
-            }
         }
 
         public override string EscapeLike(string expression)

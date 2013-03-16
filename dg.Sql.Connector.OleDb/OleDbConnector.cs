@@ -238,11 +238,11 @@ namespace dg.Sql.Connector
         {
             return strToEscape.Replace(@"'", @"''");
         }
-        public override string prepareGuid(Guid value)
+        public override string PrepareValue(Guid value)
         {
             return '\'' + value.ToString(@"D") + '\'';
         }
-        public override string prepareBoolean(bool value)
+        public override string PrepareValue(bool value)
         {
             return value ? @"true" : @"false";
         }
@@ -253,100 +253,6 @@ namespace dg.Sql.Connector
         public override string formatDate(DateTime dateTime)
         {
             return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
-        }
-        public override string sqlAddPaginationAndOrdering(
-            string selectFieldsList,
-            string primaryKeysList,
-            string tablesList,
-            string where,
-            int limit /* = 0 */, int offset /* = 0 */,
-            string orderBy /* = NULL */)
-        {
-            if (limit <= 0 && offset <= 0 && (orderBy == null || orderBy.Length == 0)) return @"SELECT " + selectFieldsList + @" FROM " + tablesList + @" WHERE " + where;
-            else
-            {
-                string sql = string.Empty;
-                tablesList = tablesList.TrimStart(new char[] { ' ' });
-                if (tablesList.Length > 0) tablesList = @" FROM " + tablesList;
-                where = where.TrimStart(new char[] { ' ' });
-                if (where.Length > 0) where = @" WHERE " + where;
-                if (orderBy == null) orderBy = string.Empty;
-                orderBy = orderBy.TrimStart(new char[] { ' ' });
-                if (orderBy.Length > 0) orderBy = @" ORDER BY " + orderBy;
-                if (limit <= 0 && offset <= 0)
-                {
-                    sql = @"SELECT " + selectFieldsList + tablesList + where + orderBy;
-                }
-                else if (limit > 0 && offset <= 0)
-                {
-                    sql = @"SELECT TOP " + limit + @" " + selectFieldsList + tablesList + where + orderBy;
-                }
-                else if (limit <= 0 && offset > 0)
-                {
-                    if (orderBy.Length == 0) orderBy = primaryKeysList;
-                    string inverseOrderBy = orderBy;
-                    string[] bys = inverseOrderBy.Split(new char[] { ',' });
-                    inverseOrderBy = string.Empty;
-                    foreach (string by in bys)
-                    {
-                        if (inverseOrderBy.Length > 0) inverseOrderBy += @", ";
-                        string tmp = by.Trim();
-                        if (tmp.EndsWith(@" ASC"))
-                        {
-                            tmp.Remove(tmp.Length - 4);
-                            tmp += @" DESC";
-                        }
-                        else if (tmp.EndsWith(@" DESC"))
-                        {
-                            tmp.Remove(tmp.Length - 5);
-                            tmp += @" ASC";
-                        }
-                        else tmp += @" DESC";
-                        inverseOrderBy += tmp;
-                    }
-                    sql =
-                       @" SELECT * " +
-                       @" FROM " +
-                       @"    (SELECT TOP (SELECT COUNT(*) " + tablesList + where + ") - " + offset.ToString() +
-                                    selectFieldsList + tablesList + where +
-                                inverseOrderBy +
-                       @"  ) p " + orderBy;
-                }
-                else if (limit > 0 && offset > 0)
-                {
-                    if (orderBy.Length == 0) orderBy = primaryKeysList;
-                    string inverseOrderBy = orderBy;
-                    if (inverseOrderBy.Length == 0) inverseOrderBy = primaryKeysList;
-                    string[] bys = inverseOrderBy.Split(new char[] { ',' });
-                    inverseOrderBy = string.Empty;
-                    foreach (string by in bys)
-                    {
-                        if (inverseOrderBy.Length > 0) inverseOrderBy += @", ";
-                        string tmp = by.Trim();
-                        if (tmp.EndsWith(@" ASC"))
-                        {
-                            tmp.Remove(tmp.Length - 4);
-                            tmp += @" DESC";
-                        }
-                        else if (tmp.EndsWith(@" DESC"))
-                        {
-                            tmp.Remove(tmp.Length - 5);
-                            tmp += @" ASC";
-                        }
-                        else tmp += @" DESC";
-                        inverseOrderBy += tmp;
-                    }
-                    sql =
-                       @" SELECT * " +
-                       @" FROM " +
-                       @"  (SELECT TOP " + limit + " * FROM" +
-                       @"    (SELECT TOP " + (limit + offset) + " " + selectFieldsList + tablesList + where +
-                                orderBy +
-                       @"    ) pp " + inverseOrderBy +
-                       @"  ) p " + orderBy;
-                }
-                return sql;
-            }
         }
 
         public override string EscapeLike(string expression)

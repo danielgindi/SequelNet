@@ -123,7 +123,7 @@ namespace dg.Sql.Connector
         }
         static private bool IsView(MySqlConnector conn, string tableName)
         {
-            string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.prepareString(tableName));
+            string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.PrepareValue(tableName));
             return !IsNull(conn.ExecuteScalar(sql));
         }
 

@@ -369,7 +369,7 @@ namespace dg.Sql.Connector
                 return EscapeString(strToEscape);
             }
         }
-        public override string prepareGuid(Guid value)
+        public override string PrepareValue(Guid value)
         {
             return '\'' + value.ToString(@"D") + '\'';
         }
