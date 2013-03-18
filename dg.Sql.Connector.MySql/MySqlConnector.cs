@@ -381,29 +381,6 @@ namespace dg.Sql.Connector
         {
             return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
         }
-        public override string sqlAddPaginationAndOrdering(
-            string selectFieldsList,
-            string primaryKeysList,
-            string tablesList,
-            string where,
-            int limit /* = 0 */, int offset /* = 0 */,
-            string orderBy /* = NULL */)
-        {
-            // The most standard technique
-
-            tablesList = tablesList.TrimStart(new char[] { ' ' });
-            if (tablesList.Length > 0) tablesList = @" FROM " + tablesList;
-            where = where.TrimStart(new char[] { ' ' });
-            if (where.Length > 0) where = @" WHERE " + where;
-            if (orderBy == null) orderBy = string.Empty;
-            orderBy = orderBy.TrimStart(new char[] { ' ' });
-            if (orderBy.Length > 0) orderBy = @" ORDER BY " + orderBy;
-
-            string sql = @"SELECT " + selectFieldsList + tablesList + where + orderBy;
-            if (limit > 0) sql += @" LIMIT " + limit;
-            if (offset > 0) sql += @" OFFSET " + offset;
-            return sql;
-        }
 
         public override string EscapeLike(string expression)
         {
