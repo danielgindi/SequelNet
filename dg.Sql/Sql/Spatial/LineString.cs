@@ -229,7 +229,7 @@ namespace dg.Sql
             #region Common Calculation Helpers
             public const double AVERAGE_KM_PER_LATITUDE_DEGREE = 111.135;
             public const double AVERAGE_KM_PER_LONGITUDE_DEGREE_AT_40_DEGREES = 85.0;
-            public const double DEGREES_TO_RADIANS = Math.PI / 180;
+            public const double DEGREES_TO_RADIANS = Math.PI / 180.0;
             static public LineString RectForDistanceAroundLatLon(double latitude, double longitude, double distanceInKilometers)
             {
                 LineString rect = new LineString();

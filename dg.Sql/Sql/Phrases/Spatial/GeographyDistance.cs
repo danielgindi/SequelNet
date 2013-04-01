@@ -13,7 +13,7 @@ namespace dg.Sql.Phrases
     /// FY = From longitude
     /// TX = To latitude
     /// TY = To longitude
-    /// D =  2R * ASIN(SQRT(POWER(SIN((FX-abs(TX)) * PI/360), 2) + COS(FX * PI/180) * COS(ABS(TX) * PI/180) * POWER(SIN((FY - TY) * PI/360), 2)))
+    /// D =  2R * ASIN(SQRT(POWER(SIN((FX-TX) * PI/360), 2) + COS(FX * PI/180) * COS(TX * PI/180) * POWER(SIN((FY - TY) * PI/360), 2)))
     /// </summary>
     public class GeographyDistance : BasePhrase
     {
@@ -87,19 +87,19 @@ namespace dg.Sql.Phrases
             FY = FromLongitude.ToString(CultureInfo.InvariantCulture);
 
             StringBuilder sb = new StringBuilder();
-            sb.Append(@"12742*ASIN(SQRT(POWER(SIN((");
+            sb.Append(@"12742.0*ASIN(SQRT(POWER(SIN(((");
             sb.Append(FX);
-            sb.Append(@"-ABS(");
+            sb.Append(@")-(");
             sb.Append(TX);
-            sb.Append(@")) * PI/360), 2) + COS(");
+            sb.Append(@")) * PI()/360.0), 2) + COS(");
             sb.Append(FX);
-            sb.Append(@"* PI/180) * COS(ABS(");
+            sb.Append(@"* PI()/180.0) * COS((");
             sb.Append(TX);
-            sb.Append(@") * PI/180) * POWER(SIN((");
+            sb.Append(@") * PI()/180.0) * POWER(SIN((");
             sb.Append(FY);
             sb.Append(@"-");
             sb.Append(TY);
-            sb.Append(@") * PI/360), 2)))");
+            sb.Append(@") * PI()/360.0), 2)))");
 
             return sb.ToString();
         }

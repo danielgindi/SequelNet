@@ -20,7 +20,7 @@ namespace dg.Sql
     }
     public class Where
     {
-        private WhereComparision _Comparision = WhereComparision.None;
+        private WhereComparision _Comparison = WhereComparision.None;
         private WhereCondition _Condition = WhereCondition.AND;
         private object _First = null;
         private ValueObjectType _FirstType = ValueObjectType.Literal;
@@ -34,8 +34,8 @@ namespace dg.Sql
 
         public WhereComparision Comparision
         {
-            get { return _Comparision; }
-            set { _Comparision = value; }
+            get { return _Comparison; }
+            set { _Comparison = value; }
         }
         public WhereCondition Condition
         {

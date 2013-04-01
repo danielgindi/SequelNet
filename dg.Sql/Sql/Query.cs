@@ -275,35 +275,35 @@ namespace dg.Sql
             ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
             return this;
         }
-        public Query Where(string columnName, WhereComparision comparision, object columnValue)
+        public Query Where(string columnName, WhereComparision comparison, object columnValue)
         {
             if (ListWhere == null) ListWhere = new WhereList();
             ListWhere.Clear();
-            ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparision, columnValue, ValueObjectType.Value));
+            ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
             return this;
         }
-        public Query Where(string tableName, string columnName, WhereComparision comparision, object columnValue)
+        public Query Where(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             if (ListWhere == null) ListWhere = new WhereList();
             ListWhere.Clear();
-            ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparision, columnValue));
+            ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
             return this;
         }
         public Query AddWhere(Where where)
         {
             return Where(where, false);
         }
-        public Query AddWhere(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparision comparer, object thatObject, ValueObjectType thatObjectType)
+        public Query AddWhere(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
         {
-            return Where(new Where(condition, thisObject, thisObjectType, comparer, thatObject, thatObjectType), false);
+            return Where(new Where(condition, thisObject, thisObjectType, comparison, thatObject, thatObjectType), false);
         }
         public Query AddWhere(string columnName, object columnValue)
         {
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value), false);
         }
-        public Query AddWhere(string columnName, WhereComparision comparision, object columnValue)
+        public Query AddWhere(string columnName, WhereComparision comparison, object columnValue)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparision, columnValue, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value), false);
         }
         public Query AddWhere(WhereCondition condition, string literalExpression)
         {
@@ -326,43 +326,43 @@ namespace dg.Sql
             }
             return this;
         }
-        public Query AddWhere(string tableName, string columnName, WhereComparision comparision, object columnValue)
+        public Query AddWhere(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             if (ListWhere == null) ListWhere = new WhereList();
-            ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparision, columnValue));
+            ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
             return this;
         }
         public Query AND(string columnName, object columnValue)
         {
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value), false);
         }
-        public Query AND(string columnName, WhereComparision comparision, object columnValue)
+        public Query AND(string columnName, WhereComparision comparison, object columnValue)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparision, columnValue, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value), false);
         }
         public Query AND(WhereList whereList)
         {
             return Where(new Where(WhereCondition.AND, whereList), false);
         }
-        public Query AND(string tableName, string columnName, WhereComparision comparision, object columnValue)
+        public Query AND(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
-            return Where(new Where(WhereCondition.AND, tableName, columnName, comparision, columnValue), false);
+            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue), false);
         }
         public Query OR(string columnName, object columnValue)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value), false);
         }
-        public Query OR(string columnName, WhereComparision comparision, object columnValue)
+        public Query OR(string columnName, WhereComparision comparison, object columnValue)
         {
-            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparision, columnValue, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value), false);
         }
         public Query OR(WhereList whereList)
         {
             return Where(new Where(WhereCondition.OR, whereList), false);
         }
-        public Query OR(string tableName, string columnName, WhereComparision comparision, object columnValue)
+        public Query OR(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
-            return Where(new Where(WhereCondition.OR, tableName, columnName, comparision, columnValue), false);
+            return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, columnValue), false);
         }
 
         public Query CreateTable()
@@ -1977,20 +1977,20 @@ namespace dg.Sql
                 }
             }
         }
-        public DataReaderBase ExecuteReader(ConnectorBase conn)
+        public DataReaderBase ExecuteReader(ConnectorBase connection)
         {
-            if (conn == null) return ExecuteReader();
+            if (connection == null) return ExecuteReader();
             else
             {
                 try
                 {
                     if (_QueryMode == QueryMode.ExecuteStoredProcedure)
                     {
-                        return conn.ExecuteReader(BuildDbCommand(conn), false);
+                        return connection.ExecuteReader(BuildDbCommand(connection), false);
                     }
                     else
                     {
-                        return conn.ExecuteReader(BuildCommand(conn), false);
+                        return connection.ExecuteReader(BuildCommand(connection), false);
                     }
                 }
                 catch (System.Exception ex)
@@ -2153,6 +2153,25 @@ namespace dg.Sql
                 if (transaction) connection.commitTransaction();
                 return retValue;
             }
+        }
+        public T[] ExecuteScalarArray<T>()
+        {
+            return ExecuteScalarArray<T>(null);
+        }
+        public T[] ExecuteScalarArray<T>(ConnectorBase connection) 
+        {
+            List<T> list = new List<T>();
+            using (DataReaderBase reader = ExecuteReader(connection))
+            {
+                object value;
+                while (reader.Read())
+                {
+                    value = reader[0];
+                    if (value is T) list.Add((T)value);
+                    else list.Add((T)Convert.ChangeType(value, typeof(T)));
+                }
+            }
+            return list.ToArray();
         }
         public object ExecuteAggregate(string columnName, string aggregateFunction, bool isDistinctQuery)
         {
