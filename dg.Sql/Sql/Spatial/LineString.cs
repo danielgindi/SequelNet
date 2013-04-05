@@ -230,26 +230,61 @@ namespace dg.Sql
             public const double AVERAGE_KM_PER_LATITUDE_DEGREE = 111.135;
             public const double AVERAGE_KM_PER_LONGITUDE_DEGREE_AT_40_DEGREES = 85.0;
             public const double DEGREES_TO_RADIANS = Math.PI / 180.0;
+
+            /// <summary>
+            /// Generates a bounding rect around a lat/lon coordinate, to constrain queries.
+            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
+            /// To prevent problems with this approach, we're changing the "radius" to a real radius of the bounding circle, which will be almost exact
+            /// </summary>
+            /// <param name="latitude"></param>
+            /// <param name="longitude"></param>
+            /// <param name="distanceInKilometers">Kinda' like radius</param>
+            /// <returns></returns>
             static public LineString RectForDistanceAroundLatLon(double latitude, double longitude, double distanceInKilometers)
             {
+                // Get the circle that bounds the rect. This will give us a much more accurate rect
+                distanceInKilometers = (Math.Sqrt(2.0 * (distanceInKilometers * 2.0) * (distanceInKilometers * 2.0)) / 2.0);
+
                 LineString rect = new LineString();
                 double distanceLat = distanceInKilometers / AVERAGE_KM_PER_LATITUDE_DEGREE;
                 double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latitude));
+
+                // This is a real rect
+                //rect.Points.Add(new Point(latitude + distanceLat, longitude + distanceLon));
+                //rect.Points.Add(new Point(latitude - distanceLat, longitude + distanceLon));
+                //rect.Points.Add(new Point(latitude - distanceLat, longitude - distanceLon));
+                //rect.Points.Add(new Point(latitude + distanceLat, longitude - distanceLon));
+                //rect.Points.Add(rect.Points[0]);
+
+                // This is enough as the wkbs are calculating the bounds and retrieves a rectangle.
                 rect.Points.Add(new Point(latitude + distanceLat, longitude + distanceLon));
-                rect.Points.Add(new Point(latitude - distanceLat, longitude + distanceLon));
-                rect.Points.Add(new Point(latitude + distanceLat, longitude + distanceLon));
-                rect.Points.Add(new Point(latitude + distanceLat, longitude - distanceLon));
+                rect.Points.Add(new Point(latitude - distanceLat, longitude - distanceLon));
                 return rect;
             }
+
+            /// <summary>
+            /// Generates a bounding rect around a lat/lon coordinate, to constrain queries.
+            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
+            /// </summary>
+            /// <param name="latitude"></param>
+            /// <param name="longitude"></param>
+            /// <param name="distanceInKilometers">Kinda' like radius</param>
+            /// <returns></returns>
             static public LineString RectForDistanceAroundLatLon(Point latLonPoint, double distanceInKilometers)
             {
+                // Get the circle that bounds the rect. This will give us a much more accurate rect
+                distanceInKilometers = (Math.Sqrt(2.0 * (distanceInKilometers * 2.0) * (distanceInKilometers * 2.0)) / 2.0);
+
                 LineString rect = new LineString();
                 double distanceLat = distanceInKilometers / AVERAGE_KM_PER_LATITUDE_DEGREE;
                 double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latLonPoint.X));
+                //rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
+                //rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y + distanceLon));
+                //rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y - distanceLon));
+                //rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y - distanceLon));
+                //rect.Points.Add(rect.Points[0]);
                 rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
-                rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y + distanceLon));
-                rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
-                rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y - distanceLon));
+                rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y - distanceLon));
                 return rect;
             }
             #endregion
