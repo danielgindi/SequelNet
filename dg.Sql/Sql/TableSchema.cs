@@ -35,6 +35,7 @@ namespace dg.Sql
         }
         public TableSchema(string schemaName, ColumnList columns)
         {
+            this.DatabaseOwner = string.Empty;
             this.SchemaName = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
@@ -52,6 +53,7 @@ namespace dg.Sql
         }
         public TableSchema(string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
+            this.DatabaseOwner = string.Empty;
             this.SchemaName = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
