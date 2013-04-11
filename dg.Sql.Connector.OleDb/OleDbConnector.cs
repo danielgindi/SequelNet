@@ -72,7 +72,10 @@ namespace dg.Sql.Connector
         public override int ExecuteNonQuery(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new OleDbCommand(strSQL, _conn, _transaction).ExecuteNonQuery();
+            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
         }
         public override int ExecuteNonQuery(DbCommand command)
         {
@@ -84,7 +87,10 @@ namespace dg.Sql.Connector
         public override object ExecuteScalar(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new OleDbCommand(strSQL, _conn, _transaction).ExecuteScalar();
+            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteScalar();
+            }
         }
         public override object ExecuteScalar(DbCommand command)
         {
@@ -96,14 +102,18 @@ namespace dg.Sql.Connector
         public override DataReaderBase ExecuteReader(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new OleDbDataReader(
-                new OleDbCommand(strSQL, _conn, _transaction).ExecuteReader());
+            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            {
+                return new OleDbDataReader(command.ExecuteReader());
+            }
         }
         public override DataReaderBase ExecuteReader(String strSQL, bool attachConnectionToReader)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new OleDbDataReader(
-                new OleDbCommand(strSQL, _conn, _transaction).ExecuteReader(), attachConnectionToReader ? this : null);
+            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            {
+                return new OleDbDataReader(command.ExecuteReader(), attachConnectionToReader ? this : null);
+            }
         }
         public override DataReaderBase ExecuteReader(DbCommand command)
         {

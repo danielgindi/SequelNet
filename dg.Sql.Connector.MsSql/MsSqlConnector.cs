@@ -75,7 +75,10 @@ namespace dg.Sql.Connector
         public override int ExecuteNonQuery(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new SqlCommand(strSQL, _conn, _transaction).ExecuteNonQuery();
+            using (SqlCommand command = new SqlCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
         }
         public override int ExecuteNonQuery(DbCommand command)
         {
@@ -87,7 +90,10 @@ namespace dg.Sql.Connector
         public override object ExecuteScalar(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new SqlCommand(strSQL, _conn, _transaction).ExecuteScalar();
+            using (SqlCommand command = new SqlCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteScalar();
+            }
         }
         public override object ExecuteScalar(DbCommand command)
         {
@@ -99,14 +105,18 @@ namespace dg.Sql.Connector
         public override DataReaderBase ExecuteReader(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MsSqlDataReader(
-                new SqlCommand(strSQL, _conn, _transaction).ExecuteReader());
+            using (SqlCommand command = new SqlCommand(strSQL, _conn, _transaction))
+            {
+                return new MsSqlDataReader(command.ExecuteReader());
+            }
         }
         public override DataReaderBase ExecuteReader(String strSQL, bool attachConnectionToReader)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MsSqlDataReader(
-                new SqlCommand(strSQL, _conn, _transaction).ExecuteReader(), attachConnectionToReader ? this : null);
+            using (SqlCommand command = new SqlCommand(strSQL, _conn, _transaction))
+            {
+                return new MsSqlDataReader(command.ExecuteReader(), attachConnectionToReader ? this : null);
+            }
         }
         public override DataReaderBase ExecuteReader(DbCommand command)
         {
@@ -125,10 +135,10 @@ namespace dg.Sql.Connector
         public override DataSet ExecuteDataSet(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (SqlCommand cmd = new SqlCommand(strSQL, _conn, _transaction))
+            using (SqlCommand command = new SqlCommand(strSQL, _conn, _transaction))
             {
                 DataSet dataSet = new DataSet();
-                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                 {
                     adapter.Fill(dataSet);
                 }

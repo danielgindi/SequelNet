@@ -12,22 +12,17 @@ namespace dg.Sql.Connector
     {
         System.Data.SqlClient.SqlDataReader _reader = null;
         protected ConnectorBase _connectionToClose = null;
+
         public MsSqlDataReader(System.Data.SqlClient.SqlDataReader reader)
         {
-            if (_reader != null) _reader.Dispose();
             _reader = reader;
         }
         public MsSqlDataReader(System.Data.SqlClient.SqlDataReader reader, ConnectorBase connectionToClose)
         {
-            if (_reader != null) _reader.Dispose();
-            if (_connectionToClose != null) _connectionToClose.Dispose();
             _reader = reader;
             _connectionToClose = connectionToClose;
         }
-        ~MsSqlDataReader()
-        {
-            Dispose(false);
-        }
+
         public override void Dispose()
         {
             Dispose(true);
@@ -41,6 +36,7 @@ namespace dg.Sql.Connector
             }
             // Now clean up Native Resources (Pointers)
         }
+
         public override void Close()
         {
             if (_reader != null) _reader.Dispose();

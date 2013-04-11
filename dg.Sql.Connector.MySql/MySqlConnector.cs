@@ -117,7 +117,10 @@ namespace dg.Sql.Connector
         public override int ExecuteNonQuery(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MySqlCommand(strSQL, _conn, _transaction).ExecuteNonQuery();
+            using (MySqlCommand command = new MySqlCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
         }
         public override int ExecuteNonQuery(DbCommand command)
         {
@@ -129,7 +132,10 @@ namespace dg.Sql.Connector
         public override object ExecuteScalar(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MySqlCommand(strSQL, _conn, _transaction).ExecuteScalar();
+            using (MySqlCommand command = new MySqlCommand(strSQL, _conn, _transaction))
+            {
+                return command.ExecuteScalar();
+            }
         }
         public override object ExecuteScalar(DbCommand command)
         {
@@ -141,14 +147,18 @@ namespace dg.Sql.Connector
         public override DataReaderBase ExecuteReader(String strSQL)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MySqlDataReader(
-                new MySqlCommand(strSQL, _conn, _transaction).ExecuteReader());
+            using (MySqlCommand command = new MySqlCommand(strSQL, _conn, _transaction))
+            {
+                return new MySqlDataReader(command.ExecuteReader());
+            }
         }
         public override DataReaderBase ExecuteReader(String strSQL, bool attachConnectionToReader)
         {
             if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return new MySqlDataReader(
-                new MySqlCommand(strSQL, _conn, _transaction).ExecuteReader(), attachConnectionToReader ? this : null);
+            using (MySqlCommand command = new MySqlCommand(strSQL, _conn, _transaction))
+            {
+                return new MySqlDataReader(command.ExecuteReader(), attachConnectionToReader ? this : null);
+            }
         }
         public override DataReaderBase ExecuteReader(DbCommand command)
         {
