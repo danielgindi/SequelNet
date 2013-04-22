@@ -35,6 +35,7 @@ namespace dg.Sql
         ChangeColumn,
         DropColumn,
         DropForeignKey,
+        DropIndex,
         DropTable,
         ExecuteStoredProcedure
     }

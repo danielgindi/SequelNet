@@ -195,13 +195,13 @@ namespace dg.Sql.Connector
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
                         {
                             if (idx > 0) writer.Write(@",");
-                            writer.Write(conn.encloseFieldName(reader.GetColumnName(idx)));
+                            writer.Write(conn.EncloseFieldName(reader.GetColumnName(idx)));
                         }
                         writer.Write(@") VALUES(");
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
                         {
                             if (idx > 0) writer.Write(@",");
-                            writer.Write(conn.prepareValue(reader[idx]));
+                            writer.Write(conn.PrepareValue(reader[idx]));
                         }
                         writer.Write(string.Format(@") {0}{1}", DELIMITER, NEW_LINE));
                     }

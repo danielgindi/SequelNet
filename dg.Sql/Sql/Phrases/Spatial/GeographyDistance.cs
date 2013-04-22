@@ -51,11 +51,11 @@ namespace dg.Sql.Phrases
             {
                 if (ContainingTableName != null)
                 {
-                    TY = conn.encloseFieldName(ContainingTableName) + @"." + conn.encloseFieldName(ContainingPointColumnName);
+                    TY = conn.EncloseFieldName(ContainingTableName) + @"." + conn.EncloseFieldName(ContainingPointColumnName);
                 }
                 else
                 {
-                    TY = conn.encloseFieldName(ContainingPointColumnName);
+                    TY = conn.EncloseFieldName(ContainingPointColumnName);
                 }
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
@@ -72,14 +72,14 @@ namespace dg.Sql.Phrases
             {
                 if (ContainingTableName != null)
                 {
-                    TX = conn.encloseFieldName(ContainingTableName);
-                    TY = TX + @"." + conn.encloseFieldName(ContainingLongitudeColumnName);
-                    TX = TX + @"." + conn.encloseFieldName(ContainingLatitudeColumnName);
+                    TX = conn.EncloseFieldName(ContainingTableName);
+                    TY = TX + @"." + conn.EncloseFieldName(ContainingLongitudeColumnName);
+                    TX = TX + @"." + conn.EncloseFieldName(ContainingLatitudeColumnName);
                 }
                 else
                 {
-                    TY = conn.encloseFieldName(ContainingLongitudeColumnName);
-                    TX = conn.encloseFieldName(ContainingLatitudeColumnName);
+                    TY = conn.EncloseFieldName(ContainingLongitudeColumnName);
+                    TX = conn.EncloseFieldName(ContainingLatitudeColumnName);
                 }
             }
 

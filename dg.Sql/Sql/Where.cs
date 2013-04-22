@@ -203,16 +203,16 @@ namespace dg.Sql
                         }
                         sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, connection));
                     }
-                    else sb.Append(connection.prepareValue(First));
+                    else sb.Append(connection.PrepareValue(First));
                 }
                 else if (FirstType == ValueObjectType.ColumnName)
                 {
                     if (FirstTableName != null)
                     {
-                        sb.Append(connection.encloseFieldName(FirstTableName));
+                        sb.Append(connection.EncloseFieldName(FirstTableName));
                         sb.Append('.');
                     }
-                    sb.Append(connection.encloseFieldName((string)First));
+                    sb.Append(connection.EncloseFieldName((string)First));
                 }
                 else sb.Append(First == null ? @"NULL" : First);
                 if (Comparision != WhereComparision.None)
@@ -272,16 +272,16 @@ namespace dg.Sql
                                 }
                                 sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, connection));
                             }
-                            else sb.Append(connection.prepareValue(Second));
+                            else sb.Append(connection.PrepareValue(Second));
                         }
                         else if (SecondType == ValueObjectType.ColumnName)
                         {
                             if (SecondTableName != null)
                             {
-                                sb.Append(connection.encloseFieldName(SecondTableName));
+                                sb.Append(connection.EncloseFieldName(SecondTableName));
                                 sb.Append('.');
                             }
-                            sb.Append(connection.encloseFieldName((string)Second));
+                            sb.Append(connection.EncloseFieldName((string)Second));
                         }
                         else
                         {
@@ -312,7 +312,7 @@ namespace dg.Sql
                                 {
                                     if (first) first = false; else sbIn.Append(',');
                                     if (schema != null) sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, connection));
-                                    else sbIn.Append(connection.prepareValue(objIn));
+                                    else sbIn.Append(connection.PrepareValue(objIn));
                                 }
                                 sbIn.Append(')');
                                 sb.Append(sbIn.ToString());
@@ -335,16 +335,16 @@ namespace dg.Sql
                                 }
                                 sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, connection));
                             }
-                            else sb.Append(connection.prepareValue(Third));
+                            else sb.Append(connection.PrepareValue(Third));
                         }
                         else if (ThirdType == ValueObjectType.ColumnName)
                         {
                             if (ThirdTableName != null)
                             {
-                                sb.Append(connection.encloseFieldName(ThirdTableName));
+                                sb.Append(connection.EncloseFieldName(ThirdTableName));
                                 sb.Append('.');
                             }
-                            sb.Append(connection.encloseFieldName((string)Third));
+                            sb.Append(connection.EncloseFieldName((string)Third));
                         }
                         else sb.Append(Third == null ? @"NULL" : Third);
                     }

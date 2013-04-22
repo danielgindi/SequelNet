@@ -14,6 +14,16 @@ namespace dg.Sql.Connector
 {
     public abstract class ConnectorBase : IDisposable
     {
+        public enum SqlServiceType
+        {
+            UNKNOWN = 0,
+            MYSQL = 1,
+            MSSQL = 2,
+            MSACCESS = 3
+        }
+
+        #region Instancing
+
         static Type s_ConnectorType = null;
         static public ConnectorBase NewInstance()
         {
@@ -31,6 +41,12 @@ namespace dg.Sql.Connector
             }
             return (ConnectorBase)System.Activator.CreateInstance(s_ConnectorType, new string[] { connectionStringKey });
         }
+
+        virtual public SqlServiceType TYPE
+        {
+            get { return SqlServiceType.UNKNOWN; }
+        }
+
         static private Type FindConnectorType()
         {
             Type type = null;
@@ -51,12 +67,7 @@ namespace dg.Sql.Connector
             return type;
         }
 
-        virtual public SqlServiceType TYPE
-        {
-            get { return SqlServiceType.UNKNOWN; }
-        }
-
-        public static String GetWebsiteConnectionString(string ConnectionStringKey)
+        public static string FindConnectionString(string ConnectionStringKey)
         {
             ConnectionStringSettings connString = null;
 
@@ -78,25 +89,40 @@ namespace dg.Sql.Connector
 
             return System.Configuration.ConfigurationManager.ConnectionStrings[0].ConnectionString;
         }
-        public static String GetWebsiteConnectionString()
+
+        public static string FindConnectionString()
         {
-            return GetWebsiteConnectionString(null);
+            return FindConnectionString(null);
         }
 
-        abstract public void Dispose();
+        abstract public DbConnection Connection { get; }
 
+        #endregion
+
+        #region Closing / Disposing
+
+        abstract public void Dispose();
         abstract public void Close();
-        abstract public int ExecuteNonQuery(String strSQL);
-        abstract public int ExecuteNonQuery(DbCommand command);
-        abstract public object ExecuteScalar(String strSQL);
-        abstract public object ExecuteScalar(DbCommand command);
-        abstract public DataReaderBase ExecuteReader(String strSQL);
-        abstract public DataReaderBase ExecuteReader(String strSQL, bool attachConnectionToReader);
-        abstract public DataReaderBase ExecuteReader(DbCommand command);
-        abstract public DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader);
-        abstract public DataSet ExecuteDataSet(String strSQL);
-        abstract public DataSet ExecuteDataSet(DbCommand command);
-        abstract public int ExecuteScript(String strSQL);
+
+        #endregion
+
+        #region Executing
+
+        abstract public int ExecuteNonQuery(string QuerySql);
+        abstract public int ExecuteNonQuery(DbCommand Command);
+        abstract public object ExecuteScalar(string QuerySql);
+        abstract public object ExecuteScalar(DbCommand Command);
+        abstract public DataReaderBase ExecuteReader(string QuerySql);
+        abstract public DataReaderBase ExecuteReader(string QuerySql, bool AttachConnectionToReader);
+        abstract public DataReaderBase ExecuteReader(DbCommand Command);
+        abstract public DataReaderBase ExecuteReader(DbCommand Command, bool AttachConnectionToReader);
+        abstract public DataSet ExecuteDataSet(string QuerySql);
+        abstract public DataSet ExecuteDataSet(DbCommand Command);
+        abstract public int ExecuteScript(string QuerySql);
+
+        #endregion
+
+        #region Utilities
 
         virtual public string GetVersion()
         {
@@ -105,106 +131,110 @@ namespace dg.Sql.Connector
 
         abstract public object GetLastInsertID();
 
-        abstract public bool beginTransaction();
-        abstract public bool beginTransaction(IsolationLevel isolationLevel);
-        abstract public bool commitTransaction();
-        abstract public bool rollbackTransaction();
-        abstract public bool hasTransaction { get; }
-        abstract public int currentTransactions { get; }
+        virtual public void SetIdentityInsert(string TableName, bool Enabled) { }
+
+        abstract public bool CheckIfTableExists(string TableName);
+
+        #endregion
+
+        #region Transactions
+
+        abstract public bool BeginTransaction();
+        abstract public bool BeginTransaction(IsolationLevel IsolationLevel);
+        abstract public bool CommitTransaction();
+        abstract public bool RollbackTransaction();
+        abstract public bool HasTransaction { get; }
+        abstract public int CurrentTransactions { get; }
 
         abstract public DbTransaction Transaction { get; }
-        abstract public DbConnection Connection { get; }
 
-        virtual public void setIdentityInsert(string TableName, bool Enabled) { }
+        #endregion
 
-        abstract public bool checkIfTableExists(string tableName);
+        #region Preparing values for SQL
 
-        public static string escapeQuotes(string strToEscape)
+        abstract public string EncloseFieldName(string FieldName);
+
+        public virtual string EscapeString(string Value)
         {
-            return strToEscape.Replace(@"'", @"''");
+            return Value.Replace(@"'", @"''");
         }
-        public virtual string fullEscape(string strToEscape)
+        public virtual string PrepareValue(decimal Value)
         {
-            return strToEscape.Replace(@"'", @"''");
+            return Value.ToString(CultureInfo.InvariantCulture);
         }
-        public string prepareQuotedString(string strToEscape)
+        public virtual string PrepareValue(float Value)
         {
-            if (strToEscape == null) return @"NULL";
-            else return '\'' + fullEscape(strToEscape) + '\'';
+            return Value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string PrepareValue(decimal value)
+        public virtual string PrepareValue(double Value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return Value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string PrepareValue(float value)
+        public virtual string PrepareValue(bool Value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            return Value ? @"1" : @"0";
         }
-        public virtual string PrepareValue(double value)
+        abstract public string PrepareValue(Guid Value);
+        public virtual string PrepareValue(string Value)
         {
-            return value.ToString(CultureInfo.InvariantCulture);
+            if (Value == null) return @"NULL";
+            else return '\'' + EscapeString(Value) + '\'';
         }
-        public virtual string PrepareValue(bool value)
+        public virtual string PrepareValue(object Value)
         {
-            return value ? @"1" : @"0";
-        }
-        abstract public string PrepareValue(Guid value);
-        public virtual string PrepareValue(string value)
-        {
-            return '\'' + fullEscape(value) + '\'';
-        }
-        [CLSCompliant(false)]
-        public virtual string prepareValue(object value)
-        {
-            if (value == null || value is DBNull) return @"NULL";
-            else if (value is string)
+            if (Value == null || Value is DBNull) return @"NULL";
+            else if (Value is string)
             {
-                return PrepareValue((string)value);
+                return PrepareValue((string)Value);
             }
-            else if (value is DateTime)
+            else if (Value is DateTime)
             {
-                return '\'' + formatDate((DateTime)value) + '\'';
+                return '\'' + FormatDate((DateTime)Value) + '\'';
             }
-            else if (value is Guid)
+            else if (Value is Guid)
             {
-                return PrepareValue((Guid)value);
+                return PrepareValue((Guid)Value);
             }
-            else if (value is bool)
+            else if (Value is bool)
             {
-                return PrepareValue((bool)value);
+                return PrepareValue((bool)Value);
             }
-            else if (value is decimal)
+            else if (Value is decimal)
             { // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((decimal)value);
+                return PrepareValue((decimal)Value);
             }
-            else if (value is float)
+            else if (Value is float)
             {
              // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((float)value);
+                return PrepareValue((float)Value);
             }
-            else if (value is double)
+            else if (Value is double)
             { // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((double)value);
+                return PrepareValue((double)Value);
             }
-            else if (value is dg.Sql.BasePhrase)
+            else if (Value is dg.Sql.BasePhrase)
             {
-                return ((dg.Sql.BasePhrase)value).BuildPhrase(this);
+                return ((dg.Sql.BasePhrase)Value).BuildPhrase(this);
             }
-            else if (value is dg.Sql.Geometry)
+            else if (Value is dg.Sql.Geometry)
             {
                 StringBuilder sb = new StringBuilder();
-                ((dg.Sql.Geometry)value).BuildValue(sb, this);
+                ((dg.Sql.Geometry)Value).BuildValue(sb, this);
                 return sb.ToString();
             }
-            else return value.ToString();
+            else return Value.ToString();
         }
-        abstract public string encloseFieldName(string fieldName);
-        abstract public string formatDate(DateTime dateTime);
 
-        public virtual string EscapeLike(string expression)
+        abstract public string FormatDate(DateTime DateTime);
+
+        public virtual string EscapeLike(string LikeExpression)
         {
-            return expression.Replace(@"\", @"\\").Replace(@"%", @"\%");
+            return LikeExpression.Replace(@"\", @"\\").Replace(@"%", @"\%");
         }
+
+        #endregion
+
+        #region Reading values from SQL
 
         /// <summary>
         /// Gets the value of the specified column in Geometry type given the column name.
@@ -212,10 +242,14 @@ namespace dg.Sql.Connector
         /// <param name="i">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column in Geometry type.</returns>
         /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found</exception>
-        public virtual Geometry ReadGeometry(object value)
+        public virtual Geometry ReadGeometry(object Value)
         {
             throw new NotImplementedException(@"ReadGeometry not implemented for this connector");
         }
+
+        #endregion
+
+        #region Engine-specific keywords
 
         public virtual string func_UTC_NOW
         {
@@ -230,29 +264,29 @@ namespace dg.Sql.Connector
             get { return @"UPPER"; }
         }
 
-        public virtual string func_YEAR(string date)
+        public virtual string func_YEAR(string Date)
         {
-            return @"YEAR(" + date + ")";
+            return @"YEAR(" + Date + ")";
         }
-        public virtual string func_MONTH(string date)
+        public virtual string func_MONTH(string Date)
         {
-            return @"MONTH(" + date + ")";
+            return @"MONTH(" + Date + ")";
         }
-        public virtual string func_DAY(string date)
+        public virtual string func_DAY(string Date)
         {
-            return @"DAY(" + date + ")";
+            return @"DAY(" + Date + ")";
         }
-        public virtual string func_HOUR(string date)
+        public virtual string func_HOUR(string Date)
         {
-            return @"HOUR(" + date + ")";
+            return @"HOUR(" + Date + ")";
         }
-        public virtual string func_MINUTE(string date)
+        public virtual string func_MINUTE(string Date)
         {
-            return @"MINUTE(" + date + ")";
+            return @"MINUTE(" + Date + ")";
         }
-        public virtual string func_SECOND(string date)
+        public virtual string func_SECOND(string Date)
         {
-            return @"SECONDS(" + date + ")";
+            return @"SECONDS(" + Date + ")";
         }
 
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
@@ -293,12 +327,108 @@ namespace dg.Sql.Connector
         public virtual string type_MULTICURVE { get { return @"MULTICURVE"; } }
         public virtual string type_MULTISURFACE { get { return @"MULTISURFACE"; } }
 
-        public enum SqlServiceType
+        #endregion
+
+        #region Legacy, backwards compatibility
+
+        [Obsolete("GetWebsiteConnectionString is deprecated, please use FindConnectionString instead.")]
+        public static String GetWebsiteConnectionString(string ConnectionStringKey)
         {
-            UNKNOWN = 0,
-            MYSQL = 1,
-            MSSQL = 2,
-            MSACCESS = 3
+            return FindConnectionString(ConnectionStringKey);
         }
+
+        [Obsolete("GetWebsiteConnectionString is deprecated, please use FindConnectionString instead.")]
+        public static String GetWebsiteConnectionString()
+        {
+            return FindConnectionString();
+        }
+
+        [Obsolete("beginTransaction is deprecated, please use BeginTransaction instead.")]
+        [CLSCompliant(false)]
+        public bool beginTransaction()
+        {
+            return BeginTransaction();
+        }
+
+        [Obsolete("beginTransaction is deprecated, please use BeginTransaction instead.")]
+        [CLSCompliant(false)]
+        public bool beginTransaction(IsolationLevel isolationLevel)
+        {
+            return BeginTransaction(isolationLevel);
+        }
+
+        [Obsolete("commitTransaction is deprecated, please use CommitTransaction instead.")]
+        [CLSCompliant(false)]
+        public bool commitTransaction()
+        {
+            return CommitTransaction();
+        }
+
+        [Obsolete("rollbackTransaction is deprecated, please use RollbackTransaction instead.")]
+        [CLSCompliant(false)]
+        public bool rollbackTransaction()
+        {
+            return RollbackTransaction();
+        }
+
+        [Obsolete("hasTransaction is deprecated, please use HasTransaction instead.")]
+        [CLSCompliant(false)]
+        public bool hasTransaction { get { return HasTransaction; } }
+
+        [Obsolete("currentTransactions is deprecated, please use CurrentTransactions instead.")]
+        [CLSCompliant(false)]
+        public int currentTransactions { get { return CurrentTransactions; } }
+
+
+        [Obsolete("setIdentityInsert is deprecated, please use SetIdentityInsert instead.")]
+        [CLSCompliant(false)]
+        public void setIdentityInsert(string TableName, bool Enabled)
+        {
+            SetIdentityInsert(TableName, Enabled);
+        }
+
+        [Obsolete("checkIfTableExists is deprecated, please use CheckIfTableExists instead.")]
+        [CLSCompliant(false)]
+        public bool checkIfTableExists(string TableName)
+        {
+            return CheckIfTableExists(TableName);
+        }
+
+        [Obsolete("fullEscape is deprecated, please use EscapeString instead.")]
+        [CLSCompliant(false)]
+        public virtual string fullEscape(string Value)
+        {
+            return EscapeString(Value);
+        }
+
+        [Obsolete("prepareQuotedString is deprecated, please use PrepareValue instead.")]
+        [CLSCompliant(false)]
+        public string prepareQuotedString(string Value)
+        {
+            return PrepareValue(Value);
+        }
+
+        [Obsolete("prepareValue is deprecated, please use PrepareValue instead.")]
+        [CLSCompliant(false)]
+        public string prepareValue(object Value)
+        {
+            return PrepareValue(Value);
+        }
+
+        [Obsolete("encloseFieldName is deprecated, please use EncloseFieldName instead.")]
+        [CLSCompliant(false)]
+        public string encloseFieldName(string FieldName)
+        {
+            return EncloseFieldName(FieldName);
+        }
+
+        [Obsolete("formatDate is deprecated, please use FormatDate instead.")]
+        [CLSCompliant(false)]
+        public string formatDate(DateTime DateTime)
+        {
+            return FormatDate(DateTime);
+        }
+
+        #endregion
     }
 }

@@ -34,14 +34,14 @@ namespace dg.Sql.Phrases
             {
                 if (TableName != null && TableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(TableName);
+                    ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(Object);
+                ret += conn.EncloseFieldName(Object);
             }
             else if (ObjectType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(Object);
+                ret += conn.PrepareValue(Object);
             }
             else ret += Object;
 

@@ -10,8 +10,7 @@ namespace dg.Sql.Connector
 {
     public class OleDbConnector : ConnectorBase
     {
-        OleDbTransaction _transaction = null;
-        Stack<OleDbTransaction> _transactions = null;
+        #region Instancing
 
         public override SqlServiceType TYPE
         {
@@ -23,20 +22,43 @@ namespace dg.Sql.Connector
             return new OleDbConnection(GetWebsiteConnectionString(connectionStringKey));
         }
 
-        OleDbConnection _conn = null;
+        private OleDbConnection _Connection = null;
 
         public OleDbConnector()
         {
-            _conn = CreateSqlConnection(null);
+            _Connection = CreateSqlConnection(null);
         }
         public OleDbConnector(string connectionStringKey)
         {
-            _conn = CreateSqlConnection(connectionStringKey);
+            _Connection = CreateSqlConnection(connectionStringKey);
         }
         ~OleDbConnector()
         {
             Dispose(false);
         }
+
+        public override void Close()
+        {
+            try
+            {
+                if (_Connection != null && _Connection.State != ConnectionState.Closed)
+                {
+                    _Connection.Close();
+                }
+            }
+            catch { }
+            if (_Connection != null) _Connection.Dispose();
+            _Connection = null;
+        }
+
+        public override DbConnection Connection
+        {
+            get { return _Connection; }
+        }
+
+        #endregion
+
+        #region IDisposable
 
         public override void Dispose()
         {
@@ -52,87 +74,74 @@ namespace dg.Sql.Connector
             // Now clean up Native Resources (Pointers)
         }
 
-        public override void Close()
+        #endregion
+
+        #region Executing
+
+        public override int ExecuteNonQuery(string QuerySql)
         {
-            try
-            {
-                if (_conn != null && _conn.State != ConnectionState.Closed)
-                {
-                    _conn.Close();
-                }
-            }
-            catch (Exception) { }
-            if (_conn != null) _conn.Dispose();
-            _conn = null;
-        }
-        public OleDbConnection GetConn()
-        {
-            return _conn;
-        }
-        public override int ExecuteNonQuery(String strSQL)
-        {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
             {
                 return command.ExecuteNonQuery();
             }
         }
-        public override int ExecuteNonQuery(DbCommand command)
+        public override int ExecuteNonQuery(DbCommand Command)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            command.Connection = _conn;
-            command.Transaction = _transaction;
-            return command.ExecuteNonQuery();
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            Command.Connection = _Connection;
+            Command.Transaction = _Transaction;
+            return Command.ExecuteNonQuery();
         }
-        public override object ExecuteScalar(String strSQL)
+        public override object ExecuteScalar(string QuerySql)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
             {
                 return command.ExecuteScalar();
             }
         }
-        public override object ExecuteScalar(DbCommand command)
+        public override object ExecuteScalar(DbCommand Command)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            command.Connection = _conn;
-            command.Transaction = _transaction;
-            return command.ExecuteScalar();
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            Command.Connection = _Connection;
+            Command.Transaction = _Transaction;
+            return Command.ExecuteScalar();
         }
-        public override DataReaderBase ExecuteReader(String strSQL)
+        public override DataReaderBase ExecuteReader(string QuerySql)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
             {
                 return new OleDbDataReader(command.ExecuteReader());
             }
         }
-        public override DataReaderBase ExecuteReader(String strSQL, bool attachConnectionToReader)
+        public override DataReaderBase ExecuteReader(string QuerySql, bool AttachConnectionToReader)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (OleDbCommand command = new OleDbCommand(strSQL, _conn, _transaction))
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
             {
-                return new OleDbDataReader(command.ExecuteReader(), attachConnectionToReader ? this : null);
+                return new OleDbDataReader(command.ExecuteReader(), AttachConnectionToReader ? this : null);
             }
         }
-        public override DataReaderBase ExecuteReader(DbCommand command)
+        public override DataReaderBase ExecuteReader(DbCommand Command)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            command.Connection = _conn;
-            command.Transaction = _transaction;
-            return new OleDbDataReader(((OleDbCommand)command).ExecuteReader());
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            Command.Connection = _Connection;
+            Command.Transaction = _Transaction;
+            return new OleDbDataReader(((OleDbCommand)Command).ExecuteReader());
         }
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
+        public override DataReaderBase ExecuteReader(DbCommand Command, bool AttachConnectionToReader)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            command.Connection = _conn;
-            command.Transaction = _transaction;
-            return new OleDbDataReader(((OleDbCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            Command.Connection = _Connection;
+            Command.Transaction = _Transaction;
+            return new OleDbDataReader(((OleDbCommand)Command).ExecuteReader(), AttachConnectionToReader ? this : null);
         }
-        public override DataSet ExecuteDataSet(String strSQL)
+        public override DataSet ExecuteDataSet(string QuerySql)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            using (OleDbCommand cmd = new OleDbCommand(strSQL, _conn, _transaction))
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            using (OleDbCommand cmd = new OleDbCommand(QuerySql, _Connection, _Transaction))
             {
                 DataSet dataSet = new DataSet();
                 using (OleDbDataAdapter adapter = new OleDbDataAdapter(cmd))
@@ -142,21 +151,30 @@ namespace dg.Sql.Connector
                 return dataSet;
             }
         }
-        public override DataSet ExecuteDataSet(DbCommand command)
+        public override DataSet ExecuteDataSet(DbCommand Command)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            command.Connection = _conn;
-            command.Transaction = _transaction;
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            Command.Connection = _Connection;
+            Command.Transaction = _Transaction;
             DataSet dataSet = new DataSet();
-            using (OleDbDataAdapter adapter = new OleDbDataAdapter((OleDbCommand)command))
+            using (OleDbDataAdapter adapter = new OleDbDataAdapter((OleDbCommand)Command))
             {
                 adapter.Fill(dataSet);
             }
             return dataSet;
         }
-        public override int ExecuteScript(String strSQL)
+        public override int ExecuteScript(string QuerySql)
         {
             throw new NotImplementedException(@"ExecuteScript");
+        }
+
+        #endregion
+
+        #region Utilities
+
+        public OleDbConnection GetUnderlyingConnection()
+        {
+            return _Connection;
         }
 
         public override object GetLastInsertID()
@@ -164,121 +182,146 @@ namespace dg.Sql.Connector
             return ExecuteScalar(@"SELECT @@identity AS id");
         }
 
-        public override bool checkIfTableExists(string tableName)
+        public override bool CheckIfTableExists(string TableName)
         {
-            if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-            return ExecuteScalar(@"SELECT name FROM MSysObjects WHERE name like '" + fullEscape(tableName) + "'") != null;
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            return ExecuteScalar(@"SELECT name FROM MSysObjects WHERE name like '" + fullEscape(TableName) + "'") != null;
         }
 
-        public override bool beginTransaction()
+        #endregion
+
+        #region Transactions
+
+        private OleDbTransaction _Transaction = null;
+        private Stack<OleDbTransaction> _Transactions = null;
+
+        public override bool BeginTransaction()
         {
             try
             {
-                if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-                _transaction = _conn.BeginTransaction();
-                if (_transactions == null) _transactions = new Stack<OleDbTransaction>(1);
-                _transactions.Push(_transaction);
-                return (_transaction != null);
+                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                _Transaction = _Connection.BeginTransaction();
+                if (_Transactions == null) _Transactions = new Stack<OleDbTransaction>(1);
+                _Transactions.Push(_Transaction);
+                return (_Transaction != null);
             }
             catch (OleDbException) { }
             return false;
         }
-        public override bool beginTransaction(IsolationLevel isolationLevel)
+
+        public override bool BeginTransaction(IsolationLevel IsolationLevel)
         {
             try
             {
-                if (_conn.State != System.Data.ConnectionState.Open) _conn.Open();
-                _transaction = _conn.BeginTransaction(isolationLevel);
-                if (_transactions == null) _transactions = new Stack<OleDbTransaction>(1);
-                _transactions.Push(_transaction);
+                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                _Transaction = _Connection.BeginTransaction(IsolationLevel);
+                if (_Transactions == null) _Transactions = new Stack<OleDbTransaction>(1);
+                _Transactions.Push(_Transaction);
             }
             catch (OleDbException) { return false; }
-            return (_transaction != null);
+            return (_Transaction != null);
         }
-        public override bool commitTransaction()
+
+        public override bool CommitTransaction()
         {
-            if (_transaction == null) return false;
+            if (_Transaction == null) return false;
             else
             {
                 try
                 {
-                    _transaction.Commit();
+                    _Transaction.Commit();
                 }
                 catch (OleDbException) { return false; }
-                _transactions.Pop();
-                if (_transactions.Count > 0) _transaction = _transactions.Peek();
-                else _transaction = null;
+                _Transactions.Pop();
+                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+                else _Transaction = null;
                 return true;
             }
         }
-        public override bool rollbackTransaction()
+
+        public override bool RollbackTransaction()
         {
-            if (_transaction == null) return false;
+            if (_Transaction == null) return false;
             else
             {
                 try
                 {
-                    _transaction.Rollback();
+                    _Transaction.Rollback();
                 }
                 catch (OleDbException) { return false; }
-                _transactions.Pop();
-                if (_transactions.Count > 0) _transaction = _transactions.Peek();
-                else _transaction = null;
+                _Transactions.Pop();
+                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+                else _Transaction = null;
                 return true;
             }
         }
-        public override bool hasTransaction
+
+        public override bool HasTransaction
         {
-            get { return _transactions != null && _transactions.Count > 0; }
+            get { return _Transactions != null && _Transactions.Count > 0; }
         }
-        public override int currentTransactions
+
+        public override int CurrentTransactions
         {
-            get { return _transactions == null ? 0 : _transactions.Count; }
+            get { return _Transactions == null ? 0 : _Transactions.Count; }
         }
+
         public override DbTransaction Transaction
         {
-            get { return _transaction; }
-        }
-        public override DbConnection Connection
-        {
-            get { return _conn; }
+            get { return _Transaction; }
         }
 
-        public override string fullEscape(string strToEscape)
+        #endregion
+
+        #region Preparing values for SQL
+
+        public override string EncloseFieldName(string FieldName)
         {
-            return strToEscape.Replace(@"'", @"''");
-        }
-        public override string PrepareValue(Guid value)
-        {
-            return '\'' + value.ToString(@"D") + '\'';
-        }
-        public override string PrepareValue(bool value)
-        {
-            return value ? @"true" : @"false";
-        }
-        public override string encloseFieldName(string fieldName)
-        {
-            return '[' + fieldName + ']';
-        }
-        public override string formatDate(DateTime dateTime)
-        {
-            return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+            return '[' + FieldName + ']';
         }
 
-        public override string EscapeLike(string expression)
+        public override string EscapeString(string Value)
         {
-            return expression.Replace(@"\", @"\\").Replace(@"%", @"\%").Replace(@"_", @"\_");
+            return Value.Replace(@"'", @"''");
         }
 
-        public override Geometry ReadGeometry(object value)
+        public override string PrepareValue(Guid Value)
         {
-            byte[] geometryData = value as byte[];
+            return '\'' + Value.ToString(@"D") + '\'';
+        }
+
+        public override string PrepareValue(bool Value)
+        {
+            return Value ? @"true" : @"false";
+        }
+
+        public override string FormatDate(DateTime DateTime)
+        {
+            return DateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+        }
+
+        public override string EscapeLike(string Expression)
+        {
+            return Expression.Replace(@"\", @"\\").Replace(@"%", @"\%").Replace(@"_", @"\_");
+        }
+
+        #endregion
+
+        #region Reading values from SQL
+
+        public override Geometry ReadGeometry(object Value)
+        {
+            byte[] geometryData = Value as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, false);
             }
             return null;
         }
+
+        #endregion
+
+        #region Engine-specific keywords
 
         public override string func_UTC_NOW
         {
@@ -293,17 +336,17 @@ namespace dg.Sql.Connector
             get { return @"UCASE"; }
         }
 
-        public override string func_HOUR(string date)
+        public override string func_HOUR(string Date)
         {
-            return @"DATEPART(hour, " + date + ")";
+            return @"DATEPART(hour, " + Date + ")";
         }
-        public override string func_MINUTE(string date)
+        public override string func_MINUTE(string Date)
         {
-            return @"DATEPART(minute, " + date + ")";
+            return @"DATEPART(minute, " + Date + ")";
         }
-        public override string func_SECOND(string date)
+        public override string func_SECOND(string Date)
         {
-            return @"DATEPART(second, " + date + ")";
+            return @"DATEPART(second, " + Date + ")";
         }
 
         public override string type_TINYINT { get { return @"BYTE"; } }
@@ -326,5 +369,7 @@ namespace dg.Sql.Connector
         public override string type_GUID { get { return @"UNIQUEIDENTIFIER"; } }
         public override string type_BLOB { get { return @"IMAGE"; } }
         public override string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
+
+        #endregion
     }
 }

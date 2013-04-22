@@ -65,14 +65,14 @@ namespace dg.Sql.Phrases
             {
                 if (FirstTableName != null && FirstTableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(FirstTableName);
+                    ret += conn.EncloseFieldName(FirstTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName((string)FirstObject);
+                ret += conn.EncloseFieldName((string)FirstObject);
             }
             else if (FirstObjectType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(FirstObject);
+                ret += conn.PrepareValue(FirstObject);
             }
             else ret += FirstObject;
 
@@ -82,14 +82,14 @@ namespace dg.Sql.Phrases
             {
                 if (SecondTableName != null && SecondTableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(SecondTableName);
+                    ret += conn.EncloseFieldName(SecondTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName((string)SecondObject);
+                ret += conn.EncloseFieldName((string)SecondObject);
             }
             else if (SecondObjectType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(SecondObject);
+                ret += conn.PrepareValue(SecondObject);
             }
             else ret += SecondObject;
 

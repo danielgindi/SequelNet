@@ -50,14 +50,14 @@ namespace dg.Sql.Phrases
             {
                 if (SourceTableName != null && SourceTableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(SourceTableName);
+                    ret += conn.EncloseFieldName(SourceTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(Source);
+                ret += conn.EncloseFieldName(Source);
             }
             else if (SourceType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(Source);
+                ret += conn.PrepareValue(Source);
             }
             else ret += Source;
 
@@ -67,14 +67,14 @@ namespace dg.Sql.Phrases
             {
                 if (SearchTableName != null && SearchTableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(SearchTableName);
+                    ret += conn.EncloseFieldName(SearchTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(Search);
+                ret += conn.EncloseFieldName(Search);
             }
             else if (SearchType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(Search);
+                ret += conn.PrepareValue(Search);
             }
             else ret += Search;
 
@@ -84,14 +84,14 @@ namespace dg.Sql.Phrases
             {
                 if (ReplaceWithTableName != null && ReplaceWithTableName.Length > 0)
                 {
-                    ret += conn.encloseFieldName(ReplaceWithTableName);
+                    ret += conn.EncloseFieldName(ReplaceWithTableName);
                     ret += ".";
                 }
-                ret += conn.encloseFieldName(ReplaceWith);
+                ret += conn.EncloseFieldName(ReplaceWith);
             }
             else if (ReplaceWithType == ValueObjectType.Value)
             {
-                ret += conn.prepareValue(ReplaceWith);
+                ret += conn.PrepareValue(ReplaceWith);
             }
             else ret += ReplaceWith;
 

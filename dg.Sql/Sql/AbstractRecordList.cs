@@ -29,15 +29,15 @@ namespace dg.Sql
             try
             {
                 if (conn == null) conn = ConnectorBase.NewInstance();
-                if (withTransaction && !conn.hasTransaction)
+                if (withTransaction && !conn.HasTransaction)
                 {
                     ownsTransaction = true;
-                    conn.beginTransaction();
+                    conn.BeginTransaction();
                 }
                 foreach (ItemType item in this) item.Save(conn);
                 if (ownsTransaction)
                 {
-                    conn.commitTransaction();
+                    conn.CommitTransaction();
                     ownsTransaction = false;
                 }
             }

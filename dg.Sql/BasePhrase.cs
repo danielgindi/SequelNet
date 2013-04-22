@@ -6,6 +6,6 @@ namespace dg.Sql
 {
     public interface BasePhrase
     {
-        string BuildPhrase(dg.Sql.Connector.ConnectorBase conn);
+        string BuildPhrase(dg.Sql.Connector.ConnectorBase Connection);
     }
 }

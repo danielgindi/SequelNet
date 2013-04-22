@@ -107,10 +107,10 @@ namespace dg.Sql.Phrases
             {
                 if (ContainingTableName != null && ContainingTableName.Length > 0)
                 {
-                    sb.Append(conn.encloseFieldName(ContainingTableName));
+                    sb.Append(conn.EncloseFieldName(ContainingTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.encloseFieldName(ContainingObject.ToString()));
+                sb.Append(conn.EncloseFieldName(ContainingObject.ToString()));
             }
             else if (ContainingObjectType == ValueObjectType.Value)
             {
@@ -120,7 +120,7 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb.Append(conn.prepareValue(ContainingObject));
+                    sb.Append(conn.PrepareValue(ContainingObject));
                 }
             }
             else sb.Append(ContainingObject);
@@ -138,10 +138,10 @@ namespace dg.Sql.Phrases
             {
                 if (ContainedTableName != null && ContainedTableName.Length > 0)
                 {
-                    sb.Append(conn.encloseFieldName(ContainedTableName));
+                    sb.Append(conn.EncloseFieldName(ContainedTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.encloseFieldName(ContainedObject.ToString()));
+                sb.Append(conn.EncloseFieldName(ContainedObject.ToString()));
             }
             else if (ContainedObjectType == ValueObjectType.Value)
             {
@@ -151,7 +151,7 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb.Append(conn.prepareValue(ContainedObject));
+                    sb.Append(conn.PrepareValue(ContainedObject));
                 }
             }
             else sb.Append(ContainedObject);

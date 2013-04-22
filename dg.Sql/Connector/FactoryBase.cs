@@ -12,19 +12,20 @@ namespace dg.Sql.Connector
 {
     public abstract class FactoryBase
     {
-        static Type s_FactoryType = null;
-        static FactoryBase instance = null;
+        static private Type s_FactoryType = null;
+        static private FactoryBase s_Instance = null;
+
         public static FactoryBase Factory()
         {
-            if (instance == null)
+            if (s_Instance == null)
             {
                 if (s_FactoryType == null)
                 {
                     s_FactoryType = FindFactoryType();
                 }
-                instance = System.Activator.CreateInstance(s_FactoryType) as FactoryBase;
+                s_Instance = System.Activator.CreateInstance(s_FactoryType) as FactoryBase;
             }
-            return instance;
+            return s_Instance;
         }
         static private Type FindFactoryType()
         {
