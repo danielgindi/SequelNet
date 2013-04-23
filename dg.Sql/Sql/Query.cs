@@ -2647,31 +2647,29 @@ namespace dg.Sql
         #endregion
 
         #region GetSum Helpers
-        public Int64 GetSum(string columnName)
+        public object GetSum(string columnName)
         {
             return GetSum(null, null, columnName, null);
         }
-        public Int64 GetSum(string columnName, ConnectorBase conn)
+        public object GetSum(string columnName, ConnectorBase conn)
         {
             return GetSum(null, null, columnName, conn);
         }
-        public Int64 GetSum(string schemaName, string columnName)
+        public object GetSum(string schemaName, string columnName)
         {
             return GetSum(null, schemaName, columnName, null);
         }
-        public Int64 GetSum(string schemaName, string columnName, ConnectorBase conn)
+        public object GetSum(string schemaName, string columnName, ConnectorBase conn)
         {
             return GetSum(null, schemaName, columnName, conn);
         }
-        public Int64 GetSum(string databaseOwner, string schemaName, string columnName)
+        public object GetSum(string databaseOwner, string schemaName, string columnName)
         {
             return GetSum(databaseOwner, schemaName, columnName, null);
         }
-        public Int64 GetSum(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
+        public object GetSum(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
         {
-            object res = this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"SUM", IsDistinct, conn);
-            if (IsNull(res)) return 0;
-            else return Convert.ToInt64(res);
+            return this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"SUM", IsDistinct, conn);
         }
         #endregion
 
@@ -2796,7 +2794,8 @@ namespace dg.Sql
                     }
                     else if (columnValue is dg.Sql.BasePhrase)
                     {
-                        columnValue = ((dg.Sql.BasePhrase)columnValue).BuildPhrase(connection);
+                        sb.Append(((dg.Sql.BasePhrase)columnValue).BuildPhrase(connection));
+                        return;
                     }
                 }
             }
