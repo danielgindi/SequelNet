@@ -172,8 +172,17 @@ namespace dg.Sql
         }
         public Query Insert(string columnName, object columnValue, bool literalValue)
         {
-            if (this.QueryMode != QueryMode.Insert && ListInsertUpdate != null) ListInsertUpdate.Clear();
-            this.QueryMode = QueryMode.Insert;
+            QueryMode currentMode = this.QueryMode;
+            if (currentMode != QueryMode.Insert)
+            {
+                this.QueryMode = QueryMode.Insert;
+                if (currentMode != QueryMode.Update &&
+                    currentMode != QueryMode.InsertOrUpdate &&
+                    ListInsertUpdate != null)
+                {
+                    if (ListInsertUpdate != null) ListInsertUpdate.Clear();
+                }
+            }
             if (ListInsertUpdate == null) ListInsertUpdate = new AssignmentColumnList();
             ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, columnValue, literalValue ? ValueObjectType.Literal : ValueObjectType.Value));
             return this;
@@ -190,18 +199,50 @@ namespace dg.Sql
         }
         public Query Update(string columnName, object columnValue, bool literalValue)
         {
-            if (this.QueryMode != QueryMode.Update && ListInsertUpdate != null) ListInsertUpdate.Clear();
-            this.QueryMode = QueryMode.Update;
+            QueryMode currentMode = this.QueryMode;
+            if (currentMode != QueryMode.Update)
+            {
+                this.QueryMode = QueryMode.Update;
+                if (currentMode != QueryMode.Insert &&
+                    currentMode != QueryMode.InsertOrUpdate &&
+                    ListInsertUpdate != null)
+                {
+                    if (ListInsertUpdate != null) ListInsertUpdate.Clear();
+                }
+            }
             if (ListInsertUpdate == null) ListInsertUpdate = new AssignmentColumnList();
             ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, columnValue, literalValue ? ValueObjectType.Literal : ValueObjectType.Value));
             return this;
         }
         public Query UpdateFromOtherColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
         {
-            if (this.QueryMode != QueryMode.Update && ListInsertUpdate != null) ListInsertUpdate.Clear();
-            this.QueryMode = QueryMode.Update;
+            QueryMode currentMode = this.QueryMode;
+            if (currentMode != QueryMode.Update &&
+                currentMode != QueryMode.Insert &&
+                currentMode != QueryMode.InsertOrUpdate &&
+                ListInsertUpdate != null)
+            {
+                ListInsertUpdate.Clear();
+                this.QueryMode = QueryMode.Update;
+            }
             if (ListInsertUpdate == null) ListInsertUpdate = new AssignmentColumnList();
             ListInsertUpdate.Add(new AssignmentColumn(tableName, columnName, fromTableName, fromTableColumn, ValueObjectType.ColumnName));
+            return this;
+        }
+
+        public Query InsertOrUpdate()
+        {
+            QueryMode currentMode = this.QueryMode;
+            if (currentMode != QueryMode.InsertOrUpdate)
+            {
+                this.QueryMode = QueryMode.InsertOrUpdate;
+                if (currentMode != QueryMode.Insert &&
+                    currentMode != QueryMode.Update &&
+                    ListInsertUpdate != null)
+                {
+                    if (ListInsertUpdate != null) ListInsertUpdate.Clear();
+                }
+            }
             return this;
         }
 
@@ -1723,6 +1764,202 @@ namespace dg.Sql
                             }
 
                             break;
+                        case QueryMode.InsertOrUpdate:
+                            {
+                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                {
+                                    sb.Append(@"REPLACE INTO ");
+
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
+                                    }
+                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                                    sb.Append(@" (");
+                                    bFirst = true;
+                                    foreach (AssignmentColumn ins in ListInsertUpdate)
+                                    {
+                                        if (bFirst) bFirst = false;
+                                        else sb.Append(',');
+                                        sb.Append(connection.EncloseFieldName(ins.ColumnName));
+                                    }
+                                    if (InsertExpression != null)
+                                    {
+                                        sb.Append(@") ");
+                                        sb.Append(InsertExpression);
+                                    }
+                                    else
+                                    {
+                                        sb.Append(@") VALUES (");
+                                        bFirst = true;
+                                        foreach (AssignmentColumn ins in ListInsertUpdate)
+                                        {
+                                            if (bFirst) bFirst = false;
+                                            else sb.Append(',');
+                                            if (ins.SecondType == ValueObjectType.Literal)
+                                            {
+                                                sb.Append(ins.Second);
+                                            }
+                                            else if (ins.SecondType == ValueObjectType.Value)
+                                            {
+                                                if (ins.Second is Query)
+                                                {
+                                                    sb.Append('(');
+                                                    sb.Append(((Query)ins.Second).BuildCommand(connection));
+                                                    sb.Append(')');
+                                                }
+                                                else PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection);
+                                            }
+                                            else if (ins.SecondType == ValueObjectType.ColumnName)
+                                            {
+                                                if (ins.SecondTableName != null)
+                                                {
+                                                    sb.Append(connection.EncloseFieldName(ins.SecondTableName));
+                                                    sb.Append(@".");
+                                                }
+                                                sb.Append(connection.EncloseFieldName(ins.Second.ToString()));
+                                            }
+                                        }
+                                        sb.Append(@")");
+
+                                        if (ListWhere != null && ListWhere.Count > 0)
+                                        {
+                                            sb.Append(@" WHERE ");
+                                            ListWhere.BuildCommand(sb, connection, this);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    NeedTransaction = true;
+
+                                    sb.Append(@"UPDATE ");
+
+                                    #region Update clause
+
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
+                                    }
+                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                                    bFirst = true;
+                                    foreach (AssignmentColumn upd in ListInsertUpdate)
+                                    {
+                                        if (bFirst)
+                                        {
+                                            sb.Append(@" SET ");
+                                            bFirst = false;
+                                        }
+                                        else sb.Append(',');
+                                        sb.Append(connection.EncloseFieldName(upd.ColumnName));
+                                        sb.Append('=');
+
+                                        if (upd.SecondType == ValueObjectType.Literal)
+                                        {
+                                            sb.Append(upd.Second);
+                                        }
+                                        else if (upd.SecondType == ValueObjectType.Value)
+                                        {
+                                            PrepareColumnValue(Schema.Columns.Find(upd.ColumnName), upd.Second, sb, connection);
+                                        }
+                                        else if (upd.SecondType == ValueObjectType.ColumnName)
+                                        {
+                                            if (upd.SecondTableName != null)
+                                            {
+                                                sb.Append(connection.EncloseFieldName(upd.SecondTableName));
+                                                sb.Append(@".");
+                                            }
+                                            sb.Append(connection.EncloseFieldName(upd.Second.ToString()));
+                                        }
+                                    }
+
+                                    if (ListWhere != null && ListWhere.Count > 0)
+                                    {
+                                        sb.Append(@" WHERE ");
+                                        ListWhere.BuildCommand(sb, connection, this);
+                                    }
+
+                                    BuildOrderBy(sb, connection, false);
+
+                                    #endregion
+                                    
+                                    sb.Append(@"; IF @@rowcount = 0 BEGIN");
+
+                                    #region Insert clause
+
+                                    sb.Append(@"INSERT INTO ");
+
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
+                                    }
+                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                                    sb.Append(@" (");
+                                    bFirst = true;
+                                    foreach (AssignmentColumn ins in ListInsertUpdate)
+                                    {
+                                        if (bFirst) bFirst = false;
+                                        else sb.Append(',');
+                                        sb.Append(connection.EncloseFieldName(ins.ColumnName));
+                                    }
+                                    if (InsertExpression != null)
+                                    {
+                                        sb.Append(@") ");
+                                        sb.Append(InsertExpression);
+                                    }
+                                    else
+                                    {
+                                        sb.Append(@") VALUES (");
+                                        bFirst = true;
+                                        foreach (AssignmentColumn ins in ListInsertUpdate)
+                                        {
+                                            if (bFirst) bFirst = false;
+                                            else sb.Append(',');
+                                            if (ins.SecondType == ValueObjectType.Literal)
+                                            {
+                                                sb.Append(ins.Second);
+                                            }
+                                            else if (ins.SecondType == ValueObjectType.Value)
+                                            {
+                                                if (ins.Second is Query)
+                                                {
+                                                    sb.Append('(');
+                                                    sb.Append(((Query)ins.Second).BuildCommand(connection));
+                                                    sb.Append(')');
+                                                }
+                                                else PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection);
+                                            }
+                                            else if (ins.SecondType == ValueObjectType.ColumnName)
+                                            {
+                                                if (ins.SecondTableName != null)
+                                                {
+                                                    sb.Append(connection.EncloseFieldName(ins.SecondTableName));
+                                                    sb.Append(@".");
+                                                }
+                                                sb.Append(connection.EncloseFieldName(ins.Second.ToString()));
+                                            }
+                                        }
+                                        sb.Append(@")");
+
+                                        if (ListWhere != null && ListWhere.Count > 0)
+                                        {
+                                            sb.Append(@" WHERE ");
+                                            ListWhere.BuildCommand(sb, connection, this);
+                                        }
+                                    }
+
+                                    #endregion
+
+                                    sb.Append(@"END");
+                                }
+                            }
+                            break;
                         case QueryMode.Delete:
                             {
                                 sb.Append(@"DELETE");
@@ -2564,6 +2801,14 @@ namespace dg.Sql
         #endregion
 
         #region GetCount Helpers
+        public Int64 GetCount()
+        {
+            return GetCount(null, null, @"*", null);
+        }
+        public Int64 GetCount(ConnectorBase conn)
+        {
+            return GetCount(null, null, @"*", conn);
+        }
         public Int64 GetCount(string columnName)
         {
             return GetCount(null, null, columnName, null);

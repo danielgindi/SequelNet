@@ -28,6 +28,7 @@ namespace dg.Sql
         Insert,
         Update,
         Delete,
+        InsertOrUpdate,
         CreateTable,
         CreateIndex,
         CreateIndexes,
