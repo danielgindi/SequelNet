@@ -2359,6 +2359,9 @@ namespace dg.Sql
                     retValue = Connection.ExecuteScalar(BuildCommand(Connection));
                 }
 
+                if (retValue is DBNull) retValue = null;
+                else if (retValue is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)retValue).IsNull) retValue = null;
+
                 if (transaction)
                 {
                     Connection.CommitTransaction();
@@ -2584,9 +2587,13 @@ namespace dg.Sql
                 {
                     List<object> row = new List<object>();
                     int i, c = reader.GetColumnCount();
+                    object value;
                     for (i = 0; i < c; i++)
                     {
-                        row.Add(reader[i]);
+                        value = reader[i];
+                        if (value is DBNull) value = null;
+                        else if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) value = null;
+                        row.Add(value);
                     }
                     return row;
                 }
@@ -2621,6 +2628,7 @@ namespace dg.Sql
                 {
                     Dictionary<string, object> row = new Dictionary<string, object>();
                     int i, c = reader.GetColumnCount();
+                    object value;
                     string[] columnNames = new string[c];
                     for (i = 0; i < c; i++)
                     {
@@ -2628,7 +2636,10 @@ namespace dg.Sql
                     }
                     for (i = 0; i < c; i++)
                     {
-                        row[columnNames[i]] = reader[i];
+                        value = reader[i];
+                        if (value is DBNull) value = null;
+                        else if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) value = null;
+                        row[columnNames[i]] = value;
                     }
                     return row;
                 }
@@ -2659,13 +2670,17 @@ namespace dg.Sql
             using (DataReaderBase reader = ExecuteReader(Connection))
             {
                 List<object> row;
+                object value;
                 while (reader.Read())
                 {
                     row = new List<object>();
                     int i, c = reader.GetColumnCount();
                     for (i = 0; i < c; i++)
                     {
-                        row.Add(reader[i]);
+                        value = reader[i];
+                        if (value is DBNull) value = null;
+                        else if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) value = null;
+                        row.Add(value);
                     }
                     results.Add(row);
                 }
@@ -2694,6 +2709,7 @@ namespace dg.Sql
             {
                 Dictionary<string, object> row;
                 int i, c = reader.GetColumnCount();
+                object value;
                 string[] columnNames = new string[c];
                 for (i = 0; i < c; i++)
                 {
@@ -2704,7 +2720,10 @@ namespace dg.Sql
                     row = new Dictionary<string, object>();
                     for (i = 0; i < c; i++)
                     {
-                        row[columnNames[i]] = reader[i];
+                        value = reader[i];
+                        if (value is DBNull) value = null;
+                        else if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) value = null;
+                        row[columnNames[i]] = value;
                     }
                     results.Add(row);
                 }
@@ -3074,8 +3093,8 @@ namespace dg.Sql
         public static bool IsNull(object value)
         {
             if (value == null) return true;
-            if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) return true;
             if (value == DBNull.Value) return true;
+            if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) return true;
             else return false;
         }
 
