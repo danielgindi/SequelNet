@@ -2475,8 +2475,16 @@ namespace dg.Sql
                     retValue = connection.ExecuteNonQuery(BuildCommand(connection));
                 }
 
-                if (retValue > 0) LastInsertId = connection.GetLastInsertID();
-                else LastInsertId = null;
+                if (retValue > 0)
+                {
+                    LastInsertId = connection.GetLastInsertID();
+                    if (LastInsertId is DBNull) LastInsertId = null;
+                    else if (LastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)LastInsertId).IsNull) LastInsertId = null;
+                }
+                else
+                {
+                    LastInsertId = null;
+                }
                 if (transaction) connection.CommitTransaction();
                 return retValue;
             }
@@ -2507,8 +2515,16 @@ namespace dg.Sql
                     retValue = Connection.ExecuteNonQuery(BuildCommand(Connection));
                 }
 
-                if (retValue > 0) LastInsertId = Connection.GetLastInsertID();
-                else LastInsertId = null;
+                if (retValue > 0)
+                {
+                    LastInsertId = Connection.GetLastInsertID();
+                    if (LastInsertId is DBNull) LastInsertId = null;
+                    else if (LastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)LastInsertId).IsNull) LastInsertId = null;
+                }
+                else
+                {
+                    LastInsertId = null;
+                }
                 if (transaction) Connection.CommitTransaction();
                 return retValue;
             }
@@ -2556,6 +2572,8 @@ namespace dg.Sql
                 while (reader.Read())
                 {
                     value = reader[0];
+                    if (value is DBNull) value = null;
+                    else if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) value = null;
                     if (value is T) list.Add((T)value);
                     else list.Add((T)Convert.ChangeType(value, typeof(T)));
                 }

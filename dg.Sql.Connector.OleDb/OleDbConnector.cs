@@ -185,7 +185,7 @@ namespace dg.Sql.Connector
         public override bool CheckIfTableExists(string TableName)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            return ExecuteScalar(@"SELECT name FROM MSysObjects WHERE name like '" + fullEscape(TableName) + "'") != null;
+            return ExecuteScalar(@"SELECT name FROM MSysObjects WHERE name like '" + EscapeString(TableName) + "'") != null;
         }
 
         #endregion
