@@ -6,18 +6,6 @@ using dg.Sql.Connector;
 
 namespace dg.Sql
 {
-    public class WhereList : List<Where>
-    {
-        public void BuildCommand(StringBuilder sb, ConnectorBase connection, Query qry)
-        {
-            bool bFirst = true;
-            foreach (Where where in this)
-            {
-                where.BuildCommand(sb, bFirst, connection, qry);
-                if (bFirst) bFirst = false;
-            }
-        }
-    }
     public class Where
     {
         private WhereComparision _Comparison = WhereComparision.None;
@@ -88,6 +76,9 @@ namespace dg.Sql
             set { _ThirdTableName = value; }
         }
 
+        public Where()
+        {
+        }
         public Where(WhereCondition condition, WhereList whereList)
         {
             Condition = condition;
