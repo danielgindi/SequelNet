@@ -389,6 +389,17 @@ namespace dg.Sql
         {
             return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue), false);
         }
+        public Query AND(string TableName, string ColumnName, object BetweenValue, object AndValue)
+        {
+            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            where.FirstTableName = TableName;
+            return Where(where, false);
+        }
+        public Query AND(string ColumnName, object BetweenValue, object AndValue)
+        {
+            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            return Where(where, false);
+        }
         public Query OR(string columnName, object columnValue)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value), false);
@@ -404,6 +415,17 @@ namespace dg.Sql
         public Query OR(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, columnValue), false);
+        }
+        public Query OR(string TableName, string ColumnName, object BetweenValue, object AndValue)
+        {
+            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            where.FirstTableName = TableName;
+            return Where(where, false);
+        }
+        public Query OR(string ColumnName, object BetweenValue, object AndValue)
+        {
+            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            return Where(where, false);
         }
 
         public Query CreateTable()
