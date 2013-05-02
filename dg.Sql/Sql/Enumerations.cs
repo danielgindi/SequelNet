@@ -9,18 +9,21 @@ namespace dg.Sql
         AND = 0,
         OR = 1
     }
+
     public enum ValueObjectType
     {
         Literal = 0,
         Value = 1,
         ColumnName = 2
     }
+
     public enum SortDirection
     {
         None = 0,
         ASC = 1,
         DESC = 2
     }
+
     public enum QueryMode
     {
         None = 0,
@@ -40,6 +43,7 @@ namespace dg.Sql
         DropTable,
         ExecuteStoredProcedure
     }
+
     public enum WhereComparision
     {
         None = 0,
@@ -56,6 +60,7 @@ namespace dg.Sql
         In = 11,
         NotIn = 12
     }
+
     public enum JoinType
     {
         /// <summary>
@@ -84,6 +89,7 @@ namespace dg.Sql
         /// </summary>
         FullOuterJoin = 6
     }
+
     public enum DataType
     {
         /// <summary>

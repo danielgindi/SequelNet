@@ -71,18 +71,33 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BasePhrase.cs" />
+    <Compile Include="Sql\Phrases\Base.cs" />
     <Compile Include="Bindable\BindableCollection.cs" />
     <Compile Include="Bindable\BindableList.cs" />
     <Compile Include="Bindable\IBindableCollection.cs" />
     <Compile Include="Connector\ConnectorBase.cs" />
     <Compile Include="Connector\DataReaderBase.cs" />
     <Compile Include="Connector\FactoryBase.cs" />
-    <Compile Include="Sql\WhereList.cs" />
-    <Compile Include="Sql\Phrases\Add.cs" />
+    <Compile Include="Sql\Query\Builders.cs" />
+    <Compile Include="Sql\Query\ShortAggregates.cs" />
+    <Compile Include="Sql\Query\Executes.cs" />
+    <Compile Include="Sql\Query\_DEPRECATED.cs" />
+    <Compile Include="Sql\Query\Joins.cs" />
+    <Compile Include="Sql\Query\StoredProcedures.cs" />
+    <Compile Include="Sql\Query\SchemaChanges.cs" />
+    <Compile Include="Sql\Query\Wheres.cs" />
+    <Compile Include="Sql\Query\GroupBys.cs" />
+    <Compile Include="Sql\Query\OrderBys.cs" />
+    <Compile Include="Sql\Query\Deletes.cs" />
+    <Compile Include="Sql\Query\InsertOrUpdates.cs" />
+    <Compile Include="Sql\Query\Updates.cs" />
+    <Compile Include="Sql\Query\Inserts.cs" />
+    <Compile Include="Sql\Query\Selects.cs" />
+    <Compile Include="Sql\QueryKeywords\WhereList.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Add.cs" />
     <Compile Include="Sql\Phrases\Spatial\GeographyDistance.cs" />
     <Compile Include="Sql\Phrases\Spatial\GeographyContains.cs" />
-    <Compile Include="Sql\QueryHint.cs" />
+    <Compile Include="Sql\QueryKeywords\QueryHint.cs" />
     <Compile Include="Sql\Spatial\MultiPoint.cs" />
     <Compile Include="Sql\Spatial\MultiPolygon.cs" />
     <Compile Include="Sql\Spatial\MultiLineString.cs" />
@@ -92,40 +107,40 @@
     <Compile Include="Sql\Spatial\Point.cs" />
     <Compile Include="Sql\Spatial\Geometry.cs" />
     <Compile Include="Sql\Spatial\WkbReader.cs" />
-    <Compile Include="Sql\TableSchema.TableOption.cs" />
-    <Compile Include="Sql\Phrases\Upper.cs" />
-    <Compile Include="Sql\Phrases\Lower.cs" />
-    <Compile Include="Sql\Phrases\Replace.cs" />
-    <Compile Include="Sql\Phrases\Second.cs" />
-    <Compile Include="Sql\Phrases\Minute.cs" />
-    <Compile Include="Sql\Phrases\Hour.cs" />
-    <Compile Include="Sql\Phrases\Day.cs" />
-    <Compile Include="Sql\Phrases\Union.cs" />
-    <Compile Include="Sql\Phrases\Sum.cs" />
-    <Compile Include="Sql\Phrases\UnionAll.cs" />
-    <Compile Include="Sql\Phrases\Month.cs" />
-    <Compile Include="Sql\Phrases\UTC_TIMESTAMP.cs" />
-    <Compile Include="Sql\Phrases\Year.cs" />
-    <Compile Include="Sql\Phrases\Max.cs" />
-    <Compile Include="Sql\Phrases\Min.cs" />
-    <Compile Include="Sql\Phrases\Count.cs" />
-    <Compile Include="Sql\Phrases\RandPerRow.cs" />
-    <Compile Include="Sql\GroupBy.cs" />
-    <Compile Include="Sql\Phrases\IfNull.cs" />
-    <Compile Include="Sql\TableSchema.ForeignKey.cs" />
+    <Compile Include="Sql\Schema\TableSchema.TableOption.cs" />
+    <Compile Include="Sql\Phrases\Strings\Upper.cs" />
+    <Compile Include="Sql\Phrases\Strings\Lower.cs" />
+    <Compile Include="Sql\Phrases\Strings\Replace.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Second.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Minute.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Hour.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Day.cs" />
+    <Compile Include="Sql\Phrases\General\Union.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Sum.cs" />
+    <Compile Include="Sql\Phrases\General\UnionAll.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Month.cs" />
+    <Compile Include="Sql\Phrases\DateTime\UTC_TIMESTAMP.cs" />
+    <Compile Include="Sql\Phrases\DateTime\Year.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Max.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Min.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Count.cs" />
+    <Compile Include="Sql\Phrases\General\RandPerRow.cs" />
+    <Compile Include="Sql\QueryKeywords\GroupBy.cs" />
+    <Compile Include="Sql\Phrases\General\IfNull.cs" />
+    <Compile Include="Sql\Schema\TableSchema.ForeignKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sql\AbstractRecord.cs" />
-    <Compile Include="Sql\AbstractRecordList.cs" />
-    <Compile Include="Sql\AssignmentColumn.cs" />
-    <Compile Include="Sql\TableSchema.Index.cs" />
-    <Compile Include="Sql\Join.cs" />
-    <Compile Include="Sql\OrderBy.cs" />
-    <Compile Include="Sql\Query.cs" />
-    <Compile Include="Sql\SelectColumn.cs" />
-    <Compile Include="Sql\TableSchema.Column.cs" />
-    <Compile Include="Sql\TableSchema.cs" />
+    <Compile Include="Sql\RecordEntity\AbstractRecord.cs" />
+    <Compile Include="Sql\RecordEntity\AbstractRecordList.cs" />
+    <Compile Include="Sql\QueryKeywords\AssignmentColumn.cs" />
+    <Compile Include="Sql\Schema\TableSchema.Index.cs" />
+    <Compile Include="Sql\QueryKeywords\Join.cs" />
+    <Compile Include="Sql\QueryKeywords\OrderBy.cs" />
+    <Compile Include="Sql\Query\Query.cs" />
+    <Compile Include="Sql\QueryKeywords\SelectColumn.cs" />
+    <Compile Include="Sql\Schema\TableSchema.Column.cs" />
+    <Compile Include="Sql\Schema\TableSchema.cs" />
     <Compile Include="Sql\Enumerations.cs" />
-    <Compile Include="Sql\Where.cs" />
+    <Compile Include="Sql\QueryKeywords\Where.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -150,6 +165,7 @@
   <ItemGroup>
     <Content Include="MACRO.vb" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
