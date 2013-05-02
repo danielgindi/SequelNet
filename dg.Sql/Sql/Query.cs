@@ -66,7 +66,7 @@ namespace dg.Sql
             } 
             if (FromExpressionTableAlias == null)
             {
-                throw new Exception("The alias you passed in is null.");
+                throw new Exception("The Alias you passed in is null.");
             }
             ListSelect = new SelectColumnList();
             ListSelect.Add(new SelectColumn(@"*", true));
@@ -101,20 +101,20 @@ namespace dg.Sql
         {
             return Select(@"*", true, true);
         }
-        public Query Select(string columnName, bool literalColumnName, bool clearSelectList)
+        public Query Select(string ColumnName, bool ColumnNameIsLiteral, bool ClearSelectList)
         {
             this.QueryMode = QueryMode.Select;
             if (ListSelect == null) ListSelect = new SelectColumnList();
-            if (clearSelectList) ListSelect.Clear();
-            ListSelect.Add(new SelectColumn(columnName, literalColumnName));
+            if (ClearSelectList) ListSelect.Clear();
+            ListSelect.Add(new SelectColumn(ColumnName, ColumnNameIsLiteral));
             return this;
         }
-        public Query Select(string columnName, string alias, bool literalColumnName, bool clearSelectList)
+        public Query Select(string ColumnName, string Alias, bool ColumnNameIsLiteral, bool ClearSelectList)
         {
             this.QueryMode = QueryMode.Select;
             if (ListSelect == null) ListSelect = new SelectColumnList();
-            if (clearSelectList) ListSelect.Clear();
-            ListSelect.Add(new SelectColumn(columnName, alias, literalColumnName));
+            if (ClearSelectList) ListSelect.Clear();
+            ListSelect.Add(new SelectColumn(ColumnName, Alias, ColumnNameIsLiteral));
             return this;
         }
         public Query Select(string tableName, string columnName, string alias, bool clearSelectList)
@@ -153,13 +153,13 @@ namespace dg.Sql
         {
             return Select(tableName, columnName, alias, false);
         }
-        public Query AddSelectLiteral(string columnName)
+        public Query AddSelectLiteral(string Expression)
         {
-            return Select(columnName, true, false);
+            return Select(Expression, true, false);
         }
-        public Query AddSelectLiteral(string columnName, string alias)
+        public Query AddSelectLiteral(string Expression, string Alias)
         {
-            return Select(columnName, alias, true, false);
+            return Select(Expression, Alias, true, false);
         }
         public Query AddSelectValue(object Value, string Alias)
         {

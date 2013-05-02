@@ -148,17 +148,17 @@ namespace dg.Sql
             SecondType = ValueObjectType.ColumnName;
         }
 
-        public void BuildCommand(StringBuilder sb, bool bFirst, ConnectorBase connection, Query qry)
+        public void BuildCommand(StringBuilder OutputBuilder, bool bFirst, ConnectorBase Connection, Query RelatedQuery)
         {
             if (!bFirst)
             {
                 switch (Condition)
                 {
                     case WhereCondition.AND:
-                        sb.Append(@" AND ");
+                        OutputBuilder.Append(@" AND ");
                         break;
                     case WhereCondition.OR:
-                        sb.Append(@" OR ");
+                        OutputBuilder.Append(@" OR ");
                         break;
                 }
             }
@@ -171,15 +171,15 @@ namespace dg.Sql
                 FirstType != ValueObjectType.Value
                 )
             {
-                sb.Append(@"1"); // dump a dummy TRUE condition to fill the blank
+                OutputBuilder.Append(@"1"); // dump a dummy TRUE condition to fill the blank
                 return;
             }
 
             if (First is WhereList)
             {
-                sb.Append('(');
-                ((WhereList)First).BuildCommand(sb, connection, qry);
-                sb.Append(')');
+                OutputBuilder.Append('(');
+                ((WhereList)First).BuildCommand(OutputBuilder, Connection, RelatedQuery);
+                OutputBuilder.Append(')');
             }
             else
             {
@@ -188,65 +188,65 @@ namespace dg.Sql
                     if (SecondType == ValueObjectType.ColumnName)
                     {
                         TableSchema schema;
-                        if (SecondTableName == null || !qry.TableAliasMap.TryGetValue(SecondTableName, out schema))
+                        if (SecondTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
                         {
-                            schema = qry.Schema;
+                            schema = RelatedQuery.Schema;
                         }
-                        sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, connection));
+                        OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, Connection));
                     }
-                    else sb.Append(connection.PrepareValue(First));
+                    else OutputBuilder.Append(Connection.PrepareValue(First));
                 }
                 else if (FirstType == ValueObjectType.ColumnName)
                 {
                     if (FirstTableName != null)
                     {
-                        sb.Append(connection.EncloseFieldName(FirstTableName));
-                        sb.Append('.');
+                        OutputBuilder.Append(Connection.EncloseFieldName(FirstTableName));
+                        OutputBuilder.Append('.');
                     }
-                    sb.Append(connection.EncloseFieldName((string)First));
+                    OutputBuilder.Append(Connection.EncloseFieldName((string)First));
                 }
-                else sb.Append(First == null ? @"NULL" : First);
+                else OutputBuilder.Append(First == null ? @"NULL" : First);
                 if (Comparision != WhereComparision.None)
                 {
                     switch (Comparision)
                     {
                         case WhereComparision.EqualsTo:
-                            if (First == null || Second == null) sb.Append(@" IS ");
-                            else sb.Append(@" = ");
+                            if (First == null || Second == null) OutputBuilder.Append(@" IS ");
+                            else OutputBuilder.Append(@" = ");
                             break;
                         case WhereComparision.NotEqualsTo:
-                            if (First == null || Second == null) sb.Append(@" IS NOT ");
-                            else sb.Append(@" <> ");
+                            if (First == null || Second == null) OutputBuilder.Append(@" IS NOT ");
+                            else OutputBuilder.Append(@" <> ");
                             break;
                         case WhereComparision.GreaterThan:
-                            sb.Append(@" > ");
+                            OutputBuilder.Append(@" > ");
                             break;
                         case WhereComparision.GreaterThanOrEqual:
-                            sb.Append(@" >= ");
+                            OutputBuilder.Append(@" >= ");
                             break;
                         case WhereComparision.LessThan:
-                            sb.Append(@" < ");
+                            OutputBuilder.Append(@" < ");
                             break;
                         case WhereComparision.LessThanOrEqual:
-                            sb.Append(@" <= ");
+                            OutputBuilder.Append(@" <= ");
                             break;
                         case WhereComparision.Is:
-                            sb.Append(@" IS ");
+                            OutputBuilder.Append(@" IS ");
                             break;
                         case WhereComparision.IsNot:
-                            sb.Append(@" IS NOT ");
+                            OutputBuilder.Append(@" IS NOT ");
                             break;
                         case WhereComparision.Like:
-                            sb.Append(@" LIKE ");
+                            OutputBuilder.Append(@" LIKE ");
                             break;
                         case WhereComparision.Between:
-                            sb.Append(@" BETWEEN ");
+                            OutputBuilder.Append(@" BETWEEN ");
                             break;
                         case WhereComparision.In:
-                            sb.Append(@" IN ");
+                            OutputBuilder.Append(@" IN ");
                             break;
                         case WhereComparision.NotIn:
-                            sb.Append(@" NOT IN ");
+                            OutputBuilder.Append(@" NOT IN ");
                             break;
                     }
 
@@ -254,35 +254,48 @@ namespace dg.Sql
                     {
                         if (SecondType == ValueObjectType.Value)
                         {
-                            if (FirstType == ValueObjectType.ColumnName)
+                            if (Second is Query)
                             {
-                                TableSchema schema;
-                                if (FirstTableName == null || !qry.TableAliasMap.TryGetValue(FirstTableName, out schema))
-                                {
-                                    schema = qry.Schema;
-                                }
-                                sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, connection));
+                                OutputBuilder.Append('(');
+                                OutputBuilder.Append(((Query)Second).BuildCommand(Connection));
+                                OutputBuilder.Append(')');
                             }
-                            else sb.Append(connection.PrepareValue(Second));
+                            else
+                            {
+                                if (FirstType == ValueObjectType.ColumnName)
+                                {
+                                    // Match SECOND value to FIRST's column type
+                                    TableSchema schema;
+                                    if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    {
+                                        schema = RelatedQuery.Schema;
+                                    }
+                                    OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, Connection));
+                                }
+                                else
+                                {
+                                    OutputBuilder.Append(Connection.PrepareValue(Second));
+                                }
+                            }
                         }
                         else if (SecondType == ValueObjectType.ColumnName)
                         {
                             if (SecondTableName != null)
                             {
-                                sb.Append(connection.EncloseFieldName(SecondTableName));
-                                sb.Append('.');
+                                OutputBuilder.Append(Connection.EncloseFieldName(SecondTableName));
+                                OutputBuilder.Append('.');
                             }
-                            sb.Append(connection.EncloseFieldName((string)Second));
+                            OutputBuilder.Append(Connection.EncloseFieldName((string)Second));
                         }
                         else
                         {
-                            if (Second == null) sb.Append(@"NULL");
-                            else sb.Append(Second);
+                            if (Second == null) OutputBuilder.Append(@"NULL");
+                            else OutputBuilder.Append(Second);
                         }
                     }
                     else
                     {
-                        if (Second is Query) sb.AppendFormat(@"({0})", Second.ToString());
+                        if (Second is Query) OutputBuilder.AppendFormat(@"({0})", Second.ToString());
                         else
                         {
                             ICollection collIn = Second as ICollection;
@@ -294,59 +307,59 @@ namespace dg.Sql
                                 TableSchema schema = null;
                                 if (FirstType == ValueObjectType.ColumnName)
                                 {
-                                    if (FirstTableName == null || !qry.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
                                     {
-                                        schema = qry.Schema;
+                                        schema = RelatedQuery.Schema;
                                     }
                                 }
                                 foreach (object objIn in collIn)
                                 {
                                     if (first) first = false; else sbIn.Append(',');
-                                    if (schema != null) sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, connection));
-                                    else sbIn.Append(connection.PrepareValue(objIn));
+                                    if (schema != null) sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, Connection));
+                                    else sbIn.Append(Connection.PrepareValue(objIn));
                                 }
                                 sbIn.Append(')');
-                                sb.Append(sbIn.ToString());
+                                OutputBuilder.Append(sbIn.ToString());
                             }
-                            else sb.Append(Second);
+                            else OutputBuilder.Append(Second);
                         }
                     }
 
                     if (Comparision == WhereComparision.Between)
                     {
-                        sb.Append(@" AND ");
+                        OutputBuilder.Append(@" AND ");
                         if (ThirdType == ValueObjectType.Value)
                         {
                             if (FirstType == ValueObjectType.ColumnName)
                             {
                                 TableSchema schema;
-                                if (FirstTableName == null || !qry.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
                                 {
-                                    schema = qry.Schema;
+                                    schema = RelatedQuery.Schema;
                                 }
-                                sb.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, connection));
+                                OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, Connection));
                             }
-                            else sb.Append(connection.PrepareValue(Third));
+                            else OutputBuilder.Append(Connection.PrepareValue(Third));
                         }
                         else if (ThirdType == ValueObjectType.ColumnName)
                         {
                             if (ThirdTableName != null)
                             {
-                                sb.Append(connection.EncloseFieldName(ThirdTableName));
-                                sb.Append('.');
+                                OutputBuilder.Append(Connection.EncloseFieldName(ThirdTableName));
+                                OutputBuilder.Append('.');
                             }
-                            sb.Append(connection.EncloseFieldName((string)Third));
+                            OutputBuilder.Append(Connection.EncloseFieldName((string)Third));
                         }
-                        else sb.Append(Third == null ? @"NULL" : Third);
+                        else OutputBuilder.Append(Third == null ? @"NULL" : Third);
                     }
 
                     if (Comparision == WhereComparision.Like)
                     {
-                        if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                        if (Connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                         {
-                            sb.Append(@" ESCAPE('\\') ");
+                            OutputBuilder.Append(@" ESCAPE('\\') ");
                         }
-                        else sb.Append(@" ESCAPE('\') ");
+                        else OutputBuilder.Append(@" ESCAPE('\') ");
                     }
                 }
             }

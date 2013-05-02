@@ -8,13 +8,25 @@ namespace dg.Sql
 {
     public class WhereList : List<Where>
     {
-        public void BuildCommand(StringBuilder sb, ConnectorBase connection, Query qry)
+        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase connection, Query qry)
         {
             bool bFirst = true;
             foreach (Where where in this)
             {
-                where.BuildCommand(sb, bFirst, connection, qry);
+                where.BuildCommand(OutputBuilder, bFirst, connection, qry);
                 if (bFirst) bFirst = false;
+            }
+        }
+        public void BuildCommand(StringBuilder OutputBuilder, Query qry)
+        {
+            using (ConnectorBase conn = ConnectorBase.NewInstance())
+            {
+                bool bFirst = true;
+                foreach (Where where in this)
+                {
+                    where.BuildCommand(OutputBuilder, bFirst, conn, qry);
+                    if (bFirst) bFirst = false;
+                }
             }
         }
 
