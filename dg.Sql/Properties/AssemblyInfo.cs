@@ -12,7 +12,7 @@ using System.Security;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("dg.Sql Data Layer")]
-[assembly: AssemblyCopyright("Copyright Daniel Cohen Gindi (danielgindi@gmail.com) ©  2009")]
+[assembly: AssemblyCopyright("Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]

@@ -152,26 +152,15 @@ namespace dg.Sql
         }
 
         /// <summary>
-        /// Sets a random select mode, on specified column
+        /// Sets a random select mode, on specified column.
+        /// A randomization column is currently required for MsAccess only, so you can pass null.
         /// </summary>
         /// <param name="TableName">Random column's table</param>
-        /// <param name="ColumnName">Random column</param>
+        /// <param name="ColumnName">Column to randomize by.</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query Randomize(string TableName, string ColumnName)
+        public Query Randomize(string TableName = null, string ColumnName = null)
         {
             OrderBy orderBy = new OrderBy(TableName, ColumnName, SortDirection.None);
-            orderBy.Randomize = true;
-            return OrderBy(orderBy);
-        }
-
-        /// <summary>
-        /// Sets a random select mode, on specified column
-        /// </summary>
-        /// <param name="ColumnName">Random column</param>
-        /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query Randomize(string ColumnName)
-        {
-            OrderBy orderBy = new OrderBy(ColumnName, SortDirection.None);
             orderBy.Randomize = true;
             return OrderBy(orderBy);
         }
