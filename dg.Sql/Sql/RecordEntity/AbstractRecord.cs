@@ -744,6 +744,8 @@ namespace dg.Sql
 
         #endregion
 
+        #region Helpers
+
         private static bool StringArrayContains(string[] Array, string Item)
         {
             foreach (string item in Array)
@@ -752,5 +754,22 @@ namespace dg.Sql
             }
             return false;
         }
+
+        protected string CurrentSessionUserName
+        {
+            get
+            {
+                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.User != null)
+                {
+                    return System.Web.HttpContext.Current.User.Identity.Name;
+                }
+                else
+               {
+                    return System.Threading.Thread.CurrentPrincipal.Identity.Name;
+                }
+            }
+        }
+
+        #endregion
     }
 }
