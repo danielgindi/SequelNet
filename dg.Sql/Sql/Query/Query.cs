@@ -33,6 +33,7 @@ namespace dg.Sql
         private Int64 _Offset = 0;
         private object _CreateIndexObject = null;
         private QueryHint _QueryHint = QueryHint.None;
+        private GroupByHint _GroupByHint = GroupByHint.None;
         private bool _NeedTransaction = false;
 
         #endregion
