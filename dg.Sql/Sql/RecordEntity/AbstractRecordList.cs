@@ -9,18 +9,18 @@ using dg.Sql.Connector;
 namespace dg.Sql
 {
     [Serializable]
-    public abstract class AbstractRecordList<ItemType, ListType> : BindableList<ItemType>
-        where ItemType : AbstractRecord<ItemType>, new()
-        where ListType : AbstractRecordList<ItemType, ListType>, new()
+    public abstract class AbstractRecordList<TItemType, TListType> : BindableList<TItemType>
+        where TItemType : AbstractRecord<TItemType>, new()
+        where TListType : AbstractRecordList<TItemType, TListType>, new()
         
     {
         public virtual void SaveAll(ConnectorBase conn)
         {
-            foreach (ItemType item in this) item.Save(conn);
+            foreach (TItemType item in this) item.Save(conn);
         }
         public virtual void SaveAll()
         {
-            foreach (ItemType item in this) item.Save();
+            foreach (TItemType item in this) item.Save();
         }
         public virtual void SaveAll(ConnectorBase conn, bool withTransaction)
         {
@@ -34,7 +34,7 @@ namespace dg.Sql
                     ownsTransaction = true;
                     conn.BeginTransaction();
                 }
-                foreach (ItemType item in this) item.Save(conn);
+                foreach (TItemType item in this) item.Save(conn);
                 if (ownsTransaction)
                 {
                     conn.CommitTransaction();
@@ -59,49 +59,49 @@ namespace dg.Sql
         {
             SaveAll(null, withTransaction);
         }
-        public static ListType FromReader(DataReaderBase reader)
+        public static TListType FromReader(DataReaderBase reader)
         {
-            ListType coll = new ListType();
-            while (reader.Read()) coll.Add(AbstractRecord<ItemType>.FromReader(reader));
+            TListType coll = new TListType();
+            while (reader.Read()) coll.Add(AbstractRecord<TItemType>.FromReader(reader));
             return coll;
         }
-        public static ListType FetchAll()
+        public static TListType FetchAll()
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<ItemType>.TableSchema).ExecuteReader())
+            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.TableSchema).ExecuteReader())
             {
                 return FromReader(reader);
             }
         }
-        public static ListType FetchAll(ConnectorBase conn)
+        public static TListType FetchAll(ConnectorBase conn)
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<ItemType>.TableSchema).ExecuteReader(conn))
+            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.TableSchema).ExecuteReader(conn))
             {
                 return FromReader(reader);
             }
         }
-        public static ListType Where(string columnName, object columnValue)
+        public static TListType Where(string columnName, object columnValue)
         {
-            Query qry = new Query(AbstractRecord<ItemType>.TableSchema);
+            Query qry = new Query(AbstractRecord<TItemType>.TableSchema);
             qry.Where(columnName, columnValue);
             return FetchByQuery(qry);
         }
-        public static ListType FetchByQuery(Query qry)
+        public static TListType FetchByQuery(Query qry)
         {
             using (DataReaderBase reader = qry.ExecuteReader())
             {
                 return FromReader(reader);
             }
         }
-        public static ListType FetchByQuery(Query qry, ConnectorBase conn)
+        public static TListType FetchByQuery(Query qry, ConnectorBase conn)
         {
             using (DataReaderBase reader = qry.ExecuteReader(conn))
             {
                 return FromReader(reader);
             }
         }
-        public ListType Clone()
+        public TListType Clone()
         {
-            ListType coll = new ListType();
+            TListType coll = new TListType();
             coll.InsertRange(0, this);
             return coll;
         }

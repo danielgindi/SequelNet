@@ -78,6 +78,8 @@
     <Compile Include="Connector\ConnectorBase.cs" />
     <Compile Include="Connector\DataReaderBase.cs" />
     <Compile Include="Connector\FactoryBase.cs" />
+    <Compile Include="Sql\Phrases\Math\Round.cs" />
+    <Compile Include="Sql\QueryKeywords\GroupByHint.cs" />
     <Compile Include="Sql\Query\Builders.cs" />
     <Compile Include="Sql\Query\ShortAggregates.cs" />
     <Compile Include="Sql\Query\Executes.cs" />

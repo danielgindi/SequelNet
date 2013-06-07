@@ -326,7 +326,7 @@ namespace dg.Sql.Connector
         public virtual string type_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
         public virtual string type_MULTICURVE { get { return @"MULTICURVE"; } }
         public virtual string type_MULTISURFACE { get { return @"MULTISURFACE"; } }
-
+        
         #endregion
 
         #region Legacy, backwards compatibility

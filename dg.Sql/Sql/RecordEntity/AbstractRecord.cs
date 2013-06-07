@@ -56,7 +56,7 @@ namespace dg.Sql
         /// Re-sets a cached version of the primary key names of this record. 
         /// This is automatically called the first time that a primary-key-related action is called.
         /// </summary>
-        public static void CachePrimaryKey()
+        public static void CachePrimaryKeyName()
         {
             List<string> keyNames = new List<string>();
 
@@ -124,7 +124,7 @@ namespace dg.Sql
             {
                 if (!__LOOKED_FOR_PRIMARY_KEY_NAME)
                 {
-                    CachePrimaryKey();
+                    CachePrimaryKeyName();
                 }
                 return __PRIMARY_KEY_NAME;
             }
@@ -630,134 +630,119 @@ namespace dg.Sql
 
         #region Utilities for loading from db
 
-        protected static string StringOrNullFromDb(object obj)
+        protected static string StringOrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return (string)obj;
+            if (Value is System.DBNull || Value == null) return null;
+            else return (string)Value;
         }
 
-        protected static string StringOrEmptyFromDb(object obj)
+        protected static string StringOrEmptyFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return string.Empty;
-            else return (string)obj;
+            if (Value is System.DBNull || Value == null) return string.Empty;
+            else return (string)Value;
         }
 
-        protected static Int32? Int32OrNullFromDb(object obj)
+        protected static Int32? Int32OrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return Convert.ToInt32(obj);
+            if (Value is System.DBNull || Value == null) return null;
+            else return Convert.ToInt32(Value);
         }
 
-        protected static Int32 Int32OrZero(object obj)
+        protected static Int32 Int32OrZero(object Value)
         {
-            if (obj is System.DBNull || obj == null) return 0;
-            else return Convert.ToInt32(obj);
+            if (Value is System.DBNull || Value == null) return 0;
+            else return Convert.ToInt32(Value);
         }
 
-        protected static Int64? Int64OrNullFromDb(object obj)
+        protected static Int64? Int64OrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return Convert.ToInt64(obj);
+            if (Value is System.DBNull || Value == null) return null;
+            else return Convert.ToInt64(Value);
         }
 
-        protected static Int64 Int64OrZero(object obj)
+        protected static Int64 Int64OrZero(object Value)
         {
-            if (obj is System.DBNull || obj == null) return 0;
-            else return Convert.ToInt64(obj);
+            if (Value is System.DBNull || Value == null) return 0;
+            else return Convert.ToInt64(Value);
         }
 
-        protected static decimal? DecimalOrNullFromDb(object obj)
+        protected static decimal? DecimalOrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return Convert.ToDecimal(obj);
+            if (Value is System.DBNull || Value == null) return null;
+            else return Convert.ToDecimal(Value);
         }
 
-        protected static decimal DecimalOrZeroFromDb(object obj)
+        protected static decimal DecimalOrZeroFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return 0m;
-            else return Convert.ToDecimal(obj);
+            if (Value is System.DBNull || Value == null) return 0m;
+            else return Convert.ToDecimal(Value);
         }
 
-        protected static float? FloatOrNullFromDb(object obj)
+        protected static float? FloatOrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return Convert.ToSingle(obj);
+            if (Value is System.DBNull || Value == null) return null;
+            else return Convert.ToSingle(Value);
         }
 
-        protected static float FloatOrZeroFromDb(object obj)
+        protected static float FloatOrZeroFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return 0f;
-            else return Convert.ToSingle(obj);
+            if (Value is System.DBNull || Value == null) return 0f;
+            else return Convert.ToSingle(Value);
         }
 
-        protected static double? DoubleOrNullFromDb(object obj)
+        protected static double? DoubleOrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return Convert.ToDouble(obj);
+            if (Value is System.DBNull || Value == null) return null;
+            else return Convert.ToDouble(Value);
         }
 
-        protected static double DoubleOrZeroFromDb(object obj)
+        protected static double DoubleOrZeroFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return 0.0;
-            else return Convert.ToDouble(obj);
+            if (Value is System.DBNull || Value == null) return 0.0;
+            else return Convert.ToDouble(Value);
         }
 
-        protected static DateTime? DateTimeOrNullFromDb(object obj)
+        protected static DateTime? DateTimeOrNullFromDb(object Value)
         {
-            if (obj is System.DBNull || obj == null) return null;
-            else return (DateTime)obj;
+            if (Value is System.DBNull || Value == null) return null;
+            else return (DateTime)Value;
         }
 
-        protected static DateTime DateTimeOrNow(object obj)
+        protected static DateTime DateTimeOrNow(object Value)
         {
-            if (obj is System.DBNull || obj == null) return DateTime.UtcNow;
-            else return (DateTime)obj;
+            if (Value is System.DBNull || Value == null) return DateTime.UtcNow;
+            else return (DateTime)Value;
         }
 
-        protected static DateTime DateTimeOrMinValue(object obj)
+        protected static DateTime DateTimeOrMinValue(object Value)
         {
-            if (obj is System.DBNull || obj == null) return DateTime.MinValue;
-            else return (DateTime)obj;
+            if (Value is System.DBNull || Value == null) return DateTime.MinValue;
+            else return (DateTime)Value;
         }
 
-        protected static Guid GuidFromDb(object obj)
+        protected static Guid GuidFromDb(object Value)
         {
-            Guid? ret = obj as Guid?;
-            if (ret == null) ret = new Guid((string)obj);
+            Guid? ret = Value as Guid?;
+            if (ret == null) ret = new Guid((string)Value);
             return ret.Value;
         }
 
-        protected static Guid? GuidOrNullFromDb(object obj)
+        protected static Guid? GuidOrNullFromDb(object Value)
         {
-            Guid? ret = obj as Guid?;
-            if (ret == null && !IsNull(obj)) ret = new Guid((string)obj);
+            Guid? ret = Value as Guid?;
+            if (ret == null && !IsNull(Value)) ret = new Guid((string)Value);
             return ret.Value;
         }
 
-        protected static bool IsNull(object value)
+        protected static bool IsNull(object Value)
         {
-            if (value == null) return true;
-            if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) return true;
-            if (value == DBNull.Value) return true;
+            if (Value == null) return true;
+            if (Value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)Value).IsNull) return true;
+            if (Value == DBNull.Value) return true;
             else return false;
         }
 
         #endregion
-        
-        protected string CurrentSessionUserName
-        {
-            get
-            {
-                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.User != null)
-                {
-                    return System.Web.HttpContext.Current.User.Identity.Name;
-                }
-                else
-                {
-                    return System.Threading.Thread.CurrentPrincipal.Identity.Name;
-                }
-            }
-        }
 
         private static bool StringArrayContains(string[] Array, string Item)
         {
