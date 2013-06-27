@@ -8,46 +8,71 @@ namespace dg.Sql
 {
     public class WhereList : List<Where>
     {
-        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase connection, Query qry)
+        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase Connection, Query RelatedQuery)
         {
             bool bFirst = true;
+            bool isForJoinList = this is JoinColumnPair;
             foreach (Where where in this)
             {
-                where.BuildCommand(OutputBuilder, bFirst, connection, qry);
+                where.BuildCommand(OutputBuilder, bFirst, Connection, RelatedQuery, null, null);
                 if (bFirst) bFirst = false;
             }
         }
-        public void BuildCommand(StringBuilder OutputBuilder, Query qry)
+        public void BuildCommand(StringBuilder OutputBuilder, Query RelatedQuery)
         {
             using (ConnectorBase conn = ConnectorBase.NewInstance())
             {
                 bool bFirst = true;
+                bool isForJoinList = this is JoinColumnPair;
                 foreach (Where where in this)
                 {
-                    where.BuildCommand(OutputBuilder, bFirst, conn, qry);
+                    where.BuildCommand(OutputBuilder, bFirst, conn, RelatedQuery, null, null);
+                    if (bFirst) bFirst = false;
+                }
+            }
+        }
+        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase Connection, Query RelatedQuery, TableSchema RightTableSchema, string RightTableName)
+        {
+            bool bFirst = true;
+            bool isForJoinList = this is JoinColumnPair;
+            foreach (Where where in this)
+            {
+                where.BuildCommand(OutputBuilder, bFirst, Connection, RelatedQuery, RightTableSchema, RightTableName);
+                if (bFirst) bFirst = false;
+            }
+        }
+        public void BuildCommand(StringBuilder OutputBuilder, Query RelatedQuery, TableSchema RightTableSchema, string RightTableName)
+        {
+            using (ConnectorBase conn = ConnectorBase.NewInstance())
+            {
+                bool bFirst = true;
+                bool isForJoinList = this is JoinColumnPair;
+                foreach (Where where in this)
+                {
+                    where.BuildCommand(OutputBuilder, bFirst, conn, RelatedQuery, RightTableSchema, RightTableName);
                     if (bFirst) bFirst = false;
                 }
             }
         }
 
-        public WhereList AND(string columnName, object columnValue)
+        public WhereList AND(string ColumnName, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, ColumnValue, ValueObjectType.Value));
             return this;
         }
-        public WhereList AND(string columnName, WhereComparision comparison, object columnValue)
+        public WhereList AND(string ColumnName, WhereComparision Comparison, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, Comparison, ColumnValue, ValueObjectType.Value));
             return this;
         }
-        public WhereList AND(WhereList whereList)
+        public WhereList AND(WhereList WhereList)
         {
-            this.Add(new Where(WhereCondition.AND, whereList));
+            this.Add(new Where(WhereCondition.AND, WhereList));
             return this;
         }
-        public WhereList AND(string tableName, string columnName, WhereComparision comparison, object columnValue)
+        public WhereList AND(string TableName, string ColumnName, WhereComparision Comparison, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
+            this.Add(new Where(WhereCondition.AND, TableName, ColumnName, Comparison, ColumnValue));
             return this;
         }
         public WhereList AND(string TableName, string ColumnName, object BetweenValue, object AndValue)
@@ -63,24 +88,24 @@ namespace dg.Sql
             this.Add(where);
             return this;
         }
-        public WhereList OR(string columnName, object columnValue)
+        public WhereList OR(string ColumnName, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, ColumnValue, ValueObjectType.Value));
             return this;
         }
-        public WhereList OR(string columnName, WhereComparision comparison, object columnValue)
+        public WhereList OR(string ColumnName, WhereComparision Comparison, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, Comparison, ColumnValue, ValueObjectType.Value));
             return this;
         }
-        public WhereList OR(WhereList whereList)
+        public WhereList OR(WhereList WhereList)
         {
-            this.Add(new Where(WhereCondition.OR, whereList));
+            this.Add(new Where(WhereCondition.OR, WhereList));
             return this;
         }
-        public WhereList OR(string tableName, string columnName, WhereComparision comparison, object columnValue)
+        public WhereList OR(string TableName, string ColumnName, WhereComparision Comparison, object ColumnValue)
         {
-            this.Add(new Where(WhereCondition.OR, tableName, columnName, comparison, columnValue));
+            this.Add(new Where(WhereCondition.OR, TableName, ColumnName, Comparison, ColumnValue));
             return this;
         }
         public WhereList OR(string TableName, string ColumnName, object BetweenValue, object AndValue)

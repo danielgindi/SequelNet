@@ -150,6 +150,11 @@ namespace dg.Sql
 
         public void BuildCommand(StringBuilder OutputBuilder, bool bFirst, ConnectorBase Connection, Query RelatedQuery)
         {
+            BuildCommand(OutputBuilder, bFirst, Connection, RelatedQuery, null, null);
+        }
+
+        public void BuildCommand(StringBuilder OutputBuilder, bool bFirst, ConnectorBase Connection, Query RelatedQuery, TableSchema RightTableSchema, string RightTableName)
+        {
             if (!bFirst)
             {
                 switch (Condition)
@@ -178,7 +183,7 @@ namespace dg.Sql
             if (First is WhereList)
             {
                 OutputBuilder.Append('(');
-                ((WhereList)First).BuildCommand(OutputBuilder, Connection, RelatedQuery);
+                ((WhereList)First).BuildCommand(OutputBuilder, Connection, RelatedQuery, RightTableSchema, RightTableName);
                 OutputBuilder.Append(')');
             }
             else
@@ -187,25 +192,46 @@ namespace dg.Sql
                 {
                     if (SecondType == ValueObjectType.ColumnName)
                     {
-                        TableSchema schema;
-                        if (SecondTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
+                        if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                         {
-                            schema = RelatedQuery.Schema;
+                            OutputBuilder.Append(Query.PrepareColumnValue(RightTableSchema.Columns.Find((string)Second), First, Connection));
                         }
-                        OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, Connection));
+                        else
+                        {
+                            TableSchema schema;
+                            if (SecondTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
+                            {
+                                schema = RelatedQuery.Schema;
+                            }
+                            OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, Connection));
+                        }
                     }
-                    else OutputBuilder.Append(Connection.PrepareValue(First));
+                    else
+                    {
+                        OutputBuilder.Append(Connection.PrepareValue(First));
+                    }
                 }
                 else if (FirstType == ValueObjectType.ColumnName)
                 {
                     if (FirstTableName != null)
                     {
-                        OutputBuilder.Append(Connection.EncloseFieldName(FirstTableName));
+                        if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                        {
+                            OutputBuilder.Append(Connection.EncloseFieldName(RightTableName));
+                        }
+                        else
+                        {
+                            OutputBuilder.Append(Connection.EncloseFieldName(FirstTableName));
+                        }
                         OutputBuilder.Append('.');
                     }
                     OutputBuilder.Append(Connection.EncloseFieldName((string)First));
                 }
-                else OutputBuilder.Append(First == null ? @"NULL" : First);
+                else
+                {
+                    OutputBuilder.Append(First == null ? @"NULL" : First);
+                }
+
                 if (Comparision != WhereComparision.None)
                 {
                     switch (Comparision)
@@ -265,12 +291,19 @@ namespace dg.Sql
                                 if (FirstType == ValueObjectType.ColumnName)
                                 {
                                     // Match SECOND value to FIRST's column type
-                                    TableSchema schema;
-                                    if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                                     {
-                                        schema = RelatedQuery.Schema;
+                                        OutputBuilder.Append(Query.PrepareColumnValue(RightTableSchema.Columns.Find((string)First), Second, Connection));
                                     }
-                                    OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, Connection));
+                                    else
+                                    {
+                                        TableSchema schema;
+                                        if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                        {
+                                            schema = RelatedQuery.Schema;
+                                        }
+                                        OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, Connection));
+                                    }
                                 }
                                 else
                                 {
@@ -282,7 +315,14 @@ namespace dg.Sql
                         {
                             if (SecondTableName != null)
                             {
-                                OutputBuilder.Append(Connection.EncloseFieldName(SecondTableName));
+                                if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                                {
+                                    OutputBuilder.Append(Connection.EncloseFieldName(RightTableName));
+                                }
+                                else
+                                {
+                                    OutputBuilder.Append(Connection.EncloseFieldName(SecondTableName));
+                                }
                                 OutputBuilder.Append('.');
                             }
                             OutputBuilder.Append(Connection.EncloseFieldName((string)Second));
@@ -304,14 +344,20 @@ namespace dg.Sql
                                 StringBuilder sbIn = new StringBuilder();
                                 sbIn.Append('(');
                                 bool first = true;
+
                                 TableSchema schema = null;
-                                if (FirstType == ValueObjectType.ColumnName)
+                                if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                                {
+                                    schema = RightTableSchema;
+                                }
+                                else
                                 {
                                     if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
                                     {
                                         schema = RelatedQuery.Schema;
                                     }
                                 }
+
                                 foreach (object objIn in collIn)
                                 {
                                     if (first) first = false; else sbIn.Append(',');
@@ -332,10 +378,17 @@ namespace dg.Sql
                         {
                             if (FirstType == ValueObjectType.ColumnName)
                             {
-                                TableSchema schema;
-                                if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                TableSchema schema = null;
+                                if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                                 {
-                                    schema = RelatedQuery.Schema;
+                                    schema = RightTableSchema;
+                                }
+                                else
+                                {
+                                    if (FirstTableName == null || !RelatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    {
+                                        schema = RelatedQuery.Schema;
+                                    }
                                 }
                                 OutputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, Connection));
                             }
@@ -345,7 +398,14 @@ namespace dg.Sql
                         {
                             if (ThirdTableName != null)
                             {
-                                OutputBuilder.Append(Connection.EncloseFieldName(ThirdTableName));
+                                if (object.ReferenceEquals(ThirdTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                                {
+                                    OutputBuilder.Append(Connection.EncloseFieldName(RightTableName));
+                                }
+                                else
+                                {
+                                    OutputBuilder.Append(Connection.EncloseFieldName(ThirdTableName));
+                                }
                                 OutputBuilder.Append('.');
                             }
                             OutputBuilder.Append(Connection.EncloseFieldName((string)Third));

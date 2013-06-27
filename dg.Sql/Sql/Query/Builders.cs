@@ -51,51 +51,24 @@ namespace dg.Sql
                         sb.Append(join.RightTableSql);
                         sb.Append(')');
                     }
-                    JoinColumnPair pair = join.Pairs[0];
+
                     sb.Append(' ');
                     sb.Append((join.RightTableAlias != null && join.RightTableAlias.Length > 0) ? join.RightTableAlias : (join.RightTableSchema != null ? join.RightTableSchema.SchemaName : @""));
-                    sb.Append(@" ON ");
-                    if (pair.LeftColumnType == ValueObjectType.ColumnName)
-                    {
-                        sb.Append(connection.EncloseFieldName(pair.LeftTableNameOrAlias));
-                        sb.Append('.');
-                        sb.Append(connection.EncloseFieldName((string)pair.LeftColumn));
-                    }
-                    else if (pair.LeftColumnType == ValueObjectType.Literal)
-                    {
-                        sb.Append(pair.LeftColumn);
-                    }
-                    else if (pair.LeftColumnType == ValueObjectType.Value)
-                    {
-                        PrepareColumnValue(join.RightTableSchema != null ? (join.RightTableSchema.Columns.Find(pair.RightColumn)) : null, pair.LeftColumn, sb, connection);
-                    }
-                    sb.Append(@" = ");
-                    sb.Append(connection.EncloseFieldName(join.RightTableAlias));
-                    sb.Append('.');
-                    sb.Append(connection.EncloseFieldName(pair.RightColumn));
 
-                    for (int lj = 1; lj < join.Pairs.Count; lj++)
+                    if (join.Pairs.Count > 1)
                     {
-                        pair = join.Pairs[lj];
-                        sb.Append(@" AND ");
-                        if (pair.LeftColumnType == ValueObjectType.ColumnName)
+                        sb.Append(@" ON ");
+                        WhereList wl = new WhereList();
+                        foreach (WhereList joins in join.Pairs)
                         {
-                            sb.Append(connection.EncloseFieldName(pair.LeftTableNameOrAlias));
-                            sb.Append('.');
-                            sb.Append(connection.EncloseFieldName((string)pair.LeftColumn));
+                            wl.AddRange(joins);
                         }
-                        else if (pair.LeftColumnType == ValueObjectType.Literal)
-                        {
-                            sb.Append(pair.LeftColumn);
-                        }
-                        else if (pair.LeftColumnType == ValueObjectType.Value)
-                        {
-                            PrepareColumnValue(join.RightTableSchema != null ? (join.RightTableSchema.Columns.Find(pair.RightColumn)) : null, pair.LeftColumn, sb, connection);
-                        }
-                        sb.Append(@" = ");
-                        sb.Append(connection.EncloseFieldName(join.RightTableAlias));
-                        sb.Append('.');
-                        sb.Append(connection.EncloseFieldName(pair.RightColumn));
+                        wl.BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.SchemaName : join.RightTableAlias);
+                    }
+                    else if (join.Pairs.Count == 1)
+                    {
+                        sb.Append(@" ON ");
+                        join.Pairs[0].BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.SchemaName : join.RightTableAlias);
                     }
                 }
             }
@@ -764,7 +737,7 @@ namespace dg.Sql
                                     if (_ListWhere != null && _ListWhere.Count > 0)
                                     {
                                         sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this);
+                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
                                     }
                                     sb.AppendFormat(@") - {0} ", Offset);
                                 }
@@ -893,7 +866,7 @@ namespace dg.Sql
                                 if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, connection, this);
+                                    _ListWhere.BuildCommand(sb, connection, this, null, null);
                                 }
 
                                 if (mssqlLimitOffsetMode)
@@ -1019,7 +992,7 @@ namespace dg.Sql
                                     if (_ListWhere != null && _ListWhere.Count > 0)
                                     {
                                         sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this);
+                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
                                     }
                                 }
                             }
@@ -1070,7 +1043,7 @@ namespace dg.Sql
                                 if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, connection, this);
+                                    _ListWhere.BuildCommand(sb, connection, this, null, null);
                                 }
 
                                 BuildOrderBy(sb, connection, false);
@@ -1140,7 +1113,7 @@ namespace dg.Sql
                                         if (_ListWhere != null && _ListWhere.Count > 0)
                                         {
                                             sb.Append(@" WHERE ");
-                                            _ListWhere.BuildCommand(sb, connection, this);
+                                            _ListWhere.BuildCommand(sb, connection, this, null, null);
                                         }
                                     }
                                 }
@@ -1193,7 +1166,7 @@ namespace dg.Sql
                                     if (_ListWhere != null && _ListWhere.Count > 0)
                                     {
                                         sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this);
+                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
                                     }
 
                                     BuildOrderBy(sb, connection, false);
@@ -1263,7 +1236,7 @@ namespace dg.Sql
                                         if (_ListWhere != null && _ListWhere.Count > 0)
                                         {
                                             sb.Append(@" WHERE ");
-                                            _ListWhere.BuildCommand(sb, connection, this);
+                                            _ListWhere.BuildCommand(sb, connection, this, null, null);
                                         }
                                     }
 
@@ -1298,7 +1271,7 @@ namespace dg.Sql
                                 if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, connection, this);
+                                    _ListWhere.BuildCommand(sb, connection, this, null, null);
                                 }
                                 BuildOrderBy(sb, connection, false);
                             }
