@@ -43,7 +43,7 @@ namespace dg.Sql.Connector
             public bool WrapInTransaction;
         }
 
-        private enum DbObjectType
+        public enum DbObjectType
         {
             PROCEDURE,
             FUNCTION,
@@ -51,7 +51,7 @@ namespace dg.Sql.Connector
             VIEW,
             TABLE
         }
-        static private string GetObjectCreate(MySqlConnector conn, DbObjectType type, string objectName, bool ifNotExists)
+        static public string GetObjectCreate(MySqlConnector conn, DbObjectType type, string objectName, bool ifNotExists)
         {
             string resultColumn = "";
             switch (type)
@@ -91,7 +91,7 @@ namespace dg.Sql.Connector
             }
             return null;
         }
-        static private List<string> GetObjectList(MySqlConnector conn, DbObjectType type)
+        static public List<string> GetObjectList(MySqlConnector conn, DbObjectType type)
         {
             string sql = null;
             switch (type)
@@ -121,7 +121,7 @@ namespace dg.Sql.Connector
             }
             return lstResults;
         }
-        static private bool IsView(MySqlConnector conn, string tableName)
+        static public bool IsView(MySqlConnector conn, string tableName)
         {
             string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.PrepareValue(tableName));
             return !IsNull(conn.ExecuteScalar(sql));
