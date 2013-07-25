@@ -278,41 +278,61 @@ namespace dg.Sql
                 }
                 else if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
-                    sb.Append(@"ALTER TABLE ");
-
-                    if (Schema.DatabaseOwner.Length > 0)
-                    {
-                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                        sb.Append('.');
-                    }
-                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
-
-                    sb.Append(@" ADD CONSTRAINT ");
-                    sb.Append(connection.EncloseFieldName(index.Name));
-                    sb.Append(' ');
-
                     if (index.Mode == dg.Sql.TableSchema.IndexMode.PrimaryKey)
                     {
-                        sb.AppendFormat(@"PRIMARY KEY ");
+                        sb.Append(@"ALTER TABLE ");
+
+                        if (Schema.DatabaseOwner.Length > 0)
+                        {
+                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                            sb.Append('.');
+                        }
+                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                        sb.Append(@" ADD CONSTRAINT ");
+                        sb.Append(connection.EncloseFieldName(index.Name));
+                        sb.Append(@" PRIMARY KEY ");
 
                         if (index.Cluster == TableSchema.ClusterMode.Clustered) sb.Append(@"CLUSTERED ");
-                        else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");
+                        else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");                      
+
+                        sb.Append(@"(");
+                        for (int i = 0; i < index.ColumnNames.Length; i++)
+                        {
+                            if (i > 0) sb.Append(",");
+                            sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
+                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+                        }
+                        sb.Append(@")");
                     }
                     else
                     {
+                        sb.Append(@"CREATE ");
+
                         if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
                         if (index.Cluster == TableSchema.ClusterMode.Clustered) sb.Append(@"CLUSTERED ");
                         else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");
-                        if (index.Mode != TableSchema.IndexMode.Unique) sb.Append(@"INDEX ");
+
+                        sb.Append(@"INDEX ");
+                        sb.Append(connection.EncloseFieldName(index.Name));
+
+                        sb.Append(@"ON ");
+                        if (Schema.DatabaseOwner.Length > 0)
+                        {
+                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                            sb.Append('.');
+                        }
+                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                        
+                        sb.Append(@"(");
+                        for (int i = 0; i < index.ColumnNames.Length; i++)
+                        {
+                            if (i > 0) sb.Append(",");
+                            sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
+                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+                        }
+                        sb.Append(@")");
                     }
-                    sb.Append(@"(");
-                    for (int i = 0; i < index.ColumnNames.Length; i++)
-                    {
-                        if (i > 0) sb.Append(",");
-                        sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
-                        sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                    }
-                    sb.Append(@")");
                 }
             }
             else if (indexObj is TableSchema.ForeignKey)
