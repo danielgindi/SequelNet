@@ -50,13 +50,11 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ClipboardHelper.cs" />
     <Compile Include="Connect.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaGenerator.cs" />
     <Compile Include="Types\DalIndex.cs" />
     <Compile Include="Types\DalForeignKey.cs" />
@@ -125,11 +123,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="dg.Sql.SchemaGeneratorAddIn.AddIn" />
     <Content Include="E:\My Documents\Visual Studio 2010\Addins\dg.Sql.SchemaGeneratorAddIn - For Testing.AddIn">
       <Link>dg.Sql.SchemaGeneratorAddIn - For Testing.AddIn</Link>
     </Content>
-    <Content Include="Macro structure.txt" />
+    <EmbeddedResource Include="Macro Structure.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
   <PropertyGroup>

@@ -1,0 +1,51 @@
+﻿Define a DAL class in comments like this:
+/* Class name
+ *  Table name
+ *  Column name:   List of keywords/datatypes ended with ; A comment
+ *  @FOREIGNKEY:   NAME(fk_name); FOREIGNTABLE(other DAL's class name); COLUMNS[Column name, Column name]; FOREIGNCOLUMNS[Column name, Column name]; ONUPDATE(CASCADE/RESTRICT/SETNULL/NOACTION); ONDELETE(CASCADE/RESTRICT/SETNULL/NOACTION);
+ *  @INDEX:        NAME(ix_name); [Column name, column name]; UNIQUE/PRIMARYKEY/SPATIAL/FULLTEXT/BTREE/RTREE/HASH/NONCLUSTERED/CLUSTERED
+ *  @BEFOREINSERT: Code to execute in beginning of Insert(...) code
+ *  @BEFOREUPDATE: Code to execute in beginning of Update(...) code
+ *  @AFTERREAD:    Code to execute at the end of Read(...) code
+ *  @MYSQLENGINE:  InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
+ */
+
+Keywords:
+ PRIMARY KEY - Defines the column as primary key or part of primary key
+ AUTOINCREMENT - Defines the column as a serial column
+ DEFAULT value - Sets the DEFAULT value for the column
+ NULLABLE - Defines the column as NULLABLE. Default is NOT NULL.
+ NOPROPERTY - will remove the property code for this specific column. Can be used to write a custom property
+ ACTUALDEFAULT - define a different code-based default value for the class's instance member variable
+ TODB - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format
+ FROMDB - Define a format to be used in Read(...). Can use the {0} specifier for column value in format
+ VIRTUAL - Defines the property as virtual
+ UNIQUE INDEX - Defines a UNIQUE index on this column
+ FOREIGN TableClassName.ColumnName - Defines a FOREIGN key for this column
+
+Data types:
+ INT64; INT32; INT16; INT8; UINT64; UINT32; UINT16; UINT8; DOUBLE; FLOAT; 
+ DECIMAL; MONEY; PRECISION(length); SCALE(length);
+ DECIMAL(scale,precision); MONEY(scale,precision);
+ DECIMAL(scale); MONEY(scale);
+ FIXEDSTRING(length); STRING(length); TEXT; LONGTEXT(length); MEDIUMTEXT(length); 
+ BOOL; GUID; DATETIME; 
+
+Geometry spatial types:
+ GEOMETRY; GEOMETRYCOLLECTION; 
+ POINT; LINESTRING; POLYGON; LINE; CURVE; SURFACE; LINEARRING; 
+ MULTIPOINT; MULTILINESTRING; MULTIPOLYGON; MULTICURVE; MULTISURFACE;
+
+Geographic spatial types:
+ GEOGRAPHIC; GEOGRAPHICCOLLECTION; 
+ GEOGRAPHIC_POINT; GEOGRAPHIC_LINESTRING; GEOGRAPHIC_POLYGON; GEOGRAPHIC_LINE; GEOGRAPHIC_CURVE; GEOGRAPHIC_SURFACE; GEOGRAPHIC_LINEARRING; 
+ GEOGRAPHIC_MULTIPOINT; GEOGRAPHIC_MULTILINESTRING; GEOGRAPHIC_MULTIPOLYGON; GEOGRAPHIC_MULTICURVE; GEOGRAPHIC_MULTISURFACE;
+
+Enumeration  type:
+ You can define an enum for the column, if specified like this:
+/* Column name:            DEFAULT EnumName.None; Comment for column:
+ *                          "EnumName"
+ *                          - None = 0
+ *                          - Option1 = 1
+ *                          - Option2 = 2
+ */
