@@ -14,5 +14,10 @@ namespace dg.Sql
 
         public abstract bool IsEmpty { get; }
         public abstract bool IsValid { get; }
+        public bool IsGeographyType
+        { 
+            get; 
+            set; 
+        }
     }
 }

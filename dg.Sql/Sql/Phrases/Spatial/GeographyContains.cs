@@ -98,9 +98,16 @@ namespace dg.Sql.Phrases
             if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
             {
             }
-            else // MYSQL
+            else 
             {
-                sb.Append(@"MBRContains(");
+                if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                {
+                    sb.Append(@"ST_Contains(");
+                }
+                else // MYSQL
+                {
+                    sb.Append(@"MBRContains(");
+                }
             }
 
             if (ContainingObjectType == ValueObjectType.ColumnName)
@@ -129,7 +136,7 @@ namespace dg.Sql.Phrases
             {
                 sb.Append(@".STContains(");
             }
-            else // MYSQL
+            else // MYSQL, PostgreSQL
             {
                 sb.Append(@",");
             }

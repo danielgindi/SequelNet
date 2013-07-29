@@ -62,10 +62,18 @@ namespace dg.Sql.Phrases
                     TX = TY + @".STX";
                     TY = TY + @".STY";
                 }
-                else // MYSQL
+                else
                 {
-                    TX = @"X(" + TY + @")";
-                    TY = @"Y(" + TY + @")";
+                    if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                    {
+                        TX = @"ST_X(" + TY + @")";
+                        TY = @"ST_Y(" + TY + @")";
+                    }
+                    else // MYSQL
+                    {
+                        TX = @"X(" + TY + @")";
+                        TY = @"Y(" + TY + @")";
+                    }
                 }
             }
             else

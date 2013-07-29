@@ -17,10 +17,10 @@ namespace dg.Sql
             {
                 _Holes = new List<LineString>();
             }
-            public Polygon(LineString Exterior, params LineString[] rings)
+            public Polygon(LineString Exterior, params LineString[] Rings)
             {
                 this._Exterior = Exterior;
-                _Holes = new List<LineString>(rings);
+                _Holes = new List<LineString>(Rings);
             }
             public Polygon(int HolesCapacity)
             {
@@ -75,10 +75,27 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
-                    sb.Append(@"geography::STGeomFromText('");
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"geography::STGeomFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"geometry::STGeomFromText('");
+                    }
+                }
+                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                {
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"ST_GeogFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"ST_GeomFromText('");
+                    }
                 }
                 else
                 {
@@ -97,24 +114,9 @@ namespace dg.Sql
                 {
                     sb.Append(@"')");
                 }
-
-#else
-                sb.Append(@"GeomFromEwkt('");
-                if (SRID != null)
-                {
-                    sb.Append(@"SRID=");
-                    sb.Append(SRID);
-                    sb.Append(';');
-                }
-
-                BuildValueForCollection(sb, conn);
-
-                sb.Append(@"')");
-#endif
             }
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 bool firstLineString = true, first;
                 sb.Append(@"POLYGON(");
                 if (_Exterior != null)
@@ -147,111 +149,6 @@ namespace dg.Sql
                 }
 
                 sb.Append(')');
-#else
-                bool HasM = false, HasZ = false;
-                if (_Exterior != null)
-                {
-                    if (_Exterior.Points.Count > 0)
-                    {
-                        Point firstPoint = _Exterior.Points[0];
-                        HasM = firstPoint.M != null;
-                        HasZ = firstPoint.Z != null;
-                    }
-                }
-
-                bool firstLineString = true, first;
-
-                if (!HasZ && HasM)
-                {
-                    sb.Append(@"POLYGONM(");
-                    if (_Exterior != null)
-                    {
-                        firstLineString = false; ;
-                        sb.Append('(');
-                        first = true;
-                        foreach (Point pt in _Exterior.Points)
-                        {
-                            if (first) first = false; else sb.Append(',');
-                            sb.Append(pt.X.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.Y.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.M.Value.ToString(formatProvider));
-                        }
-                        sb.Append(')');
-                    }
-                    foreach (LineString ring in _Holes)
-                    {
-                        if (firstLineString) firstLineString = false; else sb.Append(',');
-                        sb.Append('(');
-                        first = true;
-                        foreach (Point pt in ring.Points)
-                        {
-                            if (first) first = false; else sb.Append(',');
-                            sb.Append(pt.X.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.Y.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.M.Value.ToString(formatProvider));
-                        }
-                        sb.Append(')');
-                    }
-                }
-                else
-                {
-                    sb.Append(@"POLYGON(");
-                    if (_Exterior != null)
-                    {
-                        firstLineString = false; ;
-                        sb.Append('(');
-                        first = true;
-                        foreach (Point pt in _Exterior.Points)
-                        {
-                            if (first) first = false; else sb.Append(',');
-                            sb.Append(pt.X.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.Y.ToString(formatProvider));
-                            if (HasM)
-                            {
-                                sb.Append(' ');
-                                sb.Append(pt.Z.Value.ToString(formatProvider));
-                                if (HasZ)
-                                {
-                                    sb.Append(' ');
-                                    sb.Append(pt.M.Value.ToString(formatProvider));
-                                }
-                            }
-                        }
-                        sb.Append(')');
-                    }
-                    foreach (LineString ring in _Holes)
-                    {
-                        if (firstLineString) firstLineString = false; else sb.Append(',');
-                        sb.Append('(');
-                        first = true;
-                        foreach (Point pt in ring.Points)
-                        {
-                            if (first) first = false; else sb.Append(',');
-                            sb.Append(pt.X.ToString(formatProvider));
-                            sb.Append(' ');
-                            sb.Append(pt.Y.ToString(formatProvider));
-                            if (HasM)
-                            {
-                                sb.Append(' ');
-                                sb.Append(pt.Z.Value.ToString(formatProvider));
-                                if (HasZ)
-                                {
-                                    sb.Append(' ');
-                                    sb.Append(pt.M.Value.ToString(formatProvider));
-                                }
-                            }
-                        }
-                        sb.Append(')');
-                    }
-                }
-
-                sb.Append(')');
-#endif
             }
         }
     }

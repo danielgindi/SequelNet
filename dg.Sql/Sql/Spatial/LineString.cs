@@ -16,9 +16,9 @@ namespace dg.Sql
             {
                 _Points = new List<Point>();
             }
-            public LineString(params Point[] pt)
+            public LineString(params Point[] Points)
             {
-                _Points = new List<Point>(pt);
+                _Points = new List<Point>(Points);
             }
             public LineString(int Capacity)
             {
@@ -123,10 +123,27 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
-                    sb.Append(@"geography::STGeomFromText('");
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"geography::STGeomFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"geometry::STGeomFromText('");
+                    }
+                }
+                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                {
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"ST_GeogFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"ST_GeomFromText('");
+                    }
                 }
                 else
                 {
@@ -154,23 +171,9 @@ namespace dg.Sql
                 {
                     sb.Append(@")')");
                 }
-#else
-                sb.Append(@"GeomFromEwkt('");
-                if (SRID != null)
-                {
-                    sb.Append(@"SRID=");
-                    sb.Append(SRID);
-                    sb.Append(';');
-                }
-
-                BuildValueForCollection(sb, conn);
-
-                sb.Append(@"')");
-#endif
             }
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 sb.Append(@"LINESTRING(");
                 foreach (Point pt in _Points)
                 {
@@ -179,51 +182,6 @@ namespace dg.Sql
                     sb.Append(pt.Y.ToString(formatProvider));
                 }
                 sb.Append(@")");
-#else
-                bool HasM = false, HasZ = false;
-                if (_Points.Count > 0)
-                {
-                    HasM = _Points[0].M != null;
-                    HasZ = _Points[0].Z != null;
-                }
-
-                bool first = true;
-                if (!HasZ && HasM)
-                {
-                    sb.Append(@"LINESTRINGM(");
-                    foreach (Point pt in _Points)
-                    {
-                        if (first) first = false; else sb.Append(',');
-                        sb.Append(pt.X.ToString(formatProvider));
-                        sb.Append(' ');
-                        sb.Append(pt.Y.ToString(formatProvider));
-                        sb.Append(' ');
-                        sb.Append(pt.M.Value.ToString(formatProvider));
-                    }
-                }
-                else
-                {
-                    sb.Append(@"LINESTRING(");
-                    foreach (Point pt in _Points)
-                    {
-                        if (first) first = false; else sb.Append(',');
-                        sb.Append(pt.X.ToString(formatProvider));
-                        sb.Append(' ');
-                        sb.Append(pt.Y.ToString(formatProvider));
-                        if (HasM)
-                        {
-                            sb.Append(' ');
-                            sb.Append(pt.Z.Value.ToString(formatProvider));
-                            if (HasZ)
-                            {
-                                sb.Append(' ');
-                                sb.Append(pt.M.Value.ToString(formatProvider));
-                            }
-                        }
-                    }
-                }
-                sb.Append(')');
-#endif
             }
 
             #region Common Calculation Helpers

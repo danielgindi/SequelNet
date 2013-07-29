@@ -13,8 +13,8 @@ namespace dg.Sql
                 : base()
             {
             }
-            public MultiLineString(params LineString[] lineStrings)
-                : base(lineStrings)
+            public MultiLineString(params LineString[] LineStrings)
+                : base(LineStrings)
             {
             }
             public MultiLineString(int Capacity)

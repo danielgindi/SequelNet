@@ -61,10 +61,27 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
-                    sb.Append(@"geography::STGeomFromText('");
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"geography::STGeomFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"geometry::STGeomFromText('");
+                    }
+                }
+                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                {
+                    if (this.IsGeographyType)
+                    {
+                        sb.Append(@"ST_GeogFromText('");
+                    }
+                    else
+                    {
+                        sb.Append(@"ST_GeomFromText('");
+                    }
                 }
                 else
                 {
@@ -86,58 +103,14 @@ namespace dg.Sql
                 {
                     sb.Append(@")')");
                 }
-
-#else
-                sb.Append(@"GeomFromEwkt('");
-                if (SRID != null)
-                {
-                    sb.Append(@"SRID=");
-                    sb.Append(SRID);
-                    sb.Append(';');
-                }
-
-                BuildValueForCollection(sb, conn);
-
-                sb.Append(@"')");
-#endif
             }
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
-#if !USE_EWKT
                 sb.Append(@"POINT(");
                 sb.Append(X.ToString(formatProvider));
                 sb.Append(' ');
                 sb.Append(Y.ToString(formatProvider));
                 sb.Append(@")");
-#else
-                if (Z == null && M != null)
-                {
-                    sb.Append(@"POINTM(");
-                    sb.Append(X.ToString(formatProvider));
-                    sb.Append(' ');
-                    sb.Append(Y.ToString(formatProvider));
-                    sb.Append(' ');
-                    sb.Append(M.Value.ToString(formatProvider));
-                }
-                else
-                {
-                    sb.Append(@"POINT(");
-                    sb.Append(X.ToString(formatProvider));
-                    sb.Append(' ');
-                    sb.Append(Y.ToString(formatProvider));
-                    if (Z != null)
-                    {
-                        sb.Append(' ');
-                        sb.Append(Z.Value.ToString(formatProvider));
-                        if (M != null)
-                        {
-                            sb.Append(' ');
-                            sb.Append(M.Value.ToString(formatProvider));
-                        }
-                    }
-                }
-                sb.Append(@")");
-#endif
             }
         }
     }
