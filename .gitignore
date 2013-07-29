@@ -28,7 +28,9 @@ ipch/
 obj/
 [Bb]in
 [Dd]ebug*/
+_Debug/
 [Rr]elease*/
+_Release/
 Ankh.NoLoad
 
 #MonoDevelop
