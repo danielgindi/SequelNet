@@ -57,7 +57,7 @@ namespace dg.Sql.Phrases
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+            if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL || conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                 ret = @"IFNULL(";
             else ret = @"ISNULL(";
 

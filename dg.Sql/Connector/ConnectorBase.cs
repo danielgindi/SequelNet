@@ -19,7 +19,8 @@ namespace dg.Sql.Connector
             UNKNOWN = 0,
             MYSQL = 1,
             MSSQL = 2,
-            MSACCESS = 3
+            MSACCESS = 3,
+            POSTGRESQL = 4
         }
 
         #region Instancing
@@ -231,6 +232,10 @@ namespace dg.Sql.Connector
         {
             return LikeExpression.Replace(@"\", @"\\").Replace(@"%", @"\%");
         }
+        public virtual string LikeEscapingStatement
+        {
+            get { return @"ESCAPE('\')"; }
+        }
 
         #endregion
 
@@ -290,6 +295,7 @@ namespace dg.Sql.Connector
         }
 
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
+        public virtual string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
 
         public virtual string type_TINYINT { get { return @"INT"; } }
         public virtual string type_UNSIGNEDTINYINT { get { return @"INT"; } }
@@ -312,20 +318,35 @@ namespace dg.Sql.Connector
         public virtual string type_BLOB { get { return @"BLOB"; } }
         public virtual string type_GUID { get { return @"GUID"; } }
 
-        public virtual string type_GEOMETRY { get { return @"GEOMETRY"; } }
-        public virtual string type_GEOMETRYCOLLECTION { get { return @"GEOMETRYCOLLECTION"; } }
-        public virtual string type_POINT { get { return @"POINT"; } }
-        public virtual string type_LINESTRING { get { return @"LINESTRING"; } }
-        public virtual string type_POLYGON { get { return @"POLYGON"; } }
-        public virtual string type_LINE { get { return @"LINE"; } }
-        public virtual string type_CURVE { get { return @"CURVE"; } }
-        public virtual string type_SURFACE { get { return @"SURFACE"; } }
-        public virtual string type_LINEARRING { get { return @"LINEARRING"; } }
-        public virtual string type_MULTIPOINT { get { return @"MULTIPOINT"; } }
-        public virtual string type_MULTILINESTRING { get { return @"MULTILINESTRING"; } }
-        public virtual string type_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
-        public virtual string type_MULTICURVE { get { return @"MULTICURVE"; } }
-        public virtual string type_MULTISURFACE { get { return @"MULTISURFACE"; } }
+        public virtual string type_GEOMETRY { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOMETRYCOLLECTION { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_POINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_LINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_POLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_LINE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_CURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_SURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_LINEARRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_MULTIPOINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_MULTILINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_MULTIPOLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_MULTICURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_MULTISURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+
+        public virtual string type_GEOGRAPHIC { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHICCOLLECTION { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_POINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_LINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_POLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_LINE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_CURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_SURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_LINEARRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_MULTIPOINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_MULTILINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_MULTIPOLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_MULTICURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string type_GEOGRAPHIC_MULTISURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
         
         #endregion
 

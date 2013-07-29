@@ -415,11 +415,9 @@ namespace dg.Sql
 
                     if (Comparision == WhereComparision.Like)
                     {
-                        if (Connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                        {
-                            OutputBuilder.Append(@" ESCAPE('\\') ");
-                        }
-                        else OutputBuilder.Append(@" ESCAPE('\') ");
+                        OutputBuilder.Append(' ');
+                        OutputBuilder.Append(Connection.LikeEscapingStatement);
+                        OutputBuilder.Append(' ');
                     }
                 }
             }

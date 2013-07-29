@@ -180,7 +180,7 @@ namespace dg.Sql
         /// String (up to 4,294,967,296 bytes - 4GB)
         /// </summary>
         LongText,
-            
+
         /// <summary>
         /// Geometry base class
         /// </summary>
@@ -237,5 +237,62 @@ namespace dg.Sql
         /// Surface collection
         /// </summary>
         MultiSurface,
+
+        /// <summary>
+        /// Geographic base class
+        /// </summary>
+        Geographic,
+        /// <summary>
+        /// Geographic collection
+        /// </summary>
+        GeographicCollection,
+        /// <summary>
+        /// Geographic Point
+        /// </summary>
+        GeographicPoint,
+        /// <summary>
+        /// Geographic Line string which is two or more points
+        /// </summary>
+        GeographicLineString,
+        /// <summary>
+        /// Geographic Polygon which is two or more points
+        /// </summary>
+        GeographicPolygon,
+        /// <summary>
+        /// Geographic Line
+        /// </summary>
+        GeographicLine,
+        /// <summary>
+        /// Geographic Curve
+        /// </summary>
+        GeographicCurve,
+        /// <summary>
+        /// Geographic Surface
+        /// </summary>
+        GeographicSurface,
+        /// <summary>
+        /// Geographic Linear ring
+        /// </summary>
+        GeographicLinearRing,
+        /// <summary>
+        /// Geographic Point collection
+        /// </summary>
+        GeographicMultiPoint,
+        /// <summary>
+        /// Geographic LineString collection
+        /// </summary>
+        GeographicMultiLineString,
+        /// <summary>
+        /// Geographic Polygon collection
+        /// </summary>
+        GeographicMultiPolygon,
+        /// <summary>
+        /// Geographic Curve collection
+        /// </summary>
+        GeographicMultiCurve,
+        /// <summary>
+        /// Geographic Surface collection
+        /// </summary>
+        GeographicMultiSurface,
     }
 }

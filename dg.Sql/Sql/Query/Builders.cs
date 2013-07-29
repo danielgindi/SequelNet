@@ -91,6 +91,9 @@ namespace dg.Sql
                             case ConnectorBase.SqlServiceType.MSSQL:
                                 sb.Append(@"NEWID()");
                                 break;
+                            case ConnectorBase.SqlServiceType.POSTGRESQL:
+                                sb.Append(@"RANDOM()");
+                                break;
                             default:
                             case ConnectorBase.SqlServiceType.MYSQL:
                                 sb.Append(@"RAND()");
@@ -242,6 +245,64 @@ namespace dg.Sql
                         sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                     }
                     sb.Append(@");");
+                }
+                else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                {
+                    if (index.Mode == dg.Sql.TableSchema.IndexMode.PrimaryKey)
+                    {
+                        sb.Append(@"ALTER TABLE ");
+
+                        if (Schema.DatabaseOwner.Length > 0)
+                        {
+                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                            sb.Append('.');
+                        }
+                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                        sb.Append(@" ADD CONSTRAINT ");
+                        sb.Append(connection.EncloseFieldName(index.Name));
+                        sb.Append(@" PRIMARY KEY ");
+
+                        sb.Append(@"(");
+                        for (int i = 0; i < index.ColumnNames.Length; i++)
+                        {
+                            if (i > 0) sb.Append(",");
+                            sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
+                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+                        }
+                        sb.Append(@")");
+                    }
+                    else
+                    {
+                        sb.Append(@"CREATE ");
+
+                        if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
+
+                        sb.Append(@"INDEX ");
+                        sb.Append(connection.EncloseFieldName(index.Name));
+
+                        sb.Append(@"ON ");
+                        if (Schema.DatabaseOwner.Length > 0)
+                        {
+                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                            sb.Append('.');
+                        }
+                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+
+                        if (index.Mode == TableSchema.IndexMode.Spatial)
+                        {
+                            sb.Append(@"USING GIST");
+                        }
+
+                        sb.Append(@"(");
+                        for (int i = 0; i < index.ColumnNames.Length; i++)
+                        {
+                            if (i > 0) sb.Append(",");
+                            sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
+                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+                        }
+                        sb.Append(@")");
+                    }
                 }
                 else if (connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
                 {
@@ -408,10 +469,25 @@ namespace dg.Sql
             sb.Append(connection.EncloseFieldName(column.Name));
             sb.Append(' ');
 
-            bool isTextField = false;
+            bool isTextField;
+            BuildColumnPropertiesDataType(sb, connection, column, out isTextField);
 
+            if (!column.Nullable)
+            {
+                sb.Append(@"NOT NULL ");
+            }
+            if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
+            {
+                sb.Append(@"DEFAULT ");
+                PrepareColumnValue(column, column.Default, sb, connection);
+                sb.Append(' ');
+            }
+        }
+        public void BuildColumnPropertiesDataType(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, out bool isTextField)
+        {
+            isTextField = false;
             DataType dataType = column.ActualDataType;
-            if (!column.AutoIncrement || connection.TYPE != ConnectorBase.SqlServiceType.MSACCESS)
+            if (!column.AutoIncrement || (connection.TYPE != ConnectorBase.SqlServiceType.MSACCESS && connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL))
             {
                 if (dataType == DataType.VarChar)
                 {
@@ -613,21 +689,74 @@ namespace dg.Sql
                 {
                     sb.Append(connection.type_MULTISURFACE);
                 }
+                else if (dataType == DataType.Geographic)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC);
+                }
+                else if (dataType == DataType.GeographicCollection)
+                {
+                    sb.Append(connection.type_GEOGRAPHICCOLLECTION);
+                }
+                else if (dataType == DataType.GeographicPoint)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_POINT);
+                }
+                else if (dataType == DataType.GeographicLineString)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_LINESTRING);
+                }
+                else if (dataType == DataType.GeographicPolygon)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_POLYGON);
+                }
+                else if (dataType == DataType.GeographicLine)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_LINE);
+                }
+                else if (dataType == DataType.GeographicCurve)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_CURVE);
+                }
+                else if (dataType == DataType.GeographicSurface)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_SURFACE);
+                }
+                else if (dataType == DataType.GeographicLinearRing)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_LINEARRING);
+                }
+                else if (dataType == DataType.GeographicMultiPoint)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_MULTIPOINT);
+                }
+                else if (dataType == DataType.GeographicMultiLineString)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_MULTILINESTRING);
+                }
+                else if (dataType == DataType.GeographicMultiPolygon)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_MULTIPOLYGON);
+                }
+                else if (dataType == DataType.GeographicMultiCurve)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_MULTICURVE);
+                }
+                else if (dataType == DataType.GeographicMultiSurface)
+                {
+                    sb.Append(connection.type_GEOGRAPHIC_MULTISURFACE);
+                }
                 sb.Append(' ');
             }
             if (column.AutoIncrement)
             {
-                sb.Append(connection.type_AUTOINCREMENT);
-                sb.Append(' ');
-            }
-            if (!column.Nullable)
-            {
-                sb.Append(@"NOT NULL ");
-            }
-            if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
-            {
-                sb.Append(@"DEFAULT ");
-                PrepareColumnValue(column, column.Default, sb, connection);
+                if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
+                { // Specifically for PostgreSQL
+                    sb.Append(connection.type_AUTOINCREMENT_BIGINT);
+                }
+                else
+                {
+                    sb.Append(connection.type_AUTOINCREMENT);
+                }
                 sb.Append(' ');
             }
         }
@@ -923,7 +1052,7 @@ namespace dg.Sql
                                     BuildGroupBy(sb, connection, false);
                                     BuildOrderBy(sb, connection, false);
 
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                     {
                                         if (Limit > 0)
                                         {
@@ -936,7 +1065,9 @@ namespace dg.Sql
                                 switch (_QueryHint)
                                 {
                                     case QueryHint.ForUpdate:
-                                        if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
+                                        if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL ||
+                                            connection.TYPE == ConnectorBase.SqlServiceType.MSSQL ||
+                                            connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                         {
                                             sb.Append(@" FOR UPDATE");
                                         }
@@ -945,6 +1076,10 @@ namespace dg.Sql
                                         if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                         {
                                             sb.Append(@" LOCK IN SHARED MODE");
+                                        }
+                                        else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                                        {
+                                            sb.Append(@" FOR SHARE");
                                         }
                                         break;
                                 }
@@ -1141,128 +1276,26 @@ namespace dg.Sql
                                 {
                                     _NeedTransaction = true;
 
-                                    sb.Append(@"UPDATE ");
-
-                                    #region Update clause
-
-                                    if (Schema.DatabaseOwner.Length > 0)
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                     {
-                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                        sb.Append('.');
-                                    }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
-
-                                    bFirst = true;
-                                    foreach (AssignmentColumn upd in _ListInsertUpdate)
-                                    {
-                                        if (bFirst)
-                                        {
-                                            sb.Append(@" SET ");
-                                            bFirst = false;
-                                        }
-                                        else sb.Append(',');
-                                        sb.Append(connection.EncloseFieldName(upd.ColumnName));
-                                        sb.Append('=');
-
-                                        if (upd.SecondType == ValueObjectType.Literal)
-                                        {
-                                            sb.Append(upd.Second);
-                                        }
-                                        else if (upd.SecondType == ValueObjectType.Value)
-                                        {
-                                            PrepareColumnValue(Schema.Columns.Find(upd.ColumnName), upd.Second, sb, connection);
-                                        }
-                                        else if (upd.SecondType == ValueObjectType.ColumnName)
-                                        {
-                                            if (upd.SecondTableName != null)
-                                            {
-                                                sb.Append(connection.EncloseFieldName(upd.SecondTableName));
-                                                sb.Append(@".");
-                                            }
-                                            sb.Append(connection.EncloseFieldName(upd.Second.ToString()));
-                                        }
+                                        throw new NotImplementedException(@"This operation is not implemented for PostgreSQL due to database limitations.");
                                     }
 
-                                    if (_ListWhere != null && _ListWhere.Count > 0)
-                                    {
-                                        sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
-                                    }
+                                    // MSSQL
+                                    QueryMode qm = this.QueryMode;
+                                    this.QueryMode = QueryMode.Update;
 
-                                    BuildOrderBy(sb, connection, false);
+                                    sb.Append(BuildCommand(connection));
 
-                                    #endregion
+                                    sb.Append(@"; IF @@rowcount = 0 BEGIN ");
 
-                                    sb.Append(@"; IF @@rowcount = 0 BEGIN");
+                                    this.QueryMode = QueryMode.Insert;
 
-                                    #region Insert clause
+                                    sb.Append(BuildCommand(connection));
 
-                                    sb.Append(@"INSERT INTO ");
+                                    sb.Append(@"; END");
 
-                                    if (Schema.DatabaseOwner.Length > 0)
-                                    {
-                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                        sb.Append('.');
-                                    }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
-
-                                    sb.Append(@" (");
-                                    bFirst = true;
-                                    foreach (AssignmentColumn ins in _ListInsertUpdate)
-                                    {
-                                        if (bFirst) bFirst = false;
-                                        else sb.Append(',');
-                                        sb.Append(connection.EncloseFieldName(ins.ColumnName));
-                                    }
-                                    if (InsertExpression != null)
-                                    {
-                                        sb.Append(@") ");
-                                        sb.Append(InsertExpression);
-                                    }
-                                    else
-                                    {
-                                        sb.Append(@") VALUES (");
-                                        bFirst = true;
-                                        foreach (AssignmentColumn ins in _ListInsertUpdate)
-                                        {
-                                            if (bFirst) bFirst = false;
-                                            else sb.Append(',');
-                                            if (ins.SecondType == ValueObjectType.Literal)
-                                            {
-                                                sb.Append(ins.Second);
-                                            }
-                                            else if (ins.SecondType == ValueObjectType.Value)
-                                            {
-                                                if (ins.Second is Query)
-                                                {
-                                                    sb.Append('(');
-                                                    sb.Append(((Query)ins.Second).BuildCommand(connection));
-                                                    sb.Append(')');
-                                                }
-                                                else PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection);
-                                            }
-                                            else if (ins.SecondType == ValueObjectType.ColumnName)
-                                            {
-                                                if (ins.SecondTableName != null)
-                                                {
-                                                    sb.Append(connection.EncloseFieldName(ins.SecondTableName));
-                                                    sb.Append(@".");
-                                                }
-                                                sb.Append(connection.EncloseFieldName(ins.Second.ToString()));
-                                            }
-                                        }
-                                        sb.Append(@")");
-
-                                        if (_ListWhere != null && _ListWhere.Count > 0)
-                                        {
-                                            sb.Append(@" WHERE ");
-                                            _ListWhere.BuildCommand(sb, connection, this, null, null);
-                                        }
-                                    }
-
-                                    #endregion
-
-                                    sb.Append(@"END");
+                                    this.QueryMode = qm;
                                 }
                             }
                             break;
@@ -1381,7 +1414,7 @@ namespace dg.Sql
 
                                 sb.Append(@" ADD ");
 
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                 {
                                     sb.Append(@"COLUMN ");
                                 }
@@ -1397,43 +1430,92 @@ namespace dg.Sql
                         case QueryMode.ChangeColumn:
                             {
                                 if (_AlterColumnOldName != null && _AlterColumnOldName.Length == 0) _AlterColumnOldName = null;
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL && _AlterColumnOldName != null)
+                                if (_AlterColumnOldName != null)
                                 {
-                                    sb.Append(@"EXEC sp_rename ");
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
+                                    {
+                                        sb.Append(@"EXEC sp_rename ");
+                                        if (Schema.DatabaseOwner.Length > 0)
+                                        {
+                                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                            sb.Append('.');
+                                        }
+                                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                        sb.Append('.');
+                                        sb.Append(connection.EncloseFieldName(_AlterColumnOldName));
+                                        sb.Append(',');
+                                        sb.Append(connection.EncloseFieldName(_AlterColumn.Name));
+                                        sb.Append(@",'COLUMN';");
+                                    }
+                                    else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                                    {
+                                        sb.Append(@"ALTER TABLE ");
+                                        if (Schema.DatabaseOwner.Length > 0)
+                                        {
+                                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                            sb.Append('.');
+                                        }
+                                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                        sb.Append(@" RENAME COLUMN ");
+                                        sb.Append(connection.EncloseFieldName(_AlterColumnOldName));
+                                        sb.Append(@" TO ");
+                                        sb.Append(connection.EncloseFieldName(_AlterColumn.Name));
+                                        sb.Append(';');
+                                    }
+                                }
+                                if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                                {
+                                    // Very limited syntax, will have to do this with several statements
+
+                                    string alterTableStatement = @"ALTER TABLE ";
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        alterTableStatement += connection.EncloseFieldName(Schema.DatabaseOwner);
+                                        alterTableStatement += '.';
+                                    }
+                                    alterTableStatement += connection.EncloseFieldName(Schema.SchemaName);
+                                    alterTableStatement += @" ALTER COLUMN ";
+                                    alterTableStatement += connection.EncloseFieldName(_AlterColumn.Name);
+
+                                    sb.Append(alterTableStatement);
+                                    sb.Append(@" TYPE ");
+                                    bool isTextField; // UNUSED HERE
+                                    BuildColumnPropertiesDataType(sb, connection, _AlterColumn, out isTextField);
+                                    sb.Append(';');
+
+                                    sb.Append(alterTableStatement);
+                                    sb.Append(_AlterColumn.Nullable ? @" DROP NOT NULL;" : @" SET NOT NULL;");
+
+                                    sb.Append(alterTableStatement);
+                                    sb.Append(@" SET DEFAULT ");
+                                    PrepareColumnValue(_AlterColumn, _AlterColumn.Default, sb, connection);
+                                    sb.Append(';');
+                                }
+                                else
+                                {
+                                    sb.Append(@"ALTER TABLE ");
                                     if (Schema.DatabaseOwner.Length > 0)
                                     {
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
                                     sb.Append(connection.EncloseFieldName(Schema.SchemaName));
-                                    sb.Append('.');
-                                    sb.Append(connection.EncloseFieldName(_AlterColumnOldName));
-                                    sb.Append(',');
-                                    sb.Append(connection.EncloseFieldName(_AlterColumn.Name));
-                                    sb.Append(@",'COLUMN';");
-                                }
-                                sb.Append(@"ALTER TABLE ");
-                                if (Schema.DatabaseOwner.Length > 0)
-                                {
-                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                    sb.Append('.');
-                                }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
-                                sb.Append(' ');
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                {
-                                    sb.AppendFormat(@"CHANGE {0} ", connection.EncloseFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
-                                }
-                                else
-                                {
-                                    sb.Append(@"ALTER COLUMN ");
-                                }
-                                BuildColumnProperties(sb, connection, _AlterColumn, connection.TYPE == ConnectorBase.SqlServiceType.MSSQL);
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                {
-                                    int idx = Schema.Columns.IndexOf(_AlterColumn);
-                                    if (idx == 0) sb.Append(@"FIRST ");
-                                    else sb.AppendFormat(@"AFTER {0} ", connection.EncloseFieldName(Schema.Columns[idx - 1].Name));
+                                    sb.Append(' ');
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                    {
+                                        sb.AppendFormat(@"CHANGE {0} ", connection.EncloseFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
+                                    }
+                                    else
+                                    {
+                                        sb.Append(@"ALTER COLUMN ");
+                                    }
+                                    BuildColumnProperties(sb, connection, _AlterColumn, connection.TYPE == ConnectorBase.SqlServiceType.MSSQL);
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                    {
+                                        int idx = Schema.Columns.IndexOf(_AlterColumn);
+                                        if (idx == 0) sb.Append(@"FIRST ");
+                                        else sb.AppendFormat(@"AFTER {0} ", connection.EncloseFieldName(Schema.Columns[idx - 1].Name));
+                                    }
                                 }
                             }
                             break;
@@ -1464,6 +1546,18 @@ namespace dg.Sql
                                     sb.Append(@" DROP FOREIGN KEY ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
+                                else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                                {
+                                    sb.Append(@"ALTER TABLE ");
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
+                                    }
+                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(@" DROP CONSTRAINT ");
+                                    sb.Append(connection.EncloseFieldName(_DropColumnName));
+                                }
                                 else
                                 {
                                     sb.Append(@"ALTER TABLE ");
@@ -1480,7 +1574,7 @@ namespace dg.Sql
                             break;
                         case QueryMode.DropIndex:
                             {
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                 {
                                     sb.Append(@"ALTER TABLE ");
                                     if (Schema.DatabaseOwner.Length > 0)

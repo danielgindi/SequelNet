@@ -276,7 +276,7 @@ namespace dg.Sql.Connector
         #region Preparing values for SQL
 
         public override string EncloseFieldName(string FieldName)
-        {
+        { // Note: For performance, ignoring enclosed [] signs
             return '[' + FieldName + ']';
         }
 
@@ -369,6 +369,7 @@ namespace dg.Sql.Connector
         public override string type_GUID { get { return @"UNIQUEIDENTIFIER"; } }
         public override string type_BLOB { get { return @"IMAGE"; } }
         public override string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
+        public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
 
         #endregion
     }

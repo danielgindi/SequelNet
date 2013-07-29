@@ -337,7 +337,7 @@ namespace dg.Sql.Connector
         #region Preparing values for SQL
 
         public override string EncloseFieldName(string FieldName)
-        {
+        { // Note: For performance, ignoring enclosed ` signs
             return '`' + FieldName + '`';
         }
 
@@ -405,6 +405,10 @@ namespace dg.Sql.Connector
         {
             return Expression.Replace(@"'", @"''").Replace(@"%", @"%%");
         }
+        public override string LikeEscapingStatement
+        {
+            get { return @"ESCAPE('\\')"; }
+        }
 
         #endregion
 
@@ -430,6 +434,7 @@ namespace dg.Sql.Connector
         }
 
         public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }
+        public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTO_INCREMENT"; } }
 
         public override string type_TINYINT { get { return @"TINYINT"; } }
         public override string type_UNSIGNEDTINYINT { get { return @"TINYINT UNSIGNED"; } }
@@ -466,6 +471,21 @@ namespace dg.Sql.Connector
         public override string type_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
         public override string type_MULTICURVE { get { return @"MULTICURVE"; } }
         public override string type_MULTISURFACE { get { return @"MULTISURFACE"; } }
+
+        public override string type_GEOGRAPHIC { get { return @"GEOMETRY"; } }
+        public override string type_GEOGRAPHICCOLLECTION { get { return @"GEOMETRYCOLLECTION"; } }
+        public override string type_GEOGRAPHIC_POINT { get { return @"POINT"; } }
+        public override string type_GEOGRAPHIC_LINESTRING { get { return @"LINESTRING"; } }
+        public override string type_GEOGRAPHIC_POLYGON { get { return @"POLYGON"; } }
+        public override string type_GEOGRAPHIC_LINE { get { return @"LINE"; } }
+        public override string type_GEOGRAPHIC_CURVE { get { return @"CURVE"; } }
+        public override string type_GEOGRAPHIC_SURFACE { get { return @"SURFACE"; } }
+        public override string type_GEOGRAPHIC_LINEARRING { get { return @"LINEARRING"; } }
+        public override string type_GEOGRAPHIC_MULTIPOINT { get { return @"MULTIPOINT"; } }
+        public override string type_GEOGRAPHIC_MULTILINESTRING { get { return @"MULTILINESTRING"; } }
+        public override string type_GEOGRAPHIC_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
+        public override string type_GEOGRAPHIC_MULTICURVE { get { return @"MULTICURVE"; } }
+        public override string type_GEOGRAPHIC_MULTISURFACE { get { return @"MULTISURFACE"; } }
 
         #endregion
     }

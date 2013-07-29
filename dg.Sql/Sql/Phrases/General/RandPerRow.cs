@@ -28,7 +28,10 @@ namespace dg.Sql.Phrases
             string ret;
             if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 ret = @"RAND(CAST(NEWID() AS VARBINARY)) * ";
-            else ret = @"RAND() * ";
+            else if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                ret = @"RAND() * ";
+            else // if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+                ret = @"RANDOM() * ";
 
             if (ObjectType == ValueObjectType.ColumnName)
             {

@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.Connector.OleDb", "d
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql", "dg.Sql\dg.Sql.csproj", "{C69B5998-84AB-4C25-99BE-7010A13A2C09}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.Connector.PostgreSQL", "dg.Sql.Connector.PostgreSQL\dg.Sql.Connector.PostgreSQL.csproj", "{1CD5F321-8826-4A75-B66D-ABBF315EB64E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dg.Sql.SchemaGeneratorAddIn", "dg.Sql.SchemaGeneratorAddIn\dg.Sql.SchemaGeneratorAddIn.csproj", "{A8672B0C-FF60-4722-91A9-B66F1F6F615D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +35,14 @@ Global
 		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C69B5998-84AB-4C25-99BE-7010A13A2C09}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBF315EB64E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBF315EB64E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBF315EB64E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD5F321-8826-4A75-B66D-ABBF315EB64E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8672B0C-FF60-4722-91A9-B66F1F6F615D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8672B0C-FF60-4722-91A9-B66F1F6F615D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8672B0C-FF60-4722-91A9-B66F1F6F615D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8672B0C-FF60-4722-91A9-B66F1F6F615D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
