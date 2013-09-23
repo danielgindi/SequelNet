@@ -224,27 +224,63 @@ namespace dg.Sql
             /// Generates a bounding rect around a lat/lon coordinate, to constrain queries.
             /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
             /// </summary>
-            /// <param name="latitude"></param>
-            /// <param name="longitude"></param>
+            /// <param name="latLonPoint"></param>
             /// <param name="distanceInKilometers">Kinda' like radius</param>
             /// <returns></returns>
             static public LineString RectForDistanceAroundLatLon(Point latLonPoint, double distanceInKilometers)
             {
+                return RectForDistanceAroundLatLon(latLonPoint.X, latLonPoint.Y, distanceInKilometers);
+            }
+
+            /// <summary>
+            /// Generates a bounding rect around a lat/lon rect, to constrain queries.
+            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
+            /// To prevent problems with this approach, we're changing the "radius" to a real radius of the bounding circle, which will be almost exact
+            /// </summary>
+            /// <param name="lat1"></param>
+            /// <param name="lon1"></param>
+            /// <param name="lat2"></param>
+            /// <param name="lon2"></param>
+            /// <param name="distanceInKilometers">Kinda' like radius</param>
+            /// <returns></returns>
+            static public LineString RectForDistanceAroundRect(double lat1, double lon1, double lat2, double lon2, double distanceInKilometers)
+            {
                 // Get the circle that bounds the rect. This will give us a much more accurate rect
                 distanceInKilometers = (Math.Sqrt(2.0 * (distanceInKilometers * 2.0) * (distanceInKilometers * 2.0)) / 2.0);
 
+                double d = Math.Min(lat1, lat2);
+                lat2 = Math.Max(lat1, lat2);
+                lat1 = d;
+
+                d = Math.Min(lon1, lon2);
+                lon2 = Math.Max(lon1, lon2);
+                lon1 = d;
+
                 LineString rect = new LineString();
                 double distanceLat = distanceInKilometers / AVERAGE_KM_PER_LATITUDE_DEGREE;
-                double distanceLon = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * latLonPoint.X));
-                //rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
-                //rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y + distanceLon));
-                //rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y - distanceLon));
-                //rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y - distanceLon));
-                //rect.Points.Add(rect.Points[0]);
-                rect.Points.Add(new Point(latLonPoint.X + distanceLat, latLonPoint.Y + distanceLon));
-                rect.Points.Add(new Point(latLonPoint.X - distanceLat, latLonPoint.Y - distanceLon));
+                double distanceLon1 = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * lat1));
+                double distanceLon2 = distanceInKilometers / (AVERAGE_KM_PER_LATITUDE_DEGREE / Math.Cos(DEGREES_TO_RADIANS * lat2));
+
+                // This is enough as the wkbs are calculating the bounds and retrieves a rectangle.
+                rect.Points.Add(new Point(lat2 + distanceLat, lon2 + distanceLon2));
+                rect.Points.Add(new Point(lat1 - distanceLat, lon1 - distanceLon1));
                 return rect;
             }
+
+            /// <summary>
+            /// Generates a bounding rect around a lat/lon rect, to constrain queries.
+            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
+            /// To prevent problems with this approach, we're changing the "radius" to a real radius of the bounding circle, which will be almost exact
+            /// </summary>
+            /// <param name="rectCorner1"></param>
+            /// <param name="rectCorner2"></param>
+            /// <param name="distanceInKilometers">Kinda' like radius</param>
+            /// <returns></returns>
+            static public LineString RectForDistanceAroundRect(Point rectCorner1, Point rectCorner2, double distanceInKilometers)
+            {
+                return RectForDistanceAroundRect(rectCorner1.X, rectCorner1.Y, rectCorner2.X, rectCorner2.Y, distanceInKilometers);
+            }
+
             #endregion
         }
     }
