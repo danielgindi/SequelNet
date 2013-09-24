@@ -38,6 +38,13 @@ namespace dg.Sql
             _ColumnName = ColumnName;
             _IsLiteral = IsLiteral;
         }
+        public GroupBy(object ColumnName, bool IsLiteral, SortDirection SortDirection)
+        {
+            _TableName = null;
+            _ColumnName = ColumnName;
+            _IsLiteral = IsLiteral;
+            _SortDirection = SortDirection;
+        }
         public string TableName
         {
             get { return _TableName; }

@@ -27,6 +27,12 @@ namespace dg.Sql
             _ListGroupBy.Add(new GroupBy(ColumnName, ColumnNameIsLiteral));
             return this;
         }
+        public Query GroupBy(object ColumnName, bool ColumnNameIsLiteral, SortDirection SortDirection)
+        {
+            if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
+            _ListGroupBy.Add(new GroupBy(ColumnName, ColumnNameIsLiteral, SortDirection));
+            return this;
+        }
         public Query GroupBy(string TableName, string ColumnName)
         {
             if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
