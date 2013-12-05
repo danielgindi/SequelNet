@@ -111,6 +111,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							}
 						}
 					}
+
+                    if (dalIndex.IndexMode == DalIndexIndexMode.PrimaryKey && dalIndex.Columns.Count == 1)
+                    {
+                        singleColumnPrimaryKeyName = (singleColumnPrimaryKeyName != null ? "" : dalIndex.Columns[0]);
+                    }
 					dalIndices.Add(dalIndex);
 				}
 				else if (upper.StartsWith("@FOREIGNKEY:", StringComparison.Ordinal))

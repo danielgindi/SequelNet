@@ -123,9 +123,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="E:\My Documents\Visual Studio 2010\Addins\dg.Sql.SchemaGeneratorAddIn - For Testing.AddIn">
-      <Link>dg.Sql.SchemaGeneratorAddIn - For Testing.AddIn</Link>
-    </Content>
     <EmbeddedResource Include="Macro Structure.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSHARP.Targets" />
