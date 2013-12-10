@@ -7,7 +7,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
     {
         public DalIndex()
         {
-            this.Columns = new List<string>();
+            this.Columns = new List<DalIndexColumn>();
             this.IndexName = null;
             this.ClusterMode = DalIndexClusterMode.None;
             this.IndexType = DalIndexIndexType.None;
@@ -18,6 +18,6 @@ namespace dg.Sql.SchemaGeneratorAddIn
 		public DalIndexClusterMode ClusterMode;
 		public DalIndexIndexType IndexType;
 		public DalIndexIndexMode IndexMode;
-		public List<string> Columns;
+        public List<DalIndexColumn> Columns;
 	}
 }

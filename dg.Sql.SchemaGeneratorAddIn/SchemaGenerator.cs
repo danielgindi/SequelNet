@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows.Forms;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
@@ -30,8 +31,6 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			List<DalForeignKey> dalForeignKeys = new List<DalForeignKey>();
 			List<DalEnum> dalEnums = new List<DalEnum>();
 
-			string[] strArrays;
-			int k;
             object[] maxLength;
 			string singleColumnPrimaryKeyName = null;
 			string str5 = null;
@@ -102,19 +101,26 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						}
 						else if (str15.ToUpper().StartsWith("[", StringComparison.Ordinal))
 						{
-							string str16 = str15.Trim(new char[] { ' ', '[', ']', '\t' });
-							strArrays = str16.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-							for (k = 0; k < (int)strArrays.Length; k++)
-							{
-								string str17 = strArrays[k];
-								dalIndex.Columns.Add(str17);
-							}
+                            string[] columns = str15
+                                .Trim(new char[] { ' ', '[', ']', '\t' })
+                                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            foreach (string column in columns)
+                            {
+                                if (column.EndsWith(@" ASC") || column.EndsWith(@" DESC"))
+                                {
+                                    dalIndex.Columns.Add(new DalIndexColumn(column.Substring(0, column.LastIndexOf(' ')), column.Substring(column.LastIndexOf(' ') + 1)));
+                                }
+                                else
+                                {
+                                    dalIndex.Columns.Add(new DalIndexColumn(column));
+                                }
+                            }
 						}
 					}
 
                     if (dalIndex.IndexMode == DalIndexIndexMode.PrimaryKey && dalIndex.Columns.Count == 1)
                     {
-                        singleColumnPrimaryKeyName = (singleColumnPrimaryKeyName != null ? "" : dalIndex.Columns[0]);
+                        singleColumnPrimaryKeyName = (singleColumnPrimaryKeyName != null ? "" : dalIndex.Columns[0].Name);
                     }
 					dalIndices.Add(dalIndex);
 				}
@@ -181,8 +187,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						{
 							string str20 = str19.Substring(7);
 							string str21 = str20.Trim(new char[] { ' ', '[', ']', '\t' });
-							strArrays = str21.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-							for (k = 0; k < (int)strArrays.Length; k++)
+                            string[] strArrays = str21.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+							for (int k = 0; k < strArrays.Length; k++)
 							{
 								string str22 = strArrays[k];
 								dalForeignKey.Columns.Add(str22);
@@ -192,8 +198,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						{
 							string str23 = str19.Substring(14);
 							string str24 = str23.Trim(new char[] { ' ', '[', ']', '\t' });
-							strArrays = str24.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-							for (k = 0; k < (int)strArrays.Length; k++)
+							string[] strArrays = str24.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+							for (int k = 0; k < strArrays.Length; k++)
 							{
 								string str25 = strArrays[k];
 								dalForeignKey.ForeignColumns.Add(str25);
@@ -216,11 +222,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				}
 				else if (!upper.StartsWith("@MYSQLENGINE:", StringComparison.Ordinal))
 				{
-					int num = str13.IndexOf(":");
+					int startPos = str13.IndexOf(":");
 					DalColumn dalColumn = new DalColumn();
-					dalColumn.Name = str13.Substring(0, num).Trim();
+					dalColumn.Name = str13.Substring(0, startPos).Trim();
 					dalColumn.NameX = dalColumn.Name;
-					if (className == dalColumn.Name)
+					if (className == dalColumn.Name || dalColumn.Name == "Columns")
 					{
 						dalColumn.Name += "X";
 					}
@@ -232,7 +238,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					dalColumn.ActualDefaultValue = "";
 					dalColumn.Comment = "";
 					dalColumn.EnumTypeName = "";
-					str13 = str13.Substring(num + 1).Trim();
+					str13 = str13.Substring(startPos + 1).Trim();
 					string[] strArrays4 = str13.Split(new char[] { ';' }, StringSplitOptions.None);
 					for (int m = 0; m <= (int)strArrays4.Length - 1; m++)
 					{
@@ -570,10 +576,10 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						}
 						else if (upper4.Equals("UNIQUE INDEX", StringComparison.Ordinal))
 						{
-							DalIndex dalIndex1 = new DalIndex();
-							dalIndex1.Columns.Add(dalColumn.Name);
-							dalIndex1.IndexMode = DalIndexIndexMode.Unique;
-							dalIndices.Add(dalIndex1);
+							DalIndex index = new DalIndex();
+                            index.Columns.Add(new DalIndexColumn(dalColumn.Name));
+                            index.IndexMode = DalIndexIndexMode.Unique;
+                            dalIndices.Add(index);
 						}
 						else if (upper4.StartsWith("FOREIGN ", StringComparison.Ordinal))
 						{
@@ -608,6 +614,20 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			{
 				mySqlEngineName = "ARCHIVE";
 			}
+
+            foreach (var index in dalIndices)
+            {
+                foreach (var column in index.Columns)
+                {
+                    if (dalColumns.Find(x => x.NameX.Equals(column.Name)) == null)
+                    {
+                        MessageBox.Show(@"Column " + column + @" not found in index " + (index.IndexName ?? ""));
+                    }
+                }
+            }
+
+            // Start building the output classes
+
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.AppendFormat("public partial class {1}Collection : AbstractRecordList<{1}, {1}Collection> {{{0}}}{0}{0}", "\r\n", className);
 			foreach (DalEnum dalEnum1 in dalEnums)
@@ -1013,9 +1033,9 @@ namespace dg.Sql.SchemaGeneratorAddIn
             foreach (DalIndex index in dalIndices)
             {
                 if (index.IndexMode != DalIndexIndexMode.PrimaryKey) continue;
-                foreach (string columnName in index.Columns)
+                foreach (DalIndexColumn indexColumn in index.Columns)
                 {
-                    DalColumn column = dalColumns.Find((DalColumn c) => c.NameX == columnName);
+                    DalColumn column = dalColumns.Find((DalColumn c) => c.NameX == indexColumn.Name);
                     if (column == null) continue;
                     primaryKeyColumns.Add(column);
                 }
@@ -1034,18 +1054,16 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					maxLength[2] = dalIndex2.IndexMode.ToString();
 					maxLength[3] = dalIndex2.IndexType.ToString();
                     stringBuilder.AppendFormat("schema.AddIndex({0}, TableSchema.ClusterMode.{1}, TableSchema.IndexMode.{2}, TableSchema.IndexType.{3}", maxLength);
-					foreach (string column in dalIndex2.Columns)
-					{
-						string[] strArrays5 = column.Split(new char[] { ' ' });
-						string str31 = strArrays5[0];
-						DalColumn dalColumn2 = dalColumns.Find((DalColumn c) => c.Name == str31);
-						str31 = (dalColumn2 == null ? string.Format("\"{0}\"", str31) : string.Format("Columns.{0}", dalColumn2.Name));
-						stringBuilder.AppendFormat(", {0}", str31);
-						if ((int)strArrays5.Length != 2)
+                    foreach (DalIndexColumn indexColumn in dalIndex2.Columns)
+                    {
+                        DalColumn dalColumn2 = dalColumns.Find((DalColumn c) => c.Name == indexColumn.Name);
+                        string col = (dalColumn2 == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalColumn2.Name));
+                        stringBuilder.AppendFormat(", {0}", col);
+                        if (string.IsNullOrEmpty(indexColumn.SortDirection))
 						{
 							continue;
 						}
-						stringBuilder.AppendFormat(", SortDirection.{0}", strArrays5[1]);
+                        stringBuilder.AppendFormat(", SortDirection.{0}", indexColumn.SortDirection);
 					}
 					stringBuilder.AppendFormat(");{0}", "\r\n");
 				}
