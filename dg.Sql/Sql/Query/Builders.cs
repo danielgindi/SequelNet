@@ -244,7 +244,7 @@ namespace dg.Sql
                         if (index.ColumnLength[i] > 0) sb.AppendFormat("({0})", index.ColumnLength[i]);
                         sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                     }
-                    sb.Append(@");");
+                    sb.Append(@")");
                 }
                 else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                 {
@@ -335,7 +335,7 @@ namespace dg.Sql
                         sb.Append(connection.EncloseFieldName(index.ColumnNames[i]));
                         sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                     }
-                    sb.Append(@");");
+                    sb.Append(@")");
                 }
                 else if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
