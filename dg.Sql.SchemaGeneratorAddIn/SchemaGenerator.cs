@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
+using System.Text.RegularExpressions;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
@@ -48,12 +49,12 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			}
 			for (int i = 2; i <= (int)splitLines.Length - 1; i++)
 			{
-				string str12 = splitLines[i];
-				string str13 = str12.Trim(new char[] { ' ', '*', '\t' });
-				string upper = str13.ToUpper();
-				if (upper.StartsWith("@INDEX:", StringComparison.Ordinal))
+				string currentLine = splitLines[i];
+				string currentLineTrimmed = currentLine.Trim(new char[] { ' ', '*', '\t' });
+				string currentLineTrimmedUpper = currentLineTrimmed.ToUpper();
+				if (currentLineTrimmedUpper.StartsWith("@INDEX:", StringComparison.Ordinal))
 				{
-					string str14 = str13.Substring(7);
+					string str14 = currentLineTrimmed.Substring(7);
 					string[] strArrays2 = str14.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 					DalIndex dalIndex = new DalIndex();
 					for (int j = 0; j <= (int)strArrays2.Length - 1; j++)
@@ -124,9 +125,9 @@ namespace dg.Sql.SchemaGeneratorAddIn
                     }
 					dalIndices.Add(dalIndex);
 				}
-				else if (upper.StartsWith("@FOREIGNKEY:", StringComparison.Ordinal))
+				else if (currentLineTrimmedUpper.StartsWith("@FOREIGNKEY:", StringComparison.Ordinal))
 				{
-					string str18 = str13.Substring(12);
+					string str18 = currentLineTrimmed.Substring(12);
 					string[] strArrays3 = str18.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 					DalForeignKey dalForeignKey = new DalForeignKey();
 					for (int l = 0; l <= (int)strArrays3.Length - 1; l++)
@@ -208,24 +209,24 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					}
 					dalForeignKeys.Add(dalForeignKey);
 				}
-				else if (upper.StartsWith("@BEFOREINSERT:", StringComparison.Ordinal))
+				else if (currentLineTrimmedUpper.StartsWith("@BEFOREINSERT:", StringComparison.Ordinal))
 				{
-					str5 = str13.Substring(14).Trim();
+					str5 = currentLineTrimmed.Substring(14).Trim();
 				}
-				else if (upper.StartsWith("@BEFOREUPDATE:", StringComparison.Ordinal))
+				else if (currentLineTrimmedUpper.StartsWith("@BEFOREUPDATE:", StringComparison.Ordinal))
 				{
-					str6 = str13.Substring(14).Trim();
+					str6 = currentLineTrimmed.Substring(14).Trim();
 				}
-				else if (upper.StartsWith("@AFTERREAD:", StringComparison.Ordinal))
+				else if (currentLineTrimmedUpper.StartsWith("@AFTERREAD:", StringComparison.Ordinal))
 				{
-					str7 = str13.Substring(11).Trim();
+					str7 = currentLineTrimmed.Substring(11).Trim();
 				}
-				else if (!upper.StartsWith("@MYSQLENGINE:", StringComparison.Ordinal))
+				else if (!currentLineTrimmedUpper.StartsWith("@MYSQLENGINE:", StringComparison.Ordinal))
 				{
-					int startPos = str13.IndexOf(":");
+					int startPos = currentLineTrimmed.IndexOf(":");
 					DalColumn dalColumn = new DalColumn();
-					dalColumn.Name = str13.Substring(0, startPos).Trim();
-					dalColumn.NameX = dalColumn.Name;
+					dalColumn.Name = currentLineTrimmed.Substring(0, startPos).Trim();
+					dalColumn.NameX = StripColumnName(dalColumn.Name);
 					if (className == dalColumn.Name || dalColumn.Name == "Columns")
 					{
 						dalColumn.Name += "X";
@@ -238,143 +239,143 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					dalColumn.ActualDefaultValue = "";
 					dalColumn.Comment = "";
 					dalColumn.EnumTypeName = "";
-					str13 = str13.Substring(startPos + 1).Trim();
-					string[] strArrays4 = str13.Split(new char[] { ';' }, StringSplitOptions.None);
-					for (int m = 0; m <= (int)strArrays4.Length - 1; m++)
+					currentLineTrimmed = currentLineTrimmed.Substring(startPos + 1).Trim();
+					string[] columnKeywords = currentLineTrimmed.Split(new char[] { ';' }, StringSplitOptions.None);
+					for (int m = 0; m <= (int)columnKeywords.Length - 1; m++)
 					{
-						string str26 = strArrays4[m].Trim();
-						string upper4 = str26.ToUpper();
-						if (m == (int)strArrays4.Length - 1)
+						string columnKeyword = columnKeywords[m].Trim();
+						string columnKeywordUpper = columnKeyword.ToUpper();
+						if (m == (int)columnKeywords.Length - 1)
 						{
-							if (!str26.EndsWith(":") || (int)splitLines.Length <= i + 2 || !splitLines[i + 1].Trim(new char[] { ' ', '*', '\t' }).StartsWith("\"") || !splitLines[i + 2].Trim(new char[] { ' ', '*', '\t' }).StartsWith("-"))
+							if (!columnKeyword.EndsWith(":") || (int)splitLines.Length <= i + 2 || !splitLines[i + 1].Trim(new char[] { ' ', '*', '\t' }).StartsWith("\"") || !splitLines[i + 2].Trim(new char[] { ' ', '*', '\t' }).StartsWith("-"))
 							{
-								dalColumn.Comment = str26;
+								dalColumn.Comment = columnKeyword;
 							}
 							else
 							{
-								dalColumn.Comment = str26.Remove(str26.Length - 1, 1);
+								dalColumn.Comment = columnKeyword.Remove(columnKeyword.Length - 1, 1);
 								i++;
-								str13 = splitLines[i];
+								currentLineTrimmed = splitLines[i];
 								DalEnum dalEnum = new DalEnum();
-								dalEnum.Name = str13.Trim(new char[] { ' ', '*', '\"', '\t' });
+								dalEnum.Name = currentLineTrimmed.Trim(new char[] { ' ', '*', '\"', '\t' });
 								dalColumn.EnumTypeName = dalEnum.Name;
 								dalEnum.Items = new List<string>();
 								while ((int)splitLines.Length > i + 1 && splitLines[i + 1].Trim(new char[] { ' ', '*', '\t' }).StartsWith("-"))
 								{
 									i++;
 									string str27 = splitLines[i];
-									str13 = str27.Trim(new char[] { ' ', '*', '-', '\t' });
-									dalEnum.Items.Add(str13);
+									currentLineTrimmed = str27.Trim(new char[] { ' ', '*', '-', '\t' });
+									dalEnum.Items.Add(currentLineTrimmed);
 								}
 								dalEnums.Add(dalEnum);
 							}
 						}
-                        else if (upper4.Equals("PRIMARY KEY", StringComparison.Ordinal) || upper4.Equals("PRIMARYKEY", StringComparison.Ordinal))
+                        else if (columnKeywordUpper.Equals("PRIMARY KEY", StringComparison.Ordinal) || columnKeywordUpper.Equals("PRIMARYKEY", StringComparison.Ordinal))
 						{
 							dalColumn.IsPrimaryKey = true;
 							singleColumnPrimaryKeyName = (singleColumnPrimaryKeyName != null ? "" : dalColumn.Name);
 						}
-						else if (upper4.Equals("NULLABLE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("NULLABLE", StringComparison.Ordinal))
 						{
 							dalColumn.IsNullable = true;
 						}
-						else if (upper4.Equals("AUTOINCREMENT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("AUTOINCREMENT", StringComparison.Ordinal))
 						{
 							dalColumn.AutoIncrement = true;
 						}
-						else if (upper4.Equals("NOPROPERTY", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("NOPROPERTY", StringComparison.Ordinal))
 						{
 							dalColumn.NoProperty = true;
 						}
-						else if (upper4.StartsWith("PRECISION(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("PRECISION(", StringComparison.Ordinal))
 						{
 							int num1 = 0;
-							int.TryParse(str26.Substring(10, str26.IndexOf(")") - 10), out num1);
+							int.TryParse(columnKeyword.Substring(10, columnKeyword.IndexOf(")") - 10), out num1);
 							dalColumn.Precision = num1;
 						}
-						else if (upper4.StartsWith("SCALE(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("SCALE(", StringComparison.Ordinal))
 						{
 							int num2 = 0;
-							int.TryParse(str26.Substring(6, str26.IndexOf(")") - 6), out num2);
+							int.TryParse(columnKeyword.Substring(6, columnKeyword.IndexOf(")") - 6), out num2);
 							dalColumn.Scale = num2;
 						}
-						else if (upper4.StartsWith("STRING(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("STRING(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TString;
 							int num3 = 0;
-							int.TryParse(str26.Substring(7, str26.IndexOf(")") - 7), out num3);
+							int.TryParse(columnKeyword.Substring(7, columnKeyword.IndexOf(")") - 7), out num3);
 							dalColumn.MaxLength = num3;
 						}
-						else if (upper4.StartsWith("FIXEDSTRING(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("FIXEDSTRING(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TFixedString;
 							int num4 = 0;
-							int.TryParse(str26.Substring(12, str26.IndexOf(")") - 12), out num4);
+							int.TryParse(columnKeyword.Substring(12, columnKeyword.IndexOf(")") - 12), out num4);
 							dalColumn.MaxLength = num4;
 						}
-						else if (upper4.Equals("TEXT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("TEXT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TText;
 						}
-						else if (upper4.StartsWith("TEXT(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("TEXT(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TText;
 							int num5 = 0;
-							int.TryParse(str26.Substring(5, str26.IndexOf(")") - 5), out num5);
+							int.TryParse(columnKeyword.Substring(5, columnKeyword.IndexOf(")") - 5), out num5);
 							dalColumn.MaxLength = num5;
 						}
-						else if (upper4.Equals("LONGTEXT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("LONGTEXT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TLongText;
 						}
-						else if (upper4.StartsWith("LONGTEXT(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("LONGTEXT(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TLongText;
 							int num6 = 0;
-							int.TryParse(str26.Substring(9, str26.IndexOf(")") - 9), out num6);
+							int.TryParse(columnKeyword.Substring(9, columnKeyword.IndexOf(")") - 9), out num6);
 							dalColumn.MaxLength = num6;
 						}
-						else if (upper4.Equals("MEDIUMTEXT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MEDIUMTEXT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMediumText;
 						}
-						else if (upper4.StartsWith("MEDIUMTEXT(", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("MEDIUMTEXT(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMediumText;
 							int num7 = 0;
-							int.TryParse(str26.Substring(11, str26.IndexOf(")") - 1), out num7);
+							int.TryParse(columnKeyword.Substring(11, columnKeyword.IndexOf(")") - 1), out num7);
 							dalColumn.MaxLength = num7;
 						}
-						else if (upper4.Equals("BOOL", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("BOOL", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TBool;
 						}
-						else if (upper4.Equals("GUID", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GUID", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGuid;
 						}
-						else if (upper4.Equals("DECIMAL", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("DECIMAL", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TDecimal;
 						}
-						else if (upper4.StartsWith("DECIMAL", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("DECIMAL", StringComparison.Ordinal))
 						{
 							string str28 = "";
 							string str29 = "";
 							int num8 = -1;
 							int num9 = -1;
 							int num10 = -1;
-							num8 = str26.IndexOf("(");
-							num9 = str26.IndexOf(",");
-							num10 = str26.IndexOf(")");
+							num8 = columnKeyword.IndexOf("(");
+							num9 = columnKeyword.IndexOf(",");
+							num10 = columnKeyword.IndexOf(")");
 							if (num8 > -1 & num9 > -1)
 							{
-								str28 = str26.Substring(num8 + 1, num9 - num8 - 1).Trim();
-								str29 = str26.Substring(num9 + 1, num10 - num9 - 1).Trim();
+								str28 = columnKeyword.Substring(num8 + 1, num9 - num8 - 1).Trim();
+								str29 = columnKeyword.Substring(num9 + 1, num10 - num9 - 1).Trim();
 							}
 							else if (num8 > -1)
 							{
-								str28 = str26.Substring(num8 + 1, num10 - num8 - 1).Trim();
+								str28 = columnKeyword.Substring(num8 + 1, num10 - num8 - 1).Trim();
 							}
 							if (str28.Length > 0)
 							{
@@ -386,205 +387,209 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							}
 							dalColumn.Type = DalColumnType.TDecimal;
 						}
-						else if (upper4.Equals("DOUBLE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("DOUBLE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TDouble;
 						}
-						else if (upper4.Equals("FLOAT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("FLOAT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TFloat;
 						}
-						else if (upper4.Equals("INT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt;
 						}
-						else if (upper4.Equals("INTEGER", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INTEGER", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt;
 						}
-						else if (upper4.Equals("INT8", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INT8", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt8;
 						}
-						else if (upper4.Equals("INT16", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INT16", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt16;
 						}
-						else if (upper4.Equals("INT32", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INT32", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt32;
 						}
-						else if (upper4.Equals("INT64", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("INT64", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TInt64;
 						}
-						else if (upper4.Equals("UINT8", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("UINT8", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TUInt8;
 						}
-						else if (upper4.Equals("UINT16", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("UINT16", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TUInt16;
 						}
-						else if (upper4.Equals("UINT32", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("UINT32", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TUInt32;
 						}
-						else if (upper4.Equals("UINT64", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("UINT64", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TUInt64;
 						}
-						else if (upper4.Equals("GEOMETRY", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOMETRY", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeometry;
 						}
-						else if (upper4.Equals("GEOMETRYCOLLECTION", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOMETRYCOLLECTION", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeometryCollection;
 						}
-						else if (upper4.Equals("POINT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("POINT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TPoint;
 						}
-						else if (upper4.Equals("LINESTRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("LINESTRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TLineString;
 						}
-						else if (upper4.Equals("POLYGON", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("POLYGON", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TPolygon;
 						}
-						else if (upper4.Equals("LINE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("LINE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TLine;
 						}
-						else if (upper4.Equals("CURVE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("CURVE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TCurve;
 						}
-						else if (upper4.Equals("SURFACE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("SURFACE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TSurface;
 						}
-						else if (upper4.Equals("LINEARRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("LINEARRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TLinearRing;
 						}
-						else if (upper4.Equals("MULTIPOINT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MULTIPOINT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMultiPoint;
 						}
-						else if (upper4.Equals("MULTILINESTRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MULTILINESTRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMultiLineString;
 						}
-						else if (upper4.Equals("MULTIPOLYGON", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MULTIPOLYGON", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMultiPolygon;
 						}
-						else if (upper4.Equals("MULTICURVE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MULTICURVE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMultiCurve;
 						}
-						else if (upper4.Equals("MULTISURFACE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("MULTISURFACE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TMultiSurface;
 						}
-						else if (upper4.Equals("GEOGAPHIC", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographic;
 						}
-						else if (upper4.Equals("GEOGAPHICCOLLECTION", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHICCOLLECTION", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicCollection;
 						}
-						else if (upper4.Equals("GEOGAPHIC_POINT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_POINT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicPoint;
 						}
-						else if (upper4.Equals("GEOGAPHIC_LINESTRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_LINESTRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicLineString;
 						}
-						else if (upper4.Equals("GEOGAPHIC_POLYGON", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_POLYGON", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicPolygon;
 						}
-						else if (upper4.Equals("GEOGAPHIC_LINE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_LINE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicLine;
 						}
-						else if (upper4.Equals("GEOGAPHIC_CURVE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_CURVE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicCurve;
 						}
-						else if (upper4.Equals("GEOGAPHIC_SURFACE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_SURFACE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicSurface;
 						}
-						else if (upper4.Equals("GEOGAPHIC_LINEARRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_LINEARRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicLinearRing;
 						}
-						else if (upper4.Equals("GEOGAPHIC_MULTIPOINT", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_MULTIPOINT", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicMultiPoint;
 						}
-						else if (upper4.Equals("GEOGAPHIC_MULTILINESTRING", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_MULTILINESTRING", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicMultiLineString;
 						}
-						else if (upper4.Equals("GEOGAPHIC_MULTIPOLYGON", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_MULTIPOLYGON", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicMultiPolygon;
 						}
-						else if (upper4.Equals("GEOGAPHIC_MULTICURVE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_MULTICURVE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicMultiCurve;
 						}
-						else if (upper4.Equals("GEOGAPHIC_MULTISURFACE", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("GEOGAPHIC_MULTISURFACE", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGeographicMultiSurface;
 						}
-						else if (str26.Equals("DATETIME", StringComparison.Ordinal))
+						else if (columnKeyword.Equals("DATETIME", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TDateTime;
 						}
-						else if (upper4.StartsWith("DEFAULT ", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("DEFAULT ", StringComparison.Ordinal))
 						{
-							dalColumn.DefaultValue = str26.Substring(8);
+							dalColumn.DefaultValue = columnKeyword.Substring(8);
 						}
-						else if (upper4.StartsWith("ACTUALDEFAULT ", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("ACTUALDEFAULT ", StringComparison.Ordinal))
 						{
-							dalColumn.ActualDefaultValue = str26.Substring(14);
+							dalColumn.ActualDefaultValue = columnKeyword.Substring(14);
 						}
-						else if (upper4.StartsWith("TODB ", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("TODB ", StringComparison.Ordinal))
 						{
-							dalColumn.ToDb = str26.Substring(5);
+							dalColumn.ToDb = columnKeyword.Substring(5);
 						}
-						else if (upper4.Equals("VIRTUAL", StringComparison.Ordinal))
+						else if (columnKeywordUpper.Equals("VIRTUAL", StringComparison.Ordinal))
 						{
 							dalColumn.Virtual = true;
 						}
-						else if (upper4.StartsWith("FROMDB ", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("FROMDB ", StringComparison.Ordinal))
 						{
-							dalColumn.FromDb = str26.Substring(7);
-						}
-						else if (upper4.StartsWith("ACTUALTYPE ", StringComparison.Ordinal))
-						{
-							dalColumn.ActualType = str26.Substring(11);
-						}
-						else if (upper4.Equals("UNIQUE INDEX", StringComparison.Ordinal))
+							dalColumn.FromDb = columnKeyword.Substring(7);
+                        }
+                        else if (columnKeywordUpper.StartsWith("ACTUALTYPE ", StringComparison.Ordinal))
+                        {
+                            dalColumn.ActualType = columnKeyword.Substring(11);
+                        }
+                        else if (columnKeywordUpper.StartsWith("COLUMNNAME ", StringComparison.Ordinal))
+                        {
+                            dalColumn.Name = columnKeyword.Substring(11);
+                        }
+						else if (columnKeywordUpper.Equals("UNIQUE INDEX", StringComparison.Ordinal))
 						{
 							DalIndex index = new DalIndex();
                             index.Columns.Add(new DalIndexColumn(dalColumn.Name));
                             index.IndexMode = DalIndexIndexMode.Unique;
                             dalIndices.Add(index);
 						}
-						else if (upper4.StartsWith("FOREIGN ", StringComparison.Ordinal))
+						else if (columnKeywordUpper.StartsWith("FOREIGN ", StringComparison.Ordinal))
 						{
 							DalForeignKey dalForeignKey1 = new DalForeignKey();
-							string str30 = str26.Substring(8);
+							string str30 = columnKeyword.Substring(8);
 							dalForeignKey1.ForeignTable = str30.Substring(0, str30.IndexOf("."));
 							dalForeignKey1.ForeignColumns.Add(str30.Substring(str30.IndexOf(".") + 1));
 							dalForeignKey1.Columns.Add(dalColumn.Name);
@@ -599,7 +604,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				}
 				else
 				{
-					mySqlEngineName = str13.Substring(13).Trim();
+					mySqlEngineName = currentLineTrimmed.Substring(13).Trim();
 				}
 			}
 			if (mySqlEngineName.Equals("MyISAM", StringComparison.OrdinalIgnoreCase))
@@ -619,9 +624,9 @@ namespace dg.Sql.SchemaGeneratorAddIn
             {
                 foreach (var column in index.Columns)
                 {
-                    if (dalColumns.Find(x => x.NameX.Equals(column.Name)) == null)
+                    if (dalColumns.Find(x => x.NameX.Equals(column.Name)) == null && dalColumns.Find(x => x.Name.Equals(column.Name)) == null)
                     {
-                        MessageBox.Show(@"Column " + column + @" not found in index " + (index.IndexName ?? ""));
+                        MessageBox.Show(@"Column " + column.Name + @" not found in index " + (index.IndexName ?? ""));
                     }
                 }
             }
@@ -1754,6 +1759,14 @@ namespace dg.Sql.SchemaGeneratorAddIn
             // Copy result to ClipBoard
 			ClipboardHelper.SetClipboard(stringBuilder.ToString());
 		}
+
+        public static string StripColumnName(string columnName)
+        {
+            columnName = columnName.Trim();
+            while (columnName.Length > 0 && !Regex.IsMatch(columnName, @"^[a-zA-Z_]")) columnName = columnName.Remove(0, 1);
+            columnName = Regex.Replace(columnName, @"[^a-zA-Z_0-9]", @"");
+            return columnName;
+        }
 
 		public static bool HasSelection(DTE2 application)
 		{
