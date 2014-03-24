@@ -8,6 +8,7 @@
  *  @BEFOREUPDATE: Code to execute in beginning of Update(...) code
  *  @AFTERREAD:    Code to execute at the end of Read(...) code
  *  @MYSQLENGINE:  InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
+ *  @STATICCOLUMNS: Export column names as static fields (writable) instead of const
  */
 
 Keywords:

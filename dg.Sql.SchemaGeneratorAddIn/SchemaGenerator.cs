@@ -32,6 +32,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			List<DalForeignKey> dalForeignKeys = new List<DalForeignKey>();
 			List<DalEnum> dalEnums = new List<DalEnum>();
 
+            bool staticColumns = false;
+
             object[] maxLength;
 			string singleColumnPrimaryKeyName = null;
 			string str5 = null;
@@ -220,7 +222,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				else if (currentLineTrimmedUpper.StartsWith("@AFTERREAD:", StringComparison.Ordinal))
 				{
 					str7 = currentLineTrimmed.Substring(11).Trim();
-				}
+                }
+                else if (currentLineTrimmedUpper.StartsWith("@STATICCOLUMNS", StringComparison.Ordinal))
+                {
+                    staticColumns = true;
+                }
 				else if (!currentLineTrimmedUpper.StartsWith("@MYSQLENGINE:", StringComparison.Ordinal))
 				{
 					int startPos = currentLineTrimmed.IndexOf(":");
@@ -647,7 +653,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}#region Table Schema{0}private static TableSchema _TableSchema;{0}public struct Columns{0}{{{0}", "\r\n", className);
 			foreach (DalColumn dalColumn1 in dalColumns)
 			{
-				stringBuilder.AppendFormat("public static string {1} = \"{2}\";", "\r\n", dalColumn1.Name, dalColumn1.NameX);
+                stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";", "\r\n", staticColumns ? @"static" : @"const", dalColumn1.Name, dalColumn1.NameX);
 				if (!string.IsNullOrEmpty(dalColumn1.Comment))
 				{
 					stringBuilder.AppendFormat(" // {1}", "\r\n", dalColumn1.Comment);
