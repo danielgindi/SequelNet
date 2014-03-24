@@ -80,6 +80,12 @@
     <Compile Include="Connector\DataReaderBase.cs" />
     <Compile Include="Connector\FactoryBase.cs" />
     <Compile Include="Sql\Phrases\Math\Round.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Avg.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\Aggregate.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfPopulation.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfSample.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\VarianceOfSample.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\VarianceOfPopulation.cs" />
     <Compile Include="Sql\QueryKeywords\GroupByHint.cs" />
     <Compile Include="Sql\Query\Builders.cs" />
     <Compile Include="Sql\Query\ShortAggregates.cs" />
