@@ -5,23 +5,23 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class VarianceOfSample : BasePhrase
+    public class StandardVarianceOfPopulation : BasePhrase
     {
         string TableName;
         object Object;
         ValueObjectType ObjectType;
 
-        public VarianceOfSample(string TableName, object Object, ValueObjectType ObjectType)
+        public StandardVarianceOfPopulation(string TableName, object Object, ValueObjectType ObjectType)
         {
             this.TableName = TableName;
             this.Object = Object;
             this.ObjectType = ObjectType;
         }
-        public VarianceOfSample(object Object, ValueObjectType ObjectType)
+        public StandardVarianceOfPopulation(object Object, ValueObjectType ObjectType)
             : this(null, Object, ObjectType)
         {
         }
-        public VarianceOfSample(string ColumnName)
+        public StandardVarianceOfPopulation(string ColumnName)
             : this(null, ColumnName, ValueObjectType.ColumnName)
         {
         }
@@ -29,7 +29,7 @@ namespace dg.Sql.Phrases
         {
             string ret;
 
-            ret = @"VAR_SAMP(";
+            ret = @"VAR_POP(";
 
             if (ObjectType == ValueObjectType.ColumnName)
             {

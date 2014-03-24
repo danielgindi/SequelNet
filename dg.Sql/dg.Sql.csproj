@@ -84,8 +84,8 @@
     <Compile Include="Sql\Phrases\Quantitative\Aggregate.cs" />
     <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfPopulation.cs" />
     <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfSample.cs" />
-    <Compile Include="Sql\Phrases\Quantitative\VarianceOfSample.cs" />
-    <Compile Include="Sql\Phrases\Quantitative\VarianceOfPopulation.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\StandardVarianceOfSample.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\StandardVarianceOfPopulation.cs" />
     <Compile Include="Sql\QueryKeywords\GroupByHint.cs" />
     <Compile Include="Sql\Query\Builders.cs" />
     <Compile Include="Sql\Query\ShortAggregates.cs" />
