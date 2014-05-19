@@ -13,14 +13,14 @@ namespace dg.Sql
         private object _Second = null;
         private ValueObjectType _SecondType = ValueObjectType.Literal;
 
-        public AssignmentColumn(string TableName, string ColumnName,  
-            string SecondTableName, object Second, ValueObjectType SecondtType)
+        public AssignmentColumn(string tableName, string columnName,  
+            string secondTableName, object second, ValueObjectType secondType)
         {
-            _TableName = TableName;
-            _ColumnName = ColumnName;
-            _SecondTableName = SecondTableName;
-            _Second = Second;
-            _SecondType = SecondtType;
+            _TableName = tableName;
+            _ColumnName = columnName;
+            _SecondTableName = secondTableName;
+            _Second = second;
+            _SecondType = secondType;
         }
 
         public string TableName

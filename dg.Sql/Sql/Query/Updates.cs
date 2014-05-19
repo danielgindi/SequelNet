@@ -9,11 +9,11 @@ namespace dg.Sql
 {
     public partial class Query
     {
-        public Query Update(string columnName, object Value)
+        public Query Update(string columnName, object value)
         {
-            return Update(columnName, Value, false);
+            return Update(columnName, value, false);
         }
-        public Query Update(string columnName, object Value, bool ColumnNameIsLiteral)
+        public Query Update(string columnName, object value, bool columnValueIsLiteral)
         {
             QueryMode currentMode = this.QueryMode;
             if (currentMode != QueryMode.Update)
@@ -27,7 +27,7 @@ namespace dg.Sql
                 }
             }
             if (_ListInsertUpdate == null) _ListInsertUpdate = new AssignmentColumnList();
-            _ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, Value, ColumnNameIsLiteral ? ValueObjectType.Literal : ValueObjectType.Value));
+            _ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, value, columnValueIsLiteral ? ValueObjectType.Literal : ValueObjectType.Value));
             return this;
         }
         public Query UpdateFromOtherColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
