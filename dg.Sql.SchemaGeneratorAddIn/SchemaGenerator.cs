@@ -1356,7 +1356,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				}
 				else if (dalColumn6.Type == DalColumnType.TFloat)
 				{
-					str32 = "Convert.ToFloat({0})";
+					str32 = "Convert.ToSingle({0})";
 				}
 				else if (dalColumn6.Type == DalColumnType.TDateTime)
 				{
@@ -1577,11 +1577,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					if (!column.IsNullable)
 					{
-						fromDb = "Convert.ToFloat({0})";
+                        fromDb = "Convert.ToSingle({0})";
 					}
 					else
 					{
-						fromDb = (!column.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToFloat({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToFloat({{0}})", column.ActualType));
+                        fromDb = (!column.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", column.ActualType));
 					}
 				}
 				else if (column.Type != DalColumnType.TDateTime)
