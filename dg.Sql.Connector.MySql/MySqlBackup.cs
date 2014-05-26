@@ -25,14 +25,14 @@ namespace dg.Sql.Connector
 
                 if (options.ExportRoutines) ExportRoutines(conn, writer);
                 if (options.ExportTableCreate) ExportTableCreate(conn, writer, options.ExportTableDrop);
-                if (options.ExportTableData) ExportTableData(conn, writer);
+                if (options.ExportTableData) ExportTableData(conn, writer, options);
                 if (options.ExportTriggers) ExportTriggers(conn, writer);
 
                 writer.Write(string.Format(@"SET FOREIGN_KEY_CHECKS=1 {0}{1}", DELIMITER, NEW_LINE));
                 if (options.WrapInTransaction) writer.Write(string.Format(@"COMMIT {0}{1}", DELIMITER, NEW_LINE));
             }
         }
-        public struct BackupOptions
+        public class BackupOptions
         {
             public bool BOM;
             public bool ExportRoutines;
@@ -41,6 +41,24 @@ namespace dg.Sql.Connector
             public bool ExportTableData;
             public bool ExportTriggers;
             public bool WrapInTransaction;
+
+            private Dictionary<string, Query> tableDataQueries = new Dictionary<string, Query>();
+
+            public void SetTableDataQuery(string tableName, Query query)
+            {
+                if (query == null)
+                {
+                    tableDataQueries.Remove(tableName);
+                }
+                else
+                {
+                    tableDataQueries[tableName] = query;
+                }
+            }
+            public Query GetTableDataQuery(string tableName)
+            {
+                return tableDataQueries.ContainsKey(tableName) ? tableDataQueries[tableName] : null;
+            }
         }
 
         public enum DbObjectType
@@ -176,7 +194,7 @@ namespace dg.Sql.Connector
                 writer.Write(string.Format(@"{2} {0}{1}", DELIMITER, NEW_LINE, create));
             }
         }
-        static private void ExportTableData(MySqlConnector conn, StreamWriter writer)
+        static private void ExportTableData(MySqlConnector conn, StreamWriter writer, BackupOptions options)
         {
             List<string> lstTables = GetObjectList(conn, DbObjectType.TABLE);
 
@@ -187,7 +205,9 @@ namespace dg.Sql.Connector
                     continue;
                 }
 
-                using (DataReaderBase reader = conn.ExecuteReader(string.Format(@"SELECT * FROM {0}", table)))
+                Query query = options.GetTableDataQuery(table);
+
+                using (DataReaderBase reader = (query == null ? conn.ExecuteReader(string.Format(@"SELECT * FROM {0}", table)) : query.ExecuteReader(conn)))
                 {
                     while (reader.Read())
                     {
