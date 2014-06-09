@@ -430,6 +430,20 @@ namespace dg.Sql
         }
 
         /// <summary>
+        /// Do we have already some INSERTs or UPDATEs set for this query?
+        /// </summary>
+        public bool HasInsertsOrUpdates
+        {
+            get
+            {
+                return _ListInsertUpdate.Count > 0 && (
+                  _QueryMode == QueryMode.Insert ||
+                  _QueryMode == QueryMode.Update ||
+                  _QueryMode == QueryMode.InsertOrUpdate);
+            }
+        }
+
+        /// <summary>
         /// LIMIT for query results.
         /// </summary>
         public Int64 Limit
