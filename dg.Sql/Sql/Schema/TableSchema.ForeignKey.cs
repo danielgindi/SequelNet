@@ -6,7 +6,18 @@ namespace dg.Sql
 {
     public partial class TableSchema
     {
-        public class ForeignKeyList : List<ForeignKey> { }
+        public class ForeignKeyList : List<ForeignKey>
+        {
+            public ForeignKey Find(string foreignKeyName)
+            {
+                if (this == null) return null;
+                foreach (ForeignKey foreignKey in this)
+                {
+                    if (foreignKey.Name.Equals(foreignKeyName, StringComparison.CurrentCultureIgnoreCase)) return foreignKey;
+                }
+                return null;
+            }
+        }
         public enum ForeignKeyReference
         {
             None,
