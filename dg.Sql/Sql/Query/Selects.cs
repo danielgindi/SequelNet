@@ -45,7 +45,7 @@ namespace dg.Sql
             }
             if (_Schema != null)
             {
-                return Select(Connection.EncloseFieldName(_Schema.SchemaName) + @".*", true, true);
+                return Select(Connection.EncloseFieldName(_SchemaName) + @".*", true, true);
             }
             else
             {

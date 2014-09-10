@@ -12,6 +12,7 @@ namespace dg.Sql
         #region Private variables
 
         private TableSchema _Schema;
+        private string _SchemaName = null;
         private object _FromExpression = null;
         private string _FromExpressionTableAlias = null;
         private OrderByList _ListOrderBy;
@@ -41,8 +42,13 @@ namespace dg.Sql
         #region Instantitaion
 
         public Query(TableSchema Schema)
+            : this(Schema, null)
+        {
+        }
+        public Query(TableSchema Schema, string SchemaName)
         {
             this.Schema = Schema;
+            this.SchemaName = SchemaName;
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
             if (Schema == null)
             {
@@ -55,9 +61,9 @@ namespace dg.Sql
             _ListSelect = new SelectColumnList();
             _ListSelect.Add(new SelectColumn(@"*", true));
         }
-        public Query(string TableName)
+        public Query(string SchemaName)
         {
-            this.Schema = new TableSchema(TableName, null);
+            this.Schema = new TableSchema(SchemaName, null);
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
             _ListSelect = new SelectColumnList();
             _ListSelect.Add(new SelectColumn(@"*", true));
@@ -66,7 +72,7 @@ namespace dg.Sql
         {
             this.Schema = null;
             _FromExpression = FromExpression;
-            _FromExpressionTableAlias = FromExpressionTableAlias;
+            _SchemaName = _FromExpressionTableAlias = FromExpressionTableAlias;
             if (FromExpression == null)
             {
                 throw new Exception("The expression you passed in is null.");
@@ -83,13 +89,21 @@ namespace dg.Sql
         {
             return new Query(AbstractRecord<T>.TableSchema);
         }
+        public static Query New<T>(string SchemaName) where T : AbstractRecord<T>, new()
+        {
+            return new Query(AbstractRecord<T>.TableSchema, SchemaName);
+        }
         public static Query New(TableSchema Schema)
         {
             return new Query(Schema);
         }
-        public static Query New(string TableName)
+        public static Query New(TableSchema Schema, string SchemaName)
         {
-            return new Query(TableName);
+            return new Query(Schema, SchemaName);
+        }
+        public static Query New(string SchemaName)
+        {
+            return new Query(SchemaName);
         }
         public static Query New(object FromExpression, string FromExpressionTableAlias)
         {
@@ -421,6 +435,20 @@ namespace dg.Sql
         }
 
         /// <summary>
+        /// Current query type.
+        /// </summary>
+        public string SchemaName
+        {
+            get { return _SchemaName; }
+            set 
+            {
+                _SchemaName = value != null ?
+                    value :
+                    (_Schema != null ? _Schema.SchemaName : _FromExpressionTableAlias);
+            }
+        }
+
+        /// <summary>
         /// Is this Query returning DISTINCT values.
         /// </summary>
         public bool IsDistinct
@@ -480,9 +508,20 @@ namespace dg.Sql
             get { return _Schema; }
             set
             {
-                if (_Schema != null) TableAliasMap.Remove(_Schema.DatabaseOwner + @"/" + _Schema.SchemaName);
+                if (_Schema != null)
+                {
+                    TableAliasMap.Remove(_Schema.DatabaseOwner + @"/" + (_SchemaName ?? _Schema.SchemaName));
+                }
                 _Schema = value;
-                if (Schema != null) TableAliasMap[_Schema.DatabaseOwner + @"/" + _Schema.SchemaName] = _Schema;
+                if (Schema != null)
+                {
+                    TableAliasMap[_Schema.DatabaseOwner + @"/" + _Schema.SchemaName] = _Schema;
+                    _SchemaName = Schema.SchemaName;
+                }
+                else
+                {
+                    _SchemaName = null;
+                }
             }
         }
 

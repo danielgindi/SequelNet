@@ -574,7 +574,7 @@ namespace dg.Sql
                         {
                             schemaName = connection.EncloseFieldName(Schema.DatabaseOwner) + @".";
                         }
-                        schemaName += connection.EncloseFieldName(Schema.SchemaName);
+                        schemaName += connection.EncloseFieldName(_SchemaName);
                     }
                 }
                 SelectColumn select = new SelectColumn(aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + (columnName == "*" ? columnName : (schemaName + "." + connection.EncloseFieldName(columnName))) + @")", true);

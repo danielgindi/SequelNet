@@ -43,7 +43,14 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(join.RightTableSchema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(join.RightTableSchema.SchemaName));
+                        if (join.RightTableAlias != null)
+                        {
+                            sb.Append(connection.EncloseFieldName(join.RightTableAlias));
+                        }
+                        else
+                        {
+                            sb.Append(connection.EncloseFieldName(join.RightTableSchema.SchemaName));
+                        }
                     }
                     else
                     {
@@ -53,7 +60,15 @@ namespace dg.Sql
                     }
 
                     sb.Append(' ');
-                    sb.Append((join.RightTableAlias != null && join.RightTableAlias.Length > 0) ? join.RightTableAlias : (join.RightTableSchema != null ? join.RightTableSchema.SchemaName : @""));
+
+                    if (join.RightTableAlias != null)
+                    {
+                        sb.Append(join.RightTableAlias);
+                    }
+                    else
+                    {
+                        sb.Append(join.RightTableSchema != null ? join.RightTableSchema.SchemaName : @"");
+                    }
 
                     if (join.Pairs.Count > 1)
                     {
@@ -195,7 +210,7 @@ namespace dg.Sql
                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                         sb.Append('.');
                     }
-                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                    sb.Append(connection.EncloseFieldName(_SchemaName));
 
                     sb.Append(@" ADD ");
 
@@ -257,7 +272,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                        sb.Append(connection.EncloseFieldName(_SchemaName));
 
                         sb.Append(@" ADD CONSTRAINT ");
                         sb.Append(connection.EncloseFieldName(index.Name));
@@ -287,7 +302,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                        sb.Append(connection.EncloseFieldName(_SchemaName));
 
                         if (index.Mode == TableSchema.IndexMode.Spatial)
                         {
@@ -313,7 +328,7 @@ namespace dg.Sql
                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                         sb.Append('.');
                     }
-                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                    sb.Append(connection.EncloseFieldName(_SchemaName));
 
                     sb.Append(@" ADD ");
 
@@ -348,7 +363,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                        sb.Append(connection.EncloseFieldName(_SchemaName));
 
                         sb.Append(@" ADD CONSTRAINT ");
                         sb.Append(connection.EncloseFieldName(index.Name));
@@ -383,7 +398,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                        sb.Append(connection.EncloseFieldName(_SchemaName));
                         
                         sb.Append(@"(");
                         for (int i = 0; i < index.ColumnNames.Length; i++)
@@ -407,7 +422,7 @@ namespace dg.Sql
                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                     sb.Append('.');
                 }
-                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                 sb.Append(@" ADD CONSTRAINT ");
                 sb.Append(connection.EncloseFieldName(foreignKey.Name));
@@ -879,7 +894,7 @@ namespace dg.Sql
                                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                             sb.Append('.');
                                         }
-                                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                        sb.Append(connection.EncloseFieldName(_SchemaName));
                                     }
                                     else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                                     BuildJoin(sb, connection);
@@ -953,7 +968,7 @@ namespace dg.Sql
                                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                                     sb.Append('.');
                                                 }
-                                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                                sb.Append(connection.EncloseFieldName(_SchemaName));
                                             }
                                             else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                                             sb.Append('.');
@@ -996,7 +1011,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                 }
                                 else
                                 {
@@ -1095,7 +1110,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                 sb.Append(@" (");
                                 bFirst = true;
@@ -1162,7 +1177,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                 bFirst = true;
                                 foreach (AssignmentColumn upd in _ListInsertUpdate)
@@ -1216,7 +1231,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                     sb.Append(@" (");
                                     bFirst = true;
@@ -1309,7 +1324,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                 }
                                 sb.Append(@" FROM ");
 
@@ -1318,7 +1333,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                 BuildJoin(sb, connection);
                                 if (_ListWhere != null && _ListWhere.Count > 0)
@@ -1339,7 +1354,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                 sb.Append('(');
                                 int iPrimaryKeys = 0;
@@ -1354,7 +1369,7 @@ namespace dg.Sql
                                 {
                                     if (bSep) sb.Append(@", ");
 
-                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", connection.EncloseFieldName(@"PK_" + Schema.SchemaName));
+                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", connection.EncloseFieldName(@"PK_" + _SchemaName));
                                     bSep = false;
                                     foreach (TableSchema.Column col in Schema.Columns)
                                     {
@@ -1410,7 +1425,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
 
                                 sb.Append(@" ADD ");
 
@@ -1440,7 +1455,7 @@ namespace dg.Sql
                                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                             sb.Append('.');
                                         }
-                                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                        sb.Append(connection.EncloseFieldName(_SchemaName));
                                         sb.Append('.');
                                         sb.Append(connection.EncloseFieldName(_AlterColumnOldName));
                                         sb.Append(',');
@@ -1455,7 +1470,7 @@ namespace dg.Sql
                                             sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                             sb.Append('.');
                                         }
-                                        sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                        sb.Append(connection.EncloseFieldName(_SchemaName));
                                         sb.Append(@" RENAME COLUMN ");
                                         sb.Append(connection.EncloseFieldName(_AlterColumnOldName));
                                         sb.Append(@" TO ");
@@ -1473,7 +1488,7 @@ namespace dg.Sql
                                         alterTableStatement += connection.EncloseFieldName(Schema.DatabaseOwner);
                                         alterTableStatement += '.';
                                     }
-                                    alterTableStatement += connection.EncloseFieldName(Schema.SchemaName);
+                                    alterTableStatement += connection.EncloseFieldName(_SchemaName);
                                     alterTableStatement += @" ALTER COLUMN ";
                                     alterTableStatement += connection.EncloseFieldName(_AlterColumn.Name);
 
@@ -1499,7 +1514,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(' ');
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                     {
@@ -1527,7 +1542,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
                                 sb.Append(@" DROP COLUMN ");
                                 sb.Append(connection.EncloseFieldName(_DropColumnName));
                             }
@@ -1542,7 +1557,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(@" DROP FOREIGN KEY ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
@@ -1554,7 +1569,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(@" DROP CONSTRAINT ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
@@ -1566,7 +1581,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(@" DROP CONSTRAINT ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
@@ -1582,7 +1597,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(@" DROP INDEX ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
@@ -1594,7 +1609,7 @@ namespace dg.Sql
                                         sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                         sb.Append('.');
                                     }
-                                    sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
                                     sb.Append(@" DROP CONSTRAINT ");
                                     sb.Append(connection.EncloseFieldName(_DropColumnName));
                                 }
@@ -1608,7 +1623,7 @@ namespace dg.Sql
                                     sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.EncloseFieldName(Schema.SchemaName));
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
                             }
                             break;
                     }
