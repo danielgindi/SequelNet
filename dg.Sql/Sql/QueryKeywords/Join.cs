@@ -102,7 +102,7 @@ namespace dg.Sql
     {
         private JoinType _JoinType;
         private TableSchema _RightTableSchema;
-        private string _RightTableSql;
+        private object _RightTableSql;
         private string _RightTableAlias;
         private List<JoinColumnPair> _Pairs = new List<JoinColumnPair>();
 
@@ -118,7 +118,7 @@ namespace dg.Sql
         }
         public Join(JoinType joinType,
             TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
-            string rightTableSql, string rightColumn, string rightTableAlias)
+            object rightTableSql, string rightColumn, string rightTableAlias)
         {
             _JoinType = joinType;
             _Pairs.Add(new JoinColumnPair((leftTableAlias != null && leftTableAlias.Length > 0) ? leftTableAlias : leftTableSchema.SchemaName, leftColumn, rightColumn));
@@ -137,7 +137,7 @@ namespace dg.Sql
             if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.SchemaName;
         }
         public Join(JoinType joinType,
-            string rightTableSql, string rightTableAlias,
+            object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
             _JoinType = joinType;
@@ -156,7 +156,7 @@ namespace dg.Sql
             get { return _RightTableSchema; }
             set { _RightTableSchema = value; }
         }
-        public string RightTableSql
+        public object RightTableSql
         {
             get { return _RightTableSql; }
             set { _RightTableSql = value; }

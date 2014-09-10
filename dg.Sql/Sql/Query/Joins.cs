@@ -31,7 +31,7 @@ namespace dg.Sql
         }
         public Query Join(JoinType joinType,
             TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
-            string rightTableSql, string rightColumn, string rightTableAlias)
+            object rightTableSql, string rightColumn, string rightTableAlias)
         {
             if (_ListJoin == null) _ListJoin = new JoinList();
             Join join = new Join(joinType, leftTableSchema, leftColumn, leftTableAlias, rightTableSql, rightColumn, rightTableAlias);
@@ -39,7 +39,7 @@ namespace dg.Sql
             return this;
         }
         public Query Join(JoinType joinType,
-            string rightTableSql, string rightTableAlias,
+            object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
             if (_ListJoin == null) _ListJoin = new JoinList();

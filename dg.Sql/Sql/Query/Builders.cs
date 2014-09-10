@@ -55,7 +55,14 @@ namespace dg.Sql
                     else
                     {
                         sb.Append('(');
-                        sb.Append(join.RightTableSql);
+                        if (join.RightTableSql is Query)
+                        {
+                            sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
+                        }
+                        else
+                        {
+                            sb.Append(join.RightTableSql.ToString());
+                        }
                         sb.Append(')');
                     }
 
