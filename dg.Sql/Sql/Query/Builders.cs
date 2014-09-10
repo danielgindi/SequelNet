@@ -186,18 +186,22 @@ namespace dg.Sql
                     {
                         if (groupBy.TableName != null) sb.Append(connection.EncloseFieldName(groupBy.TableName) + @"." + connection.EncloseFieldName(groupBy.ColumnName.ToString()));
                         else sb.Append(connection.EncloseFieldName(groupBy.ColumnName.ToString()));
-                    }
-                    switch (groupBy.SortDirection)
+                    } 
+
+                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        default:
-                        case SortDirection.None:
-                            break;
-                        case SortDirection.ASC:
-                            sb.Append(invert ? @" DESC" : @" ASC");
-                            break;
-                        case SortDirection.DESC:
-                            sb.Append(invert ? @" ASC" : @" DESC");
-                            break;
+                        switch (groupBy.SortDirection)
+                        {
+                            default:
+                            case SortDirection.None:
+                                break;
+                            case SortDirection.ASC:
+                                sb.Append(invert ? @" DESC" : @" ASC");
+                                break;
+                            case SortDirection.DESC:
+                                sb.Append(invert ? @" ASC" : @" DESC");
+                                break;
+                        }
                     }
                 }
             }
