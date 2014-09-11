@@ -43,14 +43,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(join.RightTableSchema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        if (join.RightTableAlias != null)
-                        {
-                            sb.Append(connection.EncloseFieldName(join.RightTableAlias));
-                        }
-                        else
-                        {
-                            sb.Append(connection.EncloseFieldName(join.RightTableSchema.SchemaName));
-                        }
+                        sb.Append(connection.EncloseFieldName(join.RightTableSchema.SchemaName));
                     }
                     else
                     {
