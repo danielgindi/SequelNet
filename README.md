@@ -3,6 +3,8 @@ dg.Sql
 
 SQL abstraction/generalization/protection layer. Anyone is welcome to use and improve :-)
 
+It currently supports MySql, MsSql, Postgres and MsAccess (OleDb).
+
 A little bit of history
 -----------------------
 In the far past, I developed a framework for use in many of my projects, and then not so long ago I have decided to separate the Sql stuff to a library.
