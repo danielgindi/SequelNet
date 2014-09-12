@@ -32,6 +32,11 @@ Structure of this library
 * `TableSchema` is a class representing the an actual db schema. This assists the `Query` in converting values where necessary, bulding queries or even building `CREATE TABLE`, `ALTER TABLE` and `CREATE INDEX` queries...
 * There's a namespace `Phrases` which includes many objects that wrap native sql functions. You can add your own, based on the `BasePhrase` class.
 
+Bonus
+-----
+
+If you're using MySql, then there's a `MySqlBackup` class, which can create a full backup of a Database, including shcema and data. Yes, I know, it's cool.
+
 SchemaGeneratorAddIn
 --------------------
 
