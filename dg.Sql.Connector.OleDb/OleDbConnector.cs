@@ -19,7 +19,7 @@ namespace dg.Sql.Connector
 
         public static OleDbConnection CreateSqlConnection(string connectionStringKey)
         {
-            return new OleDbConnection(GetWebsiteConnectionString(connectionStringKey));
+            return new OleDbConnection(FindConnectionString(connectionStringKey));
         }
 
         private OleDbConnection _Connection = null;

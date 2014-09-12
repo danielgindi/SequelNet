@@ -356,19 +356,7 @@ namespace dg.Sql.Connector
         #endregion
 
         #region Legacy, backwards compatibility
-
-        [Obsolete("GetWebsiteConnectionString is deprecated, please use FindConnectionString instead.")]
-        public static String GetWebsiteConnectionString(string ConnectionStringKey)
-        {
-            return FindConnectionString(ConnectionStringKey);
-        }
-
-        [Obsolete("GetWebsiteConnectionString is deprecated, please use FindConnectionString instead.")]
-        public static String GetWebsiteConnectionString()
-        {
-            return FindConnectionString();
-        }
-
+        
         [Obsolete("beginTransaction is deprecated, please use BeginTransaction instead.")]
         [CLSCompliant(false)]
         public bool beginTransaction()
@@ -447,14 +435,7 @@ namespace dg.Sql.Connector
         {
             return EncloseFieldName(FieldName);
         }
-
-        [Obsolete("formatDate is deprecated, please use FormatDate instead.")]
-        [CLSCompliant(false)]
-        public string formatDate(DateTime DateTime)
-        {
-            return FormatDate(DateTime);
-        }
-
+        
         #endregion
     }
 }
