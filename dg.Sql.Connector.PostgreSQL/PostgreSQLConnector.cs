@@ -389,10 +389,11 @@ namespace dg.Sql.Connector
             }
         }
 
-        public virtual string PrepareValue(bool Value)
+        public override string PrepareValue(bool Value)
         {
             return Value ? @"TRUE" : @"FALSE";
         }
+
         public override string PrepareValue(Guid Value)
         {
             return '\'' + Value.ToString(@"D") + '\'';
