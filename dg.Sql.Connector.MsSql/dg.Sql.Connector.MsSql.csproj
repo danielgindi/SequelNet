@@ -68,6 +68,7 @@
     <Compile Include="MsSqlConnector.cs" />
     <Compile Include="MsSqlFactory.cs" />
     <Compile Include="MsSqlDataReader.cs" />
+    <Compile Include="MsSqlVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

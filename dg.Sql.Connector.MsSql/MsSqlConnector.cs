@@ -172,6 +172,47 @@ namespace dg.Sql.Connector
 
         #region Utilities
 
+        static private Dictionary<string, MsSqlVersion> _Map_ConnStr_Version = new Dictionary<string, MsSqlVersion>();
+
+        private MsSqlVersion _Version = null;
+
+        public MsSqlVersion GetVersionData()
+        {
+            if (_Version == null)
+            {
+                MsSqlVersion version;
+                if (_Map_ConnStr_Version.TryGetValue(_Connection.ConnectionString, out version))
+                {
+                    _Version = version;
+                }
+                else
+                {
+                    try
+                    {
+                        version = new MsSqlVersion();
+                        using (DataReaderBase reader = ExecuteReader("SELECT SERVERPROPERTY('ProductVersion'), SERVERPROPERTY('ProductLevel'), SERVERPROPERTY('Edition')"))
+                        {
+                            if (reader.Read())
+                            {
+                                version.Version = reader.GetStringOrEmpty(0);
+                                version.Level = reader.GetStringOrEmpty(1);
+                                version.Edition = reader.GetStringOrEmpty(2);
+                            }
+                        }
+                        _Version = version;
+                        _Map_ConnStr_Version[_Connection.ConnectionString] = _Version;
+                    }
+                    catch { }
+                }
+            }
+            return _Version;
+        }
+
+        public override string GetVersion()
+        {
+            return GetVersionData().Version;
+        }
+
         public SqlConnection GetUnderlyingConnection()
         {
             return _Connection;
