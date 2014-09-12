@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class Hour : BasePhrase
+    public class Hour : IPhrase
     {
         string TableName;
         object Object;

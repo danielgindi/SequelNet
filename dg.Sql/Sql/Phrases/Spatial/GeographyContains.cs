@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class GeographyContains : BasePhrase
+    public class GeographyContains : IPhrase
     {
         string ContainingTableName;
         object ContainingObject;

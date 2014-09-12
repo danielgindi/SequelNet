@@ -218,9 +218,9 @@ namespace dg.Sql.Connector
             { // Must be formatted specifically, to avoid decimal separator confusion
                 return PrepareValue((double)Value);
             }
-            else if (Value is dg.Sql.BasePhrase)
+            else if (Value is dg.Sql.IPhrase)
             {
-                return ((dg.Sql.BasePhrase)Value).BuildPhrase(this);
+                return ((dg.Sql.IPhrase)Value).BuildPhrase(this);
             }
             else if (Value is dg.Sql.Geometry)
             {

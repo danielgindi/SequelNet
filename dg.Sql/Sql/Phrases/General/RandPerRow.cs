@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class RandWeight : BasePhrase
+    public class RandWeight : IPhrase
     {
         string TableName;
         string Object;

@@ -374,9 +374,9 @@ namespace dg.Sql
                         }
                         catch { }
                     }
-                    else if (Value is dg.Sql.BasePhrase)
+                    else if (Value is dg.Sql.IPhrase)
                     {
-                        OutputBuilder.Append(((dg.Sql.BasePhrase)Value).BuildPhrase(Connection));
+                        OutputBuilder.Append(((dg.Sql.IPhrase)Value).BuildPhrase(Connection));
                         return;
                     }
                 }

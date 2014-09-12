@@ -4,7 +4,7 @@ using System.Text;
 
 namespace dg.Sql
 {
-    public interface BasePhrase
+    public interface IPhrase
     {
         string BuildPhrase(dg.Sql.Connector.ConnectorBase Connection);
     }

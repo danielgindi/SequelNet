@@ -57,7 +57,7 @@ namespace dg.Sql
         {
             return Where(new Where(condition, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal), false);
         }
-        public Query AddWhere(WhereCondition condition, BasePhrase phrase)
+        public Query AddWhere(WhereCondition condition, IPhrase phrase)
         {
             return Where(new Where(condition, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal), false);
         }

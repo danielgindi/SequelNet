@@ -128,9 +128,9 @@ namespace dg.Sql
                         }
                         if (orderBy.IsLiteral)
                         {
-                            if (orderBy.ColumnName is dg.Sql.BasePhrase)
+                            if (orderBy.ColumnName is dg.Sql.IPhrase)
                             {
-                                sb.Append(((dg.Sql.BasePhrase)orderBy.ColumnName).BuildPhrase(connection));
+                                sb.Append(((dg.Sql.IPhrase)orderBy.ColumnName).BuildPhrase(connection));
                             }
                             else sb.Append(orderBy.ColumnName);
                         }
@@ -169,9 +169,9 @@ namespace dg.Sql
 
                     if (groupBy.IsLiteral)
                     {
-                        if (groupBy.ColumnName is dg.Sql.BasePhrase)
+                        if (groupBy.ColumnName is dg.Sql.IPhrase)
                         {
-                            sb.Append(((dg.Sql.BasePhrase)groupBy.ColumnName).BuildPhrase(connection));
+                            sb.Append(((dg.Sql.IPhrase)groupBy.ColumnName).BuildPhrase(connection));
                         }
                         else sb.Append(groupBy.ColumnName);
                     }
@@ -966,9 +966,9 @@ namespace dg.Sql
                                     else
                                     {
                                         sb.Append(@"(");
-                                        if (_FromExpression is dg.Sql.BasePhrase)
+                                        if (_FromExpression is dg.Sql.IPhrase)
                                         {
-                                            sb.Append(((dg.Sql.BasePhrase)_FromExpression).BuildPhrase(connection));
+                                            sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
                                         }
                                         else sb.Append(_FromExpression);
                                         sb.Append(@") ");
@@ -1714,9 +1714,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.BasePhrase)
+                if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.BasePhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1858,9 +1858,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.BasePhrase)
+                if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.BasePhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1989,9 +1989,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.BasePhrase)
+                if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.BasePhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");

@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class PassThroughAggregate : BasePhrase
+    public class PassThroughAggregate : IPhrase
     {
         string TableName;
         object Object;

@@ -15,7 +15,7 @@ namespace dg.Sql.Phrases
     /// TY = To longitude
     /// D =  2R * ASIN(SQRT(POWER(SIN((FX-TX) * PI/360), 2) + COS(FX * PI/180) * COS(TX * PI/180) * POWER(SIN((FY - TY) * PI/360), 2)))
     /// </summary>
-    public class GeographyDistance : BasePhrase
+    public class GeographyDistance : IPhrase
     {
         string ContainingTableName;
         string ContainingLatitudeColumnName;

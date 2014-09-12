@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class StandardVarianceOfSample : BasePhrase
+    public class StandardVarianceOfSample : IPhrase
     {
         string TableName;
         object Object;

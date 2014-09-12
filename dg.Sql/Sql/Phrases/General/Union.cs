@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class Union : BasePhrase
+    public class Union : IPhrase
     {
         Query[] Queries;
 

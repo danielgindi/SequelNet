@@ -5,7 +5,7 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class Replace : BasePhrase
+    public class Replace : IPhrase
     {
         string Source;
         string SourceTableName;

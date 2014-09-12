@@ -72,7 +72,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sql\Phrases\Base.cs" />
+    <Compile Include="Sql\Phrases\IPhrase.cs" />
     <Compile Include="Bindable\BindableCollection.cs" />
     <Compile Include="Bindable\BindableList.cs" />
     <Compile Include="Bindable\IBindableCollection.cs" />

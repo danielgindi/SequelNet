@@ -30,7 +30,7 @@ Structure of this library
 * `FactoryBase` is a special base class which is responsible for creating special objects like `DbCommand`s and `DbDataAdapter`s. Each connector has a subclass of this class.
 * `AbstractRecord` is a DAL class that represents your data, and contains a `TableSchema`, data accessors, and helper functions. Using `AbstractRecord` is completely optional!
 * `TableSchema` is a class representing the an actual db schema. This assists the `Query` in converting values where necessary, bulding queries or even building `CREATE TABLE`, `ALTER TABLE` and `CREATE INDEX` queries...
-* There's a namespace `Phrases` which includes many objects that wrap native sql functions. You can add your own, based on the `BasePhrase` class.
+* There's a namespace `Phrases` which includes many objects that wrap native sql functions. You can add your own, based on the `IPhrase` class.
 
 Bonus
 -----
