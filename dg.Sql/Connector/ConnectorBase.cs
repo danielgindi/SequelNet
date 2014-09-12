@@ -130,6 +130,11 @@ namespace dg.Sql.Connector
             throw new NotImplementedException(@"GetVersion not implemented in connector of type " + this.GetType().Name);
         }
 
+        virtual public bool SupportsSelectPaging()
+        {
+            return false;
+        }
+
         abstract public object GetLastInsertID();
 
         virtual public void SetIdentityInsert(string TableName, bool Enabled) { }

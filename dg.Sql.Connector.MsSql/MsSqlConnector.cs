@@ -213,6 +213,11 @@ namespace dg.Sql.Connector
             return GetVersionData().Version;
         }
 
+        public override bool SupportsSelectPaging()
+        {
+            return GetVersionData().SupportsOffset;
+        }
+
         public SqlConnection GetUnderlyingConnection()
         {
             return _Connection;

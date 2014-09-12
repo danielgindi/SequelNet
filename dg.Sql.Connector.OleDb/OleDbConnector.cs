@@ -172,6 +172,11 @@ namespace dg.Sql.Connector
 
         #region Utilities
 
+        public override bool SupportsSelectPaging()
+        {
+            return false;
+        }
+
         public OleDbConnection GetUnderlyingConnection()
         {
             return _Connection;

@@ -231,6 +231,11 @@ namespace dg.Sql.Connector
             return _Version;
         }
 
+        public override bool SupportsSelectPaging()
+        {
+            return true;
+        }
+
         public NpgsqlConnection GetUnderlyingConnection()
         {
             return _Connection;

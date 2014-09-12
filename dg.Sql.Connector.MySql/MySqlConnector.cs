@@ -228,6 +228,11 @@ namespace dg.Sql.Connector
             return _Version;
         }
 
+        public override bool SupportsSelectPaging()
+        {
+            return true;
+        }
+
         public MySqlConnection GetUnderlyingConnection()
         {
             return _Connection;
