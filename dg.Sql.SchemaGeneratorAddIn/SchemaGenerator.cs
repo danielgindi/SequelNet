@@ -375,21 +375,27 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							num9 = columnKeyword.IndexOf(",");
 							num10 = columnKeyword.IndexOf(")");
 							if (num8 > -1 & num9 > -1)
+							string precision = "";
+							string scale = "";
+							int leftPartIndex = columnKeyword.IndexOf("(");
+							int commaIndex = columnKeyword.IndexOf(",");
+							int rightParIndex = columnKeyword.IndexOf(")");
+							if (leftPartIndex > -1 & commaIndex > -1)
 							{
-								str28 = columnKeyword.Substring(num8 + 1, num9 - num8 - 1).Trim();
-								str29 = columnKeyword.Substring(num9 + 1, num10 - num9 - 1).Trim();
+								precision = columnKeyword.Substring(leftPartIndex + 1, commaIndex - leftPartIndex - 1).Trim();
+								scale = columnKeyword.Substring(commaIndex + 1, rightParIndex - commaIndex - 1).Trim();
 							}
-							else if (num8 > -1)
+							else if (leftPartIndex > -1)
 							{
-								str28 = columnKeyword.Substring(num8 + 1, num10 - num8 - 1).Trim();
+								precision = columnKeyword.Substring(leftPartIndex + 1, rightParIndex - leftPartIndex - 1).Trim();
 							}
-							if (str28.Length > 0)
+							if (precision.Length > 0)
 							{
-								dalColumn.Scale = Convert.ToInt32(str28);
+                                dalColumn.Precision = Convert.ToInt32(precision);
 							}
-							if (str29.Length > 0)
+							if (scale.Length > 0)
 							{
-								dalColumn.Precision = Convert.ToInt32(str29);
+								dalColumn.Scale = Convert.ToInt32(scale);
 							}
 							dalColumn.Type = DalColumnType.TDecimal;
 						}

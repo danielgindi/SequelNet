@@ -28,8 +28,8 @@ Keywords:
 Data types:
  INT64; INT32; INT16; INT8; UINT64; UINT32; UINT16; UINT8; DOUBLE; FLOAT; 
  DECIMAL; MONEY; PRECISION(length); SCALE(length);
- DECIMAL(scale,precision); MONEY(scale,precision);
- DECIMAL(scale); MONEY(scale);
+ DECIMAL(precision,scale); MONEY(precision,scale);
+ DECIMAL(precision); MONEY(precision);
  FIXEDSTRING(length); STRING(length); TEXT; LONGTEXT(length); MEDIUMTEXT(length); 
  BOOL; GUID; DATETIME; 
 
