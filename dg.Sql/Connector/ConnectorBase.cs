@@ -313,6 +313,8 @@ namespace dg.Sql.Connector
         public virtual string type_NUMERIC { get { return @"NUMERIC"; } }
         public virtual string type_DECIMAL { get { return @"DECIMAL"; } }
         public virtual string type_MONEY { get { return @"DECIMAL"; } }
+        public virtual string type_FLOAT { get { return @"FLOAT"; } }
+        public virtual string type_DOUBLE { get { return @"DOUBLE"; } }
         public virtual string type_VARCHAR { get { return @"NVARCHAR"; } }
         public virtual string type_CHAR { get { return @"NCHAR"; } }
         public virtual string type_TEXT { get { return @"NTEXT"; } }

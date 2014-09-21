@@ -34,7 +34,6 @@ namespace dg.Sql.SchemaGeneratorAddIn
 
             bool staticColumns = false;
 
-            object[] maxLength;
 			string singleColumnPrimaryKeyName = null;
 			string str5 = null;
 			string str6 = null;
@@ -359,22 +358,18 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						else if (columnKeywordUpper.Equals("GUID", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TGuid;
-						}
-						else if (columnKeywordUpper.Equals("DECIMAL", StringComparison.Ordinal))
+                        }
+                        else if (columnKeywordUpper.Equals("DECIMAL", StringComparison.Ordinal))
+                        {
+                            dalColumn.Type = DalColumnType.TDecimal;
+                        }
+                        else if (columnKeywordUpper.Equals("MONEY", StringComparison.Ordinal))
+                        {
+                            dalColumn.Type = DalColumnType.TMoney;
+                        }
+                        else if (columnKeywordUpper.StartsWith("DECIMAL", StringComparison.Ordinal) |
+                            columnKeywordUpper.StartsWith("MONEY", StringComparison.Ordinal))
 						{
-							dalColumn.Type = DalColumnType.TDecimal;
-						}
-						else if (columnKeywordUpper.StartsWith("DECIMAL", StringComparison.Ordinal))
-						{
-							string str28 = "";
-							string str29 = "";
-							int num8 = -1;
-							int num9 = -1;
-							int num10 = -1;
-							num8 = columnKeyword.IndexOf("(");
-							num9 = columnKeyword.IndexOf(",");
-							num10 = columnKeyword.IndexOf(")");
-							if (num8 > -1 & num9 > -1)
 							string precision = "";
 							string scale = "";
 							int leftPartIndex = columnKeyword.IndexOf("(");
@@ -397,7 +392,14 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							{
 								dalColumn.Scale = Convert.ToInt32(scale);
 							}
-							dalColumn.Type = DalColumnType.TDecimal;
+                            if (columnKeywordUpper.StartsWith("MONEY", StringComparison.Ordinal))
+                            {
+                                dalColumn.Type = DalColumnType.TMoney;
+                            }
+                            else
+                            {
+                                dalColumn.Type = DalColumnType.TDecimal;
+                            }
 						}
 						else if (columnKeywordUpper.Equals("DOUBLE", StringComparison.Ordinal))
 						{
@@ -732,7 +734,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					enumTypeName.ActualType = "string";
 				}
-				else if (enumTypeName.Type == DalColumnType.TDecimal)
+                else if (enumTypeName.Type == DalColumnType.TDecimal || enumTypeName.Type == DalColumnType.TMoney)
 				{
 					enumTypeName.ActualType = "decimal";
 				}
@@ -868,11 +870,15 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				else if (enumTypeName.Type == DalColumnType.TMediumText)
 				{
 					stringBuilder.Append(", DataType.MediumText");
-				}
-				else if (enumTypeName.Type == DalColumnType.TFixedString)
-				{
-					stringBuilder.Append(", DataType.Char");
-				}
+                }
+                else if (enumTypeName.Type == DalColumnType.TFixedString)
+                {
+                    stringBuilder.Append(", DataType.Char");
+                }
+                else if (enumTypeName.Type == DalColumnType.TMoney)
+                {
+                    stringBuilder.Append(", DataType.Money");
+                }
 				else if (enumTypeName.Type == DalColumnType.TGeometry)
 				{
 					stringBuilder.Append(", DataType.Geometry");
@@ -1024,15 +1030,13 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					enumTypeName.ActualType += "?";
 				}
-				maxLength = new object[] { "\r\n", enumTypeName.MaxLength, enumTypeName.Precision, enumTypeName.Scale, null, null, null, null };
-				object[] objArray = maxLength;
-				objArray[4] = (enumTypeName.AutoIncrement ? "true" : "false");
-				object[] objArray1 = maxLength;
-				objArray1[5] = (enumTypeName.IsPrimaryKey ? "true" : "false");
-				object[] objArray2 = maxLength;
-				objArray2[6] = (enumTypeName.IsNullable ? "true" : "false");
-				maxLength[7] = enumTypeName.DefaultValue;
-                stringBuilder.AppendFormat(", {1}, {2}, {3}, {4}, {5}, {6}, {7});{0}", maxLength);
+				
+                object[] dataTypeFormatArgs = new object[] { "\r\n", enumTypeName.MaxLength, enumTypeName.Precision, enumTypeName.Scale, null, null, null, null };
+                dataTypeFormatArgs[4] = (enumTypeName.AutoIncrement ? "true" : "false");
+                dataTypeFormatArgs[5] = (enumTypeName.IsPrimaryKey ? "true" : "false");
+                dataTypeFormatArgs[6] = (enumTypeName.IsNullable ? "true" : "false");
+				dataTypeFormatArgs[7] = enumTypeName.DefaultValue;
+                stringBuilder.AppendFormat(", {1}, {2}, {3}, {4}, {5}, {6}, {7});{0}", dataTypeFormatArgs);
 				if (string.IsNullOrEmpty(actualType))
 				{
 					continue;
@@ -1064,7 +1068,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				stringBuilder.AppendFormat("{0}", "\r\n");
 				foreach (DalIndex dalIndex2 in dalIndices)
 				{
-					maxLength = new object[4];
+                    object[] maxLength = new object[4];
 					object[] objArray3 = maxLength;
 					objArray3[0] = (dalIndex2.IndexName == null ? "null" : ("\"" + dalIndex2.IndexName + "\""));
 					maxLength[1] = dalIndex2.ClusterMode.ToString();
@@ -1208,7 +1212,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					{
 						defaultValue = "string.Empty";
 					}
-					else if (dalColumn3.Type == DalColumnType.TDecimal)
+                    else if (dalColumn3.Type == DalColumnType.TDecimal || dalColumn3.Type == DalColumnType.TMoney)
 					{
 						defaultValue = "0m";
 					}
@@ -1252,7 +1256,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					continue;
 				}
-				maxLength = new object[] { "\r\n", dalColumn4.ActualType, dalColumn4.Name, null };
+                object[] maxLength = new object[] { "\r\n", dalColumn4.ActualType, dalColumn4.Name, null };
 				object[] objArray4 = maxLength;
 				objArray4[3] = (dalColumn4.Virtual ? "virtual " : "");
                 stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}get{{return _{2};}}{0}set{{_{2}=value;}}{0}}}{0}", maxLength);
@@ -1352,7 +1356,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					str32 = "Convert.ToUInt64({0})";
 				}
-				else if (dalColumn6.Type == DalColumnType.TDecimal)
+                else if (dalColumn6.Type == DalColumnType.TDecimal || dalColumn6.Type == DalColumnType.TMoney)
 				{
 					str32 = "Convert.ToDecimal({0})";
 				}
@@ -1549,7 +1553,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						fromDb = (!column.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt64({{0}})", column.ActualType));
 					}
 				}
-				else if (column.Type == DalColumnType.TDecimal)
+                else if (column.Type == DalColumnType.TDecimal || column.Type == DalColumnType.TMoney)
 				{
 					if (!column.IsNullable)
 					{

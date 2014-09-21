@@ -97,9 +97,13 @@ namespace dg.Sql
                     if (this.MaxLength > 0) return DataType.VarChar;
                     return DataType.Text;
                 }
-                else if (this.Type.Equals(typeof(double)) || this.Type.Equals(typeof(float)))
+                else if (this.Type.Equals(typeof(float)))
                 {
-                    return DataType.Numeric;
+                    return DataType.Float;
+                }
+                else if (this.Type.Equals(typeof(double)))
+                {
+                    return DataType.Double;
                 }
                 else if (this.Type.Equals(typeof(decimal)))
                 {

@@ -117,17 +117,25 @@ namespace dg.Sql
         /// </summary>
         Blob,
         /// <summary>
-        /// Float, Double
+        /// Float
         /// </summary>
-        Numeric,
+        Float,
+        /// <summary>
+        /// Double
+        /// </summary>
+        Double,
         /// <summary>
         /// Decimal
         /// </summary>
         Decimal,
         /// <summary>
-        /// Decimal
+        /// Money
         /// </summary>
         Money,
+        /// <summary>
+        /// Numeric
+        /// </summary>
+        Numeric,
         /// <summary>
         /// SByte
         /// </summary>

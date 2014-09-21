@@ -452,6 +452,8 @@ namespace dg.Sql.Connector
         public override string type_NUMERIC { get { return @"NUMERIC"; } }
         public override string type_DECIMAL { get { return @"DECIMAL"; } }
         public override string type_MONEY { get { return @"DECIMAL"; } }
+        public override string type_FLOAT { get { return @"FLOAT"; } }
+        public override string type_DOUBLE { get { return @"DOUBLE"; } }
         public override string type_VARCHAR { get { return @"NATIONAL VARCHAR"; } }
         public override string type_CHAR { get { return @"NATIONAL CHAR"; } }
         public override string type_TEXT { get { return @"TEXT"; } }

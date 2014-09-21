@@ -22,6 +22,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 		TGuid,
 		TDateTime,
 		TDecimal,
+		TMoney,
 		TDouble,
 		TFloat,
 		TGeometry,

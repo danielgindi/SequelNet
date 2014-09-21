@@ -572,7 +572,6 @@ namespace dg.Sql
                 {
                     sb.Append(connection.type_DATETIME);
                 }
-
                 else if (dataType == DataType.Numeric)
                 {
                     if (column.NumberPrecision > 0)
@@ -583,6 +582,30 @@ namespace dg.Sql
                     else
                     {
                         sb.Append(connection.type_NUMERIC);
+                    }
+                }
+                else if (dataType == DataType.Float)
+                {
+                    if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                    {
+                        sb.Append(connection.type_FLOAT);
+                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
+                    }
+                    else
+                    {
+                        sb.Append(connection.type_FLOAT);
+                    }
+                }
+                else if (dataType == DataType.Double)
+                {
+                    if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                    {
+                        sb.Append(connection.type_DOUBLE);
+                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
+                    }
+                    else
+                    {
+                        sb.Append(connection.type_DOUBLE);
                     }
                 }
                 else if (dataType == DataType.Decimal)
