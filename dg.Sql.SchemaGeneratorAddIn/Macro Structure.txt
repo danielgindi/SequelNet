@@ -19,6 +19,8 @@ Keywords:
  NOPROPERTY - will remove the property code for this specific column. Can be used to write a custom property
  ACTUALDEFAULT - define a different code-based default value for the class's instance member variable
  COLUMNNAME - define the actual column name in the db, if it is different than the variable's name
+ CHARSET - the name of a character set for this column
+ COLLATE - the name of a collation for this column
  TODB - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format
  FROMDB - Define a format to be used in Read(...). Can use the {0} specifier for column value in format
  VIRTUAL - Defines the property as virtual

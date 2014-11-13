@@ -20,7 +20,9 @@ namespace dg.Sql.SchemaGeneratorAddIn
 		public string Comment;
 		public string ActualType;
 		public string ToDb;
-		public string FromDb;
+        public string FromDb;
+        public string Charset;
+        public string Collate;
 		public bool Virtual;
 	}
 }

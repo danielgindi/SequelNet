@@ -608,7 +608,15 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							dalForeignKey1.ForeignColumns.Add(str30.Substring(str30.IndexOf(".") + 1));
 							dalForeignKey1.Columns.Add(dalColumn.Name);
 							dalForeignKeys.Add(dalForeignKey1);
-						}
+                        }
+                        else if (columnKeywordUpper.StartsWith("CHARSET ", StringComparison.Ordinal))
+                        {
+                            dalColumn.Charset = columnKeyword.Substring(8);
+                        }
+                        else if (columnKeywordUpper.StartsWith("COLLATE ", StringComparison.Ordinal))
+                        {
+                            dalColumn.Collate = columnKeyword.Substring(8);
+                        }
 					}
 					if (dalColumn.IsPrimaryKey & dalColumn.Type == DalColumnType.TInt)
 					{
@@ -677,7 +685,6 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			foreach (DalColumn enumTypeName in dalColumns)
 			{
 				string actualType = enumTypeName.ActualType;
-				stringBuilder.AppendFormat("schema.AddColumn(Columns.{1}, ", "\r\n", enumTypeName.Name);
 				if (!string.IsNullOrEmpty(enumTypeName.EnumTypeName))
 				{
 					enumTypeName.ActualType = enumTypeName.EnumTypeName;
@@ -857,8 +864,10 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				else if (enumTypeName.Type == DalColumnType.TGeographicMultiSurface)
 				{
 					enumTypeName.ActualType = "Geometry.GeometryCollection";
-				}
-				stringBuilder.AppendFormat("typeof({0})", enumTypeName.ActualType);
+                }
+
+                stringBuilder.AppendFormat("schema.AddColumn(Columns.{0}, typeof({1})", enumTypeName.Name, enumTypeName.ActualType);
+
 				if (enumTypeName.Type == DalColumnType.TText)
 				{
 					stringBuilder.Append(", DataType.Text");
@@ -1031,12 +1040,24 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					enumTypeName.ActualType += "?";
 				}
 				
-                object[] dataTypeFormatArgs = new object[] { "\r\n", enumTypeName.MaxLength, enumTypeName.Precision, enumTypeName.Scale, null, null, null, null };
-                dataTypeFormatArgs[4] = (enumTypeName.AutoIncrement ? "true" : "false");
-                dataTypeFormatArgs[5] = (enumTypeName.IsPrimaryKey ? "true" : "false");
-                dataTypeFormatArgs[6] = (enumTypeName.IsNullable ? "true" : "false");
-				dataTypeFormatArgs[7] = enumTypeName.DefaultValue;
-                stringBuilder.AppendFormat(", {1}, {2}, {3}, {4}, {5}, {6}, {7});{0}", dataTypeFormatArgs);
+                stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}",
+                    enumTypeName.MaxLength, 
+                    enumTypeName.Precision, 
+                    enumTypeName.Scale, 
+                    enumTypeName.AutoIncrement ? "true" : "false", 
+                    enumTypeName.IsPrimaryKey ? "true" : "false", 
+                    enumTypeName.IsNullable ? "true" : "false",
+                    enumTypeName.DefaultValue);
+
+                if (!string.IsNullOrEmpty(enumTypeName.Charset) || !string.IsNullOrEmpty(enumTypeName.Collate))
+                {
+                    stringBuilder.AppendFormat(@", {0}, {1}",
+                        string.IsNullOrEmpty(enumTypeName.Charset) ? "null" : (@"""" + enumTypeName.Charset + @""""),
+                        string.IsNullOrEmpty(enumTypeName.Collate) ? "null" : (@"""" + enumTypeName.Collate + @""""));
+                }
+
+                stringBuilder.AppendFormat(");{0}", "\r\n");
+
 				if (string.IsNullOrEmpty(actualType))
 				{
 					continue;

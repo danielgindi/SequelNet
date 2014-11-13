@@ -789,6 +789,7 @@ namespace dg.Sql
                 }
                 sb.Append(' ');
             }
+
             if (column.AutoIncrement)
             {
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
@@ -799,6 +800,20 @@ namespace dg.Sql
                 {
                     sb.Append(connection.type_AUTOINCREMENT);
                 }
+                sb.Append(' ');
+            }
+
+            if (connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL && !string.IsNullOrEmpty(column.Charset))
+            {
+                sb.Append(@"COLLATE ");
+                sb.Append(column.Collate);
+                sb.Append(' ');
+            }
+
+            if (!string.IsNullOrEmpty(column.Charset))
+            {
+                sb.Append(@"CHARACTER SET ");
+                sb.Append(column.Charset);
                 sb.Append(' ');
             }
         }
@@ -1464,26 +1479,27 @@ namespace dg.Sql
                                 {
                                     // Very limited syntax, will have to do this with several statements
 
-                                    string alterTableStatement = @"ALTER TABLE ";
+                                    sb.Append(@"ALTER TABLE ");
                                     if (Schema.DatabaseOwner.Length > 0)
                                     {
-                                        alterTableStatement += connection.EncloseFieldName(Schema.DatabaseOwner);
-                                        alterTableStatement += '.';
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
                                     }
-                                    alterTableStatement += connection.EncloseFieldName(_SchemaName);
-                                    alterTableStatement += @" ALTER COLUMN ";
-                                    alterTableStatement += connection.EncloseFieldName(_AlterColumn.Name);
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
 
-                                    sb.Append(alterTableStatement);
+                                    string alterColumnStatement = @" ALTER COLUMN ";
+                                    alterColumnStatement += connection.EncloseFieldName(_AlterColumn.Name);
+
+                                    sb.Append(alterColumnStatement);
                                     sb.Append(@" TYPE ");
                                     bool isTextField; // UNUSED HERE
                                     BuildColumnPropertiesDataType(sb, connection, _AlterColumn, out isTextField);
-                                    sb.Append(';');
+                                    sb.Append(',');
 
-                                    sb.Append(alterTableStatement);
+                                    sb.Append(alterColumnStatement);
                                     sb.Append(_AlterColumn.Nullable ? @" DROP NOT NULL;" : @" SET NOT NULL;");
 
-                                    sb.Append(alterTableStatement);
+                                    sb.Append(alterColumnStatement);
                                     sb.Append(@" SET DEFAULT ");
                                     PrepareColumnValue(_AlterColumn, _AlterColumn.Default, sb, connection);
                                     sb.Append(';');
