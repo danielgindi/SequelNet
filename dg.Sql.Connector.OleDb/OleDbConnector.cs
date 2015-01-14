@@ -340,6 +340,10 @@ namespace dg.Sql.Connector
         {
             get { return @"UCASE"; }
         }
+        public virtual string func_LENGTH
+        {
+            get { return @"LEN"; }
+        }
 
         public override string func_HOUR(string Date)
         {

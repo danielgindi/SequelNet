@@ -386,6 +386,11 @@ namespace dg.Sql.Connector
             return @"DATEPART(second, " + Date + ")";
         }
 
+        public virtual string func_LENGTH
+        {
+            get { return @"LEN"; }
+        }
+
         public override string type_TINYINT { get { return @"TINYINT"; } }
         public override string type_UNSIGNEDTINYINT { get { return @"TINYINT"; } }
         public override string type_SMALLINT { get { return @"SMALLINT"; } }

@@ -273,6 +273,10 @@ namespace dg.Sql.Connector
         {
             get { return @"UPPER"; }
         }
+        public virtual string func_LENGTH
+        {
+            get { return @"LENGTH"; }
+        }
 
         public virtual string func_YEAR(string Date)
         {
