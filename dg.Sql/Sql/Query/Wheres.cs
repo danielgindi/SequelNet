@@ -16,25 +16,25 @@ namespace dg.Sql
             _ListWhere.Add(where);
             return this;
         }
-        public Query Where(string columnName, object Value)
+        public Query Where(string columnName, object value)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
             _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, Value, ValueObjectType.Value));
+            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value));
             return this;
         }
-        public Query Where(string columnName, WhereComparision comparison, object Value)
+        public Query Where(string columnName, WhereComparision comparison, object value)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
             _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, Value, ValueObjectType.Value));
+            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value));
             return this;
         }
-        public Query Where(string tableName, string columnName, WhereComparision comparison, object Value)
+        public Query Where(string tableName, string columnName, WhereComparision comparison, object value)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
             _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, Value));
+            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, value));
             return this;
         }
         public Query AddWhere(Where where)
@@ -45,13 +45,13 @@ namespace dg.Sql
         {
             return Where(new Where(condition, thisObject, thisObjectType, comparison, thatObject, thatObjectType), false);
         }
-        public Query AddWhere(string columnName, object Value)
+        public Query AddWhere(string columnName, object value)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
         }
-        public Query AddWhere(string columnName, WhereComparision comparison, object Value)
+        public Query AddWhere(string columnName, WhereComparision comparison, object value)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), false);
         }
         public Query AddWhere(WhereCondition condition, string literalExpression)
         {
@@ -74,64 +74,64 @@ namespace dg.Sql
             }
             return this;
         }
-        public Query AddWhere(string tableName, string columnName, WhereComparision comparison, object Value)
+        public Query AddWhere(string tableName, string columnName, WhereComparision comparison, object value)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
-            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, Value));
+            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, value));
             return this;
         }
-        public Query AND(string columnName, object Value)
+        public Query AND(string columnName, object value)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
         }
-        public Query AND(string columnName, WhereComparision comparison, object Value)
+        public Query AND(string columnName, WhereComparision comparison, object value)
         {
-            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), false);
         }
         public Query AND(WhereList whereList)
         {
             return Where(new Where(WhereCondition.AND, whereList), false);
         }
-        public Query AND(string tableName, string columnName, WhereComparision comparison, object Value)
+        public Query AND(string tableName, string columnName, WhereComparision comparison, object value)
         {
-            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, Value), false);
+            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, value), false);
         }
-        public Query AND(string TableName, string ColumnName, object BetweenValue, object AndValue)
+        public Query AND(string tableName, string columnName, object betweenValue, object andValue)
         {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
-            where.FirstTableName = TableName;
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
             return Where(where, false);
         }
-        public Query AND(string ColumnName, object BetweenValue, object AndValue)
+        public Query AND(string columnName, object betweenValue, object andValue)
         {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             return Where(where, false);
         }
-        public Query OR(string columnName, object Value)
+        public Query OR(string columnName, object value)
         {
-            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
         }
-        public Query OR(string columnName, WhereComparision comparison, object Value)
+        public Query OR(string columnName, WhereComparision comparison, object value)
         {
-            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, Value, ValueObjectType.Value), false);
+            return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), false);
         }
         public Query OR(WhereList whereList)
         {
             return Where(new Where(WhereCondition.OR, whereList), false);
         }
-        public Query OR(string tableName, string columnName, WhereComparision comparison, object Value)
+        public Query OR(string tableName, string columnName, WhereComparision comparison, object value)
         {
-            return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, Value), false);
+            return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, value), false);
         }
-        public Query OR(string TableName, string ColumnName, object BetweenValue, object AndValue)
+        public Query OR(string tableName, string columnName, object betweenValue, object andValue)
         {
-            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
-            where.FirstTableName = TableName;
+            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
             return Where(where, false);
         }
-        public Query OR(string ColumnName, object BetweenValue, object AndValue)
+        public Query OR(string columnName, object betweenValue, object andValue)
         {
-            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             return Where(where, false);
         }
     }

@@ -42,9 +42,9 @@ namespace dg.Sql
         /// <summary>
         /// Adds an index.
         /// </summary>
-        /// <param name="Index">Index to add</param>
+        /// <param name="index">Index to add</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query CreateIndex(TableSchema.Index Index)
+        public Query CreateIndex(TableSchema.Index index)
         {
             ClearSelect();
             ClearOrderBy();
@@ -52,16 +52,16 @@ namespace dg.Sql
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
             this.QueryMode = QueryMode.CreateIndex;
-            this._CreateIndexObject = Index;
+            this._CreateIndexObject = index;
             return this;
         }
 
         /// <summary>
         /// Adds a foreign key.
         /// </summary>
-        /// <param name="ForeignKey">Key to add</param>
+        /// <param name="foreignKey">Key to add</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query CreateForeignKey(TableSchema.ForeignKey ForeignKey)
+        public Query CreateForeignKey(TableSchema.ForeignKey foreignKey)
         {
             ClearSelect();
             ClearOrderBy();
@@ -69,23 +69,23 @@ namespace dg.Sql
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
             this.QueryMode = QueryMode.CreateIndex;
-            this._CreateIndexObject = ForeignKey;
+            this._CreateIndexObject = foreignKey;
             return this;
         }
 
         /// <summary>
         /// Adds a column.
         /// </summary>
-        /// <param name="Column">Column to add</param>
+        /// <param name="column">Column to add</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddColumn(TableSchema.Column Column)
+        public Query AddColumn(TableSchema.Column column)
         {
             ClearSelect();
             ClearOrderBy();
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _AlterColumn = Column;
+            _AlterColumn = column;
             this.QueryMode = QueryMode.AddColumn;
             return this;
         }
@@ -94,22 +94,22 @@ namespace dg.Sql
         /// Adds a column.
         /// Will search in this table's schema for the column named <paramref name="ColumnName"/>
         /// </summary>
-        /// <param name="ColumnName">Column to add</param>
+        /// <param name="columnName">Column to add</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddColumn(string ColumnName)
+        public Query AddColumn(string columnName)
         {
-            return AddColumn(Schema.Columns.Find(ColumnName));
+            return AddColumn(Schema.Columns.Find(columnName));
         }
         
         /// <summary>
         /// Alters a column.
         /// Will use the same column name for old and updated column.
         /// </summary>
-        /// <param name="Column">The column to alter</param>
+        /// <param name="column">The column to alter</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query ChangeColumn(TableSchema.Column Column)
+        public Query ChangeColumn(TableSchema.Column column)
         {
-            return ChangeColumn(null, Column);
+            return ChangeColumn(null, column);
         }
 
         /// <summary>
@@ -117,28 +117,28 @@ namespace dg.Sql
         /// Will use the same column name for old and updated column.
         /// Will search in this table's schema for the column named <paramref name="ColumnName"/>
         /// </summary>
-        /// <param name="ColumnName">The column to alter</param>
+        /// <param name="columnName">The column to alter</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query ChangeColumn(string ColumnName)
+        public Query ChangeColumn(string columnName)
         {
-            return ChangeColumn(Schema.Columns.Find(ColumnName));
+            return ChangeColumn(Schema.Columns.Find(columnName));
         }
 
         /// <summary>
         /// Alters a column.
         /// </summary>
-        /// <param name="ColumnOldName">The column's old name</param>
-        /// <param name="Column">The updated column's definition</param>
+        /// <param name="oldColumnName">The column's old name</param>
+        /// <param name="column">The updated column's definition</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query ChangeColumn(string ColumnOldName, TableSchema.Column Column)
+        public Query ChangeColumn(string oldColumnName, TableSchema.Column column)
         {
             ClearSelect();
             ClearOrderBy();
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _AlterColumn = Column;
-            _AlterColumnOldName = ColumnOldName;
+            _AlterColumn = column;
+            _AlterColumnOldName = oldColumnName;
             this.QueryMode = QueryMode.ChangeColumn;
             return this;
         }
@@ -165,16 +165,16 @@ namespace dg.Sql
         /// <summary>
         /// Drops a column
         /// </summary>
-        /// <param name="ColumnName">Column to drop</param>
+        /// <param name="columnName">Column to drop</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query DropColumn(string ColumnName)
+        public Query DropColumn(string columnName)
         {
             ClearSelect();
             ClearOrderBy();
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = ColumnName;
+            _DropColumnName = columnName;
             this.QueryMode = QueryMode.DropColumn;
             return this;
         }
@@ -182,16 +182,16 @@ namespace dg.Sql
         /// <summary>
         /// Drops a foreign key
         /// </summary>
-        /// <param name="ForeignKeyName">Key to drop</param>
+        /// <param name="foreignKeyName">Key to drop</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query DropForeignKey(string ForeignKeyName)
+        public Query DropForeignKey(string foreignKeyName)
         {
             ClearSelect();
             ClearOrderBy();
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = ForeignKeyName;
+            _DropColumnName = foreignKeyName;
             this.QueryMode = QueryMode.DropForeignKey;
             return this;
         }
@@ -199,16 +199,16 @@ namespace dg.Sql
         /// <summary>
         /// Drops an index
         /// </summary>
-        /// <param name="IndexName">Index to drop</param>
+        /// <param name="indexName">Index to drop</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query DropIndex(string IndexName)
+        public Query DropIndex(string indexName)
         {
             ClearSelect();
             ClearOrderBy();
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = IndexName;
+            _DropColumnName = indexName;
             this.QueryMode = QueryMode.DropIndex;
             return this;
         }
@@ -231,12 +231,12 @@ namespace dg.Sql
         /// <summary>
         /// Drops a table (immediately executes!)
         /// </summary>
-        /// <param name="IndexName">Index to drop</param>
-        public static void DropTable(string TableName)
+        /// <param name="tableName">Table to drop</param>
+        public static void DropTable(string tableName)
         {
             using (ConnectorBase connection = ConnectorBase.NewInstance())
             {
-                string sql = string.Format(@"DROP TABLE {0}", connection.EncloseFieldName(TableName));
+                string sql = string.Format(@"DROP TABLE {0}", connection.EncloseFieldName(tableName));
                 connection.ExecuteNonQuery(sql);
             }
         }
