@@ -142,6 +142,25 @@ namespace dg.Sql
             this.QueryMode = QueryMode.ChangeColumn;
             return this;
         }
+
+        /// <summary>
+        /// Alters a column.
+        /// </summary>
+        /// <param name="oldColumnName">The column's old name</param>
+        /// <param name="newColumnName">The column's new name. This column must have a definition under this name in the TableSchema.</param>
+        /// <returns>Current <typeparamref name="Query"/> object</returns>
+        public Query ChangeColumn(string oldColumnName, string newColumnName)
+        {
+            ClearSelect();
+            ClearOrderBy();
+            ClearGroupBy();
+            ClearInsertAndUpdate();
+            ClearStoredProcedureParameters();
+            _AlterColumn = Schema.Columns.Find(newColumnName);
+            _AlterColumnOldName = oldColumnName;
+            this.QueryMode = QueryMode.ChangeColumn;
+            return this;
+        }
         
         /// <summary>
         /// Drops a column
