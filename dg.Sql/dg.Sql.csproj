@@ -93,7 +93,6 @@
     <Compile Include="Sql\Query\Builders.cs" />
     <Compile Include="Sql\Query\ShortAggregates.cs" />
     <Compile Include="Sql\Query\Executes.cs" />
-    <Compile Include="Sql\Query\_DEPRECATED.cs" />
     <Compile Include="Sql\Query\Joins.cs" />
     <Compile Include="Sql\Query\StoredProcedures.cs" />
     <Compile Include="Sql\Query\SchemaChanges.cs" />
