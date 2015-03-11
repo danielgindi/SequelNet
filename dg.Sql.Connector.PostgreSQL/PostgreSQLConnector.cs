@@ -441,6 +441,11 @@ namespace dg.Sql.Connector
 
         #region Engine-specific keywords
 
+        public override int varchar_MAX_VALUE
+        {
+            get { return 357913937; }
+        }
+
         public override string func_UTC_NOW
         {
             get { return @"now() at time zone 'utc'"; }

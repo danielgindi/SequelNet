@@ -198,7 +198,7 @@ namespace dg.Sql
                 if (this._DataType != DataType.Automatic) return _DataType;
                 if (this.Type.Equals(typeof(string)))
                 {
-                    if (this.MaxLength > 0) return DataType.VarChar;
+                    if (this.MaxLength != 0) return DataType.VarChar;
                     return DataType.Text;
                 }
                 else if (this.Type.Equals(typeof(float)))

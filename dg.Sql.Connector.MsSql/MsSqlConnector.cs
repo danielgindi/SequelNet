@@ -369,6 +369,16 @@ namespace dg.Sql.Connector
 
         #region Engine-specific keywords
 
+        public override int varchar_MAX_VALUE
+        {
+            get { return 4000; }
+        }
+
+        public override string varchar_MAX
+        {
+            get { return "MAX"; }
+        }
+
         public override string func_UTC_NOW
         {
             get { return @"GETUTCDATE()"; }

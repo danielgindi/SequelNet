@@ -433,6 +433,21 @@ namespace dg.Sql.Connector
 
         #region Engine-specific keywords
 
+        public override int varchar_MAX_VALUE
+        {
+            get 
+            {
+                if (GetVersion().CompareTo("5.0.3") >= 0)
+                {
+                    return 65535;
+                }
+                else
+                {
+                    return 255;
+                }
+            }
+        }
+
         public override string func_UTC_NOW
         {
             get { return @"UTC_TIMESTAMP()"; }

@@ -312,16 +312,31 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						else if (columnKeywordUpper.StartsWith("STRING(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TString;
-							int num3 = 0;
-							int.TryParse(columnKeyword.Substring(7, columnKeyword.IndexOf(")") - 7), out num3);
-							dalColumn.MaxLength = num3;
+                            string maxLength = columnKeyword.Substring(7, columnKeyword.IndexOf(")") - 7);
+                            if (maxLength == "MAX")
+                            {
+                                dalColumn.MaxLength = -1;
+                            }
+                            else
+                            {
+                                int iMaxLength = 0;
+                                int.TryParse(maxLength, out iMaxLength);
+                                dalColumn.MaxLength = iMaxLength;
+                            }
 						}
 						else if (columnKeywordUpper.StartsWith("FIXEDSTRING(", StringComparison.Ordinal))
 						{
-							dalColumn.Type = DalColumnType.TFixedString;
-							int num4 = 0;
-							int.TryParse(columnKeyword.Substring(12, columnKeyword.IndexOf(")") - 12), out num4);
-							dalColumn.MaxLength = num4;
+                            string maxLength = columnKeyword.Substring(12, columnKeyword.IndexOf(")") - 12);
+                            if (maxLength == "MAX")
+                            {
+                                dalColumn.MaxLength = -1;
+                            }
+                            else
+                            {
+                                int iMaxLength = 0;
+                                int.TryParse(maxLength, out iMaxLength);
+                                dalColumn.MaxLength = iMaxLength;
+                            }
 						}
 						else if (columnKeywordUpper.Equals("TEXT", StringComparison.Ordinal))
 						{

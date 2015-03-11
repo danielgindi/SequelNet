@@ -261,6 +261,16 @@ namespace dg.Sql.Connector
 
         #region Engine-specific keywords
 
+        public virtual int varchar_MAX_VALUE
+        {
+            get { return 255; }
+        }
+
+        public virtual string varchar_MAX
+        {
+            get { return null; } // Not supported
+        }
+
         public virtual string func_UTC_NOW
         {
             get { return @"NOW()"; }

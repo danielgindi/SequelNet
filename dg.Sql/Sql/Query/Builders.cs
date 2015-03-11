@@ -523,12 +523,25 @@ namespace dg.Sql
             {
                 if (dataType == DataType.VarChar)
                 {
-                    if (column.MaxLength <= 0)
+                    if (column.MaxLength < 0)
+                    {
+                        if (connection.varchar_MAX != null)
+                        {
+                            sb.Append(connection.type_VARCHAR);
+                            sb.AppendFormat(@"({0})", connection.varchar_MAX);
+                        }
+                        else
+                        {
+                            sb.Append(connection.type_VARCHAR);
+                            sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
+                        }
+                    }
+                    else if (column.MaxLength == 0)
                     {
                         sb.Append(connection.type_TEXT);
                         isTextField = true;
                     }
-                    else if (column.MaxLength < 256)
+                    else if (column.MaxLength <= connection.varchar_MAX_VALUE)
                     {
                         sb.Append(connection.type_VARCHAR);
                         sb.AppendFormat(@"({0})", column.MaxLength);
@@ -551,10 +564,23 @@ namespace dg.Sql
                 }
                 if (dataType == DataType.Char)
                 {
-                    if (column.MaxLength <= 0 || column.MaxLength >= 255)
+                    if (column.MaxLength < 0)
+                    {
+                        if (connection.varchar_MAX != null)
+                        {
+                            sb.Append(connection.type_CHAR);
+                            sb.AppendFormat(@"({0})", connection.varchar_MAX);
+                        }
+                        else
+                        {
+                            sb.Append(connection.type_CHAR);
+                            sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
+                        }
+                    }
+                    else if (column.MaxLength == 0 || column.MaxLength >= connection.varchar_MAX_VALUE)
                     {
                         sb.Append(connection.type_CHAR);
-                        sb.AppendFormat(@"({0})", 255);
+                        sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
                     }
                     else
                     {
