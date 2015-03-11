@@ -26,6 +26,7 @@ Keywords:
  VIRTUAL - Defines the property as virtual
  UNIQUE INDEX - Defines a UNIQUE index on this column
  FOREIGN TableClassName.ColumnName - Defines a FOREIGN key for this column
+ ACTUALTYPE type - The actual .Net type name
 
 Data types:
  INT64; INT32; INT16; INT8; UINT64; UINT32; UINT16; UINT8; DOUBLE; FLOAT; 
@@ -34,6 +35,9 @@ Data types:
  DECIMAL(precision); MONEY(precision);
  FIXEDSTRING(length); STRING(length); TEXT; LONGTEXT(length); MEDIUMTEXT(length); 
  BOOL; GUID; DATETIME; 
+ LITERALTYPE some_literal_type_here;
+
+NOTE: LITERALTYPE must come with an ACTUALTYPE 
 
 Geometry spatial types:
  GEOMETRY; GEOMETRYCOLLECTION; 

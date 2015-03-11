@@ -304,6 +304,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							int.TryParse(columnKeyword.Substring(6, columnKeyword.IndexOf(")") - 6), out num2);
 							dalColumn.Scale = num2;
 						}
+						else if (columnKeywordUpper.StartsWith("LITERALTYPE ", StringComparison.Ordinal))
+						{
+							dalColumn.Type = DalColumnType.TLiteral;
+                            dalColumn.LiteralType = columnKeyword.Substring(12).Trim();
+						}
 						else if (columnKeywordUpper.StartsWith("STRING(", StringComparison.Ordinal))
 						{
 							dalColumn.Type = DalColumnType.TString;
@@ -682,378 +687,383 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			{
 				stringBuilder.AppendFormat("schema.DatabaseOwner = @\"{1}\";{0}", "\r\n", databaseOwner);
 			}
-			foreach (DalColumn enumTypeName in dalColumns)
+			foreach (DalColumn column in dalColumns)
 			{
-				string actualType = enumTypeName.ActualType;
-				if (!string.IsNullOrEmpty(enumTypeName.EnumTypeName))
+				string actualType = column.ActualType;
+				if (!string.IsNullOrEmpty(column.EnumTypeName))
 				{
-					enumTypeName.ActualType = enumTypeName.EnumTypeName;
+					column.ActualType = column.EnumTypeName;
 				}
-				else if (enumTypeName.Type == DalColumnType.TBool)
+				else if (column.Type == DalColumnType.TBool)
 				{
-					enumTypeName.ActualType = "bool";
+					column.ActualType = "bool";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGuid)
+				else if (column.Type == DalColumnType.TGuid)
 				{
-					enumTypeName.ActualType = "Guid";
+					column.ActualType = "Guid";
 				}
-				else if (enumTypeName.Type == DalColumnType.TDateTime)
+				else if (column.Type == DalColumnType.TDateTime)
 				{
-					enumTypeName.ActualType = "DateTime";
+					column.ActualType = "DateTime";
 				}
-				else if (enumTypeName.Type == DalColumnType.TInt)
+				else if (column.Type == DalColumnType.TInt)
 				{
-					enumTypeName.ActualType = "int";
+					column.ActualType = "int";
 				}
-				else if (enumTypeName.Type == DalColumnType.TInt8)
+				else if (column.Type == DalColumnType.TInt8)
 				{
-					enumTypeName.ActualType = "SByte";
+					column.ActualType = "SByte";
 				}
-				else if (enumTypeName.Type == DalColumnType.TInt16)
+				else if (column.Type == DalColumnType.TInt16)
 				{
-					enumTypeName.ActualType = "Int16";
+					column.ActualType = "Int16";
 				}
-				else if (enumTypeName.Type == DalColumnType.TInt32)
+				else if (column.Type == DalColumnType.TInt32)
 				{
-					enumTypeName.ActualType = "Int32";
+					column.ActualType = "Int32";
 				}
-				else if (enumTypeName.Type == DalColumnType.TInt64)
+				else if (column.Type == DalColumnType.TInt64)
 				{
-					enumTypeName.ActualType = "Int64";
+					column.ActualType = "Int64";
 				}
-				else if (enumTypeName.Type == DalColumnType.TUInt8)
+				else if (column.Type == DalColumnType.TUInt8)
 				{
-					enumTypeName.ActualType = "Byte";
+					column.ActualType = "Byte";
 				}
-				else if (enumTypeName.Type == DalColumnType.TUInt16)
+				else if (column.Type == DalColumnType.TUInt16)
 				{
-					enumTypeName.ActualType = "UInt16";
+					column.ActualType = "UInt16";
 				}
-				else if (enumTypeName.Type == DalColumnType.TUInt32)
+				else if (column.Type == DalColumnType.TUInt32)
 				{
-					enumTypeName.ActualType = "UInt32";
+					column.ActualType = "UInt32";
 				}
-				else if (enumTypeName.Type == DalColumnType.TUInt64)
+				else if (column.Type == DalColumnType.TUInt64)
 				{
-					enumTypeName.ActualType = "UInt64";
+					column.ActualType = "UInt64";
 				}
-				else if (enumTypeName.Type == DalColumnType.TString || enumTypeName.Type == DalColumnType.TText || enumTypeName.Type == DalColumnType.TLongText || enumTypeName.Type == DalColumnType.TMediumText || enumTypeName.Type == DalColumnType.TFixedString)
+				else if (column.Type == DalColumnType.TString || column.Type == DalColumnType.TText || column.Type == DalColumnType.TLongText || column.Type == DalColumnType.TMediumText || column.Type == DalColumnType.TFixedString)
 				{
-					enumTypeName.ActualType = "string";
+					column.ActualType = "string";
 				}
-                else if (enumTypeName.Type == DalColumnType.TDecimal || enumTypeName.Type == DalColumnType.TMoney)
+                else if (column.Type == DalColumnType.TDecimal || column.Type == DalColumnType.TMoney)
 				{
-					enumTypeName.ActualType = "decimal";
+					column.ActualType = "decimal";
 				}
-				else if (enumTypeName.Type == DalColumnType.TDouble)
+				else if (column.Type == DalColumnType.TDouble)
 				{
-					enumTypeName.ActualType = "double";
+					column.ActualType = "double";
 				}
-				else if (enumTypeName.Type == DalColumnType.TFloat)
+				else if (column.Type == DalColumnType.TFloat)
 				{
-					enumTypeName.ActualType = "float";
+					column.ActualType = "float";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeometry)
+				else if (column.Type == DalColumnType.TGeometry)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeometryCollection)
+				else if (column.Type == DalColumnType.TGeometryCollection)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
 				}
-				else if (enumTypeName.Type == DalColumnType.TPoint)
+				else if (column.Type == DalColumnType.TPoint)
 				{
-					enumTypeName.ActualType = "Geometry.Point";
+					column.ActualType = "Geometry.Point";
 				}
-				else if (enumTypeName.Type == DalColumnType.TLineString)
+				else if (column.Type == DalColumnType.TLineString)
 				{
-					enumTypeName.ActualType = "Geometry.LineString";
+					column.ActualType = "Geometry.LineString";
 				}
-				else if (enumTypeName.Type == DalColumnType.TPolygon)
+				else if (column.Type == DalColumnType.TPolygon)
 				{
-					enumTypeName.ActualType = "Geometry.Polygon";
+					column.ActualType = "Geometry.Polygon";
 				}
-				else if (enumTypeName.Type == DalColumnType.TLine)
+				else if (column.Type == DalColumnType.TLine)
 				{
-					enumTypeName.ActualType = "Geometry.Line";
+					column.ActualType = "Geometry.Line";
 				}
-				else if (enumTypeName.Type == DalColumnType.TCurve)
+				else if (column.Type == DalColumnType.TCurve)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TSurface)
+				else if (column.Type == DalColumnType.TSurface)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TLinearRing)
+				else if (column.Type == DalColumnType.TLinearRing)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiPoint)
+				else if (column.Type == DalColumnType.TMultiPoint)
 				{
-					enumTypeName.ActualType = "Geometry.MultiPoint";
+					column.ActualType = "Geometry.MultiPoint";
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiLineString)
+				else if (column.Type == DalColumnType.TMultiLineString)
 				{
-					enumTypeName.ActualType = "Geometry.MultiLineString";
+					column.ActualType = "Geometry.MultiLineString";
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiPolygon)
+				else if (column.Type == DalColumnType.TMultiPolygon)
 				{
-					enumTypeName.ActualType = "Geometry.MultiPolygon";
+					column.ActualType = "Geometry.MultiPolygon";
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiCurve)
+				else if (column.Type == DalColumnType.TMultiCurve)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiSurface)
+				else if (column.Type == DalColumnType.TMultiSurface)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographic)
+				else if (column.Type == DalColumnType.TGeographic)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicCollection)
+				else if (column.Type == DalColumnType.TGeographicCollection)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicPoint)
+				else if (column.Type == DalColumnType.TGeographicPoint)
 				{
-					enumTypeName.ActualType = "Geometry.Point";
+					column.ActualType = "Geometry.Point";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLineString)
+				else if (column.Type == DalColumnType.TGeographicLineString)
 				{
-					enumTypeName.ActualType = "Geometry.LineString";
+					column.ActualType = "Geometry.LineString";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicPolygon)
+				else if (column.Type == DalColumnType.TGeographicPolygon)
 				{
-					enumTypeName.ActualType = "Geometry.Polygon";
+					column.ActualType = "Geometry.Polygon";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLine)
+				else if (column.Type == DalColumnType.TGeographicLine)
 				{
-					enumTypeName.ActualType = "Geometry.Line";
+					column.ActualType = "Geometry.Line";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicCurve)
+				else if (column.Type == DalColumnType.TGeographicCurve)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicSurface)
+				else if (column.Type == DalColumnType.TGeographicSurface)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLinearRing)
+				else if (column.Type == DalColumnType.TGeographicLinearRing)
 				{
-					enumTypeName.ActualType = "Geometry";
+					column.ActualType = "Geometry";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiPoint)
+				else if (column.Type == DalColumnType.TGeographicMultiPoint)
 				{
-					enumTypeName.ActualType = "Geometry.MultiPoint";
+					column.ActualType = "Geometry.MultiPoint";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiLineString)
+				else if (column.Type == DalColumnType.TGeographicMultiLineString)
 				{
-					enumTypeName.ActualType = "Geometry.MultiLineString";
+					column.ActualType = "Geometry.MultiLineString";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiPolygon)
+				else if (column.Type == DalColumnType.TGeographicMultiPolygon)
 				{
-					enumTypeName.ActualType = "Geometry.MultiPolygon";
+					column.ActualType = "Geometry.MultiPolygon";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiCurve)
+				else if (column.Type == DalColumnType.TGeographicMultiCurve)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiSurface)
+				else if (column.Type == DalColumnType.TGeographicMultiSurface)
 				{
-					enumTypeName.ActualType = "Geometry.GeometryCollection";
+					column.ActualType = "Geometry.GeometryCollection";
+                }
+                else if (column.Type == DalColumnType.TLiteral)
+                {
+                    // Do not change it, specified by ACTUALTYPE
                 }
 
-                stringBuilder.AppendFormat("schema.AddColumn(Columns.{0}, typeof({1})", enumTypeName.Name, enumTypeName.ActualType);
+                stringBuilder.AppendFormat("schema.AddColumn(Columns.{0}, typeof({1})", column.Name, column.ActualType);
 
-				if (enumTypeName.Type == DalColumnType.TText)
+				if (column.Type == DalColumnType.TText)
 				{
 					stringBuilder.Append(", DataType.Text");
 				}
-				else if (enumTypeName.Type == DalColumnType.TLongText)
+				else if (column.Type == DalColumnType.TLongText)
 				{
 					stringBuilder.Append(", DataType.LongText");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMediumText)
+				else if (column.Type == DalColumnType.TMediumText)
 				{
 					stringBuilder.Append(", DataType.MediumText");
                 }
-                else if (enumTypeName.Type == DalColumnType.TFixedString)
+                else if (column.Type == DalColumnType.TFixedString)
                 {
                     stringBuilder.Append(", DataType.Char");
                 }
-                else if (enumTypeName.Type == DalColumnType.TMoney)
+                else if (column.Type == DalColumnType.TMoney)
                 {
                     stringBuilder.Append(", DataType.Money");
                 }
-				else if (enumTypeName.Type == DalColumnType.TGeometry)
+				else if (column.Type == DalColumnType.TGeometry)
 				{
 					stringBuilder.Append(", DataType.Geometry");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeometryCollection)
+				else if (column.Type == DalColumnType.TGeometryCollection)
 				{
 					stringBuilder.Append(", DataType.GeometryCollection");
 				}
-				else if (enumTypeName.Type == DalColumnType.TPoint)
+				else if (column.Type == DalColumnType.TPoint)
 				{
 					stringBuilder.Append(", DataType.Point");
 				}
-				else if (enumTypeName.Type == DalColumnType.TLineString)
+				else if (column.Type == DalColumnType.TLineString)
 				{
 					stringBuilder.Append(", DataType.LineString");
 				}
-				else if (enumTypeName.Type == DalColumnType.TPolygon)
+				else if (column.Type == DalColumnType.TPolygon)
 				{
 					stringBuilder.Append(", DataType.Polygon");
 				}
-				else if (enumTypeName.Type == DalColumnType.TLine)
+				else if (column.Type == DalColumnType.TLine)
 				{
 					stringBuilder.Append(", DataType.Line");
 				}
-				else if (enumTypeName.Type == DalColumnType.TCurve)
+				else if (column.Type == DalColumnType.TCurve)
 				{
 					stringBuilder.Append(", DataType.Curve");
 				}
-				else if (enumTypeName.Type == DalColumnType.TSurface)
+				else if (column.Type == DalColumnType.TSurface)
 				{
 					stringBuilder.Append(", DataType.Surface");
 				}
-				else if (enumTypeName.Type == DalColumnType.TLinearRing)
+				else if (column.Type == DalColumnType.TLinearRing)
 				{
 					stringBuilder.Append(", DataType.LinearRing");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiPoint)
+				else if (column.Type == DalColumnType.TMultiPoint)
 				{
 					stringBuilder.Append(", DataType.MultiPoint");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiLineString)
+				else if (column.Type == DalColumnType.TMultiLineString)
 				{
 					stringBuilder.Append(", DataType.MultiLineString");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiPolygon)
+				else if (column.Type == DalColumnType.TMultiPolygon)
 				{
 					stringBuilder.Append(", DataType.MultiPolygon");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiCurve)
+				else if (column.Type == DalColumnType.TMultiCurve)
 				{
 					stringBuilder.Append(", DataType.MultiCurve");
 				}
-				else if (enumTypeName.Type == DalColumnType.TMultiSurface)
+				else if (column.Type == DalColumnType.TMultiSurface)
 				{
 					stringBuilder.Append(", DataType.MultiSurface");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographic)
+				else if (column.Type == DalColumnType.TGeographic)
 				{
 					stringBuilder.Append(", DataType.Geographic");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicCollection)
+				else if (column.Type == DalColumnType.TGeographicCollection)
 				{
 					stringBuilder.Append(", DataType.GeographicCollection");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicPoint)
+				else if (column.Type == DalColumnType.TGeographicPoint)
 				{
 					stringBuilder.Append(", DataType.GeographicPoint");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLineString)
+				else if (column.Type == DalColumnType.TGeographicLineString)
 				{
 					stringBuilder.Append(", DataType.GeographicLineString");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicPolygon)
+				else if (column.Type == DalColumnType.TGeographicPolygon)
 				{
 					stringBuilder.Append(", DataType.GeographicPolygon");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLine)
+				else if (column.Type == DalColumnType.TGeographicLine)
 				{
 					stringBuilder.Append(", DataType.GeographicLine");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicCurve)
+				else if (column.Type == DalColumnType.TGeographicCurve)
 				{
 					stringBuilder.Append(", DataType.GeographicCurve");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicSurface)
+				else if (column.Type == DalColumnType.TGeographicSurface)
 				{
 					stringBuilder.Append(", DataType.GeographicSurface");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicLinearRing)
+				else if (column.Type == DalColumnType.TGeographicLinearRing)
 				{
 					stringBuilder.Append(", DataType.GeographicLinearRing");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiPoint)
+				else if (column.Type == DalColumnType.TGeographicMultiPoint)
 				{
 					stringBuilder.Append(", DataType.GeographicMultiPoint");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiLineString)
+				else if (column.Type == DalColumnType.TGeographicMultiLineString)
 				{
 					stringBuilder.Append(", DataType.GeographicMultiLineString");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiPolygon)
+				else if (column.Type == DalColumnType.TGeographicMultiPolygon)
 				{
 					stringBuilder.Append(", DataType.GeographicMultiPolygon");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiCurve)
+				else if (column.Type == DalColumnType.TGeographicMultiCurve)
 				{
 					stringBuilder.Append(", DataType.GeographicMultiCurve");
 				}
-				else if (enumTypeName.Type == DalColumnType.TGeographicMultiSurface)
+				else if (column.Type == DalColumnType.TGeographicMultiSurface)
 				{
 					stringBuilder.Append(", DataType.GeographicMultiSurface");
 				}
-				else if (!string.IsNullOrEmpty(enumTypeName.EnumTypeName))
+				else if (!string.IsNullOrEmpty(column.EnumTypeName))
 				{
-					if (enumTypeName.Type == DalColumnType.TInt8)
+					if (column.Type == DalColumnType.TInt8)
 					{
 						stringBuilder.Append(", DataType.TinyInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TInt16)
+					else if (column.Type == DalColumnType.TInt16)
 					{
 						stringBuilder.Append(", DataType.SmallInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TInt32)
+					else if (column.Type == DalColumnType.TInt32)
 					{
 						stringBuilder.Append(", DataType.Int");
 					}
-					else if (enumTypeName.Type == DalColumnType.TInt64)
+					else if (column.Type == DalColumnType.TInt64)
 					{
 						stringBuilder.Append(", DataType.BigInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TUInt8)
+					else if (column.Type == DalColumnType.TUInt8)
 					{
 						stringBuilder.Append(", DataType.UnsignedTinyInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TUInt16)
+					else if (column.Type == DalColumnType.TUInt16)
 					{
 						stringBuilder.Append(", DataType.UnsignedSmallInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TUInt32)
+					else if (column.Type == DalColumnType.TUInt32)
 					{
 						stringBuilder.Append(", DataType.UnsignedInt");
 					}
-					else if (enumTypeName.Type == DalColumnType.TUInt64)
+					else if (column.Type == DalColumnType.TUInt64)
 					{
 						stringBuilder.Append(", DataType.UnsignedBigInt");
 					}
 				}
-				if (enumTypeName.IsNullable && enumTypeName.ActualType != "string")
+				if (column.IsNullable && column.ActualType != "string")
 				{
-					enumTypeName.ActualType += "?";
+					column.ActualType += "?";
 				}
-				
-                stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}",
-                    enumTypeName.MaxLength, 
-                    enumTypeName.Precision, 
-                    enumTypeName.Scale, 
-                    enumTypeName.AutoIncrement ? "true" : "false", 
-                    enumTypeName.IsPrimaryKey ? "true" : "false", 
-                    enumTypeName.IsNullable ? "true" : "false",
-                    enumTypeName.DefaultValue);
 
-                if (!string.IsNullOrEmpty(enumTypeName.Charset) || !string.IsNullOrEmpty(enumTypeName.Collate))
+                stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+                    column.MaxLength,
+                    string.IsNullOrEmpty(column.LiteralType) ? "null" : (@"""" + column.LiteralType.Replace(@"""", @"""""") + @""""), 
+                    column.Precision, 
+                    column.Scale, 
+                    column.AutoIncrement ? "true" : "false", 
+                    column.IsPrimaryKey ? "true" : "false", 
+                    column.IsNullable ? "true" : "false",
+                    column.DefaultValue);
+
+                if (!string.IsNullOrEmpty(column.Charset) || !string.IsNullOrEmpty(column.Collate))
                 {
                     stringBuilder.AppendFormat(@", {0}, {1}",
-                        string.IsNullOrEmpty(enumTypeName.Charset) ? "null" : (@"""" + enumTypeName.Charset + @""""),
-                        string.IsNullOrEmpty(enumTypeName.Collate) ? "null" : (@"""" + enumTypeName.Collate + @""""));
+                        string.IsNullOrEmpty(column.Charset) ? "null" : (@"""" + column.Charset + @""""),
+                        string.IsNullOrEmpty(column.Collate) ? "null" : (@"""" + column.Collate + @""""));
                 }
 
                 stringBuilder.AppendFormat(");{0}", "\r\n");
@@ -1062,7 +1072,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				{
 					continue;
 				}
-				enumTypeName.ActualType = actualType;
+				column.ActualType = actualType;
 			}
 
             // Create a list of all columns that participate in the Primary Key

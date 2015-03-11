@@ -504,6 +504,19 @@ namespace dg.Sql
         }
         public void BuildColumnPropertiesDataType(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, out bool isTextField)
         {
+            if (column.LiteralType != null && column.LiteralType.Length > 0)
+            {
+                isTextField = column.ActualDataType == DataType.VarChar ||
+                    column.ActualDataType == DataType.Char ||
+                    column.ActualDataType == DataType.Text ||
+                    column.ActualDataType == DataType.MediumText ||
+                    column.ActualDataType == DataType.LongText ||
+                    column.Type == typeof(string);
+
+                sb.Append(column.LiteralType);
+                return;
+            }
+
             isTextField = false;
             DataType dataType = column.ActualDataType;
             if (!column.AutoIncrement || (connection.TYPE != ConnectorBase.SqlServiceType.MSACCESS && connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL))

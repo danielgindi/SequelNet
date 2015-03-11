@@ -9,6 +9,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 		public bool AutoIncrement;
 		public bool NoProperty;
 		public DalColumnType Type;
+		public string LiteralType;
 		public string EnumTypeName;
 		public string Name;
 		public string NameX;

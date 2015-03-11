@@ -83,9 +83,19 @@ namespace dg.Sql
             Column column = new Column(Name, Type, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
             AddColumn(column);
         }
+        public void AddColumn(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+        {
+            Column column = new Column(Name, Type, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            AddColumn(column);
+        }
         public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
         {
             Column column = new Column(Name, Type, DataType, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            AddColumn(column);
+        }
+        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+        {
+            Column column = new Column(Name, Type, DataType, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
             AddColumn(column);
         }
         public void AddColumn(string Name, System.Type Type, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
@@ -93,9 +103,19 @@ namespace dg.Sql
             Column column = new Column(Name, Type, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
             AddColumn(column);
         }
+        public void AddColumn(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+        {
+            Column column = new Column(Name, Type, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            AddColumn(column);
+        }
         public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
         {
             Column column = new Column(Name, Type, DataType, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            AddColumn(column);
+        }
+        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+        {
+            Column column = new Column(Name, Type, DataType, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
             AddColumn(column);
         }
         public void AddIndex(Index index)

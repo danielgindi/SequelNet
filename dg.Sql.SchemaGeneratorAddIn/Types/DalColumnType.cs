@@ -4,6 +4,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 {
 	public enum DalColumnType
 	{
+		TLiteral,
 		TInt,
 		TInt8,
 		TInt16,
