@@ -396,7 +396,7 @@ namespace dg.Sql.Connector
             return @"DATEPART(second, " + Date + ")";
         }
 
-        public virtual string func_LENGTH
+        public override string func_LENGTH
         {
             get { return @"LEN"; }
         }

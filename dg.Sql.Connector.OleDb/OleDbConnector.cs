@@ -340,7 +340,7 @@ namespace dg.Sql.Connector
         {
             get { return @"UCASE"; }
         }
-        public virtual string func_LENGTH
+        public override string func_LENGTH
         {
             get { return @"LEN"; }
         }
