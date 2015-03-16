@@ -439,7 +439,7 @@ namespace dg.Sql.Connector
             {
                 if (GetVersion().CompareTo("5.0.3") >= 0)
                 {
-                    return 65535;
+                    return 21845;
                 }
                 else
                 {
