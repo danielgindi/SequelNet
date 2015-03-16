@@ -325,7 +325,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
                             }
 						}
 						else if (columnKeywordUpper.StartsWith("FIXEDSTRING(", StringComparison.Ordinal))
-						{
+                        {
+                            dalColumn.Type = DalColumnType.TString;
                             string maxLength = columnKeyword.Substring(12, columnKeyword.IndexOf(")") - 12);
                             if (maxLength == "MAX")
                             {
