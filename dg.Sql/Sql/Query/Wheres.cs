@@ -9,6 +9,13 @@ namespace dg.Sql
 {
     public partial class Query
     {
+        public Query Where(Where where)
+        {
+            if (_ListWhere == null) _ListWhere = new WhereList();
+            _ListWhere.Clear();
+            _ListWhere.Add(where);
+            return this;
+        }
         public Query Where(Where where, bool clearWhereList)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
@@ -37,6 +44,7 @@ namespace dg.Sql
             _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, value));
             return this;
         }
+
         public Query AddWhere(Where where)
         {
             return Where(where, false);
@@ -80,6 +88,13 @@ namespace dg.Sql
             _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, value));
             return this;
         }
+        public Query AddWhere(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            if (_ListWhere == null) _ListWhere = new WhereList();
+            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName));
+            return this;
+        }
+
         public Query AND(string columnName, object value)
         {
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
@@ -96,6 +111,10 @@ namespace dg.Sql
         {
             return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, value), false);
         }
+        public Query AND(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName), false);
+        }
         public Query AND(string tableName, string columnName, object betweenValue, object andValue)
         {
             Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
@@ -107,6 +126,7 @@ namespace dg.Sql
             Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             return Where(where, false);
         }
+
         public Query OR(string columnName, object value)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
@@ -122,6 +142,10 @@ namespace dg.Sql
         public Query OR(string tableName, string columnName, WhereComparision comparison, object value)
         {
             return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, value), false);
+        }
+        public Query OR(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            return Where(new Where(WhereCondition.OR, tableName, columnName, comparison, otherTableName, otherColumnName), false);
         }
         public Query OR(string tableName, string columnName, object betweenValue, object andValue)
         {
