@@ -158,7 +158,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 	                            case "CASCADE":
 		                            dalForeignKey.OnUpdate = DalForeignKeyReference.Cascade;
 		                            break;
-	                            case "SETNULL":
+                                case "SETNULL":
+                                case "SET NULL":
 		                            dalForeignKey.OnUpdate = DalForeignKeyReference.SetNull;
 		                            break;
 	                            case "NOACTION":
@@ -179,7 +180,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 	                            case "CASCADE":
 		                            dalForeignKey.OnDelete = DalForeignKeyReference.Cascade;
 		                            break;
-	                            case "SETNULL":
+                                case "SETNULL":
+                                case "SET NULL":
 		                            dalForeignKey.OnDelete = DalForeignKeyReference.SetNull;
 		                            break;
 	                            case "NOACTION":
