@@ -1512,7 +1512,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
                 stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
                 foreach (DalColumn dalCol in dalColumns)
                 {
-                    if (dalCol.AutoIncrement)
+                    if (dalCol.AutoIncrement || dalCol.NoSave)
                     {
                         continue;
                     }
