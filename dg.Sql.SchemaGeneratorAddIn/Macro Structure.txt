@@ -12,7 +12,8 @@
  */
 
 Keywords that affect the DB schema: (Case Insensitive)
- ColumnName __name__ - define the actual column name in the db, if it is different than the variable's name
+ ColumnName __name__ - define the actual column name in the db, if it is different than the default specified name
+ PropertyName __name__ - define the name of the property, if it is different than the default specified name
  Primary Key - Defines the column as primary key or part of primary key
  AutoIncrement / Auto Increment / AUTO_INCREMENT - Defines the column as a serial column
  Default __value__ - Sets the DEFAULT value for the column

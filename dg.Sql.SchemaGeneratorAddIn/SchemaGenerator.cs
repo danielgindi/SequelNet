@@ -623,6 +623,10 @@ namespace dg.Sql.SchemaGeneratorAddIn
                         {
                             dalColumn.Name = columnKeyword.Substring(11);
                         }
+                        else if (columnKeywordUpper.StartsWith("PropertyName ", StringComparison.Ordinal))
+                        {
+                            dalColumn.NameX = columnKeyword.Substring(13);
+                        }
                         else if (columnKeywordUpper.Equals("Unique Index", StringComparison.Ordinal) ||
                             columnKeywordUpper.Equals("Unique", StringComparison.Ordinal))
 						{
