@@ -8,175 +8,175 @@ namespace dg.Sql
 {
     public class WhereList : List<Where>
     {
-        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase Connection, Query RelatedQuery)
+        public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery)
         {
-            bool bFirst = true;
+            bool isFirst = true;
             bool isForJoinList = this is JoinColumnPair;
             foreach (Where where in this)
             {
-                where.BuildCommand(OutputBuilder, bFirst, Connection, RelatedQuery, null, null);
-                if (bFirst) bFirst = false;
+                where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
+                if (isFirst) isFirst = false;
             }
         }
 
-        public void BuildCommand(StringBuilder OutputBuilder, Query RelatedQuery)
+        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery)
         {
             using (ConnectorBase conn = ConnectorBase.NewInstance())
             {
-                bool bFirst = true;
+                bool isFirst = true;
                 bool isForJoinList = this is JoinColumnPair;
                 foreach (Where where in this)
                 {
-                    where.BuildCommand(OutputBuilder, bFirst, conn, RelatedQuery, null, null);
-                    if (bFirst) bFirst = false;
+                    where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
+                    if (isFirst) isFirst = false;
                 }
             }
         }
 
-        public void BuildCommand(StringBuilder OutputBuilder, ConnectorBase Connection, Query RelatedQuery, TableSchema RightTableSchema, string RightTableName)
+        public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
         {
-            bool bFirst = true;
+            bool isFirst = true;
             bool isForJoinList = this is JoinColumnPair;
             foreach (Where where in this)
             {
-                where.BuildCommand(OutputBuilder, bFirst, Connection, RelatedQuery, RightTableSchema, RightTableName);
-                if (bFirst) bFirst = false;
+                where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, rightTableSchema, rightTableName);
+                if (isFirst) isFirst = false;
             }
         }
 
-        public void BuildCommand(StringBuilder OutputBuilder, Query RelatedQuery, TableSchema RightTableSchema, string RightTableName)
+        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
         {
             using (ConnectorBase conn = ConnectorBase.NewInstance())
             {
-                bool bFirst = true;
+                bool isFirst = true;
                 bool isForJoinList = this is JoinColumnPair;
                 foreach (Where where in this)
                 {
-                    where.BuildCommand(OutputBuilder, bFirst, conn, RelatedQuery, RightTableSchema, RightTableName);
-                    if (bFirst) bFirst = false;
+                    where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, rightTableSchema, rightTableName);
+                    if (isFirst) isFirst = false;
                 }
             }
         }
 
-        public WhereList Where(string ColumnName, object ColumnValue)
+        public WhereList Where(string columnName, object columnValue)
         {
             this.Clear();
-            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, ColumnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
             return this;
         }
 
-        public WhereList Where(string ColumnName, WhereComparision Comparison, object ColumnValue)
+        public WhereList Where(string columnName, WhereComparision comparison, object columnValue)
         {
             this.Clear();
-            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, Comparison, ColumnValue, ValueObjectType.Value));
+            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
             return this;
         }
 
-        public WhereList Where(WhereList WhereList)
+        public WhereList Where(WhereList whereList)
         {
             this.Clear();
-            this.Add(new Where(WhereCondition.AND, WhereList));
+            this.Add(new Where(WhereCondition.AND, whereList));
             return this;
         }
 
-        public WhereList Where(string TableName, string ColumnName, WhereComparision Comparison, object ColumnValue)
+        public WhereList Where(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             this.Clear();
-            this.Add(new Where(WhereCondition.AND, TableName, ColumnName, Comparison, ColumnValue));
+            this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
             return this;
         }
 
-        public WhereList Where(string TableName, string ColumnName, object BetweenValue, object AndValue)
+        public WhereList Where(string tableName, string columnName, object betweenValue, object andValue)
         {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
-            where.FirstTableName = TableName;
-            this.Clear();
-            this.Add(where);
-            return this;
-        }
-
-        public WhereList Where(string ColumnName, object BetweenValue, object AndValue)
-        {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
             this.Clear();
             this.Add(where);
             return this;
         }
 
-        public WhereList AND(string ColumnName, object ColumnValue)
+        public WhereList Where(string columnName, object betweenValue, object andValue)
         {
-            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, ColumnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList AND(string ColumnName, WhereComparision Comparison, object ColumnValue)
-        {
-            this.Add(new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, Comparison, ColumnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList AND(WhereList WhereList)
-        {
-            this.Add(new Where(WhereCondition.AND, WhereList));
-            return this;
-        }
-
-        public WhereList AND(string TableName, string ColumnName, WhereComparision Comparison, object ColumnValue)
-        {
-            this.Add(new Where(WhereCondition.AND, TableName, ColumnName, Comparison, ColumnValue));
-            return this;
-        }
-
-        public WhereList AND(string TableName, string ColumnName, object BetweenValue, object AndValue)
-        {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
-            where.FirstTableName = TableName;
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            this.Clear();
             this.Add(where);
             return this;
         }
 
-        public WhereList AND(string ColumnName, object BetweenValue, object AndValue)
+        public WhereList AND(string columnName, object columnValue)
         {
-            Where where = new Where(WhereCondition.AND, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
+            return this;
+        }
+
+        public WhereList AND(string columnName, WhereComparision comparison, object columnValue)
+        {
+            this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
+            return this;
+        }
+
+        public WhereList AND(WhereList whereList)
+        {
+            this.Add(new Where(WhereCondition.AND, whereList));
+            return this;
+        }
+
+        public WhereList AND(string tableName, string columnName, WhereComparision comparison, object columnValue)
+        {
+            this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
+            return this;
+        }
+
+        public WhereList AND(string tableName, string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
             this.Add(where);
             return this;
         }
 
-        public WhereList OR(string ColumnName, object ColumnValue)
+        public WhereList AND(string columnName, object betweenValue, object andValue)
         {
-            this.Add(new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, ColumnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList OR(string ColumnName, WhereComparision Comparison, object ColumnValue)
-        {
-            this.Add(new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, Comparison, ColumnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList OR(WhereList WhereList)
-        {
-            this.Add(new Where(WhereCondition.OR, WhereList));
-            return this;
-        }
-
-        public WhereList OR(string TableName, string ColumnName, WhereComparision Comparison, object ColumnValue)
-        {
-            this.Add(new Where(WhereCondition.OR, TableName, ColumnName, Comparison, ColumnValue));
-            return this;
-        }
-
-        public WhereList OR(string TableName, string ColumnName, object BetweenValue, object AndValue)
-        {
-            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
-            where.FirstTableName = TableName;
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             this.Add(where);
             return this;
         }
 
-        public WhereList OR(string ColumnName, object BetweenValue, object AndValue)
+        public WhereList OR(string columnName, object columnValue)
         {
-            Where where = new Where(WhereCondition.OR, ColumnName, ValueObjectType.ColumnName, BetweenValue, ValueObjectType.Value, AndValue, ValueObjectType.Value);
+            this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
+            return this;
+        }
+
+        public WhereList OR(string columnName, WhereComparision comparison, object columnValue)
+        {
+            this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
+            return this;
+        }
+
+        public WhereList OR(WhereList whereList)
+        {
+            this.Add(new Where(WhereCondition.OR, whereList));
+            return this;
+        }
+
+        public WhereList OR(string tableName, string columnName, WhereComparision comparison, object columnValue)
+        {
+            this.Add(new Where(WhereCondition.OR, tableName, columnName, comparison, columnValue));
+            return this;
+        }
+
+        public WhereList OR(string tableName, string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
+            this.Add(where);
+            return this;
+        }
+
+        public WhereList OR(string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             this.Add(where);
             return this;
         }
