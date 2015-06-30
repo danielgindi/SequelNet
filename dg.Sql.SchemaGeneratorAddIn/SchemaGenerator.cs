@@ -198,8 +198,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
                             string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 							for (int k = 0; k < strArrays.Length; k++)
 							{
-								string str22 = strArrays[k];
-								dalForeignKey.Columns.Add(str22);
+								dalForeignKey.Columns.Add(strArrays[k]);
 							}
 						}
                         else if (arg.StartsWith("FOREIGNCOLUMNS[", StringComparison.OrdinalIgnoreCase))
@@ -208,8 +207,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 							string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 							for (int k = 0; k < strArrays.Length; k++)
 							{
-								string str25 = strArrays[k];
-								dalForeignKey.ForeignColumns.Add(str25);
+								dalForeignKey.ForeignColumns.Add(strArrays[k]);
 							}
 						}
 					}
