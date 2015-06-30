@@ -11,23 +11,25 @@
  *  @STATICCOLUMNS: Export column names as static fields (writable) instead of const
  */
 
-Keywords:
- PRIMARY KEY - Defines the column as primary key or part of primary key
- AUTOINCREMENT - Defines the column as a serial column
- DEFAULT value - Sets the DEFAULT value for the column
- NULLABLE - Defines the column as NULLABLE. Default is NOT NULL.
- NOPROPERTY - will remove the property code for this specific column. Can be used to write a custom property
- NOSAVE - will remove the property from the save routines
- ACTUALDEFAULT - define a different code-based default value for the class's instance member variable
- COLUMNNAME - define the actual column name in the db, if it is different than the variable's name
- CHARSET - the name of a character set for this column
- COLLATE - the name of a collation for this column
- TODB - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format
- FROMDB - Define a format to be used in Read(...). Can use the {0} specifier for column value in format
- VIRTUAL - Defines the property as virtual
- UNIQUE INDEX - Defines a UNIQUE index on this column
- FOREIGN TableClassName.ColumnName - Defines a FOREIGN key for this column
- ACTUALTYPE type - The actual .Net type name
+Keywords that affect the DB schema: (Case Insensitive)
+ ColumnName __name__ - define the actual column name in the db, if it is different than the variable's name
+ Primary Key - Defines the column as primary key or part of primary key
+ AutoIncrement / Auto Increment / AUTO_INCREMENT - Defines the column as a serial column
+ Default __value__ - Sets the DEFAULT value for the column
+ Nullable - Defines the column as NULLABLE. Default is NOT NULL.
+ Charset - the name of a character set for this column
+ Collate - the name of a collation for this column
+ Unique / Unique Index - Defines a UNIQUE index on this column
+ Foreign __TableClassName__.__ColumnName__ - Defines a foreign key for this column
+
+Keywords that affect the AbstractRecord<> structure: (Case Insensitive)
+ NoProperty - will remove the property code for this specific column. Can be used to write a custom property
+ NoSave - will remove the property from the save routines
+ ActualDefault __value__ - define a different code-based default value for the class's instance member variable
+ ActualType type - The actual .Net type name
+ ToDB - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format
+ FromDB - Define a format to be used in Read(...). Can use the {0} specifier for column value in format
+ Virtual - Defines the property as virtual
 
 Data types:
  INT64; INT32; INT16; INT8; UINT64; UINT32; UINT16; UINT8; DOUBLE; FLOAT; 
