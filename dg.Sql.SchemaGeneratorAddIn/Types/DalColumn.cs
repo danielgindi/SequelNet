@@ -7,7 +7,8 @@ namespace dg.Sql.SchemaGeneratorAddIn
 		public bool IsPrimaryKey;
 		public bool IsNullable;
 		public bool AutoIncrement;
-		public bool NoProperty;
+        public bool NoProperty;
+        public bool NoSave;
 		public DalColumnType Type;
 		public string LiteralType;
 		public string EnumTypeName;

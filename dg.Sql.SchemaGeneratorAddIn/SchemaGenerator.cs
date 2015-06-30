@@ -291,7 +291,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 						else if (columnKeywordUpper.Equals("NOPROPERTY", StringComparison.Ordinal))
 						{
 							dalColumn.NoProperty = true;
-						}
+                        }
+                        else if (columnKeywordUpper.Equals("NOSAVE", StringComparison.Ordinal))
+                        {
+                            dalColumn.NoSave = true;
+                        }
 						else if (columnKeywordUpper.StartsWith("PRECISION(", StringComparison.Ordinal))
 						{
 							int num1 = 0;
@@ -1340,10 +1344,11 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
 			foreach (DalColumn dalColumn5 in dalColumns)
 			{
-				if (dalColumn5.AutoIncrement)
+                if (dalColumn5.AutoIncrement || dalColumn5.NoSave)
 				{
 					continue;
 				}
+
 				if (string.IsNullOrEmpty(dalColumn5.ToDb))
 				{
 					stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", dalColumn5.Name);
