@@ -32,7 +32,9 @@ namespace dg.Sql.SchemaGeneratorAddIn
 			List<DalForeignKey> dalForeignKeys = new List<DalForeignKey>();
 			List<DalEnum> dalEnums = new List<DalEnum>();
 
-            bool staticColumns = false;
+            bool staticColumns = false, 
+                exportRecord = true, 
+                exportCollection = true;
 
 			string singleColumnPrimaryKeyName = null,
                 customBeforeInsert = null, 
@@ -228,6 +230,10 @@ namespace dg.Sql.SchemaGeneratorAddIn
                 else if (currentLineTrimmedUpper.StartsWith("@StaticColumns", StringComparison.OrdinalIgnoreCase))
                 {
                     staticColumns = true;
+                }
+                else if (currentLineTrimmedUpper.StartsWith("@OmitCollection", StringComparison.OrdinalIgnoreCase))
+                {
+                    exportCollection = false;
                 }
                 else if (!currentLineTrimmedUpper.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
 				{
@@ -692,1196 +698,1202 @@ namespace dg.Sql.SchemaGeneratorAddIn
 
 			StringBuilder stringBuilder = new StringBuilder();
 
-            #region AbstractRecordList
-            
-            stringBuilder.AppendFormat("public partial class {1}Collection : AbstractRecordList<{1}, {1}Collection> {{{0}}}{0}{0}", "\r\n", className);
-			foreach (DalEnum dalEn in dalEnums)
-			{
-				stringBuilder.AppendFormat("public enum {1}{0}{{{0}", "\r\n", dalEn.Name);
-				foreach (string item in dalEn.Items)
-				{
-					stringBuilder.AppendFormat("{1},{0}", "\r\n", item);
-				}
-				stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
-			}
-
-            #endregion
-
-            #region AbstractRecord
-
-            stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}", "\r\n", className);
-
-            #region Table Schema
-
-            stringBuilder.AppendFormat("#region Table Schema{0}", "\r\n");
-
-            stringBuilder.AppendFormat("private static TableSchema _TableSchema;{0}public struct Columns{0}{{{0}", "\r\n");
-			foreach (DalColumn dalCol in dalColumns)
-			{
-                stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";", "\r\n", staticColumns ? @"static" : @"const", dalCol.Name, dalCol.NameX);
-				if (!string.IsNullOrEmpty(dalCol.Comment))
-				{
-					stringBuilder.AppendFormat(" // {1}", "\r\n", dalCol.Comment);
-				}
-				stringBuilder.Append("\r\n");
-			}
-			stringBuilder.AppendFormat("}}{0}", "\r\n");
-			stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _TableSchema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.SchemaName = @\"{1}\";{0}", "\r\n", schemaName);
-			if (databaseOwner != null && databaseOwner.Length > 0)
-			{
-				stringBuilder.AppendFormat("schema.DatabaseOwner = @\"{1}\";{0}", "\r\n", databaseOwner);
-			}
-			foreach (DalColumn dalCol in dalColumns)
-			{
-				string actualType = dalCol.ActualType;
-				if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
-				{
-					dalCol.ActualType = dalCol.EnumTypeName;
-				}
-				else if (dalCol.Type == DalColumnType.TBool)
-				{
-					dalCol.ActualType = "bool";
-				}
-				else if (dalCol.Type == DalColumnType.TGuid)
-				{
-					dalCol.ActualType = "Guid";
-				}
-				else if (dalCol.Type == DalColumnType.TDateTime)
-				{
-					dalCol.ActualType = "DateTime";
-				}
-				else if (dalCol.Type == DalColumnType.TInt)
-				{
-					dalCol.ActualType = "int";
-				}
-				else if (dalCol.Type == DalColumnType.TInt8)
-				{
-					dalCol.ActualType = "SByte";
-				}
-				else if (dalCol.Type == DalColumnType.TInt16)
-				{
-					dalCol.ActualType = "Int16";
-				}
-				else if (dalCol.Type == DalColumnType.TInt32)
-				{
-					dalCol.ActualType = "Int32";
-				}
-				else if (dalCol.Type == DalColumnType.TInt64)
-				{
-					dalCol.ActualType = "Int64";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt8)
-				{
-					dalCol.ActualType = "Byte";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt16)
-				{
-					dalCol.ActualType = "UInt16";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt32)
-				{
-					dalCol.ActualType = "UInt32";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt64)
-				{
-					dalCol.ActualType = "UInt64";
-				}
-				else if (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TFixedString)
-				{
-					dalCol.ActualType = "string";
-				}
-                else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
-				{
-					dalCol.ActualType = "decimal";
-				}
-				else if (dalCol.Type == DalColumnType.TDouble)
-				{
-					dalCol.ActualType = "double";
-				}
-				else if (dalCol.Type == DalColumnType.TFloat)
-				{
-					dalCol.ActualType = "float";
-				}
-				else if (dalCol.Type == DalColumnType.TGeometry)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TGeometryCollection)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-				}
-				else if (dalCol.Type == DalColumnType.TPoint)
-				{
-					dalCol.ActualType = "Geometry.Point";
-				}
-				else if (dalCol.Type == DalColumnType.TLineString)
-				{
-					dalCol.ActualType = "Geometry.LineString";
-				}
-				else if (dalCol.Type == DalColumnType.TPolygon)
-				{
-					dalCol.ActualType = "Geometry.Polygon";
-				}
-				else if (dalCol.Type == DalColumnType.TLine)
-				{
-					dalCol.ActualType = "Geometry.Line";
-				}
-				else if (dalCol.Type == DalColumnType.TCurve)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TSurface)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TLinearRing)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TMultiPoint)
-				{
-					dalCol.ActualType = "Geometry.MultiPoint";
-				}
-				else if (dalCol.Type == DalColumnType.TMultiLineString)
-				{
-					dalCol.ActualType = "Geometry.MultiLineString";
-				}
-				else if (dalCol.Type == DalColumnType.TMultiPolygon)
-				{
-					dalCol.ActualType = "Geometry.MultiPolygon";
-				}
-				else if (dalCol.Type == DalColumnType.TMultiCurve)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-				}
-				else if (dalCol.Type == DalColumnType.TMultiSurface)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographic)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicCollection)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicPoint)
-				{
-					dalCol.ActualType = "Geometry.Point";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLineString)
-				{
-					dalCol.ActualType = "Geometry.LineString";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicPolygon)
-				{
-					dalCol.ActualType = "Geometry.Polygon";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLine)
-				{
-					dalCol.ActualType = "Geometry.Line";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicCurve)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicSurface)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
-				{
-					dalCol.ActualType = "Geometry";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
-				{
-					dalCol.ActualType = "Geometry.MultiPoint";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
-				{
-					dalCol.ActualType = "Geometry.MultiLineString";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
-				{
-					dalCol.ActualType = "Geometry.MultiPolygon";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
-				{
-					dalCol.ActualType = "Geometry.GeometryCollection";
-                }
-                else if (dalCol.Type == DalColumnType.TLiteral)
-                {
-                    // Do not change it, specified by ACTUALTYPE
-                }
-
-                stringBuilder.AppendFormat("schema.AddColumn(Columns.{0}, typeof({1})", dalCol.Name, dalCol.ActualType);
-
-				if (dalCol.Type == DalColumnType.TText)
-				{
-					stringBuilder.Append(", DataType.Text");
-				}
-				else if (dalCol.Type == DalColumnType.TLongText)
-				{
-					stringBuilder.Append(", DataType.LongText");
-				}
-				else if (dalCol.Type == DalColumnType.TMediumText)
-				{
-					stringBuilder.Append(", DataType.MediumText");
-                }
-                else if (dalCol.Type == DalColumnType.TFixedString)
-                {
-                    stringBuilder.Append(", DataType.Char");
-                }
-                else if (dalCol.Type == DalColumnType.TMoney)
-                {
-                    stringBuilder.Append(", DataType.Money");
-                }
-				else if (dalCol.Type == DalColumnType.TGeometry)
-				{
-					stringBuilder.Append(", DataType.Geometry");
-				}
-				else if (dalCol.Type == DalColumnType.TGeometryCollection)
-				{
-					stringBuilder.Append(", DataType.GeometryCollection");
-				}
-				else if (dalCol.Type == DalColumnType.TPoint)
-				{
-					stringBuilder.Append(", DataType.Point");
-				}
-				else if (dalCol.Type == DalColumnType.TLineString)
-				{
-					stringBuilder.Append(", DataType.LineString");
-				}
-				else if (dalCol.Type == DalColumnType.TPolygon)
-				{
-					stringBuilder.Append(", DataType.Polygon");
-				}
-				else if (dalCol.Type == DalColumnType.TLine)
-				{
-					stringBuilder.Append(", DataType.Line");
-				}
-				else if (dalCol.Type == DalColumnType.TCurve)
-				{
-					stringBuilder.Append(", DataType.Curve");
-				}
-				else if (dalCol.Type == DalColumnType.TSurface)
-				{
-					stringBuilder.Append(", DataType.Surface");
-				}
-				else if (dalCol.Type == DalColumnType.TLinearRing)
-				{
-					stringBuilder.Append(", DataType.LinearRing");
-				}
-				else if (dalCol.Type == DalColumnType.TMultiPoint)
-				{
-					stringBuilder.Append(", DataType.MultiPoint");
-				}
-				else if (dalCol.Type == DalColumnType.TMultiLineString)
-				{
-					stringBuilder.Append(", DataType.MultiLineString");
-				}
-				else if (dalCol.Type == DalColumnType.TMultiPolygon)
-				{
-					stringBuilder.Append(", DataType.MultiPolygon");
-				}
-				else if (dalCol.Type == DalColumnType.TMultiCurve)
-				{
-					stringBuilder.Append(", DataType.MultiCurve");
-				}
-				else if (dalCol.Type == DalColumnType.TMultiSurface)
-				{
-					stringBuilder.Append(", DataType.MultiSurface");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographic)
-				{
-					stringBuilder.Append(", DataType.Geographic");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicCollection)
-				{
-					stringBuilder.Append(", DataType.GeographicCollection");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicPoint)
-				{
-					stringBuilder.Append(", DataType.GeographicPoint");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLineString)
-				{
-					stringBuilder.Append(", DataType.GeographicLineString");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicPolygon)
-				{
-					stringBuilder.Append(", DataType.GeographicPolygon");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLine)
-				{
-					stringBuilder.Append(", DataType.GeographicLine");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicCurve)
-				{
-					stringBuilder.Append(", DataType.GeographicCurve");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicSurface)
-				{
-					stringBuilder.Append(", DataType.GeographicSurface");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
-				{
-					stringBuilder.Append(", DataType.GeographicLinearRing");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
-				{
-					stringBuilder.Append(", DataType.GeographicMultiPoint");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
-				{
-					stringBuilder.Append(", DataType.GeographicMultiLineString");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
-				{
-					stringBuilder.Append(", DataType.GeographicMultiPolygon");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
-				{
-					stringBuilder.Append(", DataType.GeographicMultiCurve");
-				}
-				else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
-				{
-					stringBuilder.Append(", DataType.GeographicMultiSurface");
-				}
-				else if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
-				{
-					if (dalCol.Type == DalColumnType.TInt8)
-					{
-						stringBuilder.Append(", DataType.TinyInt");
-					}
-					else if (dalCol.Type == DalColumnType.TInt16)
-					{
-						stringBuilder.Append(", DataType.SmallInt");
-					}
-					else if (dalCol.Type == DalColumnType.TInt32)
-					{
-						stringBuilder.Append(", DataType.Int");
-					}
-					else if (dalCol.Type == DalColumnType.TInt64)
-					{
-						stringBuilder.Append(", DataType.BigInt");
-					}
-					else if (dalCol.Type == DalColumnType.TUInt8)
-					{
-						stringBuilder.Append(", DataType.UnsignedTinyInt");
-					}
-					else if (dalCol.Type == DalColumnType.TUInt16)
-					{
-						stringBuilder.Append(", DataType.UnsignedSmallInt");
-					}
-					else if (dalCol.Type == DalColumnType.TUInt32)
-					{
-						stringBuilder.Append(", DataType.UnsignedInt");
-					}
-					else if (dalCol.Type == DalColumnType.TUInt64)
-					{
-						stringBuilder.Append(", DataType.UnsignedBigInt");
-					}
-				}
-				if (dalCol.IsNullable && dalCol.ActualType != "string")
-				{
-					dalCol.ActualType += "?";
-				}
-
-                stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
-                    dalCol.MaxLength,
-                    string.IsNullOrEmpty(dalCol.LiteralType) ? "null" : (@"""" + dalCol.LiteralType.Replace(@"""", @"""""") + @""""), 
-                    dalCol.Precision, 
-                    dalCol.Scale, 
-                    dalCol.AutoIncrement ? "true" : "false", 
-                    dalCol.IsPrimaryKey ? "true" : "false", 
-                    dalCol.IsNullable ? "true" : "false",
-                    dalCol.DefaultValue);
-
-                if (!string.IsNullOrEmpty(dalCol.Charset) || !string.IsNullOrEmpty(dalCol.Collate))
-                {
-                    stringBuilder.AppendFormat(@", {0}, {1}",
-                        string.IsNullOrEmpty(dalCol.Charset) ? "null" : (@"""" + dalCol.Charset + @""""),
-                        string.IsNullOrEmpty(dalCol.Collate) ? "null" : (@"""" + dalCol.Collate + @""""));
-                }
-
-                stringBuilder.AppendFormat(");{0}", "\r\n");
-
-				if (string.IsNullOrEmpty(actualType))
-				{
-					continue;
-				}
-				dalCol.ActualType = actualType;
-			}
-
-            // Create a list of all columns that participate in the Primary Key
-            List<DalColumn> primaryKeyColumns = new List<DalColumn>();
-            foreach (DalColumn dalCol in dalColumns)
+            if (exportCollection)
             {
-                if (!dalCol.IsPrimaryKey) continue;
-                primaryKeyColumns.Add(dalCol);
-            }
-            foreach (DalIndex dalIx in dalIndices)
-            {
-                if (dalIx.IndexMode != DalIndexIndexMode.PrimaryKey) continue;
-                foreach (DalIndexColumn indexColumn in dalIx.Columns)
+                #region AbstractRecordList
+
+                stringBuilder.AppendFormat("public partial class {1}Collection : AbstractRecordList<{1}, {1}Collection> {{{0}}}{0}{0}", "\r\n", className);
+                foreach (DalEnum dalEn in dalEnums)
                 {
-                    DalColumn column = dalColumns.Find((DalColumn c) => c.NameX == indexColumn.Name);
-                    if (column == null) continue;
-                    primaryKeyColumns.Add(column);
+                    stringBuilder.AppendFormat("public enum {1}{0}{{{0}", "\r\n", dalEn.Name);
+                    foreach (string item in dalEn.Items)
+                    {
+                        stringBuilder.AppendFormat("{1},{0}", "\r\n", item);
+                    }
+                    stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
                 }
+
+                #endregion
             }
 
-			stringBuilder.AppendFormat("{0}_TableSchema = schema;{0}", "\r\n");
-			if (dalIndices.Count > 0)
-			{
-				stringBuilder.AppendFormat("{0}", "\r\n");
-				foreach (DalIndex dalIx in dalIndices)
-				{
-                    object[] formatArgs = new object[4];
-                    formatArgs[0] = (dalIx.IndexName == null ? "null" : ("\"" + dalIx.IndexName + "\""));
-					formatArgs[1] = dalIx.ClusterMode.ToString();
-					formatArgs[2] = dalIx.IndexMode.ToString();
-					formatArgs[3] = dalIx.IndexType.ToString();
-                    stringBuilder.AppendFormat("schema.AddIndex({0}, TableSchema.ClusterMode.{1}, TableSchema.IndexMode.{2}, TableSchema.IndexType.{3}", formatArgs);
+            if (exportRecord)
+            {
+                #region AbstractRecord
+
+                stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}", "\r\n", className);
+
+                #region Table Schema
+
+                stringBuilder.AppendFormat("#region Table Schema{0}", "\r\n");
+
+                stringBuilder.AppendFormat("private static TableSchema _TableSchema;{0}public struct Columns{0}{{{0}", "\r\n");
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";", "\r\n", staticColumns ? @"static" : @"const", dalCol.Name, dalCol.NameX);
+                    if (!string.IsNullOrEmpty(dalCol.Comment))
+                    {
+                        stringBuilder.AppendFormat(" // {1}", "\r\n", dalCol.Comment);
+                    }
+                    stringBuilder.Append("\r\n");
+                }
+                stringBuilder.AppendFormat("}}{0}", "\r\n");
+                stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _TableSchema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.SchemaName = @\"{1}\";{0}", "\r\n", schemaName);
+                if (databaseOwner != null && databaseOwner.Length > 0)
+                {
+                    stringBuilder.AppendFormat("schema.DatabaseOwner = @\"{1}\";{0}", "\r\n", databaseOwner);
+                }
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    string actualType = dalCol.ActualType;
+                    if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
+                    {
+                        dalCol.ActualType = dalCol.EnumTypeName;
+                    }
+                    else if (dalCol.Type == DalColumnType.TBool)
+                    {
+                        dalCol.ActualType = "bool";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGuid)
+                    {
+                        dalCol.ActualType = "Guid";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDateTime)
+                    {
+                        dalCol.ActualType = "DateTime";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt)
+                    {
+                        dalCol.ActualType = "int";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt8)
+                    {
+                        dalCol.ActualType = "SByte";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt16)
+                    {
+                        dalCol.ActualType = "Int16";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt32)
+                    {
+                        dalCol.ActualType = "Int32";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt64)
+                    {
+                        dalCol.ActualType = "Int64";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt8)
+                    {
+                        dalCol.ActualType = "Byte";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt16)
+                    {
+                        dalCol.ActualType = "UInt16";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt32)
+                    {
+                        dalCol.ActualType = "UInt32";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt64)
+                    {
+                        dalCol.ActualType = "UInt64";
+                    }
+                    else if (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TFixedString)
+                    {
+                        dalCol.ActualType = "string";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
+                    {
+                        dalCol.ActualType = "decimal";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDouble)
+                    {
+                        dalCol.ActualType = "double";
+                    }
+                    else if (dalCol.Type == DalColumnType.TFloat)
+                    {
+                        dalCol.ActualType = "float";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeometry)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeometryCollection)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TPoint)
+                    {
+                        dalCol.ActualType = "Geometry.Point";
+                    }
+                    else if (dalCol.Type == DalColumnType.TLineString)
+                    {
+                        dalCol.ActualType = "Geometry.LineString";
+                    }
+                    else if (dalCol.Type == DalColumnType.TPolygon)
+                    {
+                        dalCol.ActualType = "Geometry.Polygon";
+                    }
+                    else if (dalCol.Type == DalColumnType.TLine)
+                    {
+                        dalCol.ActualType = "Geometry.Line";
+                    }
+                    else if (dalCol.Type == DalColumnType.TCurve)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TSurface)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TLinearRing)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiPoint)
+                    {
+                        dalCol.ActualType = "Geometry.MultiPoint";
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiLineString)
+                    {
+                        dalCol.ActualType = "Geometry.MultiLineString";
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiPolygon)
+                    {
+                        dalCol.ActualType = "Geometry.MultiPolygon";
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiCurve)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiSurface)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographic)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicCollection)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicPoint)
+                    {
+                        dalCol.ActualType = "Geometry.Point";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLineString)
+                    {
+                        dalCol.ActualType = "Geometry.LineString";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicPolygon)
+                    {
+                        dalCol.ActualType = "Geometry.Polygon";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLine)
+                    {
+                        dalCol.ActualType = "Geometry.Line";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicCurve)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicSurface)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
+                    {
+                        dalCol.ActualType = "Geometry";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
+                    {
+                        dalCol.ActualType = "Geometry.MultiPoint";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
+                    {
+                        dalCol.ActualType = "Geometry.MultiLineString";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
+                    {
+                        dalCol.ActualType = "Geometry.MultiPolygon";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                    {
+                        dalCol.ActualType = "Geometry.GeometryCollection";
+                    }
+                    else if (dalCol.Type == DalColumnType.TLiteral)
+                    {
+                        // Do not change it, specified by ACTUALTYPE
+                    }
+
+                    stringBuilder.AppendFormat("schema.AddColumn(Columns.{0}, typeof({1})", dalCol.Name, dalCol.ActualType);
+
+                    if (dalCol.Type == DalColumnType.TText)
+                    {
+                        stringBuilder.Append(", DataType.Text");
+                    }
+                    else if (dalCol.Type == DalColumnType.TLongText)
+                    {
+                        stringBuilder.Append(", DataType.LongText");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMediumText)
+                    {
+                        stringBuilder.Append(", DataType.MediumText");
+                    }
+                    else if (dalCol.Type == DalColumnType.TFixedString)
+                    {
+                        stringBuilder.Append(", DataType.Char");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMoney)
+                    {
+                        stringBuilder.Append(", DataType.Money");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeometry)
+                    {
+                        stringBuilder.Append(", DataType.Geometry");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeometryCollection)
+                    {
+                        stringBuilder.Append(", DataType.GeometryCollection");
+                    }
+                    else if (dalCol.Type == DalColumnType.TPoint)
+                    {
+                        stringBuilder.Append(", DataType.Point");
+                    }
+                    else if (dalCol.Type == DalColumnType.TLineString)
+                    {
+                        stringBuilder.Append(", DataType.LineString");
+                    }
+                    else if (dalCol.Type == DalColumnType.TPolygon)
+                    {
+                        stringBuilder.Append(", DataType.Polygon");
+                    }
+                    else if (dalCol.Type == DalColumnType.TLine)
+                    {
+                        stringBuilder.Append(", DataType.Line");
+                    }
+                    else if (dalCol.Type == DalColumnType.TCurve)
+                    {
+                        stringBuilder.Append(", DataType.Curve");
+                    }
+                    else if (dalCol.Type == DalColumnType.TSurface)
+                    {
+                        stringBuilder.Append(", DataType.Surface");
+                    }
+                    else if (dalCol.Type == DalColumnType.TLinearRing)
+                    {
+                        stringBuilder.Append(", DataType.LinearRing");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiPoint)
+                    {
+                        stringBuilder.Append(", DataType.MultiPoint");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiLineString)
+                    {
+                        stringBuilder.Append(", DataType.MultiLineString");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiPolygon)
+                    {
+                        stringBuilder.Append(", DataType.MultiPolygon");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiCurve)
+                    {
+                        stringBuilder.Append(", DataType.MultiCurve");
+                    }
+                    else if (dalCol.Type == DalColumnType.TMultiSurface)
+                    {
+                        stringBuilder.Append(", DataType.MultiSurface");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographic)
+                    {
+                        stringBuilder.Append(", DataType.Geographic");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicCollection)
+                    {
+                        stringBuilder.Append(", DataType.GeographicCollection");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicPoint)
+                    {
+                        stringBuilder.Append(", DataType.GeographicPoint");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLineString)
+                    {
+                        stringBuilder.Append(", DataType.GeographicLineString");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicPolygon)
+                    {
+                        stringBuilder.Append(", DataType.GeographicPolygon");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLine)
+                    {
+                        stringBuilder.Append(", DataType.GeographicLine");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicCurve)
+                    {
+                        stringBuilder.Append(", DataType.GeographicCurve");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicSurface)
+                    {
+                        stringBuilder.Append(", DataType.GeographicSurface");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
+                    {
+                        stringBuilder.Append(", DataType.GeographicLinearRing");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
+                    {
+                        stringBuilder.Append(", DataType.GeographicMultiPoint");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
+                    {
+                        stringBuilder.Append(", DataType.GeographicMultiLineString");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
+                    {
+                        stringBuilder.Append(", DataType.GeographicMultiPolygon");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
+                    {
+                        stringBuilder.Append(", DataType.GeographicMultiCurve");
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                    {
+                        stringBuilder.Append(", DataType.GeographicMultiSurface");
+                    }
+                    else if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
+                    {
+                        if (dalCol.Type == DalColumnType.TInt8)
+                        {
+                            stringBuilder.Append(", DataType.TinyInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TInt16)
+                        {
+                            stringBuilder.Append(", DataType.SmallInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TInt32)
+                        {
+                            stringBuilder.Append(", DataType.Int");
+                        }
+                        else if (dalCol.Type == DalColumnType.TInt64)
+                        {
+                            stringBuilder.Append(", DataType.BigInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TUInt8)
+                        {
+                            stringBuilder.Append(", DataType.UnsignedTinyInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TUInt16)
+                        {
+                            stringBuilder.Append(", DataType.UnsignedSmallInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TUInt32)
+                        {
+                            stringBuilder.Append(", DataType.UnsignedInt");
+                        }
+                        else if (dalCol.Type == DalColumnType.TUInt64)
+                        {
+                            stringBuilder.Append(", DataType.UnsignedBigInt");
+                        }
+                    }
+                    if (dalCol.IsNullable && dalCol.ActualType != "string")
+                    {
+                        dalCol.ActualType += "?";
+                    }
+
+                    stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
+                        dalCol.MaxLength,
+                        string.IsNullOrEmpty(dalCol.LiteralType) ? "null" : (@"""" + dalCol.LiteralType.Replace(@"""", @"""""") + @""""),
+                        dalCol.Precision,
+                        dalCol.Scale,
+                        dalCol.AutoIncrement ? "true" : "false",
+                        dalCol.IsPrimaryKey ? "true" : "false",
+                        dalCol.IsNullable ? "true" : "false",
+                        dalCol.DefaultValue);
+
+                    if (!string.IsNullOrEmpty(dalCol.Charset) || !string.IsNullOrEmpty(dalCol.Collate))
+                    {
+                        stringBuilder.AppendFormat(@", {0}, {1}",
+                            string.IsNullOrEmpty(dalCol.Charset) ? "null" : (@"""" + dalCol.Charset + @""""),
+                            string.IsNullOrEmpty(dalCol.Collate) ? "null" : (@"""" + dalCol.Collate + @""""));
+                    }
+
+                    stringBuilder.AppendFormat(");{0}", "\r\n");
+
+                    if (string.IsNullOrEmpty(actualType))
+                    {
+                        continue;
+                    }
+                    dalCol.ActualType = actualType;
+                }
+
+                // Create a list of all columns that participate in the Primary Key
+                List<DalColumn> primaryKeyColumns = new List<DalColumn>();
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    if (!dalCol.IsPrimaryKey) continue;
+                    primaryKeyColumns.Add(dalCol);
+                }
+                foreach (DalIndex dalIx in dalIndices)
+                {
+                    if (dalIx.IndexMode != DalIndexIndexMode.PrimaryKey) continue;
                     foreach (DalIndexColumn indexColumn in dalIx.Columns)
                     {
-                        DalColumn dalCol = dalColumns.Find((DalColumn c) => c.Name == indexColumn.Name);
-                        string col = (dalCol == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalCol.Name));
-                        stringBuilder.AppendFormat(", {0}", col);
-                        if (string.IsNullOrEmpty(indexColumn.SortDirection))
-						{
-							continue;
-						}
-                        stringBuilder.AppendFormat(", SortDirection.{0}", indexColumn.SortDirection);
-					}
-					stringBuilder.AppendFormat(");{0}", "\r\n");
-				}
-			}
-			if (dalForeignKeys.Count > 0)
-			{
-				stringBuilder.AppendFormat("{0}", "\r\n");
-				foreach (DalForeignKey dalFK in dalForeignKeys)
-				{
-                    stringBuilder.AppendFormat("schema.AddForeignKey({0}, ", 
-                        (dalFK.ForeignKeyName == null ? "null" : ("\"" + dalFK.ForeignKeyName + "\"")));
-					if (dalFK.Columns.Count <= 1)
-					{
-						stringBuilder.AppendFormat("{0}.Columns.{1}, ", className, dalFK.Columns[0]);
-					}
-					else
-					{
-						stringBuilder.Append("new string[] {");
-						foreach (string dalFKCol in dalFK.Columns)
-						{
-							if (dalFKCol != dalFK.Columns[0])
-							{
-								stringBuilder.Append(" ,");
-							}
-							stringBuilder.AppendFormat("{0}.Columns.{1}", className, dalFKCol);
-						}
-						stringBuilder.Append("}, ");
-					}
-					if (dalFK.ForeignTable != className)
-					{
-						stringBuilder.AppendFormat("{0}.TableSchema.SchemaName, ", dalFK.ForeignTable);
-					}
-					else
-					{
-						stringBuilder.Append("schema.SchemaName, ");
-					}
-					if (dalFK.ForeignColumns.Count <= 1)
-					{
-						stringBuilder.AppendFormat("{0}.Columns.{1}, ", dalFK.ForeignTable, dalFK.ForeignColumns[0]);
-					}
-					else
-					{
-						stringBuilder.Append("new string[] {");
-						foreach (string foreignColumn in dalFK.ForeignColumns)
-						{
-							if (foreignColumn != dalFK.ForeignColumns[0])
-							{
-								stringBuilder.Append(" ,");
-							}
-							stringBuilder.AppendFormat("{0}.Columns.{1}", dalFK.ForeignTable, foreignColumn);
-						}
-						stringBuilder.Append("}, ");
-					}
-					stringBuilder.AppendFormat("TableSchema.ForeignKeyReference.{1}, TableSchema.ForeignKeyReference.{2});{0}", "\r\n", dalFK.OnDelete.ToString(), dalFK.OnUpdate.ToString());
-				}
-			}
-			if (mySqlEngineName.Length > 0)
-			{
-				stringBuilder.AppendFormat("{0}schema.SetMySqlEngine(MySqlEngineType.{1});{0}", "\r\n", mySqlEngineName);
-			}
-            stringBuilder.AppendFormat("{0}}}{0}{0}return _TableSchema;{0}}}{0}", "\r\n");
+                        DalColumn column = dalColumns.Find((DalColumn c) => c.NameX == indexColumn.Name);
+                        if (column == null) continue;
+                        primaryKeyColumns.Add(column);
+                    }
+                }
 
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}_TableSchema = schema;{0}", "\r\n");
+                if (dalIndices.Count > 0)
+                {
+                    stringBuilder.AppendFormat("{0}", "\r\n");
+                    foreach (DalIndex dalIx in dalIndices)
+                    {
+                        object[] formatArgs = new object[4];
+                        formatArgs[0] = (dalIx.IndexName == null ? "null" : ("\"" + dalIx.IndexName + "\""));
+                        formatArgs[1] = dalIx.ClusterMode.ToString();
+                        formatArgs[2] = dalIx.IndexMode.ToString();
+                        formatArgs[3] = dalIx.IndexType.ToString();
+                        stringBuilder.AppendFormat("schema.AddIndex({0}, TableSchema.ClusterMode.{1}, TableSchema.IndexMode.{2}, TableSchema.IndexType.{3}", formatArgs);
+                        foreach (DalIndexColumn indexColumn in dalIx.Columns)
+                        {
+                            DalColumn dalCol = dalColumns.Find((DalColumn c) => c.Name == indexColumn.Name);
+                            string col = (dalCol == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalCol.Name));
+                            stringBuilder.AppendFormat(", {0}", col);
+                            if (string.IsNullOrEmpty(indexColumn.SortDirection))
+                            {
+                                continue;
+                            }
+                            stringBuilder.AppendFormat(", SortDirection.{0}", indexColumn.SortDirection);
+                        }
+                        stringBuilder.AppendFormat(");{0}", "\r\n");
+                    }
+                }
+                if (dalForeignKeys.Count > 0)
+                {
+                    stringBuilder.AppendFormat("{0}", "\r\n");
+                    foreach (DalForeignKey dalFK in dalForeignKeys)
+                    {
+                        stringBuilder.AppendFormat("schema.AddForeignKey({0}, ",
+                            (dalFK.ForeignKeyName == null ? "null" : ("\"" + dalFK.ForeignKeyName + "\"")));
+                        if (dalFK.Columns.Count <= 1)
+                        {
+                            stringBuilder.AppendFormat("{0}.Columns.{1}, ", className, dalFK.Columns[0]);
+                        }
+                        else
+                        {
+                            stringBuilder.Append("new string[] {");
+                            foreach (string dalFKCol in dalFK.Columns)
+                            {
+                                if (dalFKCol != dalFK.Columns[0])
+                                {
+                                    stringBuilder.Append(" ,");
+                                }
+                                stringBuilder.AppendFormat("{0}.Columns.{1}", className, dalFKCol);
+                            }
+                            stringBuilder.Append("}, ");
+                        }
+                        if (dalFK.ForeignTable != className)
+                        {
+                            stringBuilder.AppendFormat("{0}.TableSchema.SchemaName, ", dalFK.ForeignTable);
+                        }
+                        else
+                        {
+                            stringBuilder.Append("schema.SchemaName, ");
+                        }
+                        if (dalFK.ForeignColumns.Count <= 1)
+                        {
+                            stringBuilder.AppendFormat("{0}.Columns.{1}, ", dalFK.ForeignTable, dalFK.ForeignColumns[0]);
+                        }
+                        else
+                        {
+                            stringBuilder.Append("new string[] {");
+                            foreach (string foreignColumn in dalFK.ForeignColumns)
+                            {
+                                if (foreignColumn != dalFK.ForeignColumns[0])
+                                {
+                                    stringBuilder.Append(" ,");
+                                }
+                                stringBuilder.AppendFormat("{0}.Columns.{1}", dalFK.ForeignTable, foreignColumn);
+                            }
+                            stringBuilder.Append("}, ");
+                        }
+                        stringBuilder.AppendFormat("TableSchema.ForeignKeyReference.{1}, TableSchema.ForeignKeyReference.{2});{0}", "\r\n", dalFK.OnDelete.ToString(), dalFK.OnUpdate.ToString());
+                    }
+                }
+                if (mySqlEngineName.Length > 0)
+                {
+                    stringBuilder.AppendFormat("{0}schema.SetMySqlEngine(MySqlEngineType.{1});{0}", "\r\n", mySqlEngineName);
+                }
+                stringBuilder.AppendFormat("{0}}}{0}{0}return _TableSchema;{0}}}{0}", "\r\n");
 
-            #endregion
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
-            #region Private Members
+                #endregion
 
-            stringBuilder.AppendFormat("{0}#region Private Members{0}", "\r\n");
-			foreach (DalColumn dalColumn in dalColumns)
-			{
-				if (!dalColumn.NoProperty)
-				{
-					stringBuilder.Append("internal ");
-				}
-				string defaultValue = null;
-				defaultValue = dalColumn.DefaultValue;
-				if (string.IsNullOrEmpty(defaultValue) || defaultValue == "null")
-				{
-					if (!string.IsNullOrEmpty(dalColumn.EnumTypeName))
-					{
-						defaultValue = null;
-					}
-					else if (dalColumn.Type == DalColumnType.TBool)
-					{
-						defaultValue = "false";
-					}
-					else if (dalColumn.Type == DalColumnType.TGuid)
-					{
-						defaultValue = "Guid.Empty";
-					}
-					else if (dalColumn.Type == DalColumnType.TDateTime)
-					{
-						defaultValue = "DateTime.UtcNow";
-					}
-					else if (dalColumn.Type == DalColumnType.TInt)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TInt8)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TInt16)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TInt32)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TInt64)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TUInt8)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TUInt16)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TUInt32)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TUInt64)
-					{
-						defaultValue = "0";
-					}
-					else if (dalColumn.Type == DalColumnType.TString || dalColumn.Type == DalColumnType.TText || dalColumn.Type == DalColumnType.TLongText || dalColumn.Type == DalColumnType.TMediumText || dalColumn.Type == DalColumnType.TFixedString)
-					{
-						defaultValue = "string.Empty";
-					}
-                    else if (dalColumn.Type == DalColumnType.TDecimal || dalColumn.Type == DalColumnType.TMoney)
-					{
-						defaultValue = "0m";
-					}
-					else if (dalColumn.Type == DalColumnType.TDouble)
-					{
-						defaultValue = "0d";
-					}
-					else if (dalColumn.Type == DalColumnType.TFloat)
-					{
-						defaultValue = "0f";
-					}
-				}
-				if (dalColumn.ActualDefaultValue.Length > 0)
-				{
-					defaultValue = dalColumn.ActualDefaultValue;
-				}
-				if (dalColumn.NoProperty)
-				{
-					continue;
-				}
-				stringBuilder.Append(dalColumn.ActualType);
-				stringBuilder.AppendFormat(" _{0}", dalColumn.Name);
-				if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue.Length > 0 & (dalColumn.ActualDefaultValue == "null")) && dalColumn.IsNullable)
-				{
-                    stringBuilder.AppendFormat(" = {1};{0}", "\r\n", 
-                        (dalColumn.ActualDefaultValue.Length > 0 ? dalColumn.ActualDefaultValue : dalColumn.DefaultValue));
-				}
-				else if (defaultValue != null)
-				{
-					stringBuilder.AppendFormat(" = {1};{0}", "\r\n", defaultValue);
-				}
-				else
-				{
-					stringBuilder.AppendFormat(";{0}", "\r\n");
-				}
-			}
-			stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+                #region Private Members
 
-            #endregion
+                stringBuilder.AppendFormat("{0}#region Private Members{0}", "\r\n");
+                foreach (DalColumn dalColumn in dalColumns)
+                {
+                    if (!dalColumn.NoProperty)
+                    {
+                        stringBuilder.Append("internal ");
+                    }
+                    string defaultValue = null;
+                    defaultValue = dalColumn.DefaultValue;
+                    if (string.IsNullOrEmpty(defaultValue) || defaultValue == "null")
+                    {
+                        if (!string.IsNullOrEmpty(dalColumn.EnumTypeName))
+                        {
+                            defaultValue = null;
+                        }
+                        else if (dalColumn.Type == DalColumnType.TBool)
+                        {
+                            defaultValue = "false";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TGuid)
+                        {
+                            defaultValue = "Guid.Empty";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TDateTime)
+                        {
+                            defaultValue = "DateTime.UtcNow";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TInt)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TInt8)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TInt16)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TInt32)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TInt64)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TUInt8)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TUInt16)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TUInt32)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TUInt64)
+                        {
+                            defaultValue = "0";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TString || dalColumn.Type == DalColumnType.TText || dalColumn.Type == DalColumnType.TLongText || dalColumn.Type == DalColumnType.TMediumText || dalColumn.Type == DalColumnType.TFixedString)
+                        {
+                            defaultValue = "string.Empty";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TDecimal || dalColumn.Type == DalColumnType.TMoney)
+                        {
+                            defaultValue = "0m";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TDouble)
+                        {
+                            defaultValue = "0d";
+                        }
+                        else if (dalColumn.Type == DalColumnType.TFloat)
+                        {
+                            defaultValue = "0f";
+                        }
+                    }
+                    if (dalColumn.ActualDefaultValue.Length > 0)
+                    {
+                        defaultValue = dalColumn.ActualDefaultValue;
+                    }
+                    if (dalColumn.NoProperty)
+                    {
+                        continue;
+                    }
+                    stringBuilder.Append(dalColumn.ActualType);
+                    stringBuilder.AppendFormat(" _{0}", dalColumn.Name);
+                    if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue.Length > 0 & (dalColumn.ActualDefaultValue == "null")) && dalColumn.IsNullable)
+                    {
+                        stringBuilder.AppendFormat(" = {1};{0}", "\r\n",
+                            (dalColumn.ActualDefaultValue.Length > 0 ? dalColumn.ActualDefaultValue : dalColumn.DefaultValue));
+                    }
+                    else if (defaultValue != null)
+                    {
+                        stringBuilder.AppendFormat(" = {1};{0}", "\r\n", defaultValue);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat(";{0}", "\r\n");
+                    }
+                }
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
-            #region Properties
+                #endregion
 
-            stringBuilder.AppendFormat("{0}#region Properties{0}", "\r\n");
+                #region Properties
 
-            foreach (DalColumn dalCol in dalColumns)
-			{
-				if (dalCol.NoProperty)
-				{
-					continue;
-				}
-                object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.Name, null };
-				formatArgs[3] = (dalCol.Virtual ? "virtual " : "");
-                stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}get{{return _{2};}}{0}set{{_{2}=value;}}{0}}}{0}", formatArgs);
-			}
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}#region Properties{0}", "\r\n");
 
-            #endregion
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    if (dalCol.NoProperty)
+                    {
+                        continue;
+                    }
+                    object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.Name, null };
+                    formatArgs[3] = (dalCol.Virtual ? "virtual " : "");
+                    stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}get{{return _{2};}}{0}set{{_{2}=value;}}{0}}}{0}", formatArgs);
+                }
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
-            #region AbstractRecord members
+                #endregion
 
-            stringBuilder.AppendFormat("{0}#region AbstractRecord members{0}", "\r\n");
+                #region AbstractRecord members
 
-            // GetPrimaryKeyValue() function
-            stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n", 
-                string.IsNullOrEmpty(singleColumnPrimaryKeyName) ? "null" : singleColumnPrimaryKeyName);
+                stringBuilder.AppendFormat("{0}#region AbstractRecord members{0}", "\r\n");
 
-            // Insert() method
-            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn){0}{{{0}", "\r\n");
+                // GetPrimaryKeyValue() function
+                stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
+                    string.IsNullOrEmpty(singleColumnPrimaryKeyName) ? "null" : singleColumnPrimaryKeyName);
 
-			bool printExtraNewLine = false;
-			if (dalColumns.Find((DalColumn c) => c.Name == "CreatedBy") != null)
-			{
-				stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
-				printExtraNewLine = true;
-			}
-			if (dalColumns.Find((DalColumn c) => c.Name == "CreatedOn") != null)
-			{
-				stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
-				printExtraNewLine = true;
-			}
-			if (printExtraNewLine)
-			{
-				stringBuilder.Append("\r\n");
-			}
+                // Insert() method
+                stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn){0}{{{0}", "\r\n");
 
-			if (!string.IsNullOrEmpty(customBeforeInsert))
-			{
-				stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", customBeforeInsert);
-			}
-			stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
-			foreach (DalColumn dalCol in dalColumns)
-			{
-                if (dalCol.AutoIncrement || dalCol.NoSave)
-				{
-					continue;
-				}
+                bool printExtraNewLine = false;
+                if (dalColumns.Find((DalColumn c) => c.Name == "CreatedBy") != null)
+                {
+                    stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
+                if (dalColumns.Find((DalColumn c) => c.Name == "CreatedOn") != null)
+                {
+                    stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
+                if (printExtraNewLine)
+                {
+                    stringBuilder.Append("\r\n");
+                }
 
-				if (string.IsNullOrEmpty(dalCol.ToDb))
-				{
-					stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
-				}
-				else
-				{
-					stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
-				}
-			}
-			stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(conn, out lastInsert) > 0){0}{{{0}", "\r\n");
-			if (!string.IsNullOrEmpty(singleColumnPrimaryKeyName))
-			{
-				string valueConvertorFormat = "{0}";
+                if (!string.IsNullOrEmpty(customBeforeInsert))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", customBeforeInsert);
+                }
+                stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    if (dalCol.AutoIncrement || dalCol.NoSave)
+                    {
+                        continue;
+                    }
 
-                DalColumn dalCol = dalColumns.Find((DalColumn c) => c.Name == singleColumnPrimaryKeyName);
-				if (dalCol.Type == DalColumnType.TBool)
-				{
-					valueConvertorFormat = "Convert.ToBoolean({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TGuid)
-				{
-					valueConvertorFormat = "new Guid({0}.ToString())";
-				}
-				else if (dalCol.Type == DalColumnType.TInt)
-				{
-					valueConvertorFormat = "Convert.ToInt32({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TInt8)
-				{
-					valueConvertorFormat = "Convert.ToSByte({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TInt16)
-				{
-					valueConvertorFormat = "Convert.ToInt16({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TInt32)
-				{
-					valueConvertorFormat = "Convert.ToInt32({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TInt64)
-				{
-					valueConvertorFormat = "Convert.ToInt64({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt8)
-				{
-					valueConvertorFormat = "Convert.ToByte({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt16)
-				{
-					valueConvertorFormat = "Convert.ToUInt16({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt32)
-				{
-					valueConvertorFormat = "Convert.ToUInt32({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TUInt64)
-				{
-					valueConvertorFormat = "Convert.ToUInt64({0})";
-				}
-                else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
-				{
-					valueConvertorFormat = "Convert.ToDecimal({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TDouble)
-				{
-					valueConvertorFormat = "Convert.ToDouble({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TFloat)
-				{
-					valueConvertorFormat = "Convert.ToSingle({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TDateTime)
-				{
-					valueConvertorFormat = "Convert.ToDateTime({0})";
-				}
-				else if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
-				{
-					valueConvertorFormat = "(string){0}";
-				}
-				else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
-				{
-					valueConvertorFormat = "conn.ReadGeometry({0}) as " + dalCol.ActualType;
-				}
-				stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", singleColumnPrimaryKeyName, string.Format(valueConvertorFormat, "(lastInsert)"));
-			}
-            stringBuilder.AppendFormat("MarkOld();{0}}}{0}}}{0}", "\r\n");
+                    if (string.IsNullOrEmpty(dalCol.ToDb))
+                    {
+                        stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
+                    }
+                }
+                stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(conn, out lastInsert) > 0){0}{{{0}", "\r\n");
+                if (!string.IsNullOrEmpty(singleColumnPrimaryKeyName))
+                {
+                    string valueConvertorFormat = "{0}";
 
-            // Update() method
-            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
-			printExtraNewLine = false;
-			if (dalColumns.Find((DalColumn c) => c.Name == "ModifiedBy") != null)
-			{
-				stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
-				printExtraNewLine = true;
-			}
-			if (dalColumns.Find((DalColumn c) => c.Name == "ModifiedOn") != null)
-			{
-				stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
-				printExtraNewLine = true;
-			}
-			if (printExtraNewLine)
-			{
-				stringBuilder.Append("\r\n");
-			}
-			if (!string.IsNullOrEmpty(customBeforeUpdate))
-			{
-				stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", customBeforeUpdate);
-			}
+                    DalColumn dalCol = dalColumns.Find((DalColumn c) => c.Name == singleColumnPrimaryKeyName);
+                    if (dalCol.Type == DalColumnType.TBool)
+                    {
+                        valueConvertorFormat = "Convert.ToBoolean({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGuid)
+                    {
+                        valueConvertorFormat = "new Guid({0}.ToString())";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt)
+                    {
+                        valueConvertorFormat = "Convert.ToInt32({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt8)
+                    {
+                        valueConvertorFormat = "Convert.ToSByte({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt16)
+                    {
+                        valueConvertorFormat = "Convert.ToInt16({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt32)
+                    {
+                        valueConvertorFormat = "Convert.ToInt32({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt64)
+                    {
+                        valueConvertorFormat = "Convert.ToInt64({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt8)
+                    {
+                        valueConvertorFormat = "Convert.ToByte({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt16)
+                    {
+                        valueConvertorFormat = "Convert.ToUInt16({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt32)
+                    {
+                        valueConvertorFormat = "Convert.ToUInt32({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt64)
+                    {
+                        valueConvertorFormat = "Convert.ToUInt64({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
+                    {
+                        valueConvertorFormat = "Convert.ToDecimal({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDouble)
+                    {
+                        valueConvertorFormat = "Convert.ToDouble({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TFloat)
+                    {
+                        valueConvertorFormat = "Convert.ToSingle({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDateTime)
+                    {
+                        valueConvertorFormat = "Convert.ToDateTime({0})";
+                    }
+                    else if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
+                    {
+                        valueConvertorFormat = "(string){0}";
+                    }
+                    else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                    {
+                        valueConvertorFormat = "conn.ReadGeometry({0}) as " + dalCol.ActualType;
+                    }
+                    stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", singleColumnPrimaryKeyName, string.Format(valueConvertorFormat, "(lastInsert)"));
+                }
+                stringBuilder.AppendFormat("MarkOld();{0}}}{0}}}{0}", "\r\n");
 
-			stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
-			foreach (DalColumn dalCol in dalColumns)
-			{
-				if (dalCol.AutoIncrement)
-				{
-					continue;
-				}
-				if (string.IsNullOrEmpty(dalCol.ToDb))
-				{
-					stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
-				}
-				else
-				{
-					stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
-				}
-			}
-			bool flag1 = true;
-            foreach (DalColumn dalCol in primaryKeyColumns)
-			{
-                stringBuilder.AppendFormat("qry.{2}(Columns.{1}, {1});{0}", "\r\n", dalCol.Name, (flag1 ? "Where" : "AND"));
-				flag1 = false;
-			}
-            stringBuilder.AppendFormat("{0}qry.Execute(conn);{0}}}{0}", "\r\n");
+                // Update() method
+                stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
+                printExtraNewLine = false;
+                if (dalColumns.Find((DalColumn c) => c.Name == "ModifiedBy") != null)
+                {
+                    stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
+                if (dalColumns.Find((DalColumn c) => c.Name == "ModifiedOn") != null)
+                {
+                    stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
+                if (printExtraNewLine)
+                {
+                    stringBuilder.Append("\r\n");
+                }
+                if (!string.IsNullOrEmpty(customBeforeUpdate))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", customBeforeUpdate);
+                }
 
-            // Read() method
-            stringBuilder.AppendFormat("public override void Read(DataReaderBase reader){0}{{{0}", "\r\n");
-			foreach (DalColumn dalCol in dalColumns)
-			{
-				string fromDb = "{0}";
-				string fromReader = "reader[Columns.{0}]";
-				if (dalCol.Type == DalColumnType.TBool)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToBoolean({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToBoolean({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToBoolean({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TGuid)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "GuidFromDb({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : GuidFromDb({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : GuidFromDb({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TInt || dalCol.Type == DalColumnType.TInt32)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToInt32({0})";
-					}
-					else if (dalCol.DefaultValue == "0")
-					{
-						fromDb = "Int32OrZero({0})";
-					}
-					else if (dalCol.DefaultValue != "null")
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt32({{0}})", dalCol.ActualType));
-					}
-					else
-					{
-						fromDb = "Int32OrNullFromDb({0})";
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TUInt32)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToUInt32({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt32({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TInt8)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToSByte({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSByte({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TUInt8)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToByte({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToByte({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TInt16)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToInt16({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt16({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TUInt16)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToUInt16({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt16({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TInt64)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToInt64({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt64({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TUInt64)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToUInt64({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt64({{0}})", dalCol.ActualType));
-					}
-				}
-                else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToDecimal({0})";
-					}
-					else if (dalCol.DefaultValue == "0" || dalCol.DefaultValue == "0m")
-					{
-						fromDb = "DecimalOrZeroFromDb({0})";
-					}
-					else if (dalCol.DefaultValue != "null")
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDecimal({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDecimal({{0}})", dalCol.ActualType));
-					}
-					else
-					{
-						fromDb = "DecimalOrNullFromDb({0})";
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TDouble)
-				{
-					if (!dalCol.IsNullable)
-					{
-						fromDb = "Convert.ToDouble({0})";
-					}
-					else
-					{
-						fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDouble({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDouble({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type == DalColumnType.TFloat)
-				{
-					if (!dalCol.IsNullable)
-					{
-                        fromDb = "Convert.ToSingle({0})";
-					}
-					else
-					{
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", dalCol.ActualType));
-					}
-				}
-				else if (dalCol.Type != DalColumnType.TDateTime)
-				{
-					if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
-					{
-						fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
-					}
-					else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
-					{
-						fromReader = "reader.GetGeometry(Columns.{0}) as " + dalCol.ActualType;
-					}
-				}
-				else if (!dalCol.IsNullable)
-				{
-					fromDb = "Convert.ToDateTime({0})";
-				}
-				else if (dalCol.DefaultValue == "DateTime.UtcNow")
-				{
-					fromDb = "DateTimeOrNow({0})";
-				}
-				else if (dalCol.DefaultValue != "null")
-				{
-					fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDateTime({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDateTime({{0}})", dalCol.ActualType));
-				}
-				else
-				{
-					fromDb = "DateTimeOrNullFromDb({0})";
-				}
-				if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
-				{
-					fromDb = "(" + dalCol.EnumTypeName + ")" + fromDb;
-				}
-				if (!string.IsNullOrEmpty(dalCol.FromDb))
-				{
-					fromDb = dalCol.FromDb;
-				}
-				stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.Name, string.Format(fromDb, string.Format(fromReader, dalCol.Name), dalCol.DefaultValue));
-			}
-			if (!string.IsNullOrEmpty(customAfterRead))
-			{
-				stringBuilder.AppendFormat("{0}{1}{0}", "\r\n", customAfterRead);
-			}
-            stringBuilder.AppendFormat("{0}IsThisANewRecord = false;}}{0}", "\r\n");
+                stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    if (dalCol.AutoIncrement)
+                    {
+                        continue;
+                    }
+                    if (string.IsNullOrEmpty(dalCol.ToDb))
+                    {
+                        stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
+                    }
+                }
+                bool flag1 = true;
+                foreach (DalColumn dalCol in primaryKeyColumns)
+                {
+                    stringBuilder.AppendFormat("qry.{2}(Columns.{1}, {1});{0}", "\r\n", dalCol.Name, (flag1 ? "Where" : "AND"));
+                    flag1 = false;
+                }
+                stringBuilder.AppendFormat("{0}qry.Execute(conn);{0}}}{0}", "\r\n");
 
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+                // Read() method
+                stringBuilder.AppendFormat("public override void Read(DataReaderBase reader){0}{{{0}", "\r\n");
+                foreach (DalColumn dalCol in dalColumns)
+                {
+                    string fromDb = "{0}";
+                    string fromReader = "reader[Columns.{0}]";
+                    if (dalCol.Type == DalColumnType.TBool)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToBoolean({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToBoolean({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToBoolean({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TGuid)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "GuidFromDb({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : GuidFromDb({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : GuidFromDb({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt || dalCol.Type == DalColumnType.TInt32)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToInt32({0})";
+                        }
+                        else if (dalCol.DefaultValue == "0")
+                        {
+                            fromDb = "Int32OrZero({0})";
+                        }
+                        else if (dalCol.DefaultValue != "null")
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt32({{0}})", dalCol.ActualType));
+                        }
+                        else
+                        {
+                            fromDb = "Int32OrNullFromDb({0})";
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt32)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToUInt32({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt32({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt8)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToSByte({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSByte({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt8)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToByte({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToByte({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt16)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToInt16({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt16({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt16)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToUInt16({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt16({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TInt64)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToInt64({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt64({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TUInt64)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToUInt64({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt64({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToDecimal({0})";
+                        }
+                        else if (dalCol.DefaultValue == "0" || dalCol.DefaultValue == "0m")
+                        {
+                            fromDb = "DecimalOrZeroFromDb({0})";
+                        }
+                        else if (dalCol.DefaultValue != "null")
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDecimal({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDecimal({{0}})", dalCol.ActualType));
+                        }
+                        else
+                        {
+                            fromDb = "DecimalOrNullFromDb({0})";
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TDouble)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToDouble({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDouble({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDouble({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type == DalColumnType.TFloat)
+                    {
+                        if (!dalCol.IsNullable)
+                        {
+                            fromDb = "Convert.ToSingle({0})";
+                        }
+                        else
+                        {
+                            fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", dalCol.ActualType));
+                        }
+                    }
+                    else if (dalCol.Type != DalColumnType.TDateTime)
+                    {
+                        if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
+                        {
+                            fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                        }
+                        else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                        {
+                            fromReader = "reader.GetGeometry(Columns.{0}) as " + dalCol.ActualType;
+                        }
+                    }
+                    else if (!dalCol.IsNullable)
+                    {
+                        fromDb = "Convert.ToDateTime({0})";
+                    }
+                    else if (dalCol.DefaultValue == "DateTime.UtcNow")
+                    {
+                        fromDb = "DateTimeOrNow({0})";
+                    }
+                    else if (dalCol.DefaultValue != "null")
+                    {
+                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDateTime({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDateTime({{0}})", dalCol.ActualType));
+                    }
+                    else
+                    {
+                        fromDb = "DateTimeOrNullFromDb({0})";
+                    }
+                    if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
+                    {
+                        fromDb = "(" + dalCol.EnumTypeName + ")" + fromDb;
+                    }
+                    if (!string.IsNullOrEmpty(dalCol.FromDb))
+                    {
+                        fromDb = dalCol.FromDb;
+                    }
+                    stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.Name, string.Format(fromDb, string.Format(fromReader, dalCol.Name), dalCol.DefaultValue));
+                }
+                if (!string.IsNullOrEmpty(customAfterRead))
+                {
+                    stringBuilder.AppendFormat("{0}{1}{0}", "\r\n", customAfterRead);
+                }
+                stringBuilder.AppendFormat("{0}IsThisANewRecord = false;}}{0}", "\r\n");
 
-            #endregion
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
-            #region Helpers
+                #endregion
 
-			stringBuilder.AppendFormat("{0}#region Helpers{0}", "\r\n");
-			if (primaryKeyColumns.Count > 0)
-			{
-                // FetchByID(...) function
-				stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", className);
-				bool first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.Append(", ");
-					}
-					else
-					{
-						first = false;
-					}
-					stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-				}
-				stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                #region Helpers
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-					}
-					else
-					{
-						stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
-						first = false;
-					}
-				}
-                stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader()){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", className);
+                stringBuilder.AppendFormat("{0}#region Helpers{0}", "\r\n");
+                if (primaryKeyColumns.Count > 0)
+                {
+                    // FetchByID(...) function
+                    stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", className);
+                    bool first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.Append(", ");
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    }
+                    stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-                // Delete() function
-				stringBuilder.AppendFormat("public static int Delete(", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.Append(", ");
-					}
-					else
-					{
-						first = false;
-					}
-					stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-				}
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                    stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
+                            first = false;
+                        }
+                    }
+                    stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader()){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", className);
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-					}
-					else
-					{
-						stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
-						first = false;
-					}
-				}
-				stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}", "\r\n");
+                    // Delete() function
+                    stringBuilder.AppendFormat("public static int Delete(", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.Append(", ");
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    }
+                    stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-                // FetchByID(ConnectorBase, ...) function
-				stringBuilder.AppendFormat("public static {1} FetchByID(ConnectorBase conn, ", "\r\n", className);
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.Append(", ");
-					}
-					else
-					{
-						first = false;
-					}
-					stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-				}
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                    stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
+                            first = false;
+                        }
+                    }
+                    stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-					}
-					else
-					{
-						stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
-						first = false;
-					}
-				}
-                stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", className);
+                    // FetchByID(ConnectorBase, ...) function
+                    stringBuilder.AppendFormat("public static {1} FetchByID(ConnectorBase conn, ", "\r\n", className);
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.Append(", ");
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    }
+                    stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-                // Delete(ConnectorBase, ...) function
-				stringBuilder.AppendFormat("public static int Delete(ConnectorBase conn, ", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.Append(", ");
-					}
-					else
-					{
-						first = false;
-					}
-					stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-				}
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                    stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
+                            first = false;
+                        }
+                    }
+                    stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", className);
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
-				first = true;
-				foreach (DalColumn dalCol in primaryKeyColumns)
-				{
-					if (!first)
-					{
-						stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-					}
-					else
-					{
-						stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
-						first = false;
-					}
-				}
-				stringBuilder.AppendFormat(";{0}return qry.Execute(conn);{0}}}{0}", "\r\n");
-			}
-			stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+                    // Delete(ConnectorBase, ...) function
+                    stringBuilder.AppendFormat("public static int Delete(ConnectorBase conn, ", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.Append(", ");
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    }
+                    stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-            #endregion
+                    stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
+                            first = false;
+                        }
+                    }
+                    stringBuilder.AppendFormat(";{0}return qry.Execute(conn);{0}}}{0}", "\r\n");
+                }
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
-            // End of class
-            stringBuilder.Append("}");
+                #endregion
 
-            #endregion
+                // End of class
+                stringBuilder.Append("}");
+
+                #endregion
+            }
 
             // Copy result to ClipBoard
 			ClipboardHelper.SetClipboard(stringBuilder.ToString());
