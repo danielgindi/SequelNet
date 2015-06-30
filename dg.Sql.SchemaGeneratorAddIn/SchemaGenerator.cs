@@ -55,7 +55,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
 				string currentLine = splitLines[i];
 				string currentLineTrimmed = currentLine.Trim(new char[] { ' ', '*', '\t' });
 				string currentLineTrimmedUpper = currentLineTrimmed.ToUpper();
-				if (currentLineTrimmedUpper.StartsWith("@INDEX:", StringComparison.Ordinal))
+				if (currentLineTrimmedUpper.StartsWith("@Index:", StringComparison.OrdinalIgnoreCase))
 				{
 					string[] indexArguments = currentLineTrimmed.Substring(7).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -130,7 +130,7 @@ namespace dg.Sql.SchemaGeneratorAddIn
                     }
 					dalIndices.Add(dalIndex);
 				}
-				else if (currentLineTrimmedUpper.StartsWith("@FOREIGNKEY:", StringComparison.Ordinal))
+                else if (currentLineTrimmedUpper.StartsWith("@ForeignKey:", StringComparison.OrdinalIgnoreCase))
 				{
 					string[] foreignKeyArguments = currentLineTrimmed.Substring(12).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -213,23 +213,23 @@ namespace dg.Sql.SchemaGeneratorAddIn
 					}
 					dalForeignKeys.Add(dalForeignKey);
 				}
-				else if (currentLineTrimmedUpper.StartsWith("@BEFOREINSERT:", StringComparison.Ordinal))
+                else if (currentLineTrimmedUpper.StartsWith("@BeforeInsert:", StringComparison.OrdinalIgnoreCase))
 				{
 					customBeforeInsert = currentLineTrimmed.Substring(14).Trim();
 				}
-				else if (currentLineTrimmedUpper.StartsWith("@BEFOREUPDATE:", StringComparison.Ordinal))
+                else if (currentLineTrimmedUpper.StartsWith("@BeforeUpdate:", StringComparison.OrdinalIgnoreCase))
 				{
 					customBeforeUpdate = currentLineTrimmed.Substring(14).Trim();
 				}
-				else if (currentLineTrimmedUpper.StartsWith("@AFTERREAD:", StringComparison.Ordinal))
+                else if (currentLineTrimmedUpper.StartsWith("@AfterRead:", StringComparison.OrdinalIgnoreCase))
 				{
 					customAfterRead = currentLineTrimmed.Substring(11).Trim();
                 }
-                else if (currentLineTrimmedUpper.StartsWith("@STATICCOLUMNS", StringComparison.Ordinal))
+                else if (currentLineTrimmedUpper.StartsWith("@StaticColumns", StringComparison.OrdinalIgnoreCase))
                 {
                     staticColumns = true;
                 }
-				else if (!currentLineTrimmedUpper.StartsWith("@MYSQLENGINE:", StringComparison.Ordinal))
+                else if (!currentLineTrimmedUpper.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
 				{
 					int startPos = currentLineTrimmed.IndexOf(":");
 					DalColumn dalColumn = new DalColumn();
