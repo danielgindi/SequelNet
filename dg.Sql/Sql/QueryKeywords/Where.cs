@@ -79,11 +79,78 @@ namespace dg.Sql
         public Where()
         {
         }
+
+        public Where(WhereList whereList)
+        {
+            First = whereList;
+        }
+
+        public Where(object thisLiteral, WhereComparision comparedBy, object thatLiteral)
+        {
+            Comparision = comparedBy;
+            First = thisLiteral;
+            Second = thatLiteral;
+        }
+
+        public Where(object thisObject, ValueObjectType thisObjectType, WhereComparision comparedBy, object thatObject, ValueObjectType thatObjectType)
+        {
+            Comparision = comparedBy;
+            First = thisObject;
+            FirstType = thisObjectType;
+            Second = thatObject;
+            SecondType = thatObjectType;
+        }
+
+        public Where(object thisLiteral, object betweenThisLiteral, object andThatLiteral)
+        {
+            Comparision = WhereComparision.Between;
+            First = thisLiteral;
+            Second = betweenThisLiteral;
+            Third = andThatLiteral;
+        }
+
+        public Where(object thisObject, ValueObjectType thisObjectType,
+            object betweenThisObject, ValueObjectType betweenThisObjectType,
+            object andThatObject, ValueObjectType andThatObjectType)
+        {
+            Comparision = WhereComparision.Between;
+            First = thisObject;
+            FirstType = thisObjectType;
+            Second = betweenThisObject;
+            SecondType = betweenThisObjectType;
+            Third = andThatObject;
+            ThirdType = andThatObjectType;
+        }
+
+        public Where(string tableName, string columnName,
+            WhereComparision comparedBy, object value)
+        {
+            Comparision = comparedBy;
+            FirstTableName = tableName;
+            First = columnName;
+            FirstType = ValueObjectType.ColumnName;
+            Second = value;
+            SecondType = ValueObjectType.Value;
+        }
+
+        public Where(string tableName, string columnName,
+            WhereComparision comparedBy, string thatTableName, string thatColumnName)
+        {
+            Comparision = comparedBy;
+            FirstTableName = tableName;
+            First = columnName;
+            FirstType = ValueObjectType.ColumnName;
+            SecondTableName = thatTableName;
+            Second = thatColumnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+
         public Where(WhereCondition condition, WhereList whereList)
         {
             Condition = condition;
             First = whereList;
         }
+
         public Where(WhereCondition condition, object thisLiteral, WhereComparision comparedBy, object thatLiteral)
         {
             Condition = condition;
@@ -91,6 +158,7 @@ namespace dg.Sql
             First = thisLiteral;
             Second = thatLiteral;
         }
+
         public Where(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparision comparedBy, object thatObject, ValueObjectType thatObjectType)
         {
             Condition = condition;
@@ -100,6 +168,7 @@ namespace dg.Sql
             Second = thatObject;
             SecondType = thatObjectType;
         }
+
         public Where(WhereCondition condition, object thisLiteral, object betweenThisLiteral, object andThatLiteral)
         {
             Condition = condition;
@@ -108,6 +177,7 @@ namespace dg.Sql
             Second = betweenThisLiteral;
             Third = andThatLiteral;
         }
+
         public Where(WhereCondition condition,
             object thisObject, ValueObjectType thisObjectType,
             object betweenThisObject, ValueObjectType betweenThisObjectType,
@@ -122,8 +192,9 @@ namespace dg.Sql
             Third = andThatObject;
             ThirdType = andThatObjectType;
         }
-        public Where(WhereCondition condition, 
-            string tableName, string columnName, 
+
+        public Where(WhereCondition condition,
+            string tableName, string columnName,
             WhereComparision comparedBy, object value)
         {
             Condition = condition;
@@ -134,7 +205,8 @@ namespace dg.Sql
             Second = value;
             SecondType = ValueObjectType.Value;
         }
-        public Where(WhereCondition condition, 
+
+        public Where(WhereCondition condition,
             string tableName, string columnName,
             WhereComparision comparedBy, string thatTableName, string thatColumnName)
         {
