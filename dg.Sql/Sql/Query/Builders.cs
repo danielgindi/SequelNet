@@ -1206,14 +1206,40 @@ namespace dg.Sql
                             break;
                         case QueryMode.Update:
                             {
+                                bool hasJoins = _ListJoin != null && _ListJoin.Count > 0;
+
                                 sb.Append(@"UPDATE ");
 
-                                if (Schema.DatabaseOwner.Length > 0)
+                                if (hasJoins && 
+                                    (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL || 
+                                    connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS) &&
+                                    _FromExpressionTableAlias != null && _FromExpressionTableAlias.Length > 0)
                                 {
-                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                    sb.Append('.');
+                                    sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                                 }
-                                sb.Append(connection.EncloseFieldName(_SchemaName));
+                                else
+                                {
+                                    if (Schema.DatabaseOwner.Length > 0)
+                                    {
+                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                        sb.Append('.');
+                                    }
+                                    sb.Append(connection.EncloseFieldName(_SchemaName));
+
+                                    if (_FromExpressionTableAlias != null && _FromExpressionTableAlias.Length > 0)
+                                    {
+                                        sb.Append(' ');
+                                        sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                                    }
+                                }
+
+                                if (hasJoins)
+                                {
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                    {
+                                        BuildJoin(sb, connection);
+                                    }
+                                }
 
                                 bFirst = true;
                                 foreach (AssignmentColumn upd in _ListInsertUpdate)
@@ -1243,6 +1269,29 @@ namespace dg.Sql
                                             sb.Append(@".");
                                         }
                                         sb.Append(connection.EncloseFieldName(upd.Second.ToString()));
+                                    }
+                                }
+
+                                if (hasJoins)
+                                {
+                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL || 
+                                        connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
+                                    {
+                                        sb.Append(@" FROM ");
+                                        if (Schema.DatabaseOwner.Length > 0)
+                                        {
+                                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                            sb.Append('.');
+                                        }
+                                        sb.Append(connection.EncloseFieldName(_SchemaName));
+
+                                        if (_FromExpressionTableAlias != null && _FromExpressionTableAlias.Length > 0)
+                                        {
+                                            sb.Append(' ');
+                                            sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                                        }
+
+                                        BuildJoin(sb, connection);
                                     }
                                 }
 
