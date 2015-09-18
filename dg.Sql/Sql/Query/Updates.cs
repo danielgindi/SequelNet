@@ -55,5 +55,23 @@ namespace dg.Sql
         {
             return UpdateFromColumn(tableName, columnName, fromTableName, fromTableColumn);
         }
+
+        public Query UpdateFromOtherColumn(string columnName, string fromColumn)
+        {
+            QueryMode currentMode = this.QueryMode;
+            if (currentMode != QueryMode.Update)
+            {
+                this.QueryMode = QueryMode.Update;
+                if (currentMode != QueryMode.Insert &&
+                    currentMode != QueryMode.InsertOrUpdate &&
+                    _ListInsertUpdate != null)
+                {
+                    if (_ListInsertUpdate != null) _ListInsertUpdate.Clear();
+                }
+            }
+            if (_ListInsertUpdate == null) _ListInsertUpdate = new AssignmentColumnList();
+            _ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, fromColumn, ValueObjectType.ColumnName));
+            return this;
+        }
     }
 }
