@@ -32,7 +32,7 @@ namespace dg.Sql
             return this;
         }
 
-        public Query UpdateFromOtherColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
+        public Query UpdateFromColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
         {
             QueryMode currentMode = this.QueryMode;
             if (currentMode != QueryMode.Update)
@@ -48,6 +48,12 @@ namespace dg.Sql
             if (_ListInsertUpdate == null) _ListInsertUpdate = new AssignmentColumnList();
             _ListInsertUpdate.Add(new AssignmentColumn(tableName, columnName, fromTableName, fromTableColumn, ValueObjectType.ColumnName));
             return this;
+        }
+
+        [ObsoleteAttribute("This method is deprecated. Use UpdateFromColumn() instead.")]
+        public Query UpdateFromOtherColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
+        {
+            return UpdateFromColumn(tableName, columnName, fromTableName, fromTableColumn);
         }
     }
 }
