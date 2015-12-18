@@ -58,6 +58,12 @@ namespace dg.Sql
             }
         }
 
+        public WhereList ClearWhere()
+        {
+            this.Clear();
+            return this;
+        }
+
         public WhereList Where(string columnName, object columnValue)
         {
             this.Clear();
