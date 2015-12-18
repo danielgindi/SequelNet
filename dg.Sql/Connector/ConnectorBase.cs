@@ -370,5 +370,50 @@ namespace dg.Sql.Connector
         public virtual string type_GEOGRAPHIC_MULTISURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
         
         #endregion
+
+        #region DB Mutex
+
+        public enum SqlMutexOwner
+        {
+            /// <summary>
+            /// Used to declare the mutex owned by the session, and expires when the session ends.
+            /// </summary>
+            Session,
+
+            /// <summary>
+            /// Used to declare the mutex owned by the transaction, and expires when the transaction ends.
+            /// If <value>Transaction</value> is specified, then the lock must be acquired within a transaction.
+            /// 
+            /// * Not supported by MySql
+            /// </summary>
+            Transaction
+        }
+
+        /// <summary>
+        /// Creates a mutex on the DB server.
+        /// </summary>
+        /// <param name="lockName">Unique name for the lock</param>
+        /// <param name="owner">The owner of the lock. Partial support in different db servers.</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="dbPrincipal">The user that has permissions to the lock.</param>
+        /// <returns><value>true</value> if the lock was acquired, <value>false</value> if failed or timed out.</returns>
+        public virtual bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            throw new NotImplementedException(@"GetLock");
+        }
+
+        /// <summary>
+        /// Releases a mutex on the DB server.
+        /// </summary>
+        /// <param name="lockName">Unique name for the lock</param>
+        /// <param name="owner">The owner of the lock. Partial support in different db servers.</param>
+        /// <param name="dbPrincipal">The user that has permissions to the lock.</param>
+        /// <returns><value>true</value> if the lock was release, <value>false</value> if failed, not exists or timed out.</returns>
+        public virtual bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            throw new NotImplementedException(@"ReleaseLock");
+        }
+
+        #endregion
     }
 }

@@ -6,6 +6,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using dg.Sql.Sql.Spatial;
+using System.Globalization;
 
 namespace dg.Sql.Connector
 {
@@ -508,6 +509,40 @@ namespace dg.Sql.Connector
         public override string type_GEOGRAPHIC_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
         public override string type_GEOGRAPHIC_MULTICURVE { get { return @"MULTICURVE"; } }
         public override string type_GEOGRAPHIC_MULTISURFACE { get { return @"MULTISURFACE"; } }
+
+        #endregion
+
+        #region DB Mutex
+
+        public virtual bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            object sqlLock = ExecuteScalar(string.Format("SELECT GET_LOCK('{0}', {1})",
+                EscapeString(lockName), (timeout == TimeSpan.MaxValue ? "-1" : timeout.TotalSeconds.ToString(CultureInfo.InvariantCulture))));
+
+            if (sqlLock == null || 
+                sqlLock == DBNull.Value || 
+                (sqlLock is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)sqlLock).IsNull) ||
+                Convert.ToInt32(sqlLock) != 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            object sqlLock = ExecuteScalar(@"SELECT RELEASE_LOCK('" + EscapeString(lockName) + "')");
+            if (sqlLock == null ||
+                sqlLock == DBNull.Value ||
+                (sqlLock is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)sqlLock).IsNull) ||
+                Convert.ToInt32(sqlLock) != 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
     }

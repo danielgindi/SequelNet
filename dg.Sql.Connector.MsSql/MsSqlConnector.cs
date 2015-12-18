@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Data.Common;
 using dg.Sql.Sql.Spatial;
+using System.Globalization;
 
 namespace dg.Sql.Connector
 {
@@ -455,6 +456,71 @@ namespace dg.Sql.Connector
         public override string type_GEOGRAPHIC_MULTIPOLYGON { get { return @"GEOGRAPHIC"; } }
         public override string type_GEOGRAPHIC_MULTICURVE { get { return @"GEOGRAPHIC"; } }
         public override string type_GEOGRAPHIC_MULTISURFACE { get { return @"GEOGRAPHIC"; } }
+
+        #endregion
+
+        #region DB Mutex
+
+        public virtual bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            string ownerString = "Session";
+            switch (owner)
+            {
+                case SqlMutexOwner.Transaction:
+                    ownerString = "Transaction";
+                    break;
+            }
+
+            SqlCommand sqlCommand = new SqlCommand("sp_getapplock", _Connection);
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+            sqlCommand.CommandTimeout = (int)Math.Ceiling(timeout.TotalSeconds);
+
+            sqlCommand.Parameters.AddWithValue("Resource", lockName);
+            sqlCommand.Parameters.AddWithValue("LockOwner", ownerString);
+            sqlCommand.Parameters.AddWithValue("LockMode", "Exclusive");
+            sqlCommand.Parameters.AddWithValue("LockTimeout", (Int32)timeout.TotalMilliseconds);
+            sqlCommand.Parameters.AddWithValue("DbPrincipal", dbPrincipal ?? "public");
+
+            SqlParameter returnValue = sqlCommand.Parameters.Add("ReturnValue", SqlDbType.Int);
+            returnValue.Direction = ParameterDirection.ReturnValue;
+            sqlCommand.ExecuteNonQuery();
+
+            if (Convert.ToInt32(returnValue.Value) < 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            string ownerString = "Session";
+            switch (owner)
+            {
+                case SqlMutexOwner.Transaction:
+                    ownerString = "Transaction";
+                    break;
+            }
+
+            SqlCommand sqlCommand = new SqlCommand("sp_releaseapplock", _Connection);
+            sqlCommand.CommandType = CommandType.StoredProcedure;
+
+            sqlCommand.Parameters.AddWithValue("Resource", lockName);
+            sqlCommand.Parameters.AddWithValue("LockOwner", ownerString);
+            sqlCommand.Parameters.AddWithValue("DbPrincipal", dbPrincipal ?? "public");
+
+            SqlParameter returnValue = sqlCommand.Parameters.Add("ReturnValue", SqlDbType.Int);
+            returnValue.Direction = ParameterDirection.ReturnValue;
+            sqlCommand.ExecuteNonQuery();
+
+            if (Convert.ToInt32(returnValue.Value) < 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
         #endregion
     }
