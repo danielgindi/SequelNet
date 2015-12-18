@@ -263,17 +263,41 @@ namespace dg.Sql
         /// <param name="Connection">A connector to use. Mandatory.</param>
         public static void PrepareColumnValue(TableSchema.Column ColumnDefinition, object Value, StringBuilder OutputBuilder, ConnectorBase Connection)
         {
-            if (ColumnDefinition == null)
-            {
-                OutputBuilder.Append(Connection.PrepareValue(Value));
-                return;
-            }
             if (Value == null)
             {
                 OutputBuilder.Append(@"NULL");
                 return;
             }
-            else if (Value.GetType() != ColumnDefinition.Type)
+
+            if (Value is dg.Sql.IPhrase)
+            {
+                // Output the complete phrase
+
+                OutputBuilder.Append(((dg.Sql.IPhrase)Value).BuildPhrase(Connection));
+
+                return;
+            }
+
+            if (Value is dg.Sql.Query)
+            {
+                // Output a properly wrapped query
+
+                OutputBuilder.Append("(" + ((dg.Sql.Query)Value).BuildCommand(Connection) + ")");
+
+                return;
+            }
+
+            if (ColumnDefinition == null)
+            {
+                // No definition to match against,
+                // so just prepare the value as it is, output it and return
+
+                OutputBuilder.Append(Connection.PrepareValue(Value));
+
+                return;
+            }
+
+            if (Value.GetType() != ColumnDefinition.Type)
             {
                 if (Value is string)
                 {
@@ -374,11 +398,6 @@ namespace dg.Sql
                         }
                         catch { }
                     }
-                    else if (Value is dg.Sql.IPhrase)
-                    {
-                        OutputBuilder.Append(((dg.Sql.IPhrase)Value).BuildPhrase(Connection));
-                        return;
-                    }
                 }
             }
             else if (Value is string)
@@ -405,6 +424,7 @@ namespace dg.Sql
                 }
                 catch { }
             }
+
             OutputBuilder.Append(Connection.PrepareValue(Value));
         }
 
