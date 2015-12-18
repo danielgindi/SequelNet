@@ -119,16 +119,6 @@ namespace dg.Sql
             return Where(new Where(condition, whereList), false);
         }
 
-        public Query AddWhere(WhereList whereList)
-        {
-            if (_ListWhere == null) _ListWhere = new WhereList();
-            foreach (Where where in whereList)
-            {
-                _ListWhere.Add(where);
-            }
-            return this;
-        }
-
         public Query AddWhere(string tableName, string columnName, WhereComparision comparison, object value)
         {
             if (_ListWhere == null) _ListWhere = new WhereList();
@@ -247,6 +237,16 @@ namespace dg.Sql
         {
             Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
             return Where(where, false);
+        }
+
+        public Query AddFromList(WhereList whereList)
+        {
+            if (_ListWhere == null) _ListWhere = new WhereList();
+            foreach (Where where in whereList)
+            {
+                _ListWhere.Add(where);
+            }
+            return this;
         }
     }
 }

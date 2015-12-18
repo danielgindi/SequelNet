@@ -262,5 +262,14 @@ namespace dg.Sql
             this.Add(where);
             return this;
         }
+
+        public WhereList AddFromList(WhereList whereList)
+        {
+            foreach (Where where in whereList)
+            {
+                this.Add(where);
+            }
+            return this;
+        }
     }
 }
