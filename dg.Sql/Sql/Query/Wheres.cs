@@ -31,28 +31,57 @@ namespace dg.Sql
             return this;
         }
 
+        public Query Where(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            return Where(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType), true);
+        }
+
         public Query Where(string columnName, object value)
         {
-            if (_ListWhere == null) _ListWhere = new WhereList();
-            _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value));
-            return this;
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), true);
         }
 
         public Query Where(string columnName, WhereComparision comparison, object value)
         {
-            if (_ListWhere == null) _ListWhere = new WhereList();
-            _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value));
-            return this;
+            return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), true);
+        }
+
+        public Query Where(string literalExpression)
+        {
+            return Where(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal), true);
+        }
+
+        public Query Where(IPhrase phrase)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal), true);
+        }
+
+        public Query Where(WhereList whereList)
+        {
+            return Where(new Where(WhereCondition.AND, whereList), true);
         }
 
         public Query Where(string tableName, string columnName, WhereComparision comparison, object value)
         {
-            if (_ListWhere == null) _ListWhere = new WhereList();
-            _ListWhere.Clear();
-            _ListWhere.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, value));
-            return this;
+            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, value), true);
+        }
+
+        public Query Where(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            return Where(new Where(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName), true);
+        }
+
+        public Query Where(string tableName, string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
+            return Where(where, true);
+        }
+
+        public Query Where(string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            return Where(where, true);
         }
 
         public Query AddWhere(Where where)
@@ -114,6 +143,11 @@ namespace dg.Sql
             return this;
         }
 
+        public Query AND(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            return Where(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType), false);
+        }
+
         public Query AND(string columnName, object value)
         {
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
@@ -122,6 +156,16 @@ namespace dg.Sql
         public Query AND(string columnName, WhereComparision comparison, object value)
         {
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), false);
+        }
+
+        public Query AND(string literalExpression)
+        {
+            return Where(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal), false);
+        }
+
+        public Query AND(IPhrase phrase)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal), false);
         }
 
         public Query AND(WhereList whereList)
@@ -152,6 +196,11 @@ namespace dg.Sql
             return Where(where, false);
         }
 
+        public Query OR(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            return Where(new Where(WhereCondition.OR, thisObject, thisObjectType, comparison, thatObject, thatObjectType), false);
+        }
+
         public Query OR(string columnName, object value)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value), false);
@@ -160,6 +209,16 @@ namespace dg.Sql
         public Query OR(string columnName, WhereComparision comparison, object value)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value), false);
+        }
+
+        public Query OR(string literalExpression)
+        {
+            return Where(new Where(WhereCondition.OR, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal), false);
+        }
+
+        public Query OR(IPhrase phrase)
+        {
+            return Where(new Where(WhereCondition.OR, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal), false);
         }
 
         public Query OR(WhereList whereList)

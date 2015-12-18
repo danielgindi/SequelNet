@@ -64,6 +64,13 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList Where(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            this.Clear();
+            this.Add(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
+            return this;
+        }
+
         public WhereList Where(string columnName, object columnValue)
         {
             this.Clear();
@@ -78,6 +85,20 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList Where(string literalExpression)
+        {
+            this.Clear();
+            this.Add(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
+        public WhereList Where(IPhrase phrase)
+        {
+            this.Clear();
+            this.Add(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
         public WhereList Where(WhereList whereList)
         {
             this.Clear();
@@ -89,6 +110,13 @@ namespace dg.Sql
         {
             this.Clear();
             this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
+            return this;
+        }
+
+        public WhereList Where(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            this.Clear();
+            this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName));
             return this;
         }
 
@@ -109,6 +137,12 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList AND(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            this.Add(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
+            return this;
+        }
+
         public WhereList AND(string columnName, object columnValue)
         {
             this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
@@ -121,6 +155,18 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList AND(string literalExpression)
+        {
+            this.Add(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
+        public WhereList AND(IPhrase phrase)
+        {
+            this.Add(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
         public WhereList AND(WhereList whereList)
         {
             this.Add(new Where(WhereCondition.AND, whereList));
@@ -130,6 +176,12 @@ namespace dg.Sql
         public WhereList AND(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, columnValue));
+            return this;
+        }
+
+        public WhereList AND(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            this.Add(new Where(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName));
             return this;
         }
 
@@ -148,6 +200,12 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList OR(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            this.Add(new Where(WhereCondition.OR, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
+            return this;
+        }
+
         public WhereList OR(string columnName, object columnValue)
         {
             this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, columnValue, ValueObjectType.Value));
@@ -160,6 +218,18 @@ namespace dg.Sql
             return this;
         }
 
+        public WhereList OR(string literalExpression)
+        {
+            this.Add(new Where(WhereCondition.OR, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
+        public WhereList OR(IPhrase phrase)
+        {
+            this.Add(new Where(WhereCondition.OR, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal));
+            return this;
+        }
+
         public WhereList OR(WhereList whereList)
         {
             this.Add(new Where(WhereCondition.OR, whereList));
@@ -169,6 +239,12 @@ namespace dg.Sql
         public WhereList OR(string tableName, string columnName, WhereComparision comparison, object columnValue)
         {
             this.Add(new Where(WhereCondition.OR, tableName, columnName, comparison, columnValue));
+            return this;
+        }
+
+        public WhereList OR(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        {
+            this.Add(new Where(WhereCondition.OR, tableName, columnName, comparison, otherTableName, otherColumnName));
             return this;
         }
 
