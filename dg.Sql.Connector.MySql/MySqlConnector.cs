@@ -514,7 +514,7 @@ namespace dg.Sql.Connector
 
         #region DB Mutex
 
-        public virtual bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        public override bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
         {
             object sqlLock = ExecuteScalar(string.Format("SELECT GET_LOCK('{0}', {1})",
                 EscapeString(lockName), (timeout == TimeSpan.MaxValue ? "-1" : timeout.TotalSeconds.ToString(CultureInfo.InvariantCulture))));
@@ -530,7 +530,7 @@ namespace dg.Sql.Connector
             return true;
         }
 
-        public bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        public override bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
         {
             object sqlLock = ExecuteScalar(@"SELECT RELEASE_LOCK('" + EscapeString(lockName) + "')");
             if (sqlLock == null ||

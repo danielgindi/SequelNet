@@ -461,7 +461,7 @@ namespace dg.Sql.Connector
 
         #region DB Mutex
 
-        public virtual bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        public override bool GetLock(string lockName, TimeSpan timeout, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
         {
             string ownerString = "Session";
             switch (owner)
@@ -493,7 +493,7 @@ namespace dg.Sql.Connector
             return true;
         }
 
-        public bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        public override bool ReleaseLock(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
         {
             string ownerString = "Session";
             switch (owner)
