@@ -484,7 +484,8 @@ namespace dg.Sql
         {
             get
             {
-                return _ListInsertUpdate.Count > 0 && (
+                return _ListInsertUpdate != null &&
+                    _ListInsertUpdate.Count > 0 && (
                   _QueryMode == QueryMode.Insert ||
                   _QueryMode == QueryMode.Update ||
                   _QueryMode == QueryMode.InsertOrUpdate);
