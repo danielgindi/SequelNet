@@ -58,15 +58,11 @@ namespace dg.Sql
             {
                 throw new Exception("The Schema Table you passed in has no columns");
             }
-            _ListSelect = new SelectColumnList();
-            _ListSelect.Add(new SelectColumn(@"*", true));
         }
         public Query(string SchemaName)
         {
             this.Schema = new TableSchema(SchemaName, null);
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
-            _ListSelect = new SelectColumnList();
-            _ListSelect.Add(new SelectColumn(@"*", true));
         }
         public Query(object FromExpression, string FromExpressionTableAlias)
         {
@@ -81,8 +77,6 @@ namespace dg.Sql
             {
                 throw new Exception("The Alias you passed in is null.");
             }
-            _ListSelect = new SelectColumnList();
-            _ListSelect.Add(new SelectColumn(@"*", true));
         }
 
         public static Query New<T>() where T : AbstractRecord<T>, new()
@@ -116,25 +110,41 @@ namespace dg.Sql
 
         public Query ClearSelect()
         {
-            if (_ListSelect != null) _ListSelect.Clear();
+            if (_ListSelect != null)
+            {
+                _ListSelect.Clear();
+            }
             return this;
         }
+
         public Query ClearOrderBy()
         {
-            if (_ListOrderBy != null) _ListOrderBy.Clear();
+            if (_ListOrderBy != null)
+            {
+                _ListOrderBy.Clear();
+            }
             return this;
         }
+
         public Query ClearGroupBy()
         {
-            if (_ListGroupBy != null) _ListGroupBy.Clear();
+            if (_ListGroupBy != null)
+            {
+                _ListGroupBy.Clear();
+            }
             return this;
         }
+
         public Query ClearInsertAndUpdate()
         {
-            if (_ListInsertUpdate != null) _ListInsertUpdate.Clear();
+            if (_ListInsertUpdate != null)
+            {
+                _ListInsertUpdate.Clear();
+            }
             InsertExpression = null;
             return this;
         }
+
         public Query ClearStoredProcedureParameters()
         {
             _StoredProcedureParameters = null;

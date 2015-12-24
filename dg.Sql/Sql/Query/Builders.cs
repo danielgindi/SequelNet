@@ -918,8 +918,6 @@ namespace dg.Sql
                     {
                         case QueryMode.Select:
                             {
-                                if (_ListSelect.Count == 0) _ListSelect.Add(new SelectColumn(@"*", true));
-
                                 if (Offset > 0 && 
                                     connection.TYPE == ConnectorBase.SqlServiceType.MSSQL &&
                                     !connection.SupportsSelectPaging())
@@ -954,77 +952,85 @@ namespace dg.Sql
                                         sb.Append(' ');
                                     }
 
-                                    bFirst = true;
-                                    foreach (SelectColumn sel in _ListSelect)
+                                    if (_ListSelect == null || _ListSelect.Count == 0)
                                     {
-                                        if (bFirst) bFirst = false;
-                                        else sb.Append(',');
-                                        if (sel.ObjectType == ValueObjectType.Value)
+                                        sb.Append("*");
+                                    }
+                                    else
+                                    {
+                                        bFirst = true;
+                                        foreach (SelectColumn sel in _ListSelect)
                                         {
-                                            if (sel.Value is Query)
-                                            {
-                                                sb.Append('(');
-                                                sb.Append(((Query)sel.Value).BuildCommand(connection));
-                                                sb.Append(')');
-                                            }
-                                            else
-                                            {
-                                                sb.Append(connection.PrepareValue(sel.Value));
-                                            }
+                                            if (bFirst) bFirst = false;
+                                            else sb.Append(',');
 
-                                            if (!string.IsNullOrEmpty(sel.Alias))
+                                            if (sel.ObjectType == ValueObjectType.Value)
                                             {
-                                                sb.Append(@" AS ");
-                                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                if (sel.Value is Query)
+                                                {
+                                                    sb.Append('(');
+                                                    sb.Append(((Query)sel.Value).BuildCommand(connection));
+                                                    sb.Append(')');
+                                                }
+                                                else
+                                                {
+                                                    sb.Append(connection.PrepareValue(sel.Value));
+                                                }
+
+                                                if (!string.IsNullOrEmpty(sel.Alias))
+                                                {
+                                                    sb.Append(@" AS ");
+                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                }
                                             }
-                                        }
-                                        else if (sel.ObjectType == ValueObjectType.Literal)
-                                        {
-                                            if (string.IsNullOrEmpty(sel.Alias))
+                                            else if (sel.ObjectType == ValueObjectType.Literal)
                                             {
-                                                sb.Append(sel.ColumnName);
+                                                if (string.IsNullOrEmpty(sel.Alias))
+                                                {
+                                                    sb.Append(sel.ColumnName);
+                                                }
+                                                else
+                                                {
+                                                    sb.Append(sel.ColumnName);
+                                                    sb.Append(@" AS ");
+                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                }
                                             }
                                             else
                                             {
-                                                sb.Append(sel.ColumnName);
-                                                sb.Append(@" AS ");
-                                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                                            }
-                                        }
-                                        else
-                                        {
-                                            if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                                            {
-                                                if (Schema != null)
+                                                if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
                                                 {
-                                                    if (Schema.DatabaseOwner.Length > 0)
+                                                    if (Schema != null)
                                                     {
-                                                        sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                                        if (Schema.DatabaseOwner.Length > 0)
+                                                        {
+                                                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                                            sb.Append('.');
+                                                        }
+                                                        sb.Append(connection.EncloseFieldName(_SchemaName));
+                                                    }
+                                                    else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                                                    sb.Append('.');
+                                                    sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                                                    if (!string.IsNullOrEmpty(sel.Alias))
+                                                    {
+                                                        sb.Append(@" AS ");
+                                                        sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    if (!string.IsNullOrEmpty(sel.TableName))
+                                                    {
+                                                        sb.Append(connection.EncloseFieldName(sel.TableName));
                                                         sb.Append('.');
                                                     }
-                                                    sb.Append(connection.EncloseFieldName(_SchemaName));
-                                                }
-                                                else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                                                sb.Append('.');
-                                                sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                                                if (!string.IsNullOrEmpty(sel.Alias))
-                                                {
-                                                    sb.Append(@" AS ");
-                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (!string.IsNullOrEmpty(sel.TableName))
-                                                {
-                                                    sb.Append(connection.EncloseFieldName(sel.TableName));
-                                                    sb.Append('.');
-                                                }
-                                                sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                                                if (!string.IsNullOrEmpty(sel.Alias))
-                                                {
-                                                    sb.Append(@" AS ");
-                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                    sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                                                    if (!string.IsNullOrEmpty(sel.Alias))
+                                                    {
+                                                        sb.Append(@" AS ");
+                                                        sb.Append(connection.EncloseFieldName(sel.Alias));
+                                                    }
                                                 }
                                             }
                                         }
@@ -1748,77 +1754,84 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            bool bFirst = true;
-            foreach (SelectColumn sel in _ListSelect)
+            if (_ListSelect == null || _ListSelect.Count == 0)
             {
-                if (bFirst) bFirst = false;
-                else sb.Append(',');
-                if (sel.ObjectType == ValueObjectType.Value)
+                sb.Append("*");
+            }
+            else
+            {
+                bool bFirst = true;
+                foreach (SelectColumn sel in _ListSelect)
                 {
-                    if (sel.Value is Query)
+                    if (bFirst) bFirst = false;
+                    else sb.Append(',');
+                    if (sel.ObjectType == ValueObjectType.Value)
                     {
-                        sb.Append('(');
-                        sb.Append(((Query)sel.Value).BuildCommand(connection));
-                        sb.Append(')');
-                    }
-                    else
-                    {
-                        sb.Append(connection.PrepareValue(sel.Value));
-                    }
-
-                    if (!string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else if (sel.ObjectType == ValueObjectType.Literal)
-                {
-                    if (string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(sel.ColumnName);
-                    }
-                    else
-                    {
-                        sb.Append(sel.ColumnName);
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else
-                {
-                    if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                    {
-                        if (Schema != null)
+                        if (sel.Value is Query)
                         {
-                            if (Schema.DatabaseOwner.Length > 0)
+                            sb.Append('(');
+                            sb.Append(((Query)sel.Value).BuildCommand(connection));
+                            sb.Append(')');
+                        }
+                        else
+                        {
+                            sb.Append(connection.PrepareValue(sel.Value));
+                        }
+
+                        if (!string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else if (sel.ObjectType == ValueObjectType.Literal)
+                    {
+                        if (string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(sel.ColumnName);
+                        }
+                        else
+                        {
+                            sb.Append(sel.ColumnName);
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else
+                    {
+                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
+                        {
+                            if (Schema != null)
                             {
-                                sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                if (Schema.DatabaseOwner.Length > 0)
+                                {
+                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                    sb.Append('.');
+                                }
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
+                            }
+                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                            sb.Append('.');
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(sel.TableName))
+                            {
+                                sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(connection.EncloseFieldName(_SchemaName));
-                        }
-                        else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                        sb.Append('.');
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(sel.TableName))
-                        {
-                            sb.Append(connection.EncloseFieldName(sel.TableName));
-                            sb.Append('.');
-                        }
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
                         }
                     }
                 }
@@ -1896,77 +1909,84 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            bool bFirst = true;
-            foreach (SelectColumn sel in _ListSelect)
+            if (_ListSelect == null || _ListSelect.Count == 0)
             {
-                if (bFirst) bFirst = false;
-                else sb.Append(',');
-                if (sel.ObjectType == ValueObjectType.Value)
+                sb.Append("*");
+            }
+            else
+            {
+                bool bFirst = true;
+                foreach (SelectColumn sel in _ListSelect)
                 {
-                    if (sel.Value is Query)
+                    if (bFirst) bFirst = false;
+                    else sb.Append(',');
+                    if (sel.ObjectType == ValueObjectType.Value)
                     {
-                        sb.Append('(');
-                        sb.Append(((Query)sel.Value).BuildCommand(connection));
-                        sb.Append(')');
-                    }
-                    else
-                    {
-                        sb.Append(connection.PrepareValue(sel.Value));
-                    }
-
-                    if (!string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else if (sel.ObjectType == ValueObjectType.Literal)
-                {
-                    if (string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(sel.ColumnName);
-                    }
-                    else
-                    {
-                        sb.Append(sel.ColumnName);
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else
-                {
-                    if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                    {
-                        if (Schema != null)
+                        if (sel.Value is Query)
                         {
-                            if (Schema.DatabaseOwner.Length > 0)
+                            sb.Append('(');
+                            sb.Append(((Query)sel.Value).BuildCommand(connection));
+                            sb.Append(')');
+                        }
+                        else
+                        {
+                            sb.Append(connection.PrepareValue(sel.Value));
+                        }
+
+                        if (!string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else if (sel.ObjectType == ValueObjectType.Literal)
+                    {
+                        if (string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(sel.ColumnName);
+                        }
+                        else
+                        {
+                            sb.Append(sel.ColumnName);
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else
+                    {
+                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
+                        {
+                            if (Schema != null)
                             {
-                                sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                if (Schema.DatabaseOwner.Length > 0)
+                                {
+                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                    sb.Append('.');
+                                }
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
+                            }
+                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                            sb.Append('.');
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(sel.TableName))
+                            {
+                                sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(connection.EncloseFieldName(_SchemaName));
-                        }
-                        else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                        sb.Append('.');
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(sel.TableName))
-                        {
-                            sb.Append(connection.EncloseFieldName(sel.TableName));
-                            sb.Append('.');
-                        }
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
                         }
                     }
                 }
@@ -2027,77 +2047,84 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            bool bFirst = true;
-            foreach (SelectColumn sel in _ListSelect)
+            if (_ListSelect == null || _ListSelect.Count == 0)
             {
-                if (bFirst) bFirst = false;
-                else sb.Append(',');
-                if (sel.ObjectType == ValueObjectType.Value)
+                sb.Append("*");
+            }
+            else
+            {
+                bool bFirst = true;
+                foreach (SelectColumn sel in _ListSelect)
                 {
-                    if (sel.Value is Query)
+                    if (bFirst) bFirst = false;
+                    else sb.Append(',');
+                    if (sel.ObjectType == ValueObjectType.Value)
                     {
-                        sb.Append('(');
-                        sb.Append(((Query)sel.Value).BuildCommand(connection));
-                        sb.Append(')');
-                    }
-                    else
-                    {
-                        sb.Append(connection.PrepareValue(sel.Value));
-                    }
-
-                    if (!string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else if (sel.ObjectType == ValueObjectType.Literal)
-                {
-                    if (string.IsNullOrEmpty(sel.Alias))
-                    {
-                        sb.Append(sel.ColumnName);
-                    }
-                    else
-                    {
-                        sb.Append(sel.ColumnName);
-                        sb.Append(@" AS ");
-                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                    }
-                }
-                else
-                {
-                    if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                    {
-                        if (Schema != null)
+                        if (sel.Value is Query)
                         {
-                            if (Schema.DatabaseOwner.Length > 0)
+                            sb.Append('(');
+                            sb.Append(((Query)sel.Value).BuildCommand(connection));
+                            sb.Append(')');
+                        }
+                        else
+                        {
+                            sb.Append(connection.PrepareValue(sel.Value));
+                        }
+
+                        if (!string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else if (sel.ObjectType == ValueObjectType.Literal)
+                    {
+                        if (string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(sel.ColumnName);
+                        }
+                        else
+                        {
+                            sb.Append(sel.ColumnName);
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else
+                    {
+                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
+                        {
+                            if (Schema != null)
                             {
-                                sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                if (Schema.DatabaseOwner.Length > 0)
+                                {
+                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                    sb.Append('.');
+                                }
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
+                            }
+                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                            sb.Append('.');
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(sel.TableName))
+                            {
+                                sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(connection.EncloseFieldName(_SchemaName));
-                        }
-                        else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                        sb.Append('.');
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(sel.TableName))
-                        {
-                            sb.Append(connection.EncloseFieldName(sel.TableName));
-                            sb.Append('.');
-                        }
-                        sb.Append(connection.EncloseFieldName(sel.ColumnName));
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                            sb.Append(connection.EncloseFieldName(sel.ColumnName));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
                         }
                     }
                 }

@@ -9,11 +9,17 @@ namespace dg.Sql
 {
     public partial class Query
     {
+        /// <summary>
+        /// Changes query type to SELECT.
+        /// If the query type was not already SELECT, then existing selects will be cleared.
+        /// If the query type was already SELECT, then this is a No-op.
+        /// </summary>
+        /// <returns></returns>
         public Query Select()
         {
             if (this.QueryMode != QueryMode.Select)
             {
-                return Select(@"*", true, true);
+                return ClearSelect();
             }
             return this;
         }
@@ -27,7 +33,7 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query SelectAll()
         {
-            return Select(@"*", true, true);
+            return ClearSelect();
         }
 
         /// <summary>
