@@ -546,7 +546,10 @@ namespace dg.Sql
                 bool oldIsDistinct = IsDistinct;
                 IsDistinct = false;
 
-                if (_ListSelect.Count == 1 && _ListSelect[0].ObjectType == ValueObjectType.Literal && _ListSelect[0].ColumnName == "*")
+                if (_ListSelect == null ||
+                    (_ListSelect.Count == 1 &&
+                    _ListSelect[0].ObjectType == ValueObjectType.Literal && 
+                    _ListSelect[0].ColumnName == "*"))
                 {
                     _ListSelect = new SelectColumnList();
                 }
@@ -577,7 +580,8 @@ namespace dg.Sql
                         schemaName += connection.EncloseFieldName(_SchemaName);
                     }
                 }
-                SelectColumn select = new SelectColumn(aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + (columnName == "*" ? columnName : (schemaName + "." + connection.EncloseFieldName(columnName))) + @")", true);
+                SelectColumn select = new SelectColumn(aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
+                    (columnName == "*" ? columnName : (schemaName + "." + connection.EncloseFieldName(columnName))) + @")", true);
                 _ListSelect.Insert(0, select);
 
                 object ret = ExecuteScalar(connection);
