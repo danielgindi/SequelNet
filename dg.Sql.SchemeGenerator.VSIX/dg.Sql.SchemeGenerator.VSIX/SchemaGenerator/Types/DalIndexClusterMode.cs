@@ -1,6 +1,6 @@
 using System;
 
-namespace dg.Sql.SchemaGeneratorAddIn
+namespace dg.Sql.SchemaGenerator
 {
 	public enum DalIndexClusterMode
 	{

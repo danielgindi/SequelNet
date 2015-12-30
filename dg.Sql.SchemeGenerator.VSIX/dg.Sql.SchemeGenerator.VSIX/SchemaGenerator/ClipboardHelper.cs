@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace dg.Sql.SchemaGeneratorAddIn
+namespace dg.Sql.SchemaGenerator
 {
 	public static class ClipboardHelper
 	{
