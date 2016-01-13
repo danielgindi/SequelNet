@@ -1451,194 +1451,194 @@ namespace dg.Sql.SchemaGenerator
 
         private static void WriteSchemaAddColumnArguments(DalColumn dalCol, StringBuilder stringBuilder)
         {
-            string actualType = dalCol.ActualType;
+            string customActualType = dalCol.ActualType;
 
             if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
             {
-                actualType = dalCol.EnumTypeName;
+                dalCol.ActualType = dalCol.EnumTypeName;
             }
             else if (dalCol.Type == DalColumnType.TBool)
             {
-                actualType = "bool";
+                dalCol.ActualType = "bool";
             }
             else if (dalCol.Type == DalColumnType.TGuid)
             {
-                actualType = "Guid";
+                dalCol.ActualType = "Guid";
             }
             else if (dalCol.Type == DalColumnType.TDateTime)
             {
-                actualType = "DateTime";
+                dalCol.ActualType = "DateTime";
             }
             else if (dalCol.Type == DalColumnType.TInt)
             {
-                actualType = "int";
+                dalCol.ActualType = "int";
             }
             else if (dalCol.Type == DalColumnType.TInt8)
             {
-                actualType = "SByte";
+                dalCol.ActualType = "SByte";
             }
             else if (dalCol.Type == DalColumnType.TInt16)
             {
-                actualType = "Int16";
+                dalCol.ActualType = "Int16";
             }
             else if (dalCol.Type == DalColumnType.TInt32)
             {
-                actualType = "Int32";
+                dalCol.ActualType = "Int32";
             }
             else if (dalCol.Type == DalColumnType.TInt64)
             {
-                actualType = "Int64";
+                dalCol.ActualType = "Int64";
             }
             else if (dalCol.Type == DalColumnType.TUInt8)
             {
-                actualType = "Byte";
+                dalCol.ActualType = "Byte";
             }
             else if (dalCol.Type == DalColumnType.TUInt16)
             {
-                actualType = "UInt16";
+                dalCol.ActualType = "UInt16";
             }
             else if (dalCol.Type == DalColumnType.TUInt32)
             {
-                actualType = "UInt32";
+                dalCol.ActualType = "UInt32";
             }
             else if (dalCol.Type == DalColumnType.TUInt64)
             {
-                actualType = "UInt64";
+                dalCol.ActualType = "UInt64";
             }
             else if (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TFixedString)
             {
-                actualType = "string";
+                dalCol.ActualType = "string";
             }
             else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
             {
-                actualType = "decimal";
+                dalCol.ActualType = "decimal";
             }
             else if (dalCol.Type == DalColumnType.TDouble)
             {
-                actualType = "double";
+                dalCol.ActualType = "double";
             }
             else if (dalCol.Type == DalColumnType.TFloat)
             {
-                actualType = "float";
+                dalCol.ActualType = "float";
             }
             else if (dalCol.Type == DalColumnType.TGeometry)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeometryCollection)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TPoint)
             {
-                actualType = "Geometry.Point";
+                dalCol.ActualType = "Geometry.Point";
             }
             else if (dalCol.Type == DalColumnType.TLineString)
             {
-                actualType = "Geometry.LineString";
+                dalCol.ActualType = "Geometry.LineString";
             }
             else if (dalCol.Type == DalColumnType.TPolygon)
             {
-                actualType = "Geometry.Polygon";
+                dalCol.ActualType = "Geometry.Polygon";
             }
             else if (dalCol.Type == DalColumnType.TLine)
             {
-                actualType = "Geometry.Line";
+                dalCol.ActualType = "Geometry.Line";
             }
             else if (dalCol.Type == DalColumnType.TCurve)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TSurface)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TLinearRing)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TMultiPoint)
             {
-                actualType = "Geometry.MultiPoint";
+                dalCol.ActualType = "Geometry.MultiPoint";
             }
             else if (dalCol.Type == DalColumnType.TMultiLineString)
             {
-                actualType = "Geometry.MultiLineString";
+                dalCol.ActualType = "Geometry.MultiLineString";
             }
             else if (dalCol.Type == DalColumnType.TMultiPolygon)
             {
-                actualType = "Geometry.MultiPolygon";
+                dalCol.ActualType = "Geometry.MultiPolygon";
             }
             else if (dalCol.Type == DalColumnType.TMultiCurve)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TMultiSurface)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TGeographic)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeographicCollection)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TGeographicPoint)
             {
-                actualType = "Geometry.Point";
+                dalCol.ActualType = "Geometry.Point";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLineString)
             {
-                actualType = "Geometry.LineString";
+                dalCol.ActualType = "Geometry.LineString";
             }
             else if (dalCol.Type == DalColumnType.TGeographicPolygon)
             {
-                actualType = "Geometry.Polygon";
+                dalCol.ActualType = "Geometry.Polygon";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLine)
             {
-                actualType = "Geometry.Line";
+                dalCol.ActualType = "Geometry.Line";
             }
             else if (dalCol.Type == DalColumnType.TGeographicCurve)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeographicSurface)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
             {
-                actualType = "Geometry";
+                dalCol.ActualType = "Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
             {
-                actualType = "Geometry.MultiPoint";
+                dalCol.ActualType = "Geometry.MultiPoint";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
             {
-                actualType = "Geometry.MultiLineString";
+                dalCol.ActualType = "Geometry.MultiLineString";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
             {
-                actualType = "Geometry.MultiPolygon";
+                dalCol.ActualType = "Geometry.MultiPolygon";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
             {
-                actualType = "Geometry.GeometryCollection";
+                dalCol.ActualType = "Geometry.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TLiteral)
             {
                 // Do not change it, specified by ACTUALTYPE
             }
 
-            stringBuilder.AppendFormat("Columns.{0}, typeof({1})", dalCol.Name, actualType);
+            stringBuilder.AppendFormat("Columns.{0}, typeof({1})", dalCol.Name, dalCol.ActualType);
 
             if (dalCol.Type == DalColumnType.TText)
             {
@@ -1807,10 +1807,14 @@ namespace dg.Sql.SchemaGenerator
                     stringBuilder.Append(", DataType.UnsignedBigInt");
                 }
             }
-
-            if (dalCol.IsNullable && actualType != "string")
+            
+            if (!string.IsNullOrEmpty(customActualType))
             {
-                actualType += "?";
+                dalCol.ActualType = customActualType;
+            }
+            else if (dalCol.IsNullable && dalCol.ActualType != "string")
+            {
+                dalCol.ActualType += "?";
             }
 
             stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
@@ -1828,12 +1832,6 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat(@", {0}, {1}",
                     string.IsNullOrEmpty(dalCol.Charset) ? "null" : (@"""" + dalCol.Charset + @""""),
                     string.IsNullOrEmpty(dalCol.Collate) ? "null" : (@"""" + dalCol.Collate + @""""));
-            }
-            
-
-            if (!string.IsNullOrEmpty(actualType))
-            {
-                dalCol.ActualType = actualType;
             }
         }
 
