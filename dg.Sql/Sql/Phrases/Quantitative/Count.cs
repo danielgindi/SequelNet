@@ -11,20 +11,38 @@ namespace dg.Sql.Phrases
         object Object;
         ValueObjectType ObjectType;
 
-        public Count(string TableName, object Object, ValueObjectType ObjectType)
+        [Obsolete]
+        public Count(string tableName, object anObject, ValueObjectType objectType)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
-        public Count(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public Count()
+        {
+            this.Object = "*";
+            this.ObjectType = ValueObjectType.Literal;
+        }
+
+        public Count(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+        }
+
+        public Count(string columnName)
+            : this(null, columnName)
         {
         }
-        public Count(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Count(object anObject, ValueObjectType objectType)
         {
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

@@ -12,6 +12,7 @@ namespace dg.Sql.Phrases
         ValueObjectType ObjectType;
         string AggregateType;
 
+        [Obsolete]
         public PassThroughAggregate(string aggregateType, string tableName, object anObject, ValueObjectType objectType)
         {
             this.TableName = tableName;
@@ -19,14 +20,27 @@ namespace dg.Sql.Phrases
             this.ObjectType = objectType;
             this.AggregateType = aggregateType;
         }
-        public PassThroughAggregate(string aggregateType, object anObject, ValueObjectType objectType)
-            : this(aggregateType, null, anObject, objectType)
+
+        public PassThroughAggregate(string aggregateType, string tableName, string columnName)
         {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+            this.AggregateType = aggregateType;
         }
+
         public PassThroughAggregate(string aggregateType, string columnName)
-            : this(aggregateType, null, columnName, ValueObjectType.ColumnName)
+            : this(aggregateType, null, ValueObjectType.ColumnName)
         {
         }
+
+        public PassThroughAggregate(string aggregateType, object anObject, ValueObjectType objectType)
+        {
+            this.Object = anObject;
+            this.ObjectType = objectType;
+            this.AggregateType = aggregateType;
+        }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

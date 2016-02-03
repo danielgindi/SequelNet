@@ -10,21 +10,39 @@ namespace dg.Sql.Phrases
         string TableName;
         object Object;
         ValueObjectType ObjectType;
+        
+        [Obsolete]
+        public Max(string tableName, object anObject, ValueObjectType objectType)
+        {
+            this.TableName = tableName;
+            this.Object = anObject;
+            this.ObjectType = objectType;
+        }
 
-        public Max(string TableName, object Object, ValueObjectType ObjectType)
+        public Max()
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.Object = "*";
+            this.ObjectType = ValueObjectType.Literal;
         }
-        public Max(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public Max(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+        }
+
+        public Max(string columnName)
+            : this(null, columnName)
         {
         }
-        public Max(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Max(object anObject, ValueObjectType objectType)
         {
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

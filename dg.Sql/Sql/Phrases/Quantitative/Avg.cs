@@ -10,21 +10,40 @@ namespace dg.Sql.Phrases
         string TableName;
         object Object;
         ValueObjectType ObjectType;
+        
 
-        public Avg(string TableName, object Object, ValueObjectType ObjectType)
+        [Obsolete]
+        public Avg(string tableName, object anObject, ValueObjectType objectType)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
-        public Avg(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public Avg()
+        {
+            this.Object = "*";
+            this.ObjectType = ValueObjectType.Literal;
+        }
+
+        public Avg(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+        }
+
+        public Avg(string columnName)
+            : this(null, columnName)
         {
         }
-        public Avg(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Avg(object anObject, ValueObjectType objectType)
         {
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

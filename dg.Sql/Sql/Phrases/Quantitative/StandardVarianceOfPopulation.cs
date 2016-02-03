@@ -10,21 +10,39 @@ namespace dg.Sql.Phrases
         string TableName;
         object Object;
         ValueObjectType ObjectType;
+        
+        [Obsolete]
+        public StandardVarianceOfPopulation(string tableName, object anObject, ValueObjectType objectType)
+        {
+            this.TableName = tableName;
+            this.Object = anObject;
+            this.ObjectType = objectType;
+        }
 
-        public StandardVarianceOfPopulation(string TableName, object Object, ValueObjectType ObjectType)
+        public StandardVarianceOfPopulation()
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.Object = "*";
+            this.ObjectType = ValueObjectType.Literal;
         }
-        public StandardVarianceOfPopulation(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public StandardVarianceOfPopulation(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+        }
+
+        public StandardVarianceOfPopulation(string columnName)
+            : this(null, columnName)
         {
         }
-        public StandardVarianceOfPopulation(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public StandardVarianceOfPopulation(object anObject, ValueObjectType objectType)
         {
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

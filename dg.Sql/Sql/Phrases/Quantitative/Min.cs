@@ -10,21 +10,39 @@ namespace dg.Sql.Phrases
         string TableName;
         object Object;
         ValueObjectType ObjectType;
+        
+        [Obsolete]
+        public Min(string tableName, object anObject, ValueObjectType objectType)
+        {
+            this.TableName = tableName;
+            this.Object = anObject;
+            this.ObjectType = objectType;
+        }
 
-        public Min(string TableName, object Object, ValueObjectType ObjectType)
+        public Min()
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.Object = "*";
+            this.ObjectType = ValueObjectType.Literal;
         }
-        public Min(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public Min(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Object = columnName;
+            this.ObjectType = ValueObjectType.ColumnName;
+        }
+
+        public Min(string columnName)
+            : this(null, columnName)
         {
         }
-        public Min(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Min(object anObject, ValueObjectType objectType)
         {
+            this.Object = anObject;
+            this.ObjectType = objectType;
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;
