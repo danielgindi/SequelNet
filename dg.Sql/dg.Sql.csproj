@@ -81,6 +81,8 @@
     <Compile Include="Connector\FactoryBase.cs" />
     <Compile Include="Sql\Phrases\DateTime\DateTimeUnit.cs" />
     <Compile Include="Sql\Phrases\DateTime\DateTimeAdd.cs" />
+    <Compile Include="Sql\Phrases\Math\Divide.cs" />
+    <Compile Include="Sql\Phrases\Math\Multiply.cs" />
     <Compile Include="Sql\Phrases\Math\Round.cs" />
     <Compile Include="Sql\Phrases\Quantitative\Avg.cs" />
     <Compile Include="Sql\Phrases\Quantitative\Aggregate.cs" />
