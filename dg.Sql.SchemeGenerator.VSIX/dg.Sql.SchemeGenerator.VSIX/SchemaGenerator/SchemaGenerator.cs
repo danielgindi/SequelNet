@@ -246,7 +246,7 @@ namespace dg.Sql.SchemaGenerator
                 }
                 else if (currentLineTrimmed.StartsWith("@AtomicUpdates", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.AtomicUpdates = false;
+                    context.AtomicUpdates = true;
                 }
                 else if (!currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
                 {
