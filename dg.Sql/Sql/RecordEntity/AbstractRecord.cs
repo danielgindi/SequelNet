@@ -32,9 +32,14 @@ namespace dg.Sql
 
         #region Private variables
 
-        private bool _NewRecord = true;
         private bool _AtomicUpdates = false;
         private HashSet<string> _DirtyColumns = null;
+
+        #endregion
+
+        #region Protected variables
+
+        private bool _NewRecord = true;
 
         #endregion
 
@@ -165,6 +170,14 @@ namespace dg.Sql
 
         [HiddenForDataBinding(true), XmlIgnore]
         public bool IsNewRecord
+        {
+            get { return _NewRecord; }
+            set { _NewRecord = value; }
+        }
+
+        // Deprecate this
+        [HiddenForDataBinding(true), XmlIgnore]
+        public bool IsThisANewRecord
         {
             get { return _NewRecord; }
             set { _NewRecord = value; }

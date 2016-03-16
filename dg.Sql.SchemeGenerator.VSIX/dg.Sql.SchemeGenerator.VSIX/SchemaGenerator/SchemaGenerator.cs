@@ -1347,7 +1347,7 @@ namespace dg.Sql.SchemaGenerator
             {
                 stringBuilder.AppendFormat("{0}{1}{0}", "\r\n", context.CustomAfterRead);
             }
-            stringBuilder.AppendFormat("{0}IsThisANewRecord = false;}}{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}IsNewRecord = false;}}{0}", "\r\n");
 
             stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
