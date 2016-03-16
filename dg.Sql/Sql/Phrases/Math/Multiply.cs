@@ -55,7 +55,7 @@ namespace dg.Sql.Phrases
             object value1,
             object value2
             )
-            : this(null, value1, ValueObjectType.Value, null, value1, ValueObjectType.Value)
+            : this(null, value1, ValueObjectType.Value, null, value2, ValueObjectType.Value)
         {
         }
 
