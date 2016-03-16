@@ -73,27 +73,6 @@ namespace dg.Sql.Phrases
             this.ToLongitudeColumnName = toLongitudeColumnName;
         }
 
-        public GeographyDistance(
-            string fromTableName, string fromLatitudeColumnName, string fromLongitudeColumnName,
-            string toTableName, string toPointColumnName)
-        {
-            this.FromTableName = fromTableName;
-            this.FromLatitudeColumnName = fromLatitudeColumnName;
-            this.FromLongitudeColumnName = fromLongitudeColumnName;
-            this.ToTableName = toTableName;
-            this.ToPointColumnName = toPointColumnName;
-        }
-
-        public GeographyDistance(
-            string fromTableName, string fromPointColumnName,
-            string toTableName, string toPointColumnName)
-        {
-            this.FromTableName = fromTableName;
-            this.FromPointColumnName = fromPointColumnName;
-            this.ToTableName = toTableName;
-            this.ToPointColumnName = toPointColumnName;
-        }
-
         public string BuildPhrase(ConnectorBase conn)
         {
             string fx, fy, tx, ty;
