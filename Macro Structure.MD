@@ -12,6 +12,7 @@
  *  @MySqlEngine:		InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
  *  @StaticColumns:		Export column names as static fields (writable) instead of const
  *  @OmitCollection:	Omit collection class
+ *  @AtomicUpdates:		Track atomic column updates
  */
  ```
 

@@ -244,6 +244,10 @@ namespace dg.Sql.SchemaGenerator
                 {
                     context.ExportCollection = false;
                 }
+                else if (currentLineTrimmed.StartsWith("@AtomicUpdates", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.AtomicUpdates = false;
+                }
                 else if (!currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
                 {
                     int startPos = currentLineTrimmed.IndexOf(":");
@@ -914,7 +918,17 @@ namespace dg.Sql.SchemaGenerator
                 }
                 object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.Name, null };
                 formatArgs[3] = (dalCol.Virtual ? "virtual " : "");
-                stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}get{{return _{2};}}{0}set{{_{2}=value;}}{0}}}{0}", formatArgs);
+                stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}", formatArgs);
+                stringBuilder.AppendFormat("get{{ return _{2}; }}{0}", formatArgs);
+                if (context.AtomicUpdates)
+                {
+                    stringBuilder.AppendFormat("set{{ _{2}=value; MarkColumnDirty(Columns.{2}); }}{0}", formatArgs);
+                }
+                else
+                {
+                    stringBuilder.AppendFormat("set{{_{2}=value;}}{0}", formatArgs);
+                }
+                stringBuilder.AppendFormat("}}{0}", formatArgs);
             }
             stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
@@ -1048,18 +1062,28 @@ namespace dg.Sql.SchemaGenerator
 
             // Update() method
             stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
-            printExtraNewLine = false;
+
+            bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.Name == "ModifiedBy") != null;
+            bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.Name == "ModifiedOn") != null;
+
+            if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
+            {
+                stringBuilder.AppendFormat(@"if (HasDirtyColumns()){0}{{{0}", "\r\n");
+            }
             if (context.Columns.Find((DalColumn c) => c.Name == "ModifiedBy") != null)
             {
                 stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
-                printExtraNewLine = true;
             }
             if (context.Columns.Find((DalColumn c) => c.Name == "ModifiedOn") != null)
             {
                 stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
-                printExtraNewLine = true;
             }
-            if (printExtraNewLine)
+            if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
+            {
+                stringBuilder.AppendFormat(@"}}{0}", "\r\n");
+            }
+
+            if (hasModifiedBy || hasModifiedOn)
             {
                 stringBuilder.Append("\r\n");
             }
@@ -1075,6 +1099,12 @@ namespace dg.Sql.SchemaGenerator
                 {
                     continue;
                 }
+
+                if (context.AtomicUpdates)
+                {
+                    stringBuilder.AppendFormat(@"if (IsColumnDirty(Columns.{1})){0}{{{0}", "\r\n", dalCol.Name);
+                }
+
                 if (string.IsNullOrEmpty(dalCol.ToDb))
                 {
                     stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
@@ -1083,14 +1113,33 @@ namespace dg.Sql.SchemaGenerator
                 {
                     stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
                 }
+
+                if (context.AtomicUpdates)
+                {
+                    stringBuilder.AppendFormat(@"}}{0}{0}", "\r\n", dalCol.Name);
+                }
             }
+
             bool flag1 = true;
             foreach (DalColumn dalCol in primaryKeyColumns)
             {
                 stringBuilder.AppendFormat("qry.{2}(Columns.{1}, {1});{0}", "\r\n", dalCol.Name, (flag1 ? "Where" : "AND"));
                 flag1 = false;
             }
-            stringBuilder.AppendFormat("{0}qry.Execute(conn);{0}}}{0}", "\r\n");
+
+            stringBuilder.AppendFormat("{0}", "\r\n");
+
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("if (qry.HasInsertsOrUpdates){0}{{{0}", "\r\n");
+            }
+            stringBuilder.AppendFormat("qry.Execute(conn);{0}", "\r\n");
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("}}{0}", "\r\n");
+            }
+            stringBuilder.AppendFormat("}}{0}", "\r\n");
+
 
             // Read() method
             stringBuilder.AppendFormat("public override void Read(DataReaderBase reader){0}{{{0}", "\r\n");
@@ -1930,6 +1979,7 @@ namespace dg.Sql.SchemaGenerator
         public bool StaticColumns = false;
         public bool ExportRecord = true;
         public bool ExportCollection = true;
+        public bool AtomicUpdates = false;
 
         public string SingleColumnPrimaryKeyName = null;
         public string CustomBeforeInsert = null;

@@ -32,7 +32,9 @@ namespace dg.Sql
 
         #region Private variables
 
-        protected bool IsThisANewRecord = true;
+        private bool _NewRecord = true;
+        private bool _AtomicUpdates = false;
+        private HashSet<string> _DirtyColumns = null;
 
         #endregion
 
@@ -164,8 +166,49 @@ namespace dg.Sql
         [HiddenForDataBinding(true), XmlIgnore]
         public bool IsNewRecord
         {
-            get { return IsThisANewRecord; }
-            set { IsThisANewRecord = value; }
+            get { return _NewRecord; }
+            set { _NewRecord = value; }
+        }
+
+        [HiddenForDataBinding(true), XmlIgnore]
+        public bool AtomicUpdates
+        {
+            get { return _AtomicUpdates; }
+            set { _AtomicUpdates = value; }
+        }
+
+        public void MarkColumnDirty(string column)
+        {
+            if (_DirtyColumns == null)
+            {
+                _DirtyColumns = new HashSet<string>();
+            }
+
+            _DirtyColumns.Add(column);
+        }
+
+        public void MarkColumnNotDirty(string column)
+        {
+            if (_DirtyColumns == null) return;
+
+            _DirtyColumns.Remove(column);
+        }
+
+        public void MarkAllColumnsNotDirty()
+        {
+            if (_DirtyColumns == null) return;
+
+            _DirtyColumns.Clear();
+        }
+
+        public bool IsColumnDirty(string column)
+        {
+            return _DirtyColumns != null && _DirtyColumns.Contains(column);
+        }
+
+        public bool HasDirtyColumns()
+        {
+            return _DirtyColumns != null && _DirtyColumns.Count > 0;
         }
         
         public void MarkOld()
@@ -230,6 +273,7 @@ namespace dg.Sql
                     qry.Insert(@"CreatedBy", userName);
                 }
             }
+
             if (__HAS_CREATED_ON)
             {
                 qry.Insert(@"CreatedOn", DateTime.UtcNow);
@@ -237,7 +281,8 @@ namespace dg.Sql
 
             qry.Execute(Connection);
 
-            IsThisANewRecord = false;
+            _NewRecord = false;
+            MarkAllColumnsNotDirty();
         }
 
         public virtual void Update(ConnectorBase Connection)
@@ -266,40 +311,50 @@ namespace dg.Sql
                 if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
                 if (propInfo != null)
                 {
+                    if (_AtomicUpdates && !IsColumnDirty(Column.Name)) continue;
+
                     qry.Update(Column.Name, propInfo.GetValue(this, null));
                 }
             }
 
-            if (__HAS_MODIFIED_BY)
+            if (!_AtomicUpdates || qry.HasInsertsOrUpdates)
             {
-                string userName = null;
-                if (System.Web.HttpContext.Current != null)
+                if (__HAS_MODIFIED_BY)
                 {
-                    userName = System.Web.HttpContext.Current.User.Identity.Name;
-                }
-                else
-                {
-                    userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
+                    string userName = null;
+                    if (System.Web.HttpContext.Current != null)
+                    {
+                        userName = System.Web.HttpContext.Current.User.Identity.Name;
+                    }
+                    else
+                    {
+                        userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
+                    }
+
+                    if (userName == null || userName.Length == 0)
+                    {
+                        propInfo = __CLASS_TYPE.GetProperty(@"ModifiedBy");
+                        if (propInfo != null) userName = propInfo.GetValue(this, null) as string;
+                    }
+                    if (userName != null)
+                    {
+                        qry.Update(@"ModifiedBy", userName);
+                    }
                 }
 
-                if (userName == null || userName.Length == 0)
+                if (__HAS_MODIFIED_ON)
                 {
-                    propInfo = __CLASS_TYPE.GetProperty(@"ModifiedBy");
-                    if (propInfo != null) userName = propInfo.GetValue(this, null) as string;
-                }
-                if (userName != null)
-                {
-                    qry.Update(@"ModifiedBy", userName);
+                    qry.Update(@"ModifiedOn", DateTime.UtcNow);
                 }
             }
-            if (__HAS_MODIFIED_ON)
+
+            if (qry.HasInsertsOrUpdates)
             {
-                qry.Update(@"ModifiedOn", DateTime.UtcNow);
+                qry.Execute(Connection);
             }
 
-            qry.Execute(Connection);
-
-            IsThisANewRecord = false;
+            _NewRecord = false;
+            MarkAllColumnsNotDirty();
         }
 
         public virtual void Read(DataReaderBase Reader)
@@ -320,19 +375,32 @@ namespace dg.Sql
                 }
             }
 
-            IsThisANewRecord = false;
+            _NewRecord = false;
+            MarkAllColumnsNotDirty();
         }
 
         public virtual void Save()
         {
-            if (IsThisANewRecord) Insert(null);
-            else Update(null);
+            if (_NewRecord)
+            {
+                Insert(null);
+            }
+            else
+            {
+                Update(null);
+            }
         }
 
         public virtual void Save(ConnectorBase Connection)
         {
-            if (IsThisANewRecord) Insert(Connection);
-            else Update(Connection);
+            if (_NewRecord)
+            {
+                Insert(Connection);
+            }
+            else
+            {
+                Update(Connection);
+            }
         }
 
         #endregion
