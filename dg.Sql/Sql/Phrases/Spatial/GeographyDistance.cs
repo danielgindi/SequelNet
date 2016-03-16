@@ -17,99 +17,168 @@ namespace dg.Sql.Phrases
     /// </summary>
     public class GeographyDistance : IPhrase
     {
-        string ContainingTableName;
-        string ContainingLatitudeColumnName;
-        string ContainingLongitudeColumnName;
-        string ContainingPointColumnName;
-        decimal FromLatitude;
-        decimal FromLongitude;
+        string FromTableName;
+        string FromLatitudeColumnName;
+        string FromLongitudeColumnName;
+        string FromPointColumnName;
+
+        decimal? ToLatitude;
+        decimal? ToLongitude;
+        string ToTableName;
+        string ToLatitudeColumnName;
+        string ToLongitudeColumnName;
+        string ToPointColumnName;
 
         public GeographyDistance(
-            string ContainingTableName, string ContainingLatitudeColumnName, string ContainingLongitudeColumnName,
-            decimal FromLatitude, decimal FromLongitude)
+            string fromTableName, string fromLatitudeColumnName, string fromLongitudeColumnName,
+            decimal toLatitude, decimal toLongitude)
         {
-            this.ContainingTableName = ContainingTableName;
-            this.ContainingLatitudeColumnName = ContainingLatitudeColumnName;
-            this.ContainingLongitudeColumnName = ContainingLongitudeColumnName;
-            this.FromLatitude = FromLatitude;
-            this.FromLongitude = FromLongitude;
+            this.FromTableName = fromTableName;
+            this.FromLatitudeColumnName = fromLatitudeColumnName;
+            this.FromLongitudeColumnName = fromLongitudeColumnName;
+            this.ToLatitude = toLatitude;
+            this.ToLongitude = toLongitude;
         }
-        public GeographyDistance
-            (string ContainingTableName, string ContainingPointColumnName,
-            decimal FromLatitude, decimal FromLongitude)
+
+        public GeographyDistance(
+            string fromTableName, string fromPointColumnName,
+            decimal toLatitude, decimal toLongitude)
         {
-            this.ContainingTableName = null;
-            this.ContainingPointColumnName = ContainingPointColumnName;
-            this.FromLatitude = FromLatitude;
-            this.FromLongitude = FromLongitude;
+            this.FromTableName = fromTableName;
+            this.FromPointColumnName = fromPointColumnName;
+            this.ToLatitude = toLatitude;
+            this.ToLongitude = toLongitude;
+        }
+
+        public GeographyDistance(
+            string fromTableName, string fromLatitudeColumnName, string fromLongitudeColumnName,
+            string toTableName, string toLatitudeColumnName, string toLongitudeColumnName)
+        {
+            this.FromTableName = fromTableName;
+            this.FromLatitudeColumnName = fromLatitudeColumnName;
+            this.FromLongitudeColumnName = fromLongitudeColumnName;
+            this.ToTableName = toTableName;
+            this.ToLatitudeColumnName = toLatitudeColumnName;
+            this.ToLongitudeColumnName = toLongitudeColumnName;
+        }
+
+        public GeographyDistance(
+            string fromTableName, string fromPointColumnName,
+            string toTableName, string toLatitudeColumnName, string toLongitudeColumnName)
+        {
+            this.FromTableName = fromTableName;
+            this.FromPointColumnName = fromPointColumnName;
+            this.ToTableName = toTableName;
+            this.ToLatitudeColumnName = toLatitudeColumnName;
+            this.ToLongitudeColumnName = toLongitudeColumnName;
+        }
+
+        public GeographyDistance(
+            string fromTableName, string fromLatitudeColumnName, string fromLongitudeColumnName,
+            string toTableName, string toPointColumnName)
+        {
+            this.FromTableName = fromTableName;
+            this.FromLatitudeColumnName = fromLatitudeColumnName;
+            this.FromLongitudeColumnName = fromLongitudeColumnName;
+            this.ToTableName = toTableName;
+            this.ToPointColumnName = toPointColumnName;
+        }
+
+        public GeographyDistance(
+            string fromTableName, string fromPointColumnName,
+            string toTableName, string toPointColumnName)
+        {
+            this.FromTableName = fromTableName;
+            this.FromPointColumnName = fromPointColumnName;
+            this.ToTableName = toTableName;
+            this.ToPointColumnName = toPointColumnName;
         }
 
         public string BuildPhrase(ConnectorBase conn)
         {
-            string FX, FY, TX, TY;
-            if (ContainingPointColumnName != null)
+            string fx, fy, tx, ty;
+
+            GenerateXY(conn, FromTableName, FromPointColumnName, FromLatitudeColumnName, FromLongitudeColumnName, null, null, out fx, out fy);
+            GenerateXY(conn, ToTableName, ToPointColumnName, ToLatitudeColumnName, ToLongitudeColumnName, ToLatitude, ToLongitude, out tx, out ty);
+            
+            StringBuilder sb = new StringBuilder();
+            sb.Append(@"12742.0*ASIN(SQRT(POWER(SIN(((");
+            sb.Append(fx);
+            sb.Append(@")-(");
+            sb.Append(tx);
+            sb.Append(@")) * PI()/360.0), 2) + COS(");
+            sb.Append(fx);
+            sb.Append(@"* PI()/180.0) * COS((");
+            sb.Append(tx);
+            sb.Append(@") * PI()/180.0) * POWER(SIN((");
+            sb.Append(fy);
+            sb.Append(@"-");
+            sb.Append(ty);
+            sb.Append(@") * PI()/360.0), 2)))");
+
+            return sb.ToString();
+        }
+
+        private static void GenerateXY(
+            ConnectorBase conn, 
+            string tableName, string pointName, string latName, string lonName,
+            decimal? lat, decimal? lon,
+            out string x, out string y)
+        {
+            if (pointName != null)
             {
-                if (ContainingTableName != null)
+                string pt;
+
+                if (tableName != null)
                 {
-                    TY = conn.EncloseFieldName(ContainingTableName) + @"." + conn.EncloseFieldName(ContainingPointColumnName);
+                    pt = conn.EncloseFieldName(tableName) + @"." + conn.EncloseFieldName(pointName);
                 }
                 else
                 {
-                    TY = conn.EncloseFieldName(ContainingPointColumnName);
+                    pt = conn.EncloseFieldName(pointName);
                 }
+
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
                 {
-                    TX = TY + @".STX";
-                    TY = TY + @".STY";
+                    x = pt + @".STX";
+                    y = pt + @".STY";
                 }
                 else
                 {
                     if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                     {
-                        TX = @"ST_X(" + TY + @")";
-                        TY = @"ST_Y(" + TY + @")";
+                        x = @"ST_X(" + pt + @")";
+                        y = @"ST_Y(" + pt + @")";
                     }
                     else // MYSQL
                     {
-                        TX = @"X(" + TY + @")";
-                        TY = @"Y(" + TY + @")";
+                        x = @"X(" + pt + @")";
+                        y = @"Y(" + pt + @")";
                     }
                 }
             }
             else
             {
-                if (ContainingTableName != null)
+                if (latName != null)
                 {
-                    TX = conn.EncloseFieldName(ContainingTableName);
-                    TY = TX + @"." + conn.EncloseFieldName(ContainingLongitudeColumnName);
-                    TX = TX + @"." + conn.EncloseFieldName(ContainingLatitudeColumnName);
+                    x = (tableName != null ? conn.EncloseFieldName(tableName) + "." : "")
+                        + conn.EncloseFieldName(latName);
                 }
                 else
                 {
-                    TY = conn.EncloseFieldName(ContainingLongitudeColumnName);
-                    TX = conn.EncloseFieldName(ContainingLatitudeColumnName);
+                    x = (lat ?? 0m).ToString(CultureInfo.InvariantCulture);
+                }
+
+                if (lonName != null)
+                {
+                    y = (tableName != null ? conn.EncloseFieldName(tableName) + "." : "")
+                        + conn.EncloseFieldName(lonName);
+                }
+                else
+                {
+                    y = (lon ?? 0m).ToString(CultureInfo.InvariantCulture);
                 }
             }
-
-            FX = FromLatitude.ToString(CultureInfo.InvariantCulture);
-            FY = FromLongitude.ToString(CultureInfo.InvariantCulture);
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append(@"12742.0*ASIN(SQRT(POWER(SIN(((");
-            sb.Append(FX);
-            sb.Append(@")-(");
-            sb.Append(TX);
-            sb.Append(@")) * PI()/360.0), 2) + COS(");
-            sb.Append(FX);
-            sb.Append(@"* PI()/180.0) * COS((");
-            sb.Append(TX);
-            sb.Append(@") * PI()/180.0) * POWER(SIN((");
-            sb.Append(FY);
-            sb.Append(@"-");
-            sb.Append(TY);
-            sb.Append(@") * PI()/360.0), 2)))");
-
-            return sb.ToString();
         }
     }
 }
