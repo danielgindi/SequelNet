@@ -718,6 +718,16 @@ namespace dg.Sql.SchemaGenerator
         {
             stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}", "\r\n", context.ClassName);
 
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("#region Static Constructor{0}", "\r\n");
+                stringBuilder.AppendFormat("static {1}(){0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat("{{{0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat("AtomicUpdates = true;{0}", "\r\n");
+                stringBuilder.AppendFormat("}}{0}", "\r\n");
+                stringBuilder.AppendFormat("#endregion{0}{0}", "\r\n");
+            }
+
             #region Table Schema
 
             stringBuilder.AppendFormat("#region Table Schema{0}", "\r\n");

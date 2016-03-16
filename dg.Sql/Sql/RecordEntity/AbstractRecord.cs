@@ -32,7 +32,7 @@ namespace dg.Sql
 
         #region Private variables
 
-        private bool _AtomicUpdates = false;
+        private static bool _AtomicUpdates = false;
         private HashSet<string> _DirtyColumns = null;
 
         #endregion
@@ -184,7 +184,7 @@ namespace dg.Sql
         }
 
         [HiddenForDataBinding(true), XmlIgnore]
-        public bool AtomicUpdates
+        public static bool AtomicUpdates
         {
             get { return _AtomicUpdates; }
             set { _AtomicUpdates = value; }
