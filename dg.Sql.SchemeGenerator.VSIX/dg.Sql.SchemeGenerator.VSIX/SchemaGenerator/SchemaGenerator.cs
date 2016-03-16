@@ -1058,7 +1058,15 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", context.SingleColumnPrimaryKeyName, string.Format(valueConvertorFormat, "(lastInsert)"));
             }
-            stringBuilder.AppendFormat("MarkOld();{0}}}{0}}}{0}", "\r\n");
+
+            stringBuilder.AppendFormat("MarkOld();{0}", "\r\n");
+
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("MarkAllColumnsNotDirty();{0}", "\r\n");
+            }
+
+            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
 
             // Update() method
             stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
@@ -1137,8 +1145,10 @@ namespace dg.Sql.SchemaGenerator
             if (context.AtomicUpdates)
             {
                 stringBuilder.AppendFormat("}}{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}MarkAllColumnsNotDirty();{0}", "\r\n");
             }
-            stringBuilder.AppendFormat("}}{0}", "\r\n");
+
+            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
 
             // Read() method
@@ -1347,7 +1357,15 @@ namespace dg.Sql.SchemaGenerator
             {
                 stringBuilder.AppendFormat("{0}{1}{0}", "\r\n", context.CustomAfterRead);
             }
-            stringBuilder.AppendFormat("{0}IsNewRecord = false;}}{0}", "\r\n");
+
+            stringBuilder.AppendFormat("{0}MarkOld();{0}", "\r\n");
+
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("MarkAllColumnsNotDirty();{0}", "\r\n");
+            }
+
+            stringBuilder.AppendFormat("}}{0}", "\r\n");
 
             stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
@@ -1422,7 +1440,7 @@ namespace dg.Sql.SchemaGenerator
                         first = false;
                     }
                 }
-                stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}", "\r\n");
+                stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}{0}", "\r\n");
 
                 // FetchByID(ConnectorBase, ...) function
                 stringBuilder.AppendFormat("public static {1} FetchByID(ConnectorBase conn, ", "\r\n", context.ClassName);

@@ -366,7 +366,6 @@ namespace dg.Sql
                 qry.Execute(Connection);
             }
 
-            _NewRecord = false;
             MarkAllColumnsNotDirty();
         }
 
