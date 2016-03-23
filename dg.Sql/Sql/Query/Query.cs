@@ -118,24 +118,6 @@ namespace dg.Sql
             return this;
         }
 
-        public Query ClearOrderBy()
-        {
-            if (_ListOrderBy != null)
-            {
-                _ListOrderBy.Clear();
-            }
-            return this;
-        }
-
-        public Query ClearGroupBy()
-        {
-            if (_ListGroupBy != null)
-            {
-                _ListGroupBy.Clear();
-            }
-            return this;
-        }
-
         public Query ClearInsertAndUpdate()
         {
             if (_ListInsertUpdate != null)
