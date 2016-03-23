@@ -17,6 +17,7 @@ namespace dg.Sql
         private string _FromExpressionTableAlias = null;
         private OrderByList _ListOrderBy;
         private GroupByList _ListGroupBy;
+        private WhereList _ListHaving;
         private SelectColumnList _ListSelect;
         private AssignmentColumnList _ListInsertUpdate;
         private WhereList _ListWhere;

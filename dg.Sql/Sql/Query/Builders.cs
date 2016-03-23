@@ -200,6 +200,15 @@ namespace dg.Sql
             }
         }
 
+        private void BuildHaving(StringBuilder sb, ConnectorBase connection)
+        {
+            if (_ListHaving != null && _ListHaving.Count > 0)
+            {
+                sb.Append(@" HAVING ");
+                _ListHaving.BuildCommand(sb, connection, this, null, null);
+            }
+        }
+
         private void BuildCreateIndex(StringBuilder sb, ConnectorBase connection, object indexObj)
         {
             if (indexObj is TableSchema.Index)
@@ -1067,6 +1076,7 @@ namespace dg.Sql
                                     }
 
                                     BuildGroupBy(sb, connection, false);
+                                    BuildHaving(sb, connection);
                                     BuildOrderBy(sb, connection, false);
 
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
