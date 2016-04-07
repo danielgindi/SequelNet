@@ -30,7 +30,7 @@ namespace dg.Sql.Phrases
         }
 
         public PassThroughAggregate(string aggregateType, string columnName)
-            : this(aggregateType, null, ValueObjectType.ColumnName)
+            : this(aggregateType, columnName, ValueObjectType.ColumnName)
         {
         }
 

@@ -85,7 +85,7 @@
     <Compile Include="Sql\Phrases\Math\Multiply.cs" />
     <Compile Include="Sql\Phrases\Math\Round.cs" />
     <Compile Include="Sql\Phrases\Quantitative\Avg.cs" />
-    <Compile Include="Sql\Phrases\Quantitative\Aggregate.cs" />
+    <Compile Include="Sql\Phrases\Quantitative\PassThroughAggregate.cs" />
     <Compile Include="Sql\Phrases\Quantitative\CountDistinct.cs" />
     <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfPopulation.cs" />
     <Compile Include="Sql\Phrases\Quantitative\StandardDeviationOfSample.cs" />
