@@ -12,7 +12,7 @@ using EnvDTE;
 using EnvDTE80;
 using dg.Sql.SchemaGenerator;
 
-namespace DanielCohenGindi.dg_Sql_SchemeGenerator_VSIX
+namespace dg_Sql_SchemeGenerator_VSIX
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.

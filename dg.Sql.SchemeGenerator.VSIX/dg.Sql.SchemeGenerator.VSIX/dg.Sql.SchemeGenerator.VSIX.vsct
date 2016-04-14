@@ -20,12 +20,6 @@
   <!--This header contains the command ids for the menus provided by the shell. -->
   <Extern href="vsshlids.h"/>
 
-  <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
-  <Extern href="msobtnid.h"/>
-
-
-
-
   <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
   <Commands package="guiddg_Sql_SchemeGenerator_VSIXPkg">
@@ -37,19 +31,14 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
-    
     <!-- In this section you can define new menu groups. A menu group is a container for 
          other menus or buttons (commands); from a visual point of view you can see the 
          group as the part of a menu contained between two lines. The parent of a group 
          must be a menu. -->
     <Groups>
-
       <Group guid="guiddg_Sql_SchemeGenerator_VSIXCmdSet" id="MyMenuGroup" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_EDIT"/>
       </Group>
-      
-
-
     </Groups>
     
     <!--Buttons section. -->
@@ -63,7 +52,6 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-
       <Button guid="guiddg_Sql_SchemeGenerator_VSIXCmdSet" id="cmdidGenerateDalFromSelection" priority="0x0100" type="Button">
         <Parent guid="guiddg_Sql_SchemeGenerator_VSIXCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpDatabase" />
@@ -72,9 +60,6 @@
           <ButtonText>DAL</ButtonText>
         </Strings>
       </Button>
-
-
-
     </Buttons>
    
     <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
