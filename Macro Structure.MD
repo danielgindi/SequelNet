@@ -3,16 +3,17 @@
 ```C#
 /*  Class name
  *  Table name (this is the actual table name in the db)
- *  Column name:		List of keywords/datatypes ended with ; A comment
- *  @ForeignKey:		NAME(fk_name); FOREIGNTABLE(other DAL's class name); COLUMNS[Column name, Column name]; FOREIGNCOLUMNS[Column name, Column name]; ONUPDATE(CASCADE/RESTRICT/SETNULL/NOACTION); ONDELETE(CASCADE/RESTRICT/SETNULL/NOACTION);
- *  @Index:				NAME(ix_name); [Column name, column name]; UNIQUE/PRIMARYKEY/SPATIAL/FULLTEXT/BTREE/RTREE/HASH/NONCLUSTERED/CLUSTERED
- *  @BeforeInsert:		Code to execute in beginning of Insert(...) code
- *  @BeforeUpdate:		Code to execute in beginning of Update(...) code
- *  @AfterRead:			Code to execute at the end of Read(...) code
- *  @MySqlEngine:		InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
- *  @StaticColumns:		Export column names as static fields (writable) instead of const
- *  @OmitCollection:	Omit collection class
- *  @AtomicUpdates:		Track atomic column updates
+ *  Column name:            List of keywords/datatypes ended with ; A comment
+ *  @ForeignKey:            NAME(fk_name); FOREIGNTABLE(other DAL's class name); COLUMNS[Column name, Column name]; FOREIGNCOLUMNS[Column name, Column name]; ONUPDATE(CASCADE/RESTRICT/SETNULL/NOACTION); ONDELETE(CASCADE/RESTRICT/SETNULL/NOACTION);
+ *  @Index:                 NAME(ix_name); [Column name, column name]; UNIQUE/PRIMARYKEY/SPATIAL/FULLTEXT/BTREE/RTREE/HASH/NONCLUSTERED/CLUSTERED
+ *  @BeforeInsert:          Code to execute in beginning of Insert(...) code
+ *  @BeforeUpdate:          Code to execute in beginning of Update(...) code
+ *  @AfterRead:             Code to execute at the end of Read(...) code
+ *  @MySqlEngine:           InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
+ *  @StaticColumns          Export column names as static fields (writable) instead of const
+ *  @OmitCollection         Omit collection class
+ *  @AtomicUpdates          Track atomic column updates
+ *  @InsertAutoIncrement    Allow inserting autoincrement values
  */
  ```
 

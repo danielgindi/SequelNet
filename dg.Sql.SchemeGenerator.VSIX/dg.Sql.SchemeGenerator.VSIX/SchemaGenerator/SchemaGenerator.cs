@@ -248,6 +248,10 @@ namespace dg.Sql.SchemaGenerator
                 {
                     context.AtomicUpdates = true;
                 }
+                else if (currentLineTrimmed.StartsWith("@InsertAutoIncrement", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.InsertAutoIncrement = true;
+                }
                 else if (!currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
                 {
                     int startPos = currentLineTrimmed.IndexOf(":");
@@ -978,9 +982,33 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
-                if (dalCol.AutoIncrement || dalCol.NoSave)
+                if ((dalCol.AutoIncrement && !context.InsertAutoIncrement) || dalCol.NoSave)
                 {
                     continue;
+                }
+
+                if (dalCol.AutoIncrement)
+                {
+                    if (dalCol.Type == DalColumnType.TInt ||
+                        dalCol.Type == DalColumnType.TInt8 ||
+                        dalCol.Type == DalColumnType.TInt16 ||
+                        dalCol.Type == DalColumnType.TInt32 ||
+                        dalCol.Type == DalColumnType.TInt64 ||
+                        dalCol.Type == DalColumnType.TUInt8 ||
+                        dalCol.Type == DalColumnType.TUInt16 ||
+                        dalCol.Type == DalColumnType.TUInt32 ||
+                        dalCol.Type == DalColumnType.TUInt64)
+                    {
+                        stringBuilder.AppendFormat("if ({1} > 0){0}{{{0}", "\r\n", dalCol.Name);
+                    }
+                    else if (dalCol.Type == DalColumnType.TGuid)
+                    {
+                        stringBuilder.AppendFormat("if ({1}.Equals(Guid.Empty)){0}{{{0}", "\r\n", dalCol.Name);
+                    }
+                    else
+                    {
+                        stringBuilder.AppendFormat("if ({1} != null){0}{{{0}", "\r\n", dalCol.Name);
+                    }
                 }
 
                 if (string.IsNullOrEmpty(dalCol.ToDb))
@@ -991,7 +1019,13 @@ namespace dg.Sql.SchemaGenerator
                 {
                     stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
                 }
+
+                if (dalCol.AutoIncrement)
+                {
+                    stringBuilder.AppendFormat("}}{0}", "\r\n");
+                }
             }
+
             stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(conn, out lastInsert) > 0){0}{{{0}", "\r\n");
             if (!string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName))
             {
@@ -2008,6 +2042,7 @@ namespace dg.Sql.SchemaGenerator
         public bool ExportRecord = true;
         public bool ExportCollection = true;
         public bool AtomicUpdates = false;
+        public bool InsertAutoIncrement = false;
 
         public string SingleColumnPrimaryKeyName = null;
         public string CustomBeforeInsert = null;
