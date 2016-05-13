@@ -106,7 +106,7 @@ namespace dg.Sql
         public abstract TableSchema GetTableSchema();
 
         [HiddenForDataBinding(true), XmlIgnore]
-        public static TableSchema TableSchema
+        public static TableSchema Schema
         {
             get
             {
@@ -116,6 +116,22 @@ namespace dg.Sql
             set
             {
                 __TABLE_SCHEMA = value;
+            }
+        }
+
+        /// <summary>
+        /// Synonym for <see cref="Schema"/>
+        /// </summary>
+        [HiddenForDataBinding(true), XmlIgnore]
+        public static TableSchema TableSchema
+        {
+            get
+            {
+                return Schema;
+            }
+            set
+            {
+                Schema = value;
             }
         }
 
