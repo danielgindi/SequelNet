@@ -7,7 +7,7 @@ namespace dg.Sql.Phrases
 {
     public class UnionAll : IPhrase
     {
-        Query[] Queries;
+        public Query[] Queries;
 
         public UnionAll(params Query[] queries)
         {

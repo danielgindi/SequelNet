@@ -19,23 +19,26 @@ namespace dg.Sql
             {
 
             }
-            public Point(double X, double Y)
+
+            public Point(double x, double y)
             {
-                this.X = X;
-                this.Y = Y;
+                this.X = x;
+                this.Y = y;
             }
-            public Point(double X, double Y, double Z)
+
+            public Point(double x, double y, double z)
             {
-                this.X = X;
-                this.Y = Y;
-                this.Z = Z;
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
             }
-            public Point(double X, double Y, double? Z, double? M)
+
+            public Point(double x, double y, double? z, double? m)
             {
-                this.X = X;
-                this.Y = Y;
-                this.Z = Z;
-                this.M = M;
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
+                this.M = m;
             }
 
             public override bool IsEmpty
@@ -104,6 +107,7 @@ namespace dg.Sql
                     sb.Append(@")')");
                 }
             }
+
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
                 sb.Append(@"POINT(");

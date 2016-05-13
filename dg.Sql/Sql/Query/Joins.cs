@@ -19,6 +19,7 @@ namespace dg.Sql
             TableAliasMap[join.RightTableAlias] = join.RightTableSchema;
             return this;
         }
+
         public Query Join(JoinType joinType,
             TableSchema rightTableSchema, string rightTableAlias,
             params JoinColumnPair[] pairs)
@@ -29,6 +30,7 @@ namespace dg.Sql
             TableAliasMap[join.RightTableAlias] = join.RightTableSchema;
             return this;
         }
+
         public Query Join(JoinType joinType,
             TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
             object rightTableSql, string rightColumn, string rightTableAlias)
@@ -38,6 +40,7 @@ namespace dg.Sql
             _ListJoin.Add(join);
             return this;
         }
+
         public Query Join(JoinType joinType,
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)

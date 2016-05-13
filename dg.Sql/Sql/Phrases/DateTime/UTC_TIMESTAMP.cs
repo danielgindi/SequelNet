@@ -10,6 +10,7 @@ namespace dg.Sql.Phrases
         public UTC_TIMESTAMP()
         {
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             return conn.func_UTC_NOW;

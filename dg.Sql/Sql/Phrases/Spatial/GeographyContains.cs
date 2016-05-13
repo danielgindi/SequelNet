@@ -7,88 +7,104 @@ namespace dg.Sql.Phrases
 {
     public class GeographyContains : IPhrase
     {
-        string ContainingTableName;
-        object ContainingObject;
-        ValueObjectType ContainingObjectType;
-        string ContainedTableName;
-        object ContainedObject;
-        ValueObjectType ContainedObjectType;
+        public string OuterTableName;
+        public object OuterValue;
+        public ValueObjectType OuterValueType;
+        public string InnerTableName;
+        public object InnerValue;
+        public ValueObjectType InnerValueType;
 
-        public GeographyContains(string ContainingTableName, object ContainingObject, ValueObjectType ContainingObjectType,
-            string ContainedTableName, object ContainedObject, ValueObjectType ContainedObjectType)
+        public GeographyContains(
+            string outerTableName, object outerValue, ValueObjectType outerValueType,
+            string innerTableName, object innerValue, ValueObjectType innerValueType)
         {
-            this.ContainingTableName = ContainingTableName;
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ContainingObjectType;
-            this.ContainedTableName = ContainedTableName;
-            this.ContainedObject = ContainedObject;
-            this.ContainedObjectType = ContainedObjectType;
+            this.OuterTableName = outerTableName;
+            this.OuterValue = outerValue;
+            this.OuterValueType = outerValueType;
+            this.InnerTableName = innerTableName;
+            this.InnerValue = innerValue;
+            this.InnerValueType = innerValueType;
         }
-        public GeographyContains(object ContainingObject, ValueObjectType ContainingObjectType,
-            object ContainedObject, ValueObjectType ContainedObjectType)
+
+        public GeographyContains(
+            object outerValue, ValueObjectType outerValueType,
+            object innerValue, ValueObjectType innerValueType)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ContainingObjectType;
-            this.ContainedObject = ContainedObject;
-            this.ContainedObjectType = ContainedObjectType;
+            this.OuterValue = outerValue;
+            this.OuterValueType = outerValueType;
+            this.InnerValue = innerValue;
+            this.InnerValueType = innerValueType;
         }
-        public GeographyContains(object ContainingObject, ValueObjectType ContainingObjectType,
-            string ContainedColumnName)
+
+        public GeographyContains(
+            object outerValue, ValueObjectType outerValueType,
+            string CctainedColumnName)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ContainingObjectType;
-            this.ContainedObject = ContainedColumnName;
-            this.ContainedObjectType = ValueObjectType.ColumnName;
+            this.OuterValue = outerValue;
+            this.OuterValueType = outerValueType;
+            this.InnerValue = CctainedColumnName;
+            this.InnerValueType = ValueObjectType.ColumnName;
         }
-        public GeographyContains(object ContainingObject, ValueObjectType ContainingObjectType,
-            string ContainedTableName, string ContainedColumnName)
+
+        public GeographyContains(
+            object outerValue, ValueObjectType outerValueType,
+            string innerTableName, string innerColumnName)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ContainingObjectType;
-            this.ContainedTableName = ContainedTableName;
-            this.ContainedObject = ContainedColumnName;
-            this.ContainedObjectType = ValueObjectType.ColumnName;
+            this.OuterValue = outerValue;
+            this.OuterValueType = outerValueType;
+            this.InnerTableName = innerTableName;
+            this.InnerValue = innerColumnName;
+            this.InnerValueType = ValueObjectType.ColumnName;
         }
-        public GeographyContains(Geometry ContainingObject,
-            string ContainedColumnName)
+
+        public GeographyContains(
+            Geometry outerValue,
+            string innerColumnName)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ValueObjectType.Value;
-            this.ContainedObject = ContainedColumnName;
-            this.ContainedObjectType = ValueObjectType.ColumnName;
+            this.OuterValue = outerValue;
+            this.OuterValueType = ValueObjectType.Value;
+            this.InnerValue = innerColumnName;
+            this.InnerValueType = ValueObjectType.ColumnName;
         }
-        public GeographyContains(Geometry ContainingObject,
-            string ContainedTableName, string ContainedColumnName)
+
+        public GeographyContains(
+            Geometry outerValue,
+            string innerTableName, string innerColumnName)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ValueObjectType.Value;
-            this.ContainedTableName = ContainedTableName;
-            this.ContainedObject = ContainedColumnName;
-            this.ContainedObjectType = ValueObjectType.ColumnName;
+            this.OuterValue = outerValue;
+            this.OuterValueType = ValueObjectType.Value;
+            this.InnerTableName = innerTableName;
+            this.InnerValue = innerColumnName;
+            this.InnerValueType = ValueObjectType.ColumnName;
         }
-        public GeographyContains(Geometry ContainingObject, Geometry ContainedObject)
+
+        public GeographyContains(Geometry outerValue, Geometry innerValue)
         {
-            this.ContainingObject = ContainingObject;
-            this.ContainingObjectType = ValueObjectType.Value;
-            this.ContainedObject = ContainedObject;
-            this.ContainedObjectType = ValueObjectType.Value;
+            this.OuterValue = outerValue;
+            this.OuterValueType = ValueObjectType.Value;
+            this.InnerValue = innerValue;
+            this.InnerValueType = ValueObjectType.Value;
         }
-        public GeographyContains(string ContainingColumnName,
-            Geometry ContainedObject)
+
+        public GeographyContains(
+            string outerColumnName,
+            Geometry InnerObject)
         {
-            this.ContainingObject = ContainingColumnName;
-            this.ContainingObjectType = ValueObjectType.ColumnName;
-            this.ContainedObject = ContainedObject;
-            this.ContainedObjectType = ValueObjectType.Value;
+            this.OuterValue = outerColumnName;
+            this.OuterValueType = ValueObjectType.ColumnName;
+            this.InnerValue = InnerObject;
+            this.InnerValueType = ValueObjectType.Value;
         }
-        public GeographyContains(string ContainingTableName, string ContainingColumnName, 
-            Geometry ContainedObject)
+
+        public GeographyContains(
+            string outerTableName, string outerColumnName, 
+            Geometry InnerObject)
         {
-            this.ContainingTableName = ContainingTableName;
-            this.ContainingObject = ContainingColumnName;
-            this.ContainingObjectType = ValueObjectType.ColumnName;
-            this.ContainedObject = ContainedObject;
-            this.ContainedObjectType = ValueObjectType.Value;
+            this.OuterTableName = outerTableName;
+            this.OuterValue = outerColumnName;
+            this.OuterValueType = ValueObjectType.ColumnName;
+            this.InnerValue = InnerObject;
+            this.InnerValueType = ValueObjectType.Value;
         }
 
         public string BuildPhrase(ConnectorBase conn)
@@ -110,27 +126,27 @@ namespace dg.Sql.Phrases
                 }
             }
 
-            if (ContainingObjectType == ValueObjectType.ColumnName)
+            if (OuterValueType == ValueObjectType.ColumnName)
             {
-                if (ContainingTableName != null && ContainingTableName.Length > 0)
+                if (OuterTableName != null && OuterTableName.Length > 0)
                 {
-                    sb.Append(conn.EncloseFieldName(ContainingTableName));
+                    sb.Append(conn.EncloseFieldName(OuterTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.EncloseFieldName(ContainingObject.ToString()));
+                sb.Append(conn.EncloseFieldName(OuterValue.ToString()));
             }
-            else if (ContainingObjectType == ValueObjectType.Value)
+            else if (OuterValueType == ValueObjectType.Value)
             {
-                if (ContainingObject is Geometry)
+                if (OuterValue is Geometry)
                 {
-                    ((Geometry)ContainingObject).BuildValue(sb, conn);
+                    ((Geometry)OuterValue).BuildValue(sb, conn);
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(ContainingObject));
+                    sb.Append(conn.PrepareValue(OuterValue));
                 }
             }
-            else sb.Append(ContainingObject);
+            else sb.Append(OuterValue);
 
             if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
             {
@@ -141,27 +157,27 @@ namespace dg.Sql.Phrases
                 sb.Append(@",");
             }
 
-            if (ContainedObjectType == ValueObjectType.ColumnName)
+            if (InnerValueType == ValueObjectType.ColumnName)
             {
-                if (ContainedTableName != null && ContainedTableName.Length > 0)
+                if (InnerTableName != null && InnerTableName.Length > 0)
                 {
-                    sb.Append(conn.EncloseFieldName(ContainedTableName));
+                    sb.Append(conn.EncloseFieldName(InnerTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.EncloseFieldName(ContainedObject.ToString()));
+                sb.Append(conn.EncloseFieldName(InnerValue.ToString()));
             }
-            else if (ContainedObjectType == ValueObjectType.Value)
+            else if (InnerValueType == ValueObjectType.Value)
             {
-                if (ContainedObject is Geometry)
+                if (InnerValue is Geometry)
                 {
-                    ((Geometry)ContainedObject).BuildValue(sb, conn);
+                    ((Geometry)InnerValue).BuildValue(sb, conn);
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(ContainedObject));
+                    sb.Append(conn.PrepareValue(InnerValue));
                 }
             }
-            else sb.Append(ContainedObject);
+            else sb.Append(InnerValue);
 
             sb.Append(@")");
 

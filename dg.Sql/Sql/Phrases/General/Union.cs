@@ -7,7 +7,7 @@ namespace dg.Sql.Phrases
 {
     public class Union : IPhrase
     {
-        Query[] Queries;
+        public Query[] Queries;
 
         public Union(params Query[] queries)
         {

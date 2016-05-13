@@ -21,28 +21,28 @@ namespace dg.Sql
         /// <summary>
         /// Will execute the query reading the results into a <typeparamref name="DataSet"/>.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns><typeparamref name="DataSet"/> object</returns>
-        public DataSet ExecuteDataSet(ConnectorBase Connection)
+        public DataSet ExecuteDataSet(ConnectorBase connection)
         {
-            bool needsDispose = Connection == null;
+            bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) Connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.NewInstance();
                 if (_QueryMode == QueryMode.ExecuteStoredProcedure)
                 {
-                    return Connection.ExecuteDataSet(BuildDbCommand(Connection));
+                    return connection.ExecuteDataSet(BuildDbCommand(connection));
                 }
                 else
                 {
-                    return Connection.ExecuteDataSet(BuildCommand(Connection));
+                    return connection.ExecuteDataSet(BuildCommand(connection));
                 }
             }
             finally
             {
-                if (needsDispose && Connection != null)
+                if (needsDispose && connection != null)
                 {
-                    Connection.Dispose();
+                    connection.Dispose();
                 }
             }
         }
@@ -59,28 +59,28 @@ namespace dg.Sql
         /// <summary>
         /// Will execute the query returning a <typeparamref name="DataReaderBase"/> object.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns><typeparamref name="DataReaderBase"/> object</returns>
-        public DataReaderBase ExecuteReader(ConnectorBase Connection)
+        public DataReaderBase ExecuteReader(ConnectorBase connection)
         {
-            bool needsDispose = Connection == null;
+            bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) Connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.NewInstance();
                 if (_QueryMode == QueryMode.ExecuteStoredProcedure)
                 {
-                    return Connection.ExecuteReader(BuildDbCommand(Connection), needsDispose);
+                    return connection.ExecuteReader(BuildDbCommand(connection), needsDispose);
                 }
                 else
                 {
-                    return Connection.ExecuteReader(BuildCommand(Connection), needsDispose);
+                    return connection.ExecuteReader(BuildCommand(connection), needsDispose);
                 }
             }
             catch
             {
-                if (needsDispose && Connection != null)
+                if (needsDispose && connection != null)
                 {
-                    Connection.Dispose();
+                    connection.Dispose();
                 }
                 throw;
             }
@@ -99,31 +99,31 @@ namespace dg.Sql
         /// <summary>
         /// Will execute the query returning the first value of the first row.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>an object</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public object ExecuteScalar(ConnectorBase Connection)
+        public object ExecuteScalar(ConnectorBase connection)
         {
-            bool needsDispose = Connection == null;
+            bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) Connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.NewInstance();
 
                 bool transaction = false;
-                if (_NeedTransaction && !Connection.HasTransaction)
+                if (_NeedTransaction && !connection.HasTransaction)
                 {
                     transaction = true;
-                    Connection.BeginTransaction();
+                    connection.BeginTransaction();
                 }
                 object retValue = null;
 
                 if (_QueryMode == QueryMode.ExecuteStoredProcedure)
                 {
-                    retValue = Connection.ExecuteScalar(BuildDbCommand(Connection));
+                    retValue = connection.ExecuteScalar(BuildDbCommand(connection));
                 }
                 else
                 {
-                    retValue = Connection.ExecuteScalar(BuildCommand(Connection));
+                    retValue = connection.ExecuteScalar(BuildCommand(connection));
                 }
 
                 if (retValue is DBNull) retValue = null;
@@ -131,16 +131,16 @@ namespace dg.Sql
 
                 if (transaction)
                 {
-                    Connection.CommitTransaction();
+                    connection.CommitTransaction();
                 }
 
                 return retValue;
             }
             finally
             {
-                if (needsDispose && Connection != null)
+                if (needsDispose && connection != null)
                 {
-                    Connection.Dispose();
+                    connection.Dispose();
                 }
             }
         }
@@ -174,7 +174,7 @@ namespace dg.Sql
         /// <summary>
         /// Will execute the query without reading any results.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Number of affected rows</returns>
         public int ExecuteNonQuery(ConnectorBase connection)
         {
@@ -213,11 +213,11 @@ namespace dg.Sql
         /// Will execute the query without reading any results.
         /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Number of affected rows</returns>
-        public int Execute(ConnectorBase Connection)
+        public int Execute(ConnectorBase connection)
         {
-            return ExecuteNonQuery(Connection);
+            return ExecuteNonQuery(connection);
         }
 
         /// <summary>
@@ -225,7 +225,7 @@ namespace dg.Sql
         /// </summary>
         /// <param name="LastInsertId">Where to put the last inserted ROWID</param>
         /// <returns>Number of affected rows</returns>
-        public int Execute(out object LastInsertId)
+        public int Execute(out object lastInsertId)
         {
             using (ConnectorBase connection = ConnectorBase.NewInstance())
             {
@@ -244,13 +244,13 @@ namespace dg.Sql
 
                 if (retValue > 0)
                 {
-                    LastInsertId = connection.GetLastInsertID();
-                    if (LastInsertId is DBNull) LastInsertId = null;
-                    else if (LastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)LastInsertId).IsNull) LastInsertId = null;
+                    lastInsertId = connection.GetLastInsertID();
+                    if (lastInsertId is DBNull) lastInsertId = null;
+                    else if (lastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)lastInsertId).IsNull) lastInsertId = null;
                 }
                 else
                 {
-                    LastInsertId = null;
+                    lastInsertId = null;
                 }
                 if (transaction) connection.CommitTransaction();
                 return retValue;
@@ -263,36 +263,36 @@ namespace dg.Sql
         /// <param name="Connection">An existing connection to use.</param>
         /// <param name="LastInsertId">Where to put the last inserted ROWID</param>
         /// <returns>Number of affected rows</returns>
-        public int Execute(ConnectorBase Connection, out object LastInsertId)
+        public int Execute(ConnectorBase connection, out object lastInsertId)
         {
-            if (Connection == null) return Execute(out LastInsertId);
+            if (connection == null) return Execute(out lastInsertId);
             else
             {
                 bool transaction = false;
-                if (_NeedTransaction && !Connection.HasTransaction) Connection.BeginTransaction();
+                if (_NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
 
                 int retValue = 0;
 
                 if (_QueryMode == QueryMode.ExecuteStoredProcedure)
                 {
-                    retValue = Connection.ExecuteNonQuery(BuildDbCommand(Connection));
+                    retValue = connection.ExecuteNonQuery(BuildDbCommand(connection));
                 }
                 else
                 {
-                    retValue = Connection.ExecuteNonQuery(BuildCommand(Connection));
+                    retValue = connection.ExecuteNonQuery(BuildCommand(connection));
                 }
 
                 if (retValue > 0)
                 {
-                    LastInsertId = Connection.GetLastInsertID();
-                    if (LastInsertId is DBNull) LastInsertId = null;
-                    else if (LastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)LastInsertId).IsNull) LastInsertId = null;
+                    lastInsertId = connection.GetLastInsertID();
+                    if (lastInsertId is DBNull) lastInsertId = null;
+                    else if (lastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)lastInsertId).IsNull) lastInsertId = null;
                 }
                 else
                 {
-                    LastInsertId = null;
+                    lastInsertId = null;
                 }
-                if (transaction) Connection.CommitTransaction();
+                if (transaction) connection.CommitTransaction();
                 return retValue;
             }
         }
@@ -310,6 +310,7 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads the first value of each row.
         /// </summary>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Array of values. Will never return null.</returns>
         public T[] ExecuteScalarArray<T>(ConnectorBase connection)
         {
@@ -329,6 +330,7 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads the first value of each row.
         /// </summary>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>List of values. Will never return null.</returns>
         public List<T> ExecuteScalarList<T>(ConnectorBase connection)
         {
@@ -361,12 +363,12 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads the first row only into a list.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>List of values by the SELECT order. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public List<object> ExecuteOneRowToList(ConnectorBase Connection)
+        public List<object> ExecuteOneRowToList(ConnectorBase connection)
         {
-            using (DataReaderBase reader = ExecuteReader(Connection))
+            using (DataReaderBase reader = ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -402,12 +404,12 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads the first row only into a dictionary.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public Dictionary<string, object> ExecuteOneRowToDictionary(ConnectorBase Connection)
+        public Dictionary<string, object> ExecuteOneRowToDictionary(ConnectorBase connection)
         {
-            using (DataReaderBase reader = ExecuteReader(Connection))
+            using (DataReaderBase reader = ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -447,12 +449,12 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads all rows into a list of lists.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Each item in the list is a list of values by the SELECT order. Will never return null.</returns>
-        public List<List<object>> ExecuteListOfLists(ConnectorBase Connection)
+        public List<List<object>> ExecuteListOfLists(ConnectorBase connection)
         {
             List<List<object>> results = new List<List<object>>();
-            using (DataReaderBase reader = ExecuteReader(Connection))
+            using (DataReaderBase reader = ExecuteReader(connection))
             {
                 List<object> row;
                 object value;
@@ -485,12 +487,12 @@ namespace dg.Sql
         /// <summary>
         /// Executes the query and reads the first row only.
         /// </summary>
-        /// <param name="Connection">An existing connection to use.</param>
+        /// <param name="connection">An existing connection to use.</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
-        public List<Dictionary<string, object>> ExecuteListOfDictionaries(ConnectorBase Connection)
+        public List<Dictionary<string, object>> ExecuteListOfDictionaries(ConnectorBase connection)
         {
             List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
-            using (DataReaderBase reader = ExecuteReader(Connection))
+            using (DataReaderBase reader = ExecuteReader(connection))
             {
                 Dictionary<string, object> row;
                 int i, c = reader.GetColumnCount();

@@ -240,7 +240,7 @@ namespace dg.Sql
         public virtual void Insert() { Insert(null); }
         public virtual void Update() { Update(null); }
 
-        public virtual void Insert(ConnectorBase Connection)
+        public virtual void Insert(ConnectorBase connection)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -292,13 +292,13 @@ namespace dg.Sql
                 qry.Insert(@"CreatedOn", DateTime.UtcNow);
             }
 
-            qry.Execute(Connection);
+            qry.Execute(connection);
 
             _NewRecord = false;
             MarkAllColumnsNotDirty();
         }
 
-        public virtual void Update(ConnectorBase Connection)
+        public virtual void Update(ConnectorBase connection)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -363,13 +363,13 @@ namespace dg.Sql
 
             if (qry.HasInsertsOrUpdates)
             {
-                qry.Execute(Connection);
+                qry.Execute(connection);
             }
 
             MarkAllColumnsNotDirty();
         }
 
-        public virtual void Read(DataReaderBase Reader)
+        public virtual void Read(DataReaderBase reader)
         {
             if (__CLASS_TYPE == null)
             {
@@ -383,7 +383,7 @@ namespace dg.Sql
                 if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
                 if (propInfo != null)
                 {
-                    propInfo.SetValue(this, Convert.ChangeType(Reader[Column.Name], Column.Type), null);
+                    propInfo.SetValue(this, Convert.ChangeType(reader[Column.Name], Column.Type), null);
                 }
             }
 
@@ -403,15 +403,15 @@ namespace dg.Sql
             }
         }
 
-        public virtual void Save(ConnectorBase Connection)
+        public virtual void Save(ConnectorBase connection)
         {
             if (_NewRecord)
             {
-                Insert(Connection);
+                Insert(connection);
             }
             else
             {
-                Update(Connection);
+                Update(connection);
             }
         }
 
@@ -420,63 +420,63 @@ namespace dg.Sql
         #region Deleting a record
 
         /// <summary>
-        /// Deletes a record from the db, by matching the Primary Key to <paramref name="PrimaryKeyValue"/>.
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
         /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
-        /// <param name="PrimaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Delete(object PrimaryKeyValue, ConnectorBase Connection = null)
+        public static int Delete(object primaryKeyValue, ConnectorBase connection = null)
         {
             object columnName = SchemaPrimaryKeyName;
             if (columnName == null) return 0;
-            return DeleteByParameter(columnName, PrimaryKeyValue, null, Connection);
+            return DeleteByParameter(columnName, primaryKeyValue, null, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
         /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Delete(string ColumnName, object Value, ConnectorBase Connection = null)
+        public static int Delete(string columnName, object value, ConnectorBase connection = null)
         {
-            return DeleteByParameter(ColumnName, Value, null, Connection);
+            return DeleteByParameter(columnName, value, null, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
-        /// If the table has a ModifiedBy column, it will be updated with <paramref name="UserName"/> or the current identified Username.
+        /// If the table has a ModifiedBy column, it will be updated with <paramref name="userName"/> or the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="UserName">An optional username to use if updating a ModifiedBy column.</param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="userName">An optional username to use if updating a ModifiedBy column.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Delete(string ColumnName, object Value, string UserName, ConnectorBase Connection = null)
+        public static int Delete(string columnName, object value, string userName, ConnectorBase connection = null)
         {
-            return DeleteByParameter(ColumnName, Value, UserName, Connection);
+            return DeleteByParameter(columnName, value, userName, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
         /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        private static int DeleteByParameter(object ColumnName, object Value, string UserName, ConnectorBase Connection)
+        private static int DeleteByParameter(object columnName, object value, string userName, ConnectorBase connection)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -486,26 +486,26 @@ namespace dg.Sql
             string strUpdate = string.Empty;
             if (__HAS_DELETED || __HAS_IS_DELETED)
             {
-                if (UserName == null || UserName.Length == 0)
+                if (userName == null || userName.Length == 0)
                 {
                     if (System.Web.HttpContext.Current != null)
-                        UserName = System.Web.HttpContext.Current.User.Identity.Name;
-                    else UserName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
+                        userName = System.Web.HttpContext.Current.User.Identity.Name;
+                    else userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
                 }
 
                 Query qry = new Query(TableSchema);
 
                 if (__HAS_DELETED) qry.Update(@"Deleted", true);
                 if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
-                if (__HAS_MODIFIED_BY && !string.IsNullOrEmpty(UserName)) qry.Update(@"ModifiedBy", UserName);
+                if (__HAS_MODIFIED_BY && !string.IsNullOrEmpty(userName)) qry.Update(@"ModifiedBy", userName);
                 if (__HAS_MODIFIED_ON) qry.Update(@"ModifiedOn", DateTime.UtcNow);
 
-                if (ColumnName is ICollection)
+                if (columnName is ICollection)
                 {
-                    if (!(Value is ICollection)) return 0;
+                    if (!(value is ICollection)) return 0;
 
-                    IEnumerator keyEnumerator = ((IEnumerable)ColumnName).GetEnumerator();
-                    IEnumerator valueEnumerator = ((IEnumerable)Value).GetEnumerator();
+                    IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                    IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
 
                     while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
                     {
@@ -514,55 +514,55 @@ namespace dg.Sql
                 }
                 else
                 {
-                    qry.Where((string)ColumnName, Value);
+                    qry.Where((string)columnName, value);
                 }
-                return qry.ExecuteNonQuery(Connection);
+                return qry.ExecuteNonQuery(connection);
             }
-            return DestroyByParameter(ColumnName, Value, Connection);
+            return DestroyByParameter(columnName, value, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching the Primary Key to <paramref name="PrimaryKeyValue"/>.
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
-        /// <param name="PrimaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Destroy(object PrimaryKeyValue, ConnectorBase Connection = null)
+        public static int Destroy(object primaryKeyValue, ConnectorBase connection = null)
         {
             object columnName = SchemaPrimaryKeyName;
             if (columnName == null) return 0;
-            return DestroyByParameter(columnName, PrimaryKeyValue, Connection);
+            return DestroyByParameter(columnName, primaryKeyValue, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Destroy(string ColumnName, object Value, ConnectorBase Connection = null)
+        public static int Destroy(string columnName, object value, ConnectorBase connection = null)
         {
-            return DestroyByParameter(ColumnName, Value, Connection);
+            return DestroyByParameter(columnName, value, connection);
         }
 
         /// <summary>
-        /// Deletes a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        private static int DestroyByParameter(object ColumnName, object Value, ConnectorBase Connection)
+        private static int DestroyByParameter(object columnName, object value, ConnectorBase connection)
         {
             Query qry = new Query(TableSchema).Delete();
 
-            if (ColumnName is ICollection)
+            if (columnName is ICollection)
             {
-                if (!(Value is ICollection)) return 0;
+                if (!(value is ICollection)) return 0;
 
-                IEnumerator keyEnumerator = ((IEnumerable)ColumnName).GetEnumerator();
-                IEnumerator valueEnumerator = ((IEnumerable)Value).GetEnumerator();
+                IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
 
                 while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
                 {
@@ -571,21 +571,21 @@ namespace dg.Sql
             }
             else
             {
-                qry.Where((string)ColumnName, Value);
+                qry.Where((string)columnName, value);
             }
 
-            return qry.ExecuteNonQuery(Connection);
+            return qry.ExecuteNonQuery(connection);
         }
 
         #endregion
 
         #region Column utilities
 
-        private Type FindColumnType(string ColumnName)
+        private Type FindColumnType(string columnName)
         {
             foreach (TableSchema.Column col in TableSchema.Columns)
             {
-                if (col.Name.Equals(ColumnName, StringComparison.CurrentCultureIgnoreCase))
+                if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return col.Type;
                 }
@@ -593,11 +593,11 @@ namespace dg.Sql
             return null;
         }
 
-        private DataType FindColumnDataType(string ColumnName)
+        private DataType FindColumnDataType(string columnName)
         {
             foreach (TableSchema.Column col in TableSchema.Columns)
             {
-                if (col.Name.Equals(ColumnName, StringComparison.CurrentCultureIgnoreCase))
+                if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 {
                     return col.ActualDataType;
                 }
@@ -610,22 +610,22 @@ namespace dg.Sql
         #region Loading utilities
 
         /// <summary>
-        /// Fetches a record from the db, by matching the Primary Key to <paramref name="PrimaryKeyValue"/>.
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
-        /// <param name="PrimaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>A record (marked as "old") or null.</returns>
-        public static T FetchByID(object PrimaryKeyValue, ConnectorBase Connection = null)
+        public static T FetchByID(object primaryKeyValue, ConnectorBase connection = null)
         {
             Query qry = new Query(TableSchema);
 
             object primaryKey = SchemaPrimaryKeyName;
             if (__PRIMARY_KEY_MULTI)
             {
-                if (!(PrimaryKeyValue is ICollection)) return null;
+                if (!(primaryKeyValue is ICollection)) return null;
 
                 IEnumerator keyEnumerator = ((IEnumerable)primaryKey).GetEnumerator();
-                IEnumerator valueEnumerator = ((IEnumerable)PrimaryKeyValue).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)primaryKeyValue).GetEnumerator();
 
                 while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
                 {
@@ -634,10 +634,10 @@ namespace dg.Sql
             }
             else
             {
-                qry.Where((string)primaryKey, PrimaryKeyValue);
+                qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            using (DataReaderBase reader = qry.ExecuteReader(Connection))
+            using (DataReaderBase reader = qry.ExecuteReader(connection))
             {
                 if (reader.Read()) return FromReader(reader);
             }
@@ -645,33 +645,33 @@ namespace dg.Sql
         }
 
         /// <summary>
-        /// Loads a record from the db, by matching the Primary Key to <paramref name="PrimaryKeyValue"/>.
+        /// Loads a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// If the record was loaded, it will be marked as an "old" record.
         /// </summary>
-        /// <param name="PrimaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
-        public void LoadByKey(object PrimaryKeyValue, ConnectorBase Connection = null)
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        public void LoadByKey(object primaryKeyValue, ConnectorBase connection = null)
         {
-            LoadByParam(SchemaPrimaryKeyName, PrimaryKeyValue, Connection);
+            LoadByParam(SchemaPrimaryKeyName, primaryKeyValue, connection);
         }
         
         /// <summary>
-        /// Loads a record from the db, by matching <paramref name="ColumnName"/> to <paramref name="Value"/>.
+        /// Loads a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the record was loaded, it will be marked as an "old" record.
         /// </summary>
-        /// <param name="ColumnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
-        /// <param name="Value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="ColumnName"/></param>
-        /// <param name="Connection">An optional db connection to use when executing the query.</param>
-        public void LoadByParam(object ColumnName, object Value, ConnectorBase Connection = null)
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        public void LoadByParam(object columnName, object value, ConnectorBase connection = null)
         {
             Query qry = new Query(TableSchema);
 
-            if (ColumnName is ICollection)
+            if (columnName is ICollection)
             {
-                if (!(Value is ICollection)) return;
+                if (!(value is ICollection)) return;
 
-                IEnumerator keyEnumerator = ((IEnumerable)ColumnName).GetEnumerator();
-                IEnumerator valueEnumerator = ((IEnumerable)Value).GetEnumerator();
+                IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
 
                 while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
                 {
@@ -680,10 +680,10 @@ namespace dg.Sql
             }
             else
             {
-                qry.Where((string)ColumnName, Value);
+                qry.Where((string)columnName, value);
             }
 
-            using (DataReaderBase reader = qry.ExecuteReader(Connection))
+            using (DataReaderBase reader = qry.ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -694,15 +694,15 @@ namespace dg.Sql
         }
 
         /// <summary>
-        /// Creates a new instance of this record, and loads it from the <paramref name="Reader"/>.
+        /// Creates a new instance of this record, and loads it from the <paramref name="reader"/>.
         /// Will me marked as "old".
         /// </summary>
-        /// <param name="Reader">The reader to use for loading the new record</param>
+        /// <param name="reader">The reader to use for loading the new record</param>
         /// <returns>The new <typeparamref name="T"/>.</returns>
-        public static T FromReader(DataReaderBase Reader)
+        public static T FromReader(DataReaderBase reader)
         {
             T item = new T();
-            item.Read(Reader);
+            item.Read(reader);
             return item;
         }
 
@@ -710,115 +710,115 @@ namespace dg.Sql
 
         #region Utilities for loading from db
 
-        protected static string StringOrNullFromDb(object Value)
+        protected static string StringOrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return (string)Value;
+            if (value is System.DBNull || value == null) return null;
+            else return (string)value;
         }
 
-        protected static string StringOrEmptyFromDb(object Value)
+        protected static string StringOrEmptyFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return string.Empty;
-            else return (string)Value;
+            if (value is System.DBNull || value == null) return string.Empty;
+            else return (string)value;
         }
 
-        protected static Int32? Int32OrNullFromDb(object Value)
+        protected static Int32? Int32OrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return Convert.ToInt32(Value);
+            if (value is System.DBNull || value == null) return null;
+            else return Convert.ToInt32(value);
         }
 
-        protected static Int32 Int32OrZero(object Value)
+        protected static Int32 Int32OrZero(object value)
         {
-            if (Value is System.DBNull || Value == null) return 0;
-            else return Convert.ToInt32(Value);
+            if (value is System.DBNull || value == null) return 0;
+            else return Convert.ToInt32(value);
         }
 
-        protected static Int64? Int64OrNullFromDb(object Value)
+        protected static Int64? Int64OrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return Convert.ToInt64(Value);
+            if (value is System.DBNull || value == null) return null;
+            else return Convert.ToInt64(value);
         }
 
-        protected static Int64 Int64OrZero(object Value)
+        protected static Int64 Int64OrZero(object value)
         {
-            if (Value is System.DBNull || Value == null) return 0;
-            else return Convert.ToInt64(Value);
+            if (value is System.DBNull || value == null) return 0;
+            else return Convert.ToInt64(value);
         }
 
-        protected static decimal? DecimalOrNullFromDb(object Value)
+        protected static decimal? DecimalOrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return Convert.ToDecimal(Value);
+            if (value is System.DBNull || value == null) return null;
+            else return Convert.ToDecimal(value);
         }
 
-        protected static decimal DecimalOrZeroFromDb(object Value)
+        protected static decimal DecimalOrZeroFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return 0m;
-            else return Convert.ToDecimal(Value);
+            if (value is System.DBNull || value == null) return 0m;
+            else return Convert.ToDecimal(value);
         }
 
-        protected static float? FloatOrNullFromDb(object Value)
+        protected static float? FloatOrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return Convert.ToSingle(Value);
+            if (value is System.DBNull || value == null) return null;
+            else return Convert.ToSingle(value);
         }
 
-        protected static float FloatOrZeroFromDb(object Value)
+        protected static float FloatOrZeroFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return 0f;
-            else return Convert.ToSingle(Value);
+            if (value is System.DBNull || value == null) return 0f;
+            else return Convert.ToSingle(value);
         }
 
-        protected static double? DoubleOrNullFromDb(object Value)
+        protected static double? DoubleOrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return Convert.ToDouble(Value);
+            if (value is System.DBNull || value == null) return null;
+            else return Convert.ToDouble(value);
         }
 
-        protected static double DoubleOrZeroFromDb(object Value)
+        protected static double DoubleOrZeroFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return 0.0;
-            else return Convert.ToDouble(Value);
+            if (value is System.DBNull || value == null) return 0.0;
+            else return Convert.ToDouble(value);
         }
 
-        protected static DateTime? DateTimeOrNullFromDb(object Value)
+        protected static DateTime? DateTimeOrNullFromDb(object value)
         {
-            if (Value is System.DBNull || Value == null) return null;
-            else return (DateTime)Value;
+            if (value is System.DBNull || value == null) return null;
+            else return (DateTime)value;
         }
 
-        protected static DateTime DateTimeOrNow(object Value)
+        protected static DateTime DateTimeOrNow(object value)
         {
-            if (Value is System.DBNull || Value == null) return DateTime.UtcNow;
-            else return (DateTime)Value;
+            if (value is System.DBNull || value == null) return DateTime.UtcNow;
+            else return (DateTime)value;
         }
 
-        protected static DateTime DateTimeOrMinValue(object Value)
+        protected static DateTime DateTimeOrMinValue(object value)
         {
-            if (Value is System.DBNull || Value == null) return DateTime.MinValue;
-            else return (DateTime)Value;
+            if (value is System.DBNull || value == null) return DateTime.MinValue;
+            else return (DateTime)value;
         }
 
-        protected static Guid GuidFromDb(object Value)
+        protected static Guid GuidFromDb(object value)
         {
-            Guid? ret = Value as Guid?;
-            if (ret == null) ret = new Guid((string)Value);
+            Guid? ret = value as Guid?;
+            if (ret == null) ret = new Guid((string)value);
             return ret.Value;
         }
 
-        protected static Guid? GuidOrNullFromDb(object Value)
+        protected static Guid? GuidOrNullFromDb(object value)
         {
-            Guid? ret = Value as Guid?;
-            if (ret == null && !IsNull(Value)) ret = new Guid((string)Value);
+            Guid? ret = value as Guid?;
+            if (ret == null && !IsNull(value)) ret = new Guid((string)value);
             return ret.Value;
         }
 
-        protected static bool IsNull(object Value)
+        protected static bool IsNull(object value)
         {
-            if (Value == null) return true;
-            if (Value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)Value).IsNull) return true;
-            if (Value == DBNull.Value) return true;
+            if (value == null) return true;
+            if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) return true;
+            if (value == DBNull.Value) return true;
             else return false;
         }
 
@@ -826,11 +826,11 @@ namespace dg.Sql
 
         #region Helpers
 
-        private static bool StringArrayContains(string[] Array, string Item)
+        private static bool StringArrayContains(string[] array, string containsItem)
         {
-            foreach (string item in Array)
+            foreach (string item in array)
             {
-                if (item == Item) return true;
+                if (item == containsItem) return true;
             }
             return false;
         }

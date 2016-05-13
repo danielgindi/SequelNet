@@ -13,12 +13,14 @@ namespace dg.Sql
                 : base()
             {
             }
+
             public MultiPolygon(params Polygon[] polygons)
                 : base(polygons)
             {
             }
-            public MultiPolygon(int Capacity)
-                : base(Capacity)
+
+            public MultiPolygon(int capacity)
+                : base(capacity)
             {
             }
         }

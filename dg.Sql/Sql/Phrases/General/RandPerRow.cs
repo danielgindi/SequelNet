@@ -7,22 +7,24 @@ namespace dg.Sql.Phrases
 {
     public class RandWeight : IPhrase
     {
-        string TableName;
-        string Object;
-        ValueObjectType ObjectType;
+        public string TableName;
+        public string Value;
+        public ValueObjectType ValueType;
 
         public RandWeight(
-            string TableName, string Object, ValueObjectType ObjectType)
+            string tableName, string value, ValueObjectType valueType)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Value = value;
+            this.ValueType = valueType;
         }
+
         public RandWeight(
-             string Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+             string Object, ValueObjectType valueType)
+            : this(null, Object, valueType)
         {
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;
@@ -33,20 +35,20 @@ namespace dg.Sql.Phrases
             else // if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                 ret = @"RANDOM() * ";
 
-            if (ObjectType == ValueObjectType.ColumnName)
+            if (ValueType == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object);
+                ret += conn.EncloseFieldName(Value);
             }
-            else if (ObjectType == ValueObjectType.Value)
+            else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object);
+                ret += conn.PrepareValue(Value);
             }
-            else ret += Object;
+            else ret += Value;
 
             return ret;
         }

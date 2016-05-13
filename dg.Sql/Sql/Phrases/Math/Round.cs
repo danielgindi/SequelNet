@@ -7,61 +7,67 @@ namespace dg.Sql.Phrases
 {
     public class Round : IPhrase
     {
-        string TableName;
-        object Object;
-        ValueObjectType ObjectType;
-        int DecimalPlaces;
+        public string TableName;
+        public object Value;
+        public ValueObjectType ValueType;
+        public int DecimalPlaces;
 
-        public Round(string TableName, object Object, ValueObjectType ObjectType)
+        public Round(string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Value = value;
+            this.ValueType = valueType;
             this.DecimalPlaces = 0;
         }
-        public Round(string TableName, object Object, ValueObjectType ObjectType, int DecimalPlaces)
+
+        public Round(string tableName, object value, ValueObjectType valueType, int DecimalPlaces)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Value = value;
+            this.ValueType = valueType;
             this.DecimalPlaces = DecimalPlaces;
         }
-        public Round(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
+
+        public Round(object value, ValueObjectType valueType)
+            : this(null, value, valueType)
         {
         }
-        public Round(object Object, ValueObjectType ObjectType, int DecimalPlaces)
-            : this(null, Object, ObjectType, DecimalPlaces)
+
+        public Round(object value, ValueObjectType valueType, int DecimalPlaces)
+            : this(null, value, valueType, DecimalPlaces)
         {
         }
-        public Round(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Round(string columnName)
+            : this(null, columnName, ValueObjectType.ColumnName)
         {
         }
-        public Round(string ColumnName, int DecimalPlaces)
-            : this(null, ColumnName, ValueObjectType.ColumnName, DecimalPlaces)
+
+        public Round(string columnName, int DecimalPlaces)
+            : this(null, columnName, ValueObjectType.ColumnName, DecimalPlaces)
         {
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;
 
             ret = @"ROUND(";
 
-            if (ObjectType == ValueObjectType.ColumnName)
+            if (ValueType == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object.ToString());
+                ret += conn.EncloseFieldName(Value.ToString());
             }
-            else if (ObjectType == ValueObjectType.Value)
+            else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object);
+                ret += conn.PrepareValue(Value);
             }
-            else ret += Object;
+            else ret += Value;
 
             if (DecimalPlaces != 0)
             {

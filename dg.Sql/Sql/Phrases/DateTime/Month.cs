@@ -7,42 +7,45 @@ namespace dg.Sql.Phrases
 {
     public class Month : IPhrase
     {
-        string TableName;
-        object Object;
-        ValueObjectType ObjectType;
+        public string TableName;
+        public object Value;
+        public ValueObjectType ValueType;
 
-        public Month(string TableName, object Object, ValueObjectType ObjectType)
+        public Month(string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Value = value;
+            this.ValueType = valueType;
         }
-        public Month(object Object, ValueObjectType ObjectType)
-            : this(null, Object, ObjectType)
-        {
-        }
-        public Month(string ColumnName)
-            : this(null, ColumnName, ValueObjectType.ColumnName)
+
+        public Month(object value, ValueObjectType valueType)
+            : this(null, value, valueType)
         {
         }
+
+        public Month(string columnName)
+            : this(null, columnName, ValueObjectType.ColumnName)
+        {
+        }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret = "";
 
-            if (ObjectType == ValueObjectType.ColumnName)
+            if (ValueType == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object.ToString());
+                ret += conn.EncloseFieldName(Value.ToString());
             }
-            else if (ObjectType == ValueObjectType.Value)
+            else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object);
+                ret += conn.PrepareValue(Value);
             }
-            else ret += Object;
+            else ret += Value;
 
             return conn.func_MONTH(ret);
         }

@@ -7,28 +7,31 @@ namespace dg.Sql.Phrases
 {
     public class DateTimeAdd : IPhrase
     {
-        string TableName;
-        object Object;
-        ValueObjectType ObjectType;
-        DateTimeUnit Unit;
-        Int64 Interval;
+        public string TableName;
+        public object Value;
+        public ValueObjectType ValueType;
+        public DateTimeUnit Unit;
+        public Int64 Interval;
 
-        public DateTimeAdd(string TableName, object Object, ValueObjectType ObjectType, DateTimeUnit unit, Int64 interval)
+        public DateTimeAdd(string tableName, object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
-            this.TableName = TableName;
-            this.Object = Object;
-            this.ObjectType = ObjectType;
+            this.TableName = tableName;
+            this.Value = value;
+            this.ValueType = valueType;
             this.Unit = unit;
             this.Interval = interval;
         }
-        public DateTimeAdd(object Object, ValueObjectType ObjectType, DateTimeUnit unit, Int64 interval)
-            : this(null, Object, ObjectType, unit, interval)
+
+        public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
+            : this(null, value, valueType, unit, interval)
         {
         }
-        public DateTimeAdd(string ColumnName, DateTimeUnit unit, Int64 interval)
-            : this(null, ColumnName, ValueObjectType.ColumnName, unit, interval)
+
+        public DateTimeAdd(string columnName, DateTimeUnit unit, Int64 interval)
+            : this(null, columnName, ValueObjectType.ColumnName, unit, interval)
         {
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             StringBuilder sb = new StringBuilder();
@@ -74,39 +77,39 @@ namespace dg.Sql.Phrases
                 sb.Append(Unit == DateTimeUnit.Millisecond ? Interval * 1000L : Interval);
                 sb.Append(',');
 
-                if (ObjectType == ValueObjectType.ColumnName)
+                if (ValueType == ValueObjectType.ColumnName)
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
                         sb.Append(conn.EncloseFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Object.ToString()));
+                    sb.Append(conn.EncloseFieldName(Value.ToString()));
                 }
-                else if (ObjectType == ValueObjectType.Value)
+                else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Object));
+                    sb.Append(conn.PrepareValue(Value));
                 }
-                else sb.Append(Object);
+                else sb.Append(Value);
 
                 sb.Append(')');
             }
             else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
             {
-                if (ObjectType == ValueObjectType.ColumnName)
+                if (ValueType == ValueObjectType.ColumnName)
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
                         sb.Append(conn.EncloseFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Object.ToString()));
+                    sb.Append(conn.EncloseFieldName(Value.ToString()));
                 }
-                else if (ObjectType == ValueObjectType.Value)
+                else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Object));
+                    sb.Append(conn.PrepareValue(Value));
                 }
-                else sb.Append(Object);
+                else sb.Append(Value);
 
                 sb.Append(" + INTERVAL '");
 
@@ -198,20 +201,20 @@ namespace dg.Sql.Phrases
                 sb.Append(Interval);
                 sb.Append(',');
 
-                if (ObjectType == ValueObjectType.ColumnName)
+                if (ValueType == ValueObjectType.ColumnName)
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
                         sb.Append(conn.EncloseFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Object.ToString()));
+                    sb.Append(conn.EncloseFieldName(Value.ToString()));
                 }
-                else if (ObjectType == ValueObjectType.Value)
+                else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Object));
+                    sb.Append(conn.PrepareValue(Value));
                 }
-                else sb.Append(Object);
+                else sb.Append(Value);
 
                 sb.Append(')');
             }

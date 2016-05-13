@@ -19,6 +19,7 @@ namespace dg.Sql
             get { return _DatabaseOwner; }
             set { _DatabaseOwner = value; }
         }
+
         public string SchemaName
         {
             get { return _SchemaName; }
@@ -33,6 +34,7 @@ namespace dg.Sql
             this.Indexes = new IndexList();
             this.ForeignKeys = new ForeignKeyList();
         }
+
         public TableSchema(string schemaName, ColumnList columns)
         {
             this.DatabaseOwner = string.Empty;
@@ -42,6 +44,7 @@ namespace dg.Sql
             this.Indexes = new IndexList();
             this.ForeignKeys = new ForeignKeyList();
         }
+
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns)
         {
             this.DatabaseOwner = databaseOwner ?? @"";
@@ -51,6 +54,7 @@ namespace dg.Sql
             this.Indexes = new IndexList();
             this.ForeignKeys = new ForeignKeyList();
         }
+
         public TableSchema(string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
             this.DatabaseOwner = string.Empty;
@@ -62,6 +66,7 @@ namespace dg.Sql
             this.ForeignKeys = new ForeignKeyList();
             this.ForeignKeys.InsertRange(0, foreignKeys);
         }
+
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
             this.DatabaseOwner = databaseOwner ?? @"";
@@ -73,51 +78,105 @@ namespace dg.Sql
             this.ForeignKeys = new ForeignKeyList();
             this.ForeignKeys.InsertRange(0, foreignKeys);
         }
+
         public void AddColumn(Column column)
         {
             if (Columns == null) Columns = new ColumnList();
             Columns.Add(column);
         }
-        public void AddColumn(string Name, System.Type Type, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+
+        public void AddColumn(
+            string name, System.Type type,
+            int maxLength, 
+            int numberPrecision, int numberScale, 
+            bool autoIncrement, bool isPrimaryKey, 
+            bool nullable, object defaultValue)
         {
-            Column column = new Column(Name, Type, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            Column column = new Column(name, type, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+
+        public void AddColumn(
+            string name, System.Type type, 
+            int maxLength, string literalType, 
+            int numberPrecision, int numberScale, 
+            bool autoIncrement, bool isPrimaryKey,
+            bool nullable, object defaultValue)
         {
-            Column column = new Column(Name, Type, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            Column column = new Column(name, type, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+
+        public void AddColumn(
+            string Name, System.Type type, DataType dataType, 
+            int maxLength,
+            int numberPrecision, int numberScale,
+            bool autoIncrement, bool isPrimaryKey, 
+            bool nullable, object defaultValue)
         {
-            Column column = new Column(Name, Type, DataType, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            Column column = new Column(Name, type, dataType, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
+
+        public void AddColumn(
+            string name, System.Type type, DataType dataType,
+            int maxLength, string literalType,
+            int numberPrecision, int numberScale,
+            bool autoIncrement, bool isPrimaryKey, 
+            bool nullable, object defaultValue)
         {
-            Column column = new Column(Name, Type, DataType, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default);
+            Column column = new Column(name, type, dataType, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+
+        public void AddColumn(
+            string name, System.Type type,
+            int maxLength,
+            int numberPrecision, int numberScale,
+            bool autoIncrement, bool isPrimaryKey,
+            bool nullable, object defaultValue,
+            string charset, string collate)
         {
-            Column column = new Column(Name, Type, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            Column column = new Column(name, type, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+
+        public void AddColumn(
+            string name, System.Type type,
+            int maxLength, string literalType, 
+            int numberPrecision, int numberScale, 
+            bool autoIncrement, bool isPrimaryKey,
+            bool nullable, object defaultValue, 
+            string charset, string collate)
         {
-            Column column = new Column(Name, Type, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            Column column = new Column(name, type, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+
+        public void AddColumn(
+            string name, System.Type type, DataType dataType, 
+            int maxLength,
+            int numberPrecision, int numberScale, 
+            bool autoIncrement, bool isPrimaryKey,
+            bool nullable, object defaultValue,
+            string charset, string collate)
         {
-            Column column = new Column(Name, Type, DataType, MaxLength, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            Column column = new Column(name, type, dataType, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
             AddColumn(column);
         }
-        public void AddColumn(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
+
+        public void AddColumn(
+            string name, System.Type type, DataType dataType, 
+            int maxLength, string literalType, 
+            int numberPrecision, int numberScale,
+            bool autoIncrement, bool isPrimaryKey, 
+            bool nullable, object defaultValue,
+            string charset, string collate)
         {
-            Column column = new Column(Name, Type, DataType, MaxLength, LiteralType, NumberPrecision, NumberScale, AutoIncrement, IsPrimaryKey, Nullable, Default, Charset, Collate);
+            Column column = new Column(name, type, dataType, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
             AddColumn(column);
         }
+
         public void AddIndex(Index index)
         {
             if (Indexes == null) Indexes = new IndexList();
@@ -140,11 +199,13 @@ namespace dg.Sql
             }
             Indexes.Add(index);
         }
-        public void AddIndex(string Name, ClusterMode Cluster, IndexMode Mode, IndexType Type, params object[] Columns)
+
+        public void AddIndex(string name, ClusterMode cluster, IndexMode mode, IndexType type, params object[] columns)
         {
-            Index index = new Index(Name, Cluster, Mode, Type, Columns);
+            Index index = new Index(name, cluster, mode, type, columns);
             AddIndex(index);
         }
+
         public void AddForeignKey(ForeignKey foreignKey)
         {
             if (ForeignKeys == null) ForeignKeys = new ForeignKeyList();
@@ -161,36 +222,40 @@ namespace dg.Sql
             }
             ForeignKeys.Add(foreignKey);
         }
-        public void AddForeignKey(string Name, string[] Columns, string ForeignTable, string[] ForeignColumns, ForeignKeyReference OnDelete, ForeignKeyReference OnUpdate)
+
+        public void AddForeignKey(string name, string[] columns, string foreignTable, string[] foreignColumns, ForeignKeyReference onDelete, ForeignKeyReference onUpdate)
         {
-            ForeignKey foreignKey = new ForeignKey(Name, Columns, ForeignTable, ForeignColumns, OnDelete, OnUpdate);
-            AddForeignKey(foreignKey);
-        }
-        public void AddForeignKey(string Name, string Column, string ForeignTable, string ForeignColumn, ForeignKeyReference OnDelete, ForeignKeyReference OnUpdate)
-        {
-            ForeignKey foreignKey = new ForeignKey(Name, Column, ForeignTable, ForeignColumn, OnDelete, OnUpdate);
+            ForeignKey foreignKey = new ForeignKey(name, columns, foreignTable, foreignColumns, onDelete, onUpdate);
             AddForeignKey(foreignKey);
         }
 
-        public void SetTableOption(string OptionName, string Option)
+        public void AddForeignKey(string name, string column, string foreignTable, string foreignColumns, ForeignKeyReference onDelete, ForeignKeyReference onUpdate)
+        {
+            ForeignKey foreignKey = new ForeignKey(name, column, foreignTable, foreignColumns, onDelete, onUpdate);
+            AddForeignKey(foreignKey);
+        }
+
+        public void SetTableOption(string optionName, string option)
         {
             if (TableOptions == null) TableOptions = new TableOptionList();
-            TableOptions[OptionName] = Option;
+            TableOptions[optionName] = option;
         }
-        public bool RemoveTableOption(string OptionName)
+
+        public bool RemoveTableOption(string optionName)
         {
             if (TableOptions != null)
             {
-                return TableOptions.Remove(OptionName);
+                return TableOptions.Remove(optionName);
             }
             return false;
         }
-        public string GetTableOption(string OptionName)
+
+        public string GetTableOption(string optionName)
         {
             if (TableOptions != null)
             {
                 string value;
-                if (TableOptions.TryGetValue(OptionName, out value))
+                if (TableOptions.TryGetValue(optionName, out value))
                 {
                     return value;
                 }

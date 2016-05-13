@@ -17,8 +17,8 @@ namespace dg.Sql.Phrases
     /// </summary>
     public class GeographyDistance : IPhrase
     {
-        PointWrapper From;
-        PointWrapper To;
+        public PointWrapper From;
+        public PointWrapper To;
 
         public GeographyDistance(PointWrapper from, PointWrapper to)
         {

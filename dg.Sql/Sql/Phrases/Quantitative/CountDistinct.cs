@@ -7,15 +7,15 @@ namespace dg.Sql.Phrases
 {
     public class CountDistinct : IPhrase
     {
-        string TableName;
-        object Object;
-        ValueObjectType ObjectType;
+        public string TableName;
+        public object Value;
+        public ValueObjectType ValueType;
         
         public CountDistinct(string tableName, string columnName)
         {
             this.TableName = tableName;
-            this.Object = columnName;
-            this.ObjectType = ValueObjectType.ColumnName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public CountDistinct(string columnName)
@@ -23,10 +23,10 @@ namespace dg.Sql.Phrases
         {
         }
 
-        public CountDistinct(object theObject, ValueObjectType objectType)
+        public CountDistinct(object theObject, ValueObjectType valueType)
         {
-            this.Object = theObject;
-            this.ObjectType = objectType;
+            this.Value = theObject;
+            this.ValueType = valueType;
         }
 
         public string BuildPhrase(ConnectorBase conn)
@@ -35,20 +35,20 @@ namespace dg.Sql.Phrases
 
             ret = @"COUNT(DISTINCT ";
 
-            if (ObjectType == ValueObjectType.ColumnName)
+            if (ValueType == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object.ToString());
+                ret += conn.EncloseFieldName(Value.ToString());
             }
-            else if (ObjectType == ValueObjectType.Value)
+            else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object);
+                ret += conn.PrepareValue(Value);
             }
-            else ret += Object;
+            else ret += Value;
 
             ret += ")";
 

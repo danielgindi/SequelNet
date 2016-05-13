@@ -92,7 +92,7 @@ namespace dg.Sql
 
         /// <summary>
         /// Adds a column.
-        /// Will search in this table's schema for the column named <paramref name="ColumnName"/>
+        /// Will search in this table's schema for the column named <paramref name="columnName"/>
         /// </summary>
         /// <param name="columnName">Column to add</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>

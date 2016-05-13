@@ -25,51 +25,61 @@ namespace dg.Sql
             get { return _Comparison; }
             set { _Comparison = value; }
         }
+
         public WhereCondition Condition
         {
             get { return _Condition; }
             set { _Condition = value; }
         }
+
         public object First
         {
             get { return _First; }
             set { _First = value; }
         }
+
         public ValueObjectType FirstType
         {
             get { return _FirstType; }
             set { _FirstType = value; }
         }
+
         public object Second
         {
             get { return _Second; }
             set { _Second = value; }
         }
+
         public ValueObjectType SecondType
         {
             get { return _SecondType; }
             set { _SecondType = value; }
         }
+
         public object Third
         {
             get { return _Third; }
             set { _Third = value; }
         }
+
         public ValueObjectType ThirdType
         {
             get { return _ThirdType; }
             set { _ThirdType = value; }
         }
+
         public string FirstTableName
         {
             get { return _FirstTableName; }
             set { _FirstTableName = value; }
         }
+
         public string SecondTableName
         {
             get { return _SecondTableName; }
             set { _SecondTableName = value; }
         }
+
         public string ThirdTableName
         {
             get { return _ThirdTableName; }

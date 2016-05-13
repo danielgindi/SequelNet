@@ -13,6 +13,7 @@ namespace dg.Sql
         {
             return Insert(columnName, Value, false);
         }
+
         public Query Insert(string columnName, object Value, bool ColumnNameIsLiteral)
         {
             QueryMode currentMode = this.QueryMode;
@@ -30,6 +31,7 @@ namespace dg.Sql
             _ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, Value, ColumnNameIsLiteral ? ValueObjectType.Literal : ValueObjectType.Value));
             return this;
         }
+
         public Query SetInsertExpression(object insertExpression)
         {
             _InsertExpression = insertExpression;

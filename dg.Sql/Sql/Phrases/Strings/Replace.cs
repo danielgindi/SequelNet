@@ -7,41 +7,43 @@ namespace dg.Sql.Phrases
 {
     public class Replace : IPhrase
     {
-        string Source;
-        string SourceTableName;
-        ValueObjectType SourceType;
-        string Search;
-        string SearchTableName;
-        ValueObjectType SearchType;
-        string ReplaceWith;
-        string ReplaceWithTableName;
-        ValueObjectType ReplaceWithType;
+        public string Source;
+        public string SourceTableName;
+        public ValueObjectType SourceType;
+        public string Search;
+        public string SearchTableName;
+        public ValueObjectType SearchType;
+        public string ReplaceWith;
+        public string ReplaceWithTableName;
+        public ValueObjectType ReplaceWithType;
 
         public Replace(
-            string SourceTableName, string Source, ValueObjectType SourceType,
-            string SearchTableName, string Search, ValueObjectType SearchType,
-            string ReplaceWithTableName, string ReplaceWith, ValueObjectType ReplaceWithType)
+            string sourceTableName, string source, ValueObjectType sourceType,
+            string searchTableName, string search, ValueObjectType searchType,
+            string replaceWithTableName, string replaceWith, ValueObjectType replaceWithType)
         {
-            this.SourceTableName = SourceTableName;
-            this.Source = Source;
-            this.SourceType = SourceType;
-            this.SearchTableName = SearchTableName;
-            this.Search = Search;
-            this.SearchType = SearchType;
-            this.ReplaceWithTableName = ReplaceWithTableName;
-            this.ReplaceWith = ReplaceWith;
-            this.ReplaceWithType = ReplaceWithType;
+            this.SourceTableName = sourceTableName;
+            this.Source = source;
+            this.SourceType = sourceType;
+            this.SearchTableName = searchTableName;
+            this.Search = search;
+            this.SearchType = searchType;
+            this.ReplaceWithTableName = replaceWithTableName;
+            this.ReplaceWith = replaceWith;
+            this.ReplaceWithType = replaceWithType;
         }
+
         public Replace(
-             string Source, ValueObjectType SourceType,
-             string Search, ValueObjectType SearchType,
-             string ReplaceWith, ValueObjectType ReplaceWithType)
+             string source, ValueObjectType sourceType,
+             string search, ValueObjectType searchType,
+             string replaceWith, ValueObjectType replaceWithType)
             : this(
-            null, Source, SourceType,
-            null, Search, SearchType,
-            null, ReplaceWith, ReplaceWithType)
+            null, source, sourceType,
+            null, search, searchType,
+            null, replaceWith, replaceWithType)
         {
         }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret = @"REPLACE(";

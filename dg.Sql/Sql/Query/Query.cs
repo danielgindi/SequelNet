@@ -42,39 +42,42 @@ namespace dg.Sql
 
         #region Instantitaion
 
-        public Query(TableSchema Schema)
-            : this(Schema, null)
+        public Query(TableSchema schema)
+            : this(schema, null)
         {
         }
-        public Query(TableSchema Schema, string SchemaName)
+
+        public Query(TableSchema schema, string schemaName)
         {
-            this.Schema = Schema;
-            this.SchemaName = SchemaName;
+            this.Schema = schema;
+            this.SchemaName = schemaName;
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
-            if (Schema == null)
+            if (schema == null)
             {
                 throw new Exception("The Schema you passed in is null.");
             }
-            if (Schema.Columns == null || Schema.Columns.Count == 0)
+            if (schema.Columns == null || schema.Columns.Count == 0)
             {
                 throw new Exception("The Schema Table you passed in has no columns");
             }
         }
-        public Query(string SchemaName)
+
+        public Query(string schemaName)
         {
-            this.Schema = new TableSchema(SchemaName, null);
+            this.Schema = new TableSchema(schemaName, null);
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
         }
-        public Query(object FromExpression, string FromExpressionTableAlias)
+
+        public Query(object fromExpression, string fromExpressionTableAlias)
         {
             this.Schema = null;
-            _FromExpression = FromExpression;
-            _SchemaName = _FromExpressionTableAlias = FromExpressionTableAlias;
-            if (FromExpression == null)
+            _FromExpression = fromExpression;
+            _SchemaName = _FromExpressionTableAlias = fromExpressionTableAlias;
+            if (fromExpression == null)
             {
                 throw new Exception("The expression you passed in is null.");
             } 
-            if (FromExpressionTableAlias == null)
+            if (fromExpressionTableAlias == null)
             {
                 throw new Exception("The Alias you passed in is null.");
             }
@@ -84,22 +87,27 @@ namespace dg.Sql
         {
             return new Query(AbstractRecord<T>.TableSchema);
         }
-        public static Query New<T>(string SchemaName) where T : AbstractRecord<T>, new()
+
+        public static Query New<T>(string schemaName) where T : AbstractRecord<T>, new()
         {
-            return new Query(AbstractRecord<T>.TableSchema, SchemaName);
+            return new Query(AbstractRecord<T>.TableSchema, schemaName);
         }
-        public static Query New(TableSchema Schema)
+
+        public static Query New(TableSchema schema)
         {
-            return new Query(Schema);
+            return new Query(schema);
         }
-        public static Query New(TableSchema Schema, string SchemaName)
+
+        public static Query New(TableSchema schema, string SchemaName)
         {
-            return new Query(Schema, SchemaName);
+            return new Query(schema, SchemaName);
         }
-        public static Query New(string SchemaName)
+
+        public static Query New(string schemaName)
         {
-            return new Query(SchemaName);
+            return new Query(schemaName);
         }
+
         public static Query New(object FromExpression, string FromExpressionTableAlias)
         {
             return new Query(FromExpression, FromExpressionTableAlias);
@@ -153,9 +161,9 @@ namespace dg.Sql
         /// </summary>
         /// <param name="IsDistinct">Is distinct?</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query Distinct(bool IsDistinct)
+        public Query Distinct(bool isDistinct)
         {
-            this.IsDistinct = IsDistinct;
+            this.IsDistinct = isDistinct;
             return this;
         }
 
@@ -166,9 +174,9 @@ namespace dg.Sql
         /// <param name="TableName">Random column's table</param>
         /// <param name="ColumnName">Column to randomize by.</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query Randomize(string TableName = null, string ColumnName = null)
+        public Query Randomize(string tableName = null, string columnName = null)
         {
-            OrderBy orderBy = new OrderBy(TableName, ColumnName, SortDirection.None);
+            OrderBy orderBy = new OrderBy(tableName, columnName, SortDirection.None);
             orderBy.Randomize = true;
             return OrderBy(orderBy);
         }
@@ -224,9 +232,9 @@ namespace dg.Sql
         /// </summary>
         /// <param name="Connection">Connection to use for building the query.</param>
         /// <returns>String representation</returns>
-        public string ToString(ConnectorBase Connection)
+        public string ToString(ConnectorBase connection)
         {
-            return BuildCommand(Connection);
+            return BuildCommand(connection);
         }
 
         #endregion
@@ -240,10 +248,10 @@ namespace dg.Sql
         /// <param name="Value">Value to be prepared</param>
         /// <param name="Connection">A connector to use. Mandatory.</param>
         /// <returns>The SQL expression</returns>
-        public static string PrepareColumnValue(TableSchema.Column ColumnDefinition, object Value, ConnectorBase Connection)
+        public static string PrepareColumnValue(TableSchema.Column columnDefinition, object value, ConnectorBase connection)
         {
             StringBuilder sb = new StringBuilder();
-            PrepareColumnValue(ColumnDefinition, Value, sb, Connection);
+            PrepareColumnValue(columnDefinition, value, sb, connection);
             return sb.ToString();
         }
 
@@ -254,171 +262,171 @@ namespace dg.Sql
         /// <param name="Value">Value to be prepared</param>
         /// <param name="OutputBuilder">The <typeparamref name="StringBuilder"/> to output the SQL expression</param>
         /// <param name="Connection">A connector to use. Mandatory.</param>
-        public static void PrepareColumnValue(TableSchema.Column ColumnDefinition, object Value, StringBuilder OutputBuilder, ConnectorBase Connection)
+        public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection)
         {
-            if (Value == null)
+            if (value == null)
             {
-                OutputBuilder.Append(@"NULL");
+                outputBuilder.Append(@"NULL");
                 return;
             }
 
-            if (Value is dg.Sql.IPhrase)
+            if (value is dg.Sql.IPhrase)
             {
                 // Output the complete phrase
 
-                OutputBuilder.Append(((dg.Sql.IPhrase)Value).BuildPhrase(Connection));
+                outputBuilder.Append(((dg.Sql.IPhrase)value).BuildPhrase(connection));
 
                 return;
             }
 
-            if (Value is dg.Sql.Query)
+            if (value is dg.Sql.Query)
             {
                 // Output a properly wrapped query
 
-                OutputBuilder.Append("(" + ((dg.Sql.Query)Value).BuildCommand(Connection) + ")");
+                outputBuilder.Append("(" + ((dg.Sql.Query)value).BuildCommand(connection) + ")");
 
                 return;
             }
 
-            if (ColumnDefinition == null)
+            if (columnDefinition == null)
             {
                 // No definition to match against,
                 // so just prepare the value as it is, output it and return
 
-                OutputBuilder.Append(Connection.PrepareValue(Value));
+                outputBuilder.Append(connection.PrepareValue(value));
 
                 return;
             }
 
-            if (Value.GetType() != ColumnDefinition.Type)
+            if (value.GetType() != columnDefinition.Type)
             {
-                if (Value is string)
+                if (value is string)
                 {
                     // Try to convert from string to number if necessary
-                    if (ColumnDefinition.Type == typeof(Int32))
+                    if (columnDefinition.Type == typeof(Int32))
                     {
                         Int32 iValue;
-                        if (Int32.TryParse((string)Value, out iValue))
+                        if (Int32.TryParse((string)value, out iValue))
                         {
-                            Value = iValue;
+                            value = iValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(UInt32))
+                    else if (columnDefinition.Type == typeof(UInt32))
                     {
                         UInt32 uiValue;
-                        if (UInt32.TryParse((string)Value, out uiValue))
+                        if (UInt32.TryParse((string)value, out uiValue))
                         {
-                            Value = uiValue;
+                            value = uiValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Int64))
+                    else if (columnDefinition.Type == typeof(Int64))
                     {
                         Int64 iValue;
-                        if (Int64.TryParse((string)Value, out iValue))
+                        if (Int64.TryParse((string)value, out iValue))
                         {
-                            Value = iValue;
+                            value = iValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(UInt64))
+                    else if (columnDefinition.Type == typeof(UInt64))
                     {
                         UInt64 uiValue;
-                        if (UInt64.TryParse((string)Value, out uiValue))
+                        if (UInt64.TryParse((string)value, out uiValue))
                         {
-                            Value = uiValue;
+                            value = uiValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Decimal))
+                    else if (columnDefinition.Type == typeof(Decimal))
                     {
                         Decimal dValue;
-                        if (Decimal.TryParse((string)Value, out dValue))
+                        if (Decimal.TryParse((string)value, out dValue))
                         {
-                            Value = dValue;
+                            value = dValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(float))
+                    else if (columnDefinition.Type == typeof(float))
                     {
                         float fValue;
-                        if (float.TryParse((string)Value, out fValue))
+                        if (float.TryParse((string)value, out fValue))
                         {
-                            Value = fValue;
+                            value = fValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Double))
+                    else if (columnDefinition.Type == typeof(Double))
                     {
                         Double dValue;
-                        if (Double.TryParse((string)Value, out dValue))
+                        if (Double.TryParse((string)value, out dValue))
                         {
-                            Value = dValue;
+                            value = dValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Single))
+                    else if (columnDefinition.Type == typeof(Single))
                     {
                         Single sValue;
-                        if (Single.TryParse((string)Value, out sValue))
+                        if (Single.TryParse((string)value, out sValue))
                         {
-                            Value = sValue;
+                            value = sValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Byte))
+                    else if (columnDefinition.Type == typeof(Byte))
                     {
                         Byte bValue;
-                        if (Byte.TryParse((string)Value, out bValue))
+                        if (Byte.TryParse((string)value, out bValue))
                         {
-                            Value = bValue;
+                            value = bValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(SByte))
+                    else if (columnDefinition.Type == typeof(SByte))
                     {
                         SByte sbValue;
-                        if (SByte.TryParse((string)Value, out sbValue))
+                        if (SByte.TryParse((string)value, out sbValue))
                         {
-                            Value = sbValue;
+                            value = sbValue;
                         }
                     }
-                    else if (ColumnDefinition.Type == typeof(Guid))
+                    else if (columnDefinition.Type == typeof(Guid))
                     {
-                        Guid gValue = new Guid((string)Value);
-                        Value = gValue;
+                        Guid gValue = new Guid((string)value);
+                        value = gValue;
                     }
                 }
                 else
                 {
-                    if (Value.GetType().BaseType.Name == @"Enum")
+                    if (value.GetType().BaseType.Name == @"Enum")
                     {
                         try
                         {
-                            Value = (int)Value;
+                            value = (int)value;
                         }
                         catch { }
                     }
                 }
             }
-            else if (Value is string)
+            else if (value is string)
             {
-                if (ColumnDefinition.MaxLength > 0)
+                if (columnDefinition.MaxLength > 0)
                 {
-                    if (((string)Value).Length > ColumnDefinition.MaxLength)
+                    if (((string)value).Length > columnDefinition.MaxLength)
                     {
-                        OutputBuilder.Append(Connection.PrepareValue(((string)Value).Remove(ColumnDefinition.MaxLength)));
+                        outputBuilder.Append(connection.PrepareValue(((string)value).Remove(columnDefinition.MaxLength)));
                         return;
                     }
                 }
             }
-            else if (Value is Geometry)
+            else if (value is Geometry)
             {
-                ((Geometry)Value).BuildValue(OutputBuilder, Connection);
+                ((Geometry)value).BuildValue(outputBuilder, connection);
                 return;
             }
-            else if (Value.GetType().BaseType.Name == @"Enum")
+            else if (value.GetType().BaseType.Name == @"Enum")
             {
                 try
                 {
-                    Value = (int)Value;
+                    value = (int)value;
                 }
                 catch { }
             }
 
-            OutputBuilder.Append(Connection.PrepareValue(Value));
+            outputBuilder.Append(connection.PrepareValue(value));
         }
 
         /// <summary>

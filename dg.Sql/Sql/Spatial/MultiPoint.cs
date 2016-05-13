@@ -13,12 +13,14 @@ namespace dg.Sql
                 : base()
             {
             }
+
             public MultiPoint(params Point[] points)
                 : base(points)
             {
             }
-            public MultiPoint(int Capacity)
-                : base(Capacity)
+
+            public MultiPoint(int capacity)
+                : base(capacity)
             {
             }
         }

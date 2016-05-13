@@ -12,9 +12,9 @@ namespace dg.Sql
         /// <summary>
         /// Calls a stored procedure.
         /// </summary>
-        /// <param name="StoredProcedureName">Procedue to call</param>
+        /// <param name="storedProcedureName">Procedue to call</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query StoredProcedure(string StoredProcedureName)
+        public Query StoredProcedure(string storedProcedureName)
         {
             ClearSelect();
             ClearOrderBy();
@@ -22,7 +22,7 @@ namespace dg.Sql
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
             this.QueryMode = QueryMode.ExecuteStoredProcedure;
-            _StoredProcedureName = StoredProcedureName;
+            _StoredProcedureName = storedProcedureName;
             return this;
         }
 
@@ -30,73 +30,76 @@ namespace dg.Sql
         /// Adds a parameter to the Stored Procedure execution.
         /// You can use SqlMgrFactoryBase.Factory() in order to create parameters.
         /// </summary>
-        /// <param name="DbParameter">Parameter</param>
+        /// <param name="dbParameter">Parameter</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddStoredProcedureParameter(DbParameter DbParameter)
+        public Query AddStoredProcedureParameter(DbParameter dbParameter)
         {
             if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(DbParameter);
+            _StoredProcedureParameters.Add(dbParameter);
             return this;
         }
 
         /// <summary>
         /// Adds a parameter to the Stored Procedure execution.
         /// </summary>
-        /// <param name="Name">Parameter name</param>
-        /// <param name="Value">Parameter value</param>
+        /// <param name="name">Parameter name</param>
+        /// <param name="value">Parameter value</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddStoredProcedureParameter(string Name, object Value)
+        public Query AddStoredProcedureParameter(string name, object value)
         {
             if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(Name, Value));
+            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, value));
             return this;
         }
 
         /// <summary>
         /// Adds a parameter to the Stored Procedure execution.
         /// </summary>
-        /// <param name="Name">Parameter name</param>
-        /// <param name="DbType">Parameter's type</param>
-        /// <param name="Value">Parameter value</param>
+        /// <param name="name">Parameter name</param>
+        /// <param name="type">Parameter's type</param>
+        /// <param name="value">Parameter value</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddStoredProcedureParameter(string Name, DbType Type, object Value)
+        public Query AddStoredProcedureParameter(string name, DbType type, object value)
         {
             if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(Name, Type, Value));
+            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, type, value));
             return this;
         }
 
         /// <summary>
         /// Adds a parameter to the Stored Procedure execution.
         /// </summary>
-        /// <param name="Name">Parameter name</param>
-        /// <param name="Value">Parameter value</param>
-        /// <param name="ParameterDirection">Parameter's input/output direction</param>
+        /// <param name="name">Parameter name</param>
+        /// <param name="value">Parameter value</param>
+        /// <param name="parameterDirection">Parameter's input/output direction</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddStoredProcedureParameter(string Name, object Value, ParameterDirection ParameterDirection)
+        public Query AddStoredProcedureParameter(string name, object value, ParameterDirection parameterDirection)
         {
             if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(Name, Value, ParameterDirection));
+            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, value, parameterDirection));
             return this;
         }
 
         /// <summary>
         /// Adds a parameter to the Stored Procedure execution.
         /// </summary>
-        /// <param name="Name">Parameter name</param>
-        /// <param name="DbType">Parameter's type</param>
-        /// <param name="ParameterDirection">Parameter's input/output direction</param>
-        /// <param name="Size">Paremeter's type definition: Size</param>
-        /// <param name="IsNullable">Paremeter's type definition: Is nullable?</param>
-        /// <param name="Precision">Paremeter's type definition: Precision</param>
-        /// <param name="SourceColumn">Source column</param>
-        /// <param name="SourceVersion">Source version</param>
-        /// <param name="Value">Parameter value</param>
+        /// <param name="name">Parameter name</param>
+        /// <param name="type">Parameter's type</param>
+        /// <param name="parameterDirection">Parameter's input/output direction</param>
+        /// <param name="size">Paremeter's type definition: Size</param>
+        /// <param name="isNullable">Paremeter's type definition: Is nullable?</param>
+        /// <param name="precision">Paremeter's type definition: Precision</param>
+        /// <param name="sourceColumn">Source column</param>
+        /// <param name="sourceVersion">Source version</param>
+        /// <param name="value">Parameter value</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query AddStoredProcedureParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value)
+        public Query AddStoredProcedureParameter(
+            string name, DbType type, ParameterDirection parameterDirection,
+            int size, bool isNullable, byte precision, byte scale, 
+            string sourceColumn, DataRowVersion sourceVersion, object value)
         {
             if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(Name, Type, ParameterDirection, Size, IsNullable, Precision, Scale, SourceColumn, SourceVersion, Value));
+            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, type, parameterDirection, size, isNullable, precision, scale, sourceColumn, sourceVersion, value));
             return this;
         }
     }

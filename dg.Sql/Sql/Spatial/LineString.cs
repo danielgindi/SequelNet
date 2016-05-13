@@ -16,13 +16,15 @@ namespace dg.Sql
             {
                 _Points = new List<Point>();
             }
-            public LineString(params Point[] Points)
+
+            public LineString(params Point[] points)
             {
-                _Points = new List<Point>(Points);
+                _Points = new List<Point>(points);
             }
-            public LineString(int Capacity)
+
+            public LineString(int capacity)
             {
-                _Points = new List<Point>(Capacity);
+                _Points = new List<Point>(capacity);
             }
 
             public Point this[int i]
@@ -50,6 +52,7 @@ namespace dg.Sql
                     return _Points.Count == 0;
                 }
             }
+
             public override bool IsValid
             {
                 get
@@ -62,6 +65,7 @@ namespace dg.Sql
                     return true;
                 }
             }
+
             public bool IsValidRing
             {
                 get
@@ -75,6 +79,7 @@ namespace dg.Sql
                     return true;
                 }
             }
+
             public virtual bool IsClosed
             {
                 get
@@ -85,6 +90,7 @@ namespace dg.Sql
                     return FirstPoint.X == LastPoint.X && FirstPoint.Y == LastPoint.Y;
                 }
             }
+
             public virtual bool IsClosedRing
             {
                 get
@@ -172,6 +178,7 @@ namespace dg.Sql
                     sb.Append(@")')");
                 }
             }
+
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
                 sb.Append(@"LINESTRING(");

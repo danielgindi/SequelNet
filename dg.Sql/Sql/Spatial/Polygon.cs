@@ -17,14 +17,16 @@ namespace dg.Sql
             {
                 _Holes = new List<LineString>();
             }
-            public Polygon(LineString Exterior, params LineString[] Rings)
+
+            public Polygon(LineString exterior, params LineString[] rings)
             {
-                this._Exterior = Exterior;
-                _Holes = new List<LineString>(Rings);
+                this._Exterior = exterior;
+                _Holes = new List<LineString>(rings);
             }
-            public Polygon(int HolesCapacity)
+
+            public Polygon(int holesCapacity)
             {
-                _Holes = new List<LineString>(HolesCapacity);
+                _Holes = new List<LineString>(holesCapacity);
             }
 
             public LineString Exterior
@@ -38,6 +40,7 @@ namespace dg.Sql
                     _Exterior = value;
                 }
             }
+
             public List<LineString> Holes
             {
                 get
@@ -57,6 +60,7 @@ namespace dg.Sql
                     return Exterior == null;
                 }
             }
+
             public override bool IsValid
             {
                 get
@@ -115,6 +119,7 @@ namespace dg.Sql
                     sb.Append(@"')");
                 }
             }
+
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
                 bool firstLineString = true, first;

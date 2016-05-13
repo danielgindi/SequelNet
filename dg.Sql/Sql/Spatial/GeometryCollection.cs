@@ -16,13 +16,15 @@ namespace dg.Sql
             {
                 _Geometries = new List<GeometryType>();
             }
+
             public GeometryCollection(params GeometryType[] geometries)
             {
                 _Geometries = new List<GeometryType>(geometries);
             }
-            public GeometryCollection(int Capacity)
+
+            public GeometryCollection(int capacity)
             {
-                _Geometries = new List<GeometryType>(Capacity);
+                _Geometries = new List<GeometryType>(capacity);
             }
 
             public GeometryType this[int i]
@@ -44,6 +46,7 @@ namespace dg.Sql
                     return _Geometries.Count == 0;
                 }
             }
+
             public override bool IsValid
             {
                 get
@@ -105,6 +108,7 @@ namespace dg.Sql
                     sb.Append(@")')");
                 }
             }
+
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
                 sb.Append(@"GEOMETRYCOLLECTION(");

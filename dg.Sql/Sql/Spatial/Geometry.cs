@@ -13,7 +13,9 @@ namespace dg.Sql
         public int? SRID;
 
         public abstract bool IsEmpty { get; }
+
         public abstract bool IsValid { get; }
+
         public bool IsGeographyType
         { 
             get; 

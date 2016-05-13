@@ -16,28 +16,33 @@ namespace dg.Sql
         {
             _ColumnName = ColumnName;
         }
+
         public GroupBy(object ColumnName, SortDirection SortDirection)
         {
             _ColumnName = ColumnName;
             _SortDirection = SortDirection;
         }
+
         public GroupBy(string TableName, string ColumnName)
         {
             _TableName = TableName;
             _ColumnName = ColumnName;
         }
+
         public GroupBy(string TableName, string ColumnName, SortDirection SortDirection)
         {
             _TableName = TableName;
             _ColumnName = ColumnName;
             _SortDirection = SortDirection;
         }
+
         public GroupBy(object ColumnName, bool IsLiteral)
         {
             _TableName = null;
             _ColumnName = ColumnName;
             _IsLiteral = IsLiteral;
         }
+
         public GroupBy(object ColumnName, bool IsLiteral, SortDirection SortDirection)
         {
             _TableName = null;
@@ -45,21 +50,25 @@ namespace dg.Sql
             _IsLiteral = IsLiteral;
             _SortDirection = SortDirection;
         }
+
         public string TableName
         {
             get { return _TableName; }
             set { _TableName = value; }
         }
+
         public object ColumnName
         {
             get { return _ColumnName; }
             set { _ColumnName = value; }
         }
+
         public SortDirection SortDirection
         {
             get { return _SortDirection; }
             set { _SortDirection = value; }
         }
+
         internal bool IsLiteral
         {
             get { return _IsLiteral; }

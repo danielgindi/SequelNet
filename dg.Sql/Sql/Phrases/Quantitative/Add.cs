@@ -7,74 +7,79 @@ namespace dg.Sql.Phrases
 {
     public class Add : IPhrase
     {
-        string TableName1;
-        object Object1;
-        ValueObjectType ObjectType1;
-        string TableName2;
-        object Object2;
-        ValueObjectType ObjectType2;
+        public string TableName1;
+        public object Value1;
+        public ValueObjectType ValueType1;
+        public string TableName2;
+        public object Value2;
+        public ValueObjectType ValueType2;
 
-        public Add(string TableName1, object Object1, ValueObjectType ObjectType1, 
-            string TableName2, object Object2, ValueObjectType ObjectType2)
+        public Add(string tableName1, object value1, ValueObjectType valueType1, 
+            string tableName2, object value2, ValueObjectType valueType2)
         {
-            this.TableName1 = TableName1;
-            this.Object1 = Object1;
-            this.ObjectType1 = ObjectType1;
-            this.TableName2 = TableName2;
-            this.Object2 = Object2;
-            this.ObjectType2 = ObjectType2;
+            this.TableName1 = tableName1;
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
+            this.TableName2 = tableName2;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
         }
-        public Add(string TableName, string ColumnName, Int64 Value)
-            : this(TableName, ColumnName, ValueObjectType.ColumnName, null, Value, ValueObjectType.Value)
-        {
-        }
-        public Add(string ColumnName, Int64 Value)
-            : this(null, ColumnName, ValueObjectType.ColumnName, null, Value, ValueObjectType.Value)
+
+        public Add(string tableName, string columnName, Int64 value)
+            : this(tableName, columnName, ValueObjectType.ColumnName, null, value, ValueObjectType.Value)
         {
         }
-        public Add(string TableName1, string ColumnName1, string TableName2, string ColumnName2)
-            : this(TableName1, ColumnName1, ValueObjectType.ColumnName, TableName2, ColumnName2, ValueObjectType.ColumnName)
+
+        public Add(string columnName, Int64 value)
+            : this(null, columnName, ValueObjectType.ColumnName, null, value, ValueObjectType.Value)
         {
         }
-        public Add(string ColumnName1, string ColumnName2)
-            : this(null, ColumnName1, ValueObjectType.ColumnName, null, ColumnName2, ValueObjectType.ColumnName)
+
+        public Add(string tableName1, string columnName1, string tableName2, string columnName2)
+            : this(tableName1, columnName1, ValueObjectType.ColumnName, tableName2, columnName2, ValueObjectType.ColumnName)
         {
         }
+
+        public Add(string columnName1, string columnName2)
+            : this(null, columnName1, ValueObjectType.ColumnName, null, columnName2, ValueObjectType.ColumnName)
+        {
+        }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret = @"";
 
-            if (ObjectType1 == ValueObjectType.ColumnName)
+            if (ValueType1 == ValueObjectType.ColumnName)
             {
                 if (TableName1 != null && TableName1.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName1);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object1.ToString());
+                ret += conn.EncloseFieldName(Value1.ToString());
             }
-            else if (ObjectType1 == ValueObjectType.Value)
+            else if (ValueType1 == ValueObjectType.Value)
             {
-                ret += @"(" + conn.PrepareValue(Object1) + @")";
+                ret += @"(" + conn.PrepareValue(Value1) + @")";
             }
-            else ret += Object1;
+            else ret += Value1;
 
             ret += @"+";
 
-            if (ObjectType2 == ValueObjectType.ColumnName)
+            if (ValueType2 == ValueObjectType.ColumnName)
             {
                 if (TableName2 != null && TableName2.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName2);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object2.ToString());
+                ret += conn.EncloseFieldName(Value2.ToString());
             }
-            else if (ObjectType2 == ValueObjectType.Value)
+            else if (ValueType2 == ValueObjectType.Value)
             {
-                ret += @"(" + conn.PrepareValue(Object2) + @")";
+                ret += @"(" + conn.PrepareValue(Value2) + @")";
             }
-            else ret += Object2;
+            else ret += Value2;
 
             return ret;
         }

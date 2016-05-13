@@ -7,24 +7,24 @@ namespace dg.Sql.Phrases
 {
     public class Multiply : IPhrase
     {
-        string TableName1;
-        object Object1;
-        ValueObjectType ObjectType1;
-        string TableName2;
-        object Object2;
-        ValueObjectType ObjectType2;
+        public string TableName1;
+        public object Value1;
+        public ValueObjectType ValueType1;
+        public string TableName2;
+        public object Value2;
+        public ValueObjectType ValueType2;
 
         public Multiply(
-            string tableName1, object object1, ValueObjectType objectType1,
-            string tableName2, object object2, ValueObjectType objectType2
+            string tableName1, object value1, ValueObjectType valueType1,
+            string tableName2, object value2, ValueObjectType valueType2
             )
         {
             this.TableName1 = tableName1;
-            this.Object1 = object1;
-            this.ObjectType1 = objectType1;
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
             this.TableName2 = tableName2;
-            this.Object2 = object2;
-            this.ObjectType2 = objectType2;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
         }
 
         public Multiply(
@@ -63,37 +63,37 @@ namespace dg.Sql.Phrases
         {
             string ret = "(";
             
-            if (ObjectType1 == ValueObjectType.ColumnName)
+            if (ValueType1 == ValueObjectType.ColumnName)
             {
                 if (TableName1 != null && TableName1.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName1);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object1.ToString());
+                ret += conn.EncloseFieldName(Value1.ToString());
             }
-            else if (ObjectType1 == ValueObjectType.Value)
+            else if (ValueType1 == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object1);
+                ret += conn.PrepareValue(Value1);
             }
-            else ret += Object1;
+            else ret += Value1;
 
             ret += " * ";
             
-            if (ObjectType2 == ValueObjectType.ColumnName)
+            if (ValueType2 == ValueObjectType.ColumnName)
             {
                 if (TableName2 != null && TableName2.Length > 0)
                 {
                     ret += conn.EncloseFieldName(TableName2);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Object2.ToString());
+                ret += conn.EncloseFieldName(Value2.ToString());
             }
-            else if (ObjectType2 == ValueObjectType.Value)
+            else if (ValueType2 == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Object2);
+                ret += conn.PrepareValue(Value2);
             }
-            else ret += Object2;
+            else ret += Value2;
 
             ret += ')';
 
