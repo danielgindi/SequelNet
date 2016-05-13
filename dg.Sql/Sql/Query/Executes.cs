@@ -518,6 +518,18 @@ namespace dg.Sql
             return results;
         }
 
+        /// <summary>
+        /// Executes the query and reads the first row only.
+        /// </summary>
+        /// <param name="connection">An existing connection to use.</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        public L ExecuteCollection<R, L>(ConnectorBase connection)
+            where R : AbstractRecord<R>, new()
+            where L : AbstractRecordList<R, L>, new()
+        {
+            return AbstractRecordList<R, L>.FetchByQuery(this, connection);
+        }
+
         public object ExecuteAggregate(string columnName, string aggregateFunction, bool isDistinctQuery)
         {
             return ExecuteAggregate(null, null, columnName, aggregateFunction, isDistinctQuery, null);
