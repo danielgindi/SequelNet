@@ -1026,7 +1026,7 @@ namespace dg.Sql.SchemaGenerator
                 }
             }
 
-            stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(conn, out lastInsert) > 0){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(out lastInsert, conn) > 0){0}{{{0}", "\r\n");
             if (!string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName))
             {
                 string valueConvertorFormat = "{0}";
