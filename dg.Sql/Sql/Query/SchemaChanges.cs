@@ -57,6 +57,17 @@ namespace dg.Sql
         }
 
         /// <summary>
+        /// Adds an index.
+        /// Will search in this table's schema for the index named <paramref name="indexName"/>
+        /// </summary>
+        /// <param name="indexName">Name of the index to add</param>
+        /// <returns>Current <typeparamref name="Query"/> object</returns>
+        public Query CreateIndex(string indexName)
+        {
+            return CreateIndex(Schema.Indexes.Find(indexName));
+        }
+
+        /// <summary>
         /// Adds a foreign key.
         /// </summary>
         /// <param name="foreignKey">Key to add</param>
@@ -71,6 +82,17 @@ namespace dg.Sql
             this.QueryMode = QueryMode.CreateIndex;
             this._CreateIndexObject = foreignKey;
             return this;
+        }
+
+        /// <summary>
+        /// Adds an foreign key.
+        /// Will search in this table's schema for the foreign key named <paramref name="fkName"/>
+        /// </summary>
+        /// <param name="fkName">Name of the foreign key to add</param>
+        /// <returns>Current <typeparamref name="Query"/> object</returns>
+        public Query CreateForeignKey(string fkName)
+        {
+            return CreateForeignKey(Schema.ForeignKeys.Find(fkName));
         }
 
         /// <summary>
