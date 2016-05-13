@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Sql\Phrases\Encoding\MD5.cs" />
+    <Compile Include="Sql\Phrases\PhraseHelper.cs" />
     <Compile Include="Sql\Phrases\IPhrase.cs" />
     <Compile Include="Bindable\BindableCollection.cs" />
     <Compile Include="Bindable\BindableList.cs" />
