@@ -43,7 +43,7 @@ namespace dg.Sql
                             sb.Append(connection.EncloseFieldName(join.RightTableSchema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.EncloseFieldName(join.RightTableSchema.SchemaName));
+                        sb.Append(connection.EncloseFieldName(join.RightTableSchema.Name));
                     }
                     else
                     {
@@ -67,7 +67,7 @@ namespace dg.Sql
                     }
                     else
                     {
-                        sb.Append(join.RightTableSchema != null ? join.RightTableSchema.SchemaName : @"");
+                        sb.Append(join.RightTableSchema != null ? join.RightTableSchema.Name : @"");
                     }
 
                     if (join.Pairs.Count > 1)
@@ -78,12 +78,12 @@ namespace dg.Sql
                         {
                             wl.AddRange(joins);
                         }
-                        wl.BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.SchemaName : join.RightTableAlias);
+                        wl.BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias);
                     }
                     else if (join.Pairs.Count == 1)
                     {
                         sb.Append(@" ON ");
-                        join.Pairs[0].BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.SchemaName : join.RightTableAlias);
+                        join.Pairs[0].BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias);
                     }
                 }
             }

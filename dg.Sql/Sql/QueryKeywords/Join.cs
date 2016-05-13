@@ -16,7 +16,7 @@ namespace dg.Sql
 
         public JoinColumnPair(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableSchema.SchemaName, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
         }
 
         public JoinColumnPair(string leftTableNameOrAlias, string leftColumn, string rightColumn)
@@ -45,7 +45,7 @@ namespace dg.Sql
 
         public JoinColumnPair JoinAND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableSchema.SchemaName, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
@@ -78,7 +78,7 @@ namespace dg.Sql
 
         public JoinColumnPair JoinOR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.OR, leftTableSchema.SchemaName, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.OR, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
@@ -123,10 +123,10 @@ namespace dg.Sql
             TableSchema rightTableSchema, string rightColumn, string rightTableAlias)
         {
             _JoinType = joinType;
-            _Pairs.Add(new JoinColumnPair((leftTableAlias != null && leftTableAlias.Length > 0) ? leftTableAlias : leftTableSchema.SchemaName, leftColumn, rightColumn));
+            _Pairs.Add(new JoinColumnPair((leftTableAlias != null && leftTableAlias.Length > 0) ? leftTableAlias : leftTableSchema.Name, leftColumn, rightColumn));
             _RightTableSchema = rightTableSchema;
             _RightTableAlias = rightTableAlias;
-            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.SchemaName;
+            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
         }
 
         public Join(JoinType joinType,
@@ -134,10 +134,10 @@ namespace dg.Sql
             object rightTableSql, string rightColumn, string rightTableAlias)
         {
             _JoinType = joinType;
-            _Pairs.Add(new JoinColumnPair((leftTableAlias != null && leftTableAlias.Length > 0) ? leftTableAlias : leftTableSchema.SchemaName, leftColumn, rightColumn));
+            _Pairs.Add(new JoinColumnPair((leftTableAlias != null && leftTableAlias.Length > 0) ? leftTableAlias : leftTableSchema.Name, leftColumn, rightColumn));
             _RightTableSql = rightTableSql;
             _RightTableAlias = rightTableAlias;
-            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.SchemaName;
+            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
         }
 
         public Join(JoinType joinType,
@@ -148,7 +148,7 @@ namespace dg.Sql
             _Pairs.AddRange(pairs);
             _RightTableSchema = rightTableSchema;
             _RightTableAlias = rightTableAlias;
-            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.SchemaName;
+            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
         }
 
         public Join(JoinType joinType,
@@ -159,7 +159,7 @@ namespace dg.Sql
             _Pairs.AddRange(pairs);
             _RightTableSql = rightTableSql;
             _RightTableAlias = rightTableAlias;
-            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.SchemaName;
+            if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
         }
 
         public JoinType JoinType

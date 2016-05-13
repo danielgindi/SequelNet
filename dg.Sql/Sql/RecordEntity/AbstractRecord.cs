@@ -140,7 +140,7 @@ namespace dg.Sql
         {
             get
             {
-                return TableSchema.SchemaName;
+                return TableSchema.Name;
             }
         }
 

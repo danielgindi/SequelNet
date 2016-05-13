@@ -51,7 +51,7 @@ namespace dg.Sql
         {
             this.Schema = schema;
             this.SchemaName = schemaName;
-            TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
+            TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.Name] = this.Schema;
             if (schema == null)
             {
                 throw new Exception("The Schema you passed in is null.");
@@ -65,7 +65,7 @@ namespace dg.Sql
         public Query(string schemaName)
         {
             this.Schema = new TableSchema(schemaName, null);
-            TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.SchemaName] = this.Schema;
+            TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.Name] = this.Schema;
         }
 
         public Query(object fromExpression, string fromExpressionTableAlias)
@@ -465,7 +465,7 @@ namespace dg.Sql
             {
                 _SchemaName = value != null ?
                     value :
-                    (_Schema != null ? _Schema.SchemaName : _FromExpressionTableAlias);
+                    (_Schema != null ? _Schema.Name : _FromExpressionTableAlias);
             }
         }
 
@@ -532,13 +532,13 @@ namespace dg.Sql
             {
                 if (_Schema != null)
                 {
-                    TableAliasMap.Remove(_Schema.DatabaseOwner + @"/" + (_SchemaName ?? _Schema.SchemaName));
+                    TableAliasMap.Remove(_Schema.DatabaseOwner + @"/" + (_SchemaName ?? _Schema.Name));
                 }
                 _Schema = value;
                 if (Schema != null)
                 {
-                    TableAliasMap[_Schema.DatabaseOwner + @"/" + _Schema.SchemaName] = _Schema;
-                    _SchemaName = Schema.SchemaName;
+                    TableAliasMap[_Schema.DatabaseOwner + @"/" + _Schema.Name] = _Schema;
+                    _SchemaName = Schema.Name;
                 }
                 else
                 {

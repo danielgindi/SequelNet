@@ -8,7 +8,7 @@ namespace dg.Sql
     public partial class TableSchema
     {
         private string _DatabaseOwner;
-        private string _SchemaName;
+        private string _Name;
         public ColumnList Columns;
         public IndexList Indexes;
         public ForeignKeyList ForeignKeys;
@@ -20,16 +20,25 @@ namespace dg.Sql
             set { _DatabaseOwner = value; }
         }
 
+        public string Name
+        {
+            get { return _Name; }
+            set { _Name = value; }
+        }
+
+        /// <summary>
+        /// Synonym for <see cref="Name"/>
+        /// </summary>
         public string SchemaName
         {
-            get { return _SchemaName; }
-            set { _SchemaName = value; }
+            get { return _Name; }
+            set { _Name = value; }
         }
 
         public TableSchema()
         {
             this.DatabaseOwner = string.Empty;
-            this.SchemaName = string.Empty;
+            this.Name = string.Empty;
             this.Columns = new ColumnList();
             this.Indexes = new IndexList();
             this.ForeignKeys = new ForeignKeyList();
@@ -38,7 +47,7 @@ namespace dg.Sql
         public TableSchema(string schemaName, ColumnList columns)
         {
             this.DatabaseOwner = string.Empty;
-            this.SchemaName = schemaName ?? @"";
+            this.Name = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -48,7 +57,7 @@ namespace dg.Sql
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns)
         {
             this.DatabaseOwner = databaseOwner ?? @"";
-            this.SchemaName = schemaName ?? @"";
+            this.Name = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -58,7 +67,7 @@ namespace dg.Sql
         public TableSchema(string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
             this.DatabaseOwner = string.Empty;
-            this.SchemaName = schemaName ?? @"";
+            this.Name = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -70,7 +79,7 @@ namespace dg.Sql
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
             this.DatabaseOwner = databaseOwner ?? @"";
-            this.SchemaName = schemaName ?? @"";
+            this.Name = schemaName ?? @"";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -190,7 +199,7 @@ namespace dg.Sql
                 {
                     index.Name = @"IX_";
                 }
-                index.Name += SchemaName + @"_";
+                index.Name += Name + @"_";
                 for (int idx = 0; idx < index.ColumnNames.Length; idx++)
                 {
                     if (idx > 0) index.Name += @"_";
@@ -212,7 +221,7 @@ namespace dg.Sql
             if (foreignKey.Name == null)
             {
                 foreignKey.Name = @"FK_";
-                foreignKey.Name += SchemaName + @"_";
+                foreignKey.Name += Name + @"_";
                 foreignKey.Name += foreignKey.ForeignTable + @"_";
                 for (int idx = 0; idx < foreignKey.Columns.Length; idx++)
                 {
