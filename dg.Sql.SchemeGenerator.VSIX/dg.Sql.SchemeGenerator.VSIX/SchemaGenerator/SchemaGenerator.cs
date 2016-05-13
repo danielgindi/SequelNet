@@ -1486,8 +1486,8 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}{0}", "\r\n");
 
-                // FetchByID(ConnectorBase, ...) function
-                stringBuilder.AppendFormat("public static {1} FetchByID(ConnectorBase conn, ", "\r\n", context.ClassName);
+                // FetchByID(..., ConnectorBase conn = null) function
+                stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", context.ClassName);
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -1501,7 +1501,7 @@ namespace dg.Sql.SchemaGenerator
                     }
                     stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
                 }
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
                 stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
                 first = true;
@@ -1519,8 +1519,8 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
 
-                // Delete(ConnectorBase, ...) function
-                stringBuilder.AppendFormat("public static int Delete(ConnectorBase conn, ", "\r\n");
+                // Delete(..., ConnectorBase conn = null) function
+                stringBuilder.AppendFormat("public static int Delete(", "\r\n");
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -1534,7 +1534,7 @@ namespace dg.Sql.SchemaGenerator
                     }
                     stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
                 }
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
                 stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
                 first = true;
