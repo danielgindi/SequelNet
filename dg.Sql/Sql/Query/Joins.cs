@@ -9,6 +9,7 @@ namespace dg.Sql
 {
     public partial class Query
     {
+        [Obsolete]
         public Query Join(JoinType joinType,
             TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
             TableSchema rightTableSchema, string rightColumn, string rightTableAlias)
@@ -20,6 +21,17 @@ namespace dg.Sql
             return this;
         }
 
+        [Obsolete]
+        public Query Join(JoinType joinType,
+            TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
+            object rightTableSql, string rightColumn, string rightTableAlias)
+        {
+            if (_ListJoin == null) _ListJoin = new JoinList();
+            Join join = new Join(joinType, leftTableSchema, leftColumn, leftTableAlias, rightTableSql, rightColumn, rightTableAlias);
+            _ListJoin.Add(join);
+            return this;
+        }
+
         public Query Join(JoinType joinType,
             TableSchema rightTableSchema, string rightTableAlias,
             params JoinColumnPair[] pairs)
@@ -28,16 +40,6 @@ namespace dg.Sql
             Join join = new Join(joinType, rightTableSchema, rightTableAlias, pairs);
             _ListJoin.Add(join);
             TableAliasMap[join.RightTableAlias] = join.RightTableSchema;
-            return this;
-        }
-
-        public Query Join(JoinType joinType,
-            TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
-            object rightTableSql, string rightColumn, string rightTableAlias)
-        {
-            if (_ListJoin == null) _ListJoin = new JoinList();
-            Join join = new Join(joinType, leftTableSchema, leftColumn, leftTableAlias, rightTableSql, rightColumn, rightTableAlias);
-            _ListJoin.Add(join);
             return this;
         }
 
