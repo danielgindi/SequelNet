@@ -11,6 +11,8 @@ namespace dg.Sql.Phrases
         public object Value;
         public ValueObjectType ValueType;
 
+        #region Constructors
+
         public Month(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -27,6 +29,13 @@ namespace dg.Sql.Phrases
             : this(null, columnName, ValueObjectType.ColumnName)
         {
         }
+
+        public Month(IPhrase phrase)
+            : this(null, phrase, ValueObjectType.Value)
+        {
+        }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn)
         {
