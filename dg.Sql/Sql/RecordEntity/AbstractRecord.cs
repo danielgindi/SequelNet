@@ -119,6 +119,15 @@ namespace dg.Sql
             }
         }
 
+        [HiddenForDataBinding(true), XmlIgnore]
+        public static string SchemaName
+        {
+            get
+            {
+                return TableSchema.SchemaName;
+            }
+        }
+
         /// <summary>
         /// The primary key name for this record's schema.
         /// It is found automatically and cached.
