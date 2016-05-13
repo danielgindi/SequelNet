@@ -313,6 +313,11 @@ namespace dg.Sql.Connector
             return @"SECONDS(" + Date + ")";
         }
 
+        public virtual string func_MD5(string value)
+        {
+            return @"MD5(" + value + ")";
+        }
+
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
         public virtual string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
 

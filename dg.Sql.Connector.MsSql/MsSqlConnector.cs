@@ -397,6 +397,18 @@ namespace dg.Sql.Connector
             return @"DATEPART(second, " + Date + ")";
         }
 
+        public override string func_MD5(string value)
+        {
+            if (GetVersionData().MajorVersion < 10)
+            {
+                return @"SUBSTRING(sys.fn_sqlvarbasetostr(HASHBYTES('MD5', " + value + ")), 3, 32)";
+            }
+            else
+            {
+                return @"CONVERT(VARCHAR(32), HashBytes('MD5', " + value + "), 2)";
+            }
+        }
+
         public override string func_LENGTH
         {
             get { return @"LEN"; }
