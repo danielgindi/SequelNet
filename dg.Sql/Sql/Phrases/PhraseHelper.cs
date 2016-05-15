@@ -238,5 +238,149 @@ namespace dg.Sql
         }
 
         #endregion
+
+        #region Quantitative
+
+        public static Min Min(object value, ValueObjectType valueType)
+        {
+            return new Min(value, valueType);
+        }
+
+        public static Min Min(string tableName, string columnName)
+        {
+            return new Min(tableName, columnName);
+        }
+
+        public static Min Min(string columnName)
+        {
+            return new Min(columnName);
+        }
+
+        public static Min Min(IPhrase phrase)
+        {
+            return new Min(phrase);
+        }
+
+        public static Max Max(object value, ValueObjectType valueType)
+        {
+            return new Max(value, valueType);
+        }
+
+        public static Max Max(string tableName, string columnName)
+        {
+            return new Max(tableName, columnName);
+        }
+
+        public static Max Max(string columnName)
+        {
+            return new Max(columnName);
+        }
+
+        public static Max Max(IPhrase phrase)
+        {
+            return new Max(phrase);
+        }
+
+        public static Count Count(object value, ValueObjectType valueType, bool distinct = false)
+        {
+            return new Count(value, valueType, distinct);
+        }
+
+        public static Count Count(string tableName, string columnName, bool distinct = false)
+        {
+            return new Count(tableName, columnName, distinct);
+        }
+
+        public static Count Count(string columnName, bool distinct = false)
+        {
+            return new Count(columnName, distinct);
+        }
+
+        public static Count Count(IPhrase phrase, bool distinct = false)
+        {
+            return new Count(phrase, distinct);
+        }
+
+        public static CountDistinct CountDistinct(object value, ValueObjectType valueType)
+        {
+            return new CountDistinct(value, valueType);
+        }
+
+        public static CountDistinct CountDistinct(string tableName, string columnName)
+        {
+            return new CountDistinct(tableName, columnName);
+        }
+
+        public static CountDistinct CountDistinct(string columnName)
+        {
+            return new CountDistinct(columnName);
+        }
+
+        public static CountDistinct CountDistinct(IPhrase phrase)
+        {
+            return new CountDistinct(phrase);
+        }
+
+        public static Sum Sum(object value, ValueObjectType valueType)
+        {
+            return new Sum(value, valueType);
+        }
+
+        public static Sum Sum(string tableName, string columnName)
+        {
+            return new Sum(tableName, columnName);
+        }
+
+        public static Sum Sum(string columnName)
+        {
+            return new Sum(columnName);
+        }
+
+        public static Sum Sum(IPhrase phrase)
+        {
+            return new Sum(phrase);
+        }
+
+        public static Avg Avg(object value, ValueObjectType valueType)
+        {
+            return new Avg(value, valueType);
+        }
+
+        public static Avg Avg(string tableName, string columnName)
+        {
+            return new Avg(tableName, columnName);
+        }
+
+        public static Avg Avg(string columnName)
+        {
+            return new Avg(columnName);
+        }
+
+        public static Avg Avg(IPhrase phrase)
+        {
+            return new Avg(phrase);
+        }
+
+        public static PassThroughAggregate PassThroughAggregate(string aggregateType, object value, ValueObjectType valueType)
+        {
+            return new PassThroughAggregate(aggregateType, value, valueType);
+        }
+
+        public static PassThroughAggregate PassThroughAggregate(string aggregateType, string tableName, string columnName)
+        {
+            return new PassThroughAggregate(aggregateType, tableName, columnName);
+        }
+
+        public static PassThroughAggregate PassThroughAggregate(string aggregateType, string columnName)
+        {
+            return new PassThroughAggregate(aggregateType, columnName);
+        }
+
+        public static PassThroughAggregate PassThroughAggregate(string aggregateType, IPhrase phrase)
+        {
+            return new PassThroughAggregate(aggregateType, phrase);
+        }
+        
+        #endregion
     }
 }
