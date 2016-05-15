@@ -41,6 +41,11 @@ namespace dg.Sql.Phrases
             this.AggregateType = aggregateType;
         }
 
+        public PassThroughAggregate(string aggregateType, IPhrase phrase)
+            : this(aggregateType, phrase, ValueObjectType.Value)
+        {
+        }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

@@ -43,6 +43,11 @@ namespace dg.Sql.Phrases
             this.ValueType = valueType;
         }
 
+        public Min(IPhrase phrase)
+            : this(phrase, ValueObjectType.Value)
+        {
+        }
+
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;

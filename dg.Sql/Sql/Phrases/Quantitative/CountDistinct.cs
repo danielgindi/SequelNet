@@ -5,54 +5,31 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class CountDistinct : IPhrase
+    public class CountDistinct : Count
     {
-        public string TableName;
-        public object Value;
-        public ValueObjectType ValueType;
-        
-        public CountDistinct(string tableName, string columnName)
+        public CountDistinct()
+            : base(true)
         {
-            this.TableName = tableName;
-            this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+        }
+
+        public CountDistinct(string tableName, string columnName)
+            : base(tableName, columnName, true)
+        {
         }
 
         public CountDistinct(string columnName)
-            : this(null, columnName)
+            : base(null, columnName, true)
         {
         }
 
         public CountDistinct(object theObject, ValueObjectType valueType)
+            : base(theObject, valueType, true)
         {
-            this.Value = theObject;
-            this.ValueType = valueType;
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public CountDistinct(IPhrase phrase)
+            : base(phrase, true)
         {
-            string ret;
-
-            ret = @"COUNT(DISTINCT ";
-
-            if (ValueType == ValueObjectType.ColumnName)
-            {
-                if (TableName != null && TableName.Length > 0)
-                {
-                    ret += conn.EncloseFieldName(TableName);
-                    ret += ".";
-                }
-                ret += conn.EncloseFieldName(Value.ToString());
-            }
-            else if (ValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(Value);
-            }
-            else ret += Value;
-
-            ret += ")";
-
-            return ret;
         }
     }
 }

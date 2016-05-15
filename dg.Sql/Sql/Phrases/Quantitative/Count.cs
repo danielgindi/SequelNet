@@ -7,6 +7,7 @@ namespace dg.Sql.Phrases
 {
     public class Count : IPhrase
     {
+        public bool Distinct = false;
         public string TableName;
         public object Value;
         public ValueObjectType ValueType;
@@ -19,35 +20,50 @@ namespace dg.Sql.Phrases
             this.ValueType = valueType;
         }
 
-        public Count()
+        public Count(bool distinct = false)
         {
+            this.Distinct = distinct;
             this.Value = "*";
             this.ValueType = ValueObjectType.Literal;
         }
 
-        public Count(string tableName, string columnName)
+        public Count(string tableName, string columnName, bool distinct = false)
         {
+            this.Distinct = distinct;
             this.TableName = tableName;
             this.Value = columnName;
             this.ValueType = ValueObjectType.ColumnName;
         }
 
-        public Count(string columnName)
-            : this(null, columnName)
+        public Count(string columnName, bool distinct = false)
+            : this(null, columnName, distinct)
         {
         }
 
-        public Count(object value, ValueObjectType valueType)
+        public Count(object value, ValueObjectType valueType, bool distinct = false)
         {
+            this.Distinct = distinct;
             this.Value = value;
             this.ValueType = valueType;
+        }
+
+        public Count(IPhrase phrase, bool distinct = false)
+            : this(phrase, ValueObjectType.Value, distinct)
+        {
         }
 
         public string BuildPhrase(ConnectorBase conn)
         {
             string ret;
 
-            ret = @"COUNT(";
+            if (Distinct)
+            {
+                ret = @"COUNT(DISTINCT ";
+            }
+            else
+            {
+                ret = @"COUNT(";
+            }
 
             if (ValueType == ValueObjectType.ColumnName)
             {
