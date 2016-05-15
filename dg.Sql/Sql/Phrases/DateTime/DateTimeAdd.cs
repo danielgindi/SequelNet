@@ -32,7 +32,7 @@ namespace dg.Sql.Phrases
         {
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -88,7 +88,7 @@ namespace dg.Sql.Phrases
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Value));
+                    sb.Append(conn.PrepareValue(Value, relatedQuery));
                 }
                 else sb.Append(Value);
 
@@ -107,7 +107,7 @@ namespace dg.Sql.Phrases
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Value));
+                    sb.Append(conn.PrepareValue(Value, relatedQuery));
                 }
                 else sb.Append(Value);
 
@@ -212,7 +212,7 @@ namespace dg.Sql.Phrases
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {
-                    sb.Append(conn.PrepareValue(Value));
+                    sb.Append(conn.PrepareValue(Value, relatedQuery));
                 }
                 else sb.Append(Value);
 

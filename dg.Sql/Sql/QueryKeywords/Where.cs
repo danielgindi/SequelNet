@@ -276,21 +276,32 @@ namespace dg.Sql
                     {
                         if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                         {
-                            outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)Second), First, conn));
+                            outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)Second), First, conn, relatedQuery));
                         }
                         else
                         {
-                            TableSchema schema;
-                            if (SecondTableName == null || !relatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
+                            TableSchema schema = null;
+                            if (relatedQuery != null)
                             {
-                                schema = relatedQuery.Schema;
+                                if (SecondTableName == null || !relatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
+                                {
+                                    schema = relatedQuery.Schema;
+                                }
                             }
-                            outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, conn));
+
+                            if (schema != null)
+                            {
+                                outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, conn, relatedQuery));
+                            }
+                            else
+                            {
+                                outputBuilder.Append(conn.PrepareValue(First, relatedQuery));
+                            }
                         }
                     }
                     else
                     {
-                        outputBuilder.Append(conn.PrepareValue(First));
+                        outputBuilder.Append(conn.PrepareValue(First, relatedQuery));
                     }
                 }
                 else if (FirstType == ValueObjectType.ColumnName)
@@ -375,21 +386,32 @@ namespace dg.Sql
                                     // Match SECOND value to FIRST's column type
                                     if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                                     {
-                                        outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)First), Second, conn));
+                                        outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)First), Second, conn, relatedQuery));
                                     }
                                     else
                                     {
-                                        TableSchema schema;
-                                        if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                        TableSchema schema = null;
+                                        if (relatedQuery != null)
                                         {
-                                            schema = relatedQuery.Schema;
+                                            if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                            {
+                                                schema = relatedQuery.Schema;
+                                            }
                                         }
-                                        outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, conn));
+
+                                        if (schema != null)
+                                        {
+                                            outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, conn, relatedQuery));
+                                        }
+                                        else
+                                        {
+                                            outputBuilder.Append(conn.PrepareValue(Second, relatedQuery));
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    outputBuilder.Append(conn.PrepareValue(Second));
+                                    outputBuilder.Append(conn.PrepareValue(Second, relatedQuery));
                                 }
                             }
                         }
@@ -434,18 +456,30 @@ namespace dg.Sql
                                 }
                                 else
                                 {
-                                    if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    if (relatedQuery != null)
                                     {
-                                        schema = relatedQuery.Schema;
+                                        if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                        {
+                                            schema = relatedQuery.Schema;
+                                        }
                                     }
                                 }
 
                                 foreach (object objIn in collIn)
                                 {
-                                    if (first) first = false; else sbIn.Append(',');
-                                    if (schema != null) sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, conn));
-                                    else sbIn.Append(conn.PrepareValue(objIn));
+                                    if (first) first = false;
+                                    else sbIn.Append(',');
+
+                                    if (schema != null)
+                                    {
+                                        sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, conn, relatedQuery));
+                                    }
+                                    else
+                                    {
+                                        sbIn.Append(conn.PrepareValue(objIn, relatedQuery));
+                                    }
                                 }
+
                                 sbIn.Append(')');
                                 outputBuilder.Append(sbIn.ToString());
                             }
@@ -467,14 +501,28 @@ namespace dg.Sql
                                 }
                                 else
                                 {
-                                    if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                    if (relatedQuery != null)
                                     {
-                                        schema = relatedQuery.Schema;
+                                        if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
+                                        {
+                                            schema = relatedQuery.Schema;
+                                        }
                                     }
                                 }
-                                outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, conn));
+
+                                if (schema != null)
+                                {
+                                    outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, conn, relatedQuery));
+                                }
+                                else
+                                {
+                                    outputBuilder.Append(conn.PrepareValue(Third, relatedQuery));
+                                }
                             }
-                            else outputBuilder.Append(conn.PrepareValue(Third));
+                            else
+                            {
+                                outputBuilder.Append(conn.PrepareValue(Third, relatedQuery));
+                            }
                         }
                         else if (ThirdType == ValueObjectType.ColumnName)
                         {

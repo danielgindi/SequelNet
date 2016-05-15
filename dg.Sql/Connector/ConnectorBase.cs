@@ -160,75 +160,88 @@ namespace dg.Sql.Connector
 
         abstract public string EncloseFieldName(string FieldName);
 
-        public virtual string EscapeString(string Value)
+        public virtual string EscapeString(string value)
         {
-            return Value.Replace(@"'", @"''");
+            return value.Replace(@"'", @"''");
         }
-        public virtual string PrepareValue(decimal Value)
+
+        public virtual string PrepareValue(decimal value)
         {
-            return Value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string PrepareValue(float Value)
+
+        public virtual string PrepareValue(float value)
         {
-            return Value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string PrepareValue(double Value)
+
+        public virtual string PrepareValue(double value)
         {
-            return Value.ToString(CultureInfo.InvariantCulture);
+            return value.ToString(CultureInfo.InvariantCulture);
         }
-        public virtual string PrepareValue(bool Value)
+
+        public virtual string PrepareValue(bool value)
         {
-            return Value ? @"1" : @"0";
+            return value ? @"1" : @"0";
         }
-        abstract public string PrepareValue(Guid Value);
-        public virtual string PrepareValue(string Value)
+
+        abstract public string PrepareValue(Guid value);
+
+        public virtual string PrepareValue(string value)
         {
-            if (Value == null) return @"NULL";
-            else return '\'' + EscapeString(Value) + '\'';
+            if (value == null) return @"NULL";
+            else return '\'' + EscapeString(value) + '\'';
         }
-        public virtual string PrepareValue(object Value)
+
+        public virtual string PrepareValue(object value, Query relatedQuery = null)
         {
-            if (Value == null || Value is DBNull) return @"NULL";
-            else if (Value is string)
+            if (value == null || value is DBNull) return @"NULL";
+            else if (value is string)
             {
-                return PrepareValue((string)Value);
+                return PrepareValue((string)value);
             }
-            else if (Value is DateTime)
+            else if (value is DateTime)
             {
-                return '\'' + FormatDate((DateTime)Value) + '\'';
+                return '\'' + FormatDate((DateTime)value) + '\'';
             }
-            else if (Value is Guid)
+            else if (value is Guid)
             {
-                return PrepareValue((Guid)Value);
+                return PrepareValue((Guid)value);
             }
-            else if (Value is bool)
+            else if (value is bool)
             {
-                return PrepareValue((bool)Value);
+                return PrepareValue((bool)value);
             }
-            else if (Value is decimal)
+            else if (value is decimal)
             { // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((decimal)Value);
+                return PrepareValue((decimal)value);
             }
-            else if (Value is float)
+            else if (value is float)
             {
              // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((float)Value);
+                return PrepareValue((float)value);
             }
-            else if (Value is double)
+            else if (value is double)
             { // Must be formatted specifically, to avoid decimal separator confusion
-                return PrepareValue((double)Value);
+                return PrepareValue((double)value);
             }
-            else if (Value is dg.Sql.IPhrase)
+            else if (value is dg.Sql.IPhrase)
             {
-                return ((dg.Sql.IPhrase)Value).BuildPhrase(this);
+                return ((dg.Sql.IPhrase)value).BuildPhrase(this, relatedQuery);
             }
-            else if (Value is dg.Sql.Geometry)
+            else if (value is dg.Sql.Geometry)
             {
                 StringBuilder sb = new StringBuilder();
-                ((dg.Sql.Geometry)Value).BuildValue(sb, this);
+                ((dg.Sql.Geometry)value).BuildValue(sb, this);
                 return sb.ToString();
             }
-            else return Value.ToString();
+            else if (value is dg.Sql.Where)
+            {
+                StringBuilder sb = new StringBuilder();
+                ((dg.Sql.Where)value).BuildCommand(sb, true, this, relatedQuery);
+                return sb.ToString();
+            }
+            else return value.ToString();
         }
 
         abstract public string FormatDate(DateTime DateTime);

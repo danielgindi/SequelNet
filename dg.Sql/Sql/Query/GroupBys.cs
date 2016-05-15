@@ -32,17 +32,17 @@ namespace dg.Sql
             return this;
         }
 
-        public Query GroupBy(object columnName, bool columnNameIsLiteral)
+        public Query GroupBy(object value, bool valueIsLiteral)
         {
             if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-            _ListGroupBy.Add(new GroupBy(columnName, columnNameIsLiteral));
+            _ListGroupBy.Add(new GroupBy(value, valueIsLiteral));
             return this;
         }
 
-        public Query GroupBy(object columnName, bool columnNameIsLiteral, SortDirection sortDirection)
+        public Query GroupBy(object value, bool valueIsLiteral, SortDirection sortDirection)
         {
             if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-            _ListGroupBy.Add(new GroupBy(columnName, columnNameIsLiteral, sortDirection));
+            _ListGroupBy.Add(new GroupBy(value, valueIsLiteral, sortDirection));
             return this;
         }
 

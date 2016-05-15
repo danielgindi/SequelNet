@@ -44,7 +44,7 @@ namespace dg.Sql.Phrases
         {
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret = @"REPLACE(";
 

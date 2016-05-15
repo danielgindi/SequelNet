@@ -48,7 +48,7 @@ namespace dg.Sql.Phrases
         {
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
@@ -65,7 +65,7 @@ namespace dg.Sql.Phrases
             }
             else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Value);
+                ret += conn.PrepareValue(Value, relatedQuery);
             }
             else ret += Value;
 

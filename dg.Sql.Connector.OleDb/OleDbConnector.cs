@@ -285,19 +285,19 @@ namespace dg.Sql.Connector
             return '[' + FieldName + ']';
         }
 
-        public override string EscapeString(string Value)
+        public override string EscapeString(string value)
         {
-            return Value.Replace(@"'", @"''");
+            return value.Replace(@"'", @"''");
         }
 
-        public override string PrepareValue(Guid Value)
+        public override string PrepareValue(Guid value)
         {
-            return '\'' + Value.ToString(@"D") + '\'';
+            return '\'' + value.ToString(@"D") + '\'';
         }
 
-        public override string PrepareValue(bool Value)
+        public override string PrepareValue(bool value)
         {
-            return Value ? @"true" : @"false";
+            return value ? @"true" : @"false";
         }
 
         public override string FormatDate(DateTime DateTime)

@@ -107,7 +107,7 @@ namespace dg.Sql.Phrases
             this.InnerValueType = ValueObjectType.Value;
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -143,7 +143,7 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(OuterValue));
+                    sb.Append(conn.PrepareValue(OuterValue, relatedQuery));
                 }
             }
             else sb.Append(OuterValue);
@@ -174,7 +174,7 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(InnerValue));
+                    sb.Append(conn.PrepareValue(InnerValue, relatedQuery));
                 }
             }
             else sb.Append(InnerValue);

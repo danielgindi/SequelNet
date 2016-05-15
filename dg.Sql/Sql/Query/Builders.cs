@@ -126,19 +126,31 @@ namespace dg.Sql
                             TableSchema.Column col = Schema.Columns.Find(orderBy.ColumnName.ToString());
                             if (col != null && col.ActualDataType == DataType.Boolean) sb.Append(@" NOT ");
                         }
-                        if (orderBy.IsLiteral)
+
+                        if (orderBy.ColumnName is dg.Sql.IPhrase)
                         {
-                            if (orderBy.ColumnName is dg.Sql.IPhrase)
-                            {
-                                sb.Append(((dg.Sql.IPhrase)orderBy.ColumnName).BuildPhrase(connection));
-                            }
-                            else sb.Append(orderBy.ColumnName);
+                            sb.Append(((dg.Sql.IPhrase)orderBy.ColumnName).BuildPhrase(connection, this));
+                        }
+                        else if (orderBy.ColumnName is dg.Sql.Where)
+                        {
+                            ((dg.Sql.Where)orderBy.ColumnName).BuildCommand(sb, true, connection, this);
+                        }
+                        else if (orderBy.IsLiteral)
+                        {
+                            sb.Append(orderBy.ColumnName);
                         }
                         else
                         {
-                            if (orderBy.TableName != null) sb.Append(connection.EncloseFieldName(orderBy.TableName) + @"." + connection.EncloseFieldName(orderBy.ColumnName.ToString()));
-                            else sb.Append(connection.EncloseFieldName(orderBy.ColumnName.ToString()));
+                            if (orderBy.TableName != null)
+                            {
+                                sb.Append(connection.EncloseFieldName(orderBy.TableName) + @"." + connection.EncloseFieldName(orderBy.ColumnName.ToString()));
+                            }
+                            else
+                            {
+                                sb.Append(connection.EncloseFieldName(orderBy.ColumnName.ToString()));
+                            }
                         }
+
                         switch (orderBy.SortDirection)
                         {
                             default:
@@ -167,18 +179,28 @@ namespace dg.Sql
                     if (bFirst) bFirst = false;
                     else sb.Append(',');
 
-                    if (groupBy.IsLiteral)
+                    if (groupBy.ColumnName is dg.Sql.IPhrase)
                     {
-                        if (groupBy.ColumnName is dg.Sql.IPhrase)
-                        {
-                            sb.Append(((dg.Sql.IPhrase)groupBy.ColumnName).BuildPhrase(connection));
-                        }
-                        else sb.Append(groupBy.ColumnName);
+                        sb.Append(((dg.Sql.IPhrase)groupBy.ColumnName).BuildPhrase(connection, this));
+                    }
+                    else if (groupBy.ColumnName is dg.Sql.Where)
+                    {
+                        ((dg.Sql.Where)groupBy.ColumnName).BuildCommand(sb, true, connection, this);
+                    }
+                    else if (groupBy.IsLiteral)
+                    {
+                        sb.Append(groupBy.ColumnName);
                     }
                     else
                     {
-                        if (groupBy.TableName != null) sb.Append(connection.EncloseFieldName(groupBy.TableName) + @"." + connection.EncloseFieldName(groupBy.ColumnName.ToString()));
-                        else sb.Append(connection.EncloseFieldName(groupBy.ColumnName.ToString()));
+                        if (groupBy.TableName != null)
+                        {
+                            sb.Append(connection.EncloseFieldName(groupBy.TableName) + @"." + connection.EncloseFieldName(groupBy.ColumnName.ToString()));
+                        }
+                        else
+                        {
+                            sb.Append(connection.EncloseFieldName(groupBy.ColumnName.ToString()));
+                        }
                     }
 
                     if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
@@ -507,10 +529,11 @@ namespace dg.Sql
             if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
             {
                 sb.Append(@"DEFAULT ");
-                PrepareColumnValue(column, column.Default, sb, connection);
+                Query.PrepareColumnValue(column, column.Default, sb, connection, this);
                 sb.Append(' ');
             }
         }
+
         public void BuildColumnPropertiesDataType(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, out bool isTextField)
         {
             if (column.LiteralType != null && column.LiteralType.Length > 0)
@@ -983,7 +1006,7 @@ namespace dg.Sql
                                                 }
                                                 else
                                                 {
-                                                    sb.Append(connection.PrepareValue(sel.Value));
+                                                    sb.Append(connection.PrepareValue(sel.Value, this));
                                                 }
 
                                                 if (!string.IsNullOrEmpty(sel.Alias))
@@ -1060,7 +1083,7 @@ namespace dg.Sql
                                         sb.Append(@"(");
                                         if (_FromExpression is dg.Sql.IPhrase)
                                         {
-                                            sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
+                                            sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
                                         }
                                         else sb.Append(_FromExpression);
                                         sb.Append(@") ");
@@ -1197,7 +1220,10 @@ namespace dg.Sql
                                                 sb.Append(((Query)ins.Second).BuildCommand(connection));
                                                 sb.Append(')');
                                             }
-                                            else PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection);
+                                            else
+                                            {
+                                                Query.PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection, this);
+                                            }
                                         }
                                         else if (ins.SecondType == ValueObjectType.ColumnName)
                                         {
@@ -1275,7 +1301,7 @@ namespace dg.Sql
                                     }
                                     else if (upd.SecondType == ValueObjectType.Value)
                                     {
-                                        PrepareColumnValue(Schema.Columns.Find(upd.ColumnName), upd.Second, sb, connection);
+                                        Query.PrepareColumnValue(Schema.Columns.Find(upd.ColumnName), upd.Second, sb, connection, this);
                                     }
                                     else if (upd.SecondType == ValueObjectType.ColumnName)
                                     {
@@ -1367,7 +1393,10 @@ namespace dg.Sql
                                                     sb.Append(((Query)ins.Second).BuildCommand(connection));
                                                     sb.Append(')');
                                                 }
-                                                else PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection);
+                                                else
+                                                {
+                                                    Query.PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection, this);
+                                                }
                                             }
                                             else if (ins.SecondType == ValueObjectType.ColumnName)
                                             {
@@ -1605,7 +1634,7 @@ namespace dg.Sql
 
                                     sb.Append(alterColumnStatement);
                                     sb.Append(@" SET DEFAULT ");
-                                    PrepareColumnValue(_AlterColumn, _AlterColumn.Default, sb, connection);
+                                    Query.PrepareColumnValue(_AlterColumn, _AlterColumn.Default, sb, connection, this);
                                     sb.Append(';');
                                 }
                                 else
@@ -1785,7 +1814,7 @@ namespace dg.Sql
                         }
                         else
                         {
-                            sb.Append(connection.PrepareValue(sel.Value));
+                            sb.Append(connection.PrepareValue(sel.Value, this));
                         }
 
                         if (!string.IsNullOrEmpty(sel.Alias))
@@ -1866,7 +1895,7 @@ namespace dg.Sql
                 sb.Append(@"(");
                 if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1940,7 +1969,7 @@ namespace dg.Sql
                         }
                         else
                         {
-                            sb.Append(connection.PrepareValue(sel.Value));
+                            sb.Append(connection.PrepareValue(sel.Value, this));
                         }
 
                         if (!string.IsNullOrEmpty(sel.Alias))
@@ -2017,7 +2046,7 @@ namespace dg.Sql
                 sb.Append(@"(");
                 if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -2078,7 +2107,7 @@ namespace dg.Sql
                         }
                         else
                         {
-                            sb.Append(connection.PrepareValue(sel.Value));
+                            sb.Append(connection.PrepareValue(sel.Value, this));
                         }
 
                         if (!string.IsNullOrEmpty(sel.Alias))
@@ -2155,7 +2184,7 @@ namespace dg.Sql
                 sb.Append(@"(");
                 if (_FromExpression is dg.Sql.IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection));
+                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");

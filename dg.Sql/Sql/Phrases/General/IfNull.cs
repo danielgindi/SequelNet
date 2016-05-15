@@ -58,7 +58,7 @@ namespace dg.Sql.Phrases
             this.SecondValueType = ValueObjectType.ColumnName;
         }
 
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
             if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL || conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
@@ -76,7 +76,7 @@ namespace dg.Sql.Phrases
             }
             else if (FirstValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(FirstValue);
+                ret += conn.PrepareValue(FirstValue, relatedQuery);
             }
             else ret += FirstValue;
 
@@ -93,7 +93,7 @@ namespace dg.Sql.Phrases
             }
             else if (SecondValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(SecondValue);
+                ret += conn.PrepareValue(SecondValue, relatedQuery);
             }
             else ret += SecondValue;
 

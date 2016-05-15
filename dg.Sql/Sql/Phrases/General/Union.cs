@@ -13,7 +13,7 @@ namespace dg.Sql.Phrases
         {
             Queries = queries;
         }
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             StringBuilder sb = new StringBuilder();
             bool first = true;

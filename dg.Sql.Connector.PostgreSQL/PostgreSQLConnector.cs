@@ -377,26 +377,26 @@ namespace dg.Sql.Connector
             return sb.ToString();
         }
 
-        public override string EscapeString(string Value)
+        public override string EscapeString(string value)
         {
             if (GetPostgreSQLMode().StandardConformingStrings)
             {
-                return EscapeStringWithoutBackslashes(Value);
+                return EscapeStringWithoutBackslashes(value);
             }
             else
             {
-                return EscapeStringWithBackslashes(Value);
+                return EscapeStringWithBackslashes(value);
             }
         }
 
-        public override string PrepareValue(bool Value)
+        public override string PrepareValue(bool value)
         {
-            return Value ? @"TRUE" : @"FALSE";
+            return value ? @"TRUE" : @"FALSE";
         }
 
-        public override string PrepareValue(Guid Value)
+        public override string PrepareValue(Guid value)
         {
-            return '\'' + Value.ToString(@"D") + '\'';
+            return '\'' + value.ToString(@"D") + '\'';
         }
 
         public override string FormatDate(DateTime DateTime)

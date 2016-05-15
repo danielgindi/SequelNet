@@ -353,10 +353,10 @@ namespace dg.Sql.Connector
         private static string CharactersNeedsDoubling = // Kinds of quotes...
             "\u0027\u0060\u00b4\u02b9\u02ba\u02bb\u02bc\u02c8\u02ca\u02cb\u02d9\u0300\u0301\u2018\u2019\u201a\u2032\u2035\u275b\u275c\uff07";
 
-        public static string EscapeStringWithBackslashes(string Value)
+        public static string EscapeStringWithBackslashes(string value)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (char c in Value)
+            foreach (char c in value)
             {
                 if (CharactersNeedsDoubling.IndexOf(c) >= 0 || CharactersNeedsBackslashes.IndexOf(c) >= 0)
                 {
@@ -367,10 +367,10 @@ namespace dg.Sql.Connector
             return sb.ToString();
         }
 
-        public static string EscapeStringWithoutBackslashes(string Value)
+        public static string EscapeStringWithoutBackslashes(string value)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (char c in Value)
+            foreach (char c in value)
             {
                 if (CharactersNeedsDoubling.IndexOf(c) >= 0)
                 {
@@ -385,21 +385,21 @@ namespace dg.Sql.Connector
             return sb.ToString();
         }
 
-        public override string EscapeString(string Value)
+        public override string EscapeString(string value)
         {
             if (GetMySqlMode().NoBackSlashes)
             {
-                return EscapeStringWithoutBackslashes(Value);
+                return EscapeStringWithoutBackslashes(value);
             }
             else
             {
-                return EscapeStringWithBackslashes(Value);
+                return EscapeStringWithBackslashes(value);
             }
         }
 
-        public override string PrepareValue(Guid Value)
+        public override string PrepareValue(Guid value)
         {
-            return '\'' + Value.ToString(@"D") + '\'';
+            return '\'' + value.ToString(@"D") + '\'';
         }
 
         public override string FormatDate(DateTime DateTime)

@@ -26,7 +26,7 @@ namespace dg.Sql.Phrases
             this.To = to;
         }
         
-        public string BuildPhrase(ConnectorBase conn)
+        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string fx, fy, tx, ty;
 

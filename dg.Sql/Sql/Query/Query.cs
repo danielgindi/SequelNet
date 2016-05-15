@@ -244,25 +244,25 @@ namespace dg.Sql
         /// <summary>
         /// Prepares a value for SQL, considering the type of the column to which is going to be assigned.
         /// </summary>
-        /// <param name="ColumnDefinition">A column definition, so we can adjust the value to it</param>
-        /// <param name="Value">Value to be prepared</param>
-        /// <param name="Connection">A connector to use. Mandatory.</param>
+        /// <param name="columnDefinition">A column definition, so we can adjust the value to it</param>
+        /// <param name="value">Value to be prepared</param>
+        /// <param name="connection">A connector to use. Mandatory.</param>
         /// <returns>The SQL expression</returns>
-        public static string PrepareColumnValue(TableSchema.Column columnDefinition, object value, ConnectorBase connection)
+        public static string PrepareColumnValue(TableSchema.Column columnDefinition, object value, ConnectorBase connection, Query relatedQuery = null)
         {
             StringBuilder sb = new StringBuilder();
-            PrepareColumnValue(columnDefinition, value, sb, connection);
+            PrepareColumnValue(columnDefinition, value, sb, connection, relatedQuery);
             return sb.ToString();
         }
 
         /// <summary>
         /// Prepares a value for SQL, considering the type of the column to which is going to be assigned.
         /// </summary>
-        /// <param name="ColumnDefinition">A column definition, so we can adjust the value to it</param>
-        /// <param name="Value">Value to be prepared</param>
-        /// <param name="OutputBuilder">The <typeparamref name="StringBuilder"/> to output the SQL expression</param>
-        /// <param name="Connection">A connector to use. Mandatory.</param>
-        public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection)
+        /// <param name="columnDefinition">A column definition, so we can adjust the value to it</param>
+        /// <param name="value">Value to be prepared</param>
+        /// <param name="outputBuilder">The <typeparamref name="StringBuilder"/> to output the SQL expression</param>
+        /// <param name="connection">A connector to use. Mandatory.</param>
+        public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection, Query relatedQuery = null)
         {
             if (value == null)
             {
@@ -274,7 +274,7 @@ namespace dg.Sql
             {
                 // Output the complete phrase
 
-                outputBuilder.Append(((dg.Sql.IPhrase)value).BuildPhrase(connection));
+                outputBuilder.Append(((dg.Sql.IPhrase)value).BuildPhrase(connection, relatedQuery));
 
                 return;
             }
@@ -293,7 +293,7 @@ namespace dg.Sql
                 // No definition to match against,
                 // so just prepare the value as it is, output it and return
 
-                outputBuilder.Append(connection.PrepareValue(value));
+                outputBuilder.Append(connection.PrepareValue(value, relatedQuery));
 
                 return;
             }
@@ -426,7 +426,7 @@ namespace dg.Sql
                 catch { }
             }
 
-            outputBuilder.Append(connection.PrepareValue(value));
+            outputBuilder.Append(connection.PrepareValue(value, relatedQuery));
         }
 
         /// <summary>
