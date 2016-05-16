@@ -122,6 +122,18 @@ namespace dg.Sql
             return AddWhere(new Where(condition, tableName, columnName, comparison, otherTableName, otherColumnName));
         }
 
+        public Query AddWhere(WhereCondition condition, string tableName, string columnName, object betweenValue, object andValue)
+        {
+            Where where = new Where(condition, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
+            where.FirstTableName = tableName;
+            return AddWhere(where);
+        }
+
+        public Query AddWhere(WhereCondition condition, string columnName, object betweenValue, object andValue)
+        {
+            return AddWhere(new Where(condition, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value));
+        }
+
         public Query AND(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return AddWhere(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
