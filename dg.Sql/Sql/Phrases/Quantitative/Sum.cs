@@ -48,6 +48,11 @@ namespace dg.Sql.Phrases
         {
         }
 
+        public Sum(Where where)
+            : this(where, ValueObjectType.Value)
+        {
+        }
+
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;

@@ -35,6 +35,11 @@ namespace dg.Sql.Phrases
         {
         }
 
+        public Hour(Where where)
+            : this(null, where, ValueObjectType.Value)
+        {
+        }
+
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
