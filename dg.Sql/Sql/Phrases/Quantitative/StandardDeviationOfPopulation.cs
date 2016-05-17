@@ -10,7 +10,9 @@ namespace dg.Sql.Phrases
         public string TableName;
         public object Value;
         public ValueObjectType ValueType;
-        
+
+        #region Constructors
+
         [Obsolete]
         public StandardDeviationOfPopulation(string tableName, object value, ValueObjectType valueType)
         {
@@ -42,6 +44,8 @@ namespace dg.Sql.Phrases
             this.Value = value;
             this.ValueType = valueType;
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

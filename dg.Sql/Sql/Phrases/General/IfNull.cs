@@ -14,6 +14,8 @@ namespace dg.Sql.Phrases
         public object SecondValue;
         public ValueObjectType SecondValueType;
 
+        #region Constructors
+
         public IfNull(
             string firstTableName, string firstColumnName,
             string secondTableName, string secondColumnName)
@@ -57,6 +59,8 @@ namespace dg.Sql.Phrases
             this.SecondValue = secondColumnName;
             this.SecondValueType = ValueObjectType.ColumnName;
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

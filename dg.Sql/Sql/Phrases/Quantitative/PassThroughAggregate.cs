@@ -12,6 +12,8 @@ namespace dg.Sql.Phrases
         public ValueObjectType ValueType;
         public string AggregateType;
 
+        #region Constructors
+
         [Obsolete]
         public PassThroughAggregate(string aggregateType, string tableName, object value, ValueObjectType valueType)
         {
@@ -45,6 +47,8 @@ namespace dg.Sql.Phrases
             : this(aggregateType, phrase, ValueObjectType.Value)
         {
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

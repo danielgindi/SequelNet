@@ -12,6 +12,8 @@ namespace dg.Sql.Phrases
         public object Value;
         public ValueObjectType ValueType;
 
+        #region Constructors
+
         [Obsolete]
         public Count(string tableName, object value, ValueObjectType valueType)
         {
@@ -51,6 +53,8 @@ namespace dg.Sql.Phrases
             : this(phrase, ValueObjectType.Value, distinct)
         {
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

@@ -10,7 +10,9 @@ namespace dg.Sql.Phrases
         public string TableName;
         public object Value;
         public ValueObjectType ValueType;
-        
+
+        #region Constructors
+
         [Obsolete]
         public Avg(string tableName, object value, ValueObjectType valueType)
         {
@@ -52,6 +54,8 @@ namespace dg.Sql.Phrases
             : this(where, ValueObjectType.Value)
         {
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

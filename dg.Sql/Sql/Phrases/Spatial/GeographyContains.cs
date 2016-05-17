@@ -14,6 +14,9 @@ namespace dg.Sql.Phrases
         public object InnerValue;
         public ValueObjectType InnerValueType;
 
+        #region Constructors
+
+        [Obsolete]
         public GeographyContains(
             string outerTableName, object outerValue, ValueObjectType outerValueType,
             string innerTableName, object innerValue, ValueObjectType innerValueType)
@@ -106,6 +109,8 @@ namespace dg.Sql.Phrases
             this.InnerValue = InnerObject;
             this.InnerValueType = ValueObjectType.Value;
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

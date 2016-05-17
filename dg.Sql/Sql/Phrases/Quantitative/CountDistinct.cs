@@ -7,6 +7,8 @@ namespace dg.Sql.Phrases
 {
     public class CountDistinct : Count
     {
+        #region Constructors
+
         public CountDistinct()
             : base(true)
         {
@@ -31,5 +33,7 @@ namespace dg.Sql.Phrases
             : base(phrase, true)
         {
         }
+
+        #endregion
     }
 }
