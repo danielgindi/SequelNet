@@ -60,7 +60,7 @@ namespace dg.Sql
             return Join(JoinType.LeftJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query LeftJoin(JoinType joinType,
+        public Query LeftJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
@@ -74,7 +74,7 @@ namespace dg.Sql
             return Join(JoinType.RightJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query RightJoin(JoinType joinType,
+        public Query RightJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
@@ -88,7 +88,7 @@ namespace dg.Sql
             return Join(JoinType.InnerJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query InnerJoin(JoinType joinType,
+        public Query InnerJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
@@ -102,7 +102,7 @@ namespace dg.Sql
             return Join(JoinType.LeftOuterJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query LeftOuterJoin(JoinType joinType,
+        public Query LeftOuterJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
@@ -116,7 +116,7 @@ namespace dg.Sql
             return Join(JoinType.RightOuterJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query RightOuterJoin(JoinType joinType,
+        public Query RightOuterJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
@@ -130,7 +130,7 @@ namespace dg.Sql
             return Join(JoinType.FullOuterJoin, rightTableSchema, rightTableAlias, pairs);
         }
 
-        public Query FullOuterJoin(JoinType joinType,
+        public Query FullOuterJoin(
             object rightTableSql, string rightTableAlias,
             params JoinColumnPair[] pairs)
         {
