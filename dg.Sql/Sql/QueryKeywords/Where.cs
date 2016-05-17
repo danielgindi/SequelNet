@@ -8,7 +8,7 @@ namespace dg.Sql
 {
     public class Where
     {
-        private WhereComparision _Comparison = WhereComparision.None;
+        private WhereComparison _Comparison = WhereComparison.None;
         private WhereCondition _Condition = WhereCondition.AND;
         private object _First = null;
         private ValueObjectType _FirstType = ValueObjectType.Literal;
@@ -20,7 +20,7 @@ namespace dg.Sql
         private string _SecondTableName = null;
         private string _ThirdTableName = null;
 
-        public WhereComparision Comparision
+        public WhereComparison Comparison
         {
             get { return _Comparison; }
             set { _Comparison = value; }
@@ -95,16 +95,16 @@ namespace dg.Sql
             First = whereList;
         }
 
-        public Where(object thisLiteral, WhereComparision comparedBy, object thatLiteral)
+        public Where(object thisLiteral, WhereComparison comparedBy, object thatLiteral)
         {
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             First = thisLiteral;
             Second = thatLiteral;
         }
 
-        public Where(object thisObject, ValueObjectType thisObjectType, WhereComparision comparedBy, object thatObject, ValueObjectType thatObjectType)
+        public Where(object thisObject, ValueObjectType thisObjectType, WhereComparison comparedBy, object thatObject, ValueObjectType thatObjectType)
         {
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             First = thisObject;
             FirstType = thisObjectType;
             Second = thatObject;
@@ -113,7 +113,7 @@ namespace dg.Sql
 
         public Where(object thisLiteral, object betweenThisLiteral, object andThatLiteral)
         {
-            Comparision = WhereComparision.Between;
+            Comparison = WhereComparison.Between;
             First = thisLiteral;
             Second = betweenThisLiteral;
             Third = andThatLiteral;
@@ -123,7 +123,7 @@ namespace dg.Sql
             object betweenThisObject, ValueObjectType betweenThisObjectType,
             object andThatObject, ValueObjectType andThatObjectType)
         {
-            Comparision = WhereComparision.Between;
+            Comparison = WhereComparison.Between;
             First = thisObject;
             FirstType = thisObjectType;
             Second = betweenThisObject;
@@ -133,9 +133,9 @@ namespace dg.Sql
         }
 
         public Where(string tableName, string columnName,
-            WhereComparision comparedBy, object value)
+            WhereComparison comparedBy, object value)
         {
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             FirstTableName = tableName;
             First = columnName;
             FirstType = ValueObjectType.ColumnName;
@@ -144,9 +144,9 @@ namespace dg.Sql
         }
 
         public Where(string tableName, string columnName,
-            WhereComparision comparedBy, string thatTableName, string thatColumnName)
+            WhereComparison comparedBy, string thatTableName, string thatColumnName)
         {
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             FirstTableName = tableName;
             First = columnName;
             FirstType = ValueObjectType.ColumnName;
@@ -161,18 +161,18 @@ namespace dg.Sql
             First = whereList;
         }
 
-        public Where(WhereCondition condition, object thisLiteral, WhereComparision comparedBy, object thatLiteral)
+        public Where(WhereCondition condition, object thisLiteral, WhereComparison comparedBy, object thatLiteral)
         {
             Condition = condition;
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             First = thisLiteral;
             Second = thatLiteral;
         }
 
-        public Where(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparision comparedBy, object thatObject, ValueObjectType thatObjectType)
+        public Where(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparison comparedBy, object thatObject, ValueObjectType thatObjectType)
         {
             Condition = condition;
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             First = thisObject;
             FirstType = thisObjectType;
             Second = thatObject;
@@ -182,7 +182,7 @@ namespace dg.Sql
         public Where(WhereCondition condition, object thisLiteral, object betweenThisLiteral, object andThatLiteral)
         {
             Condition = condition;
-            Comparision = WhereComparision.Between;
+            Comparison = WhereComparison.Between;
             First = thisLiteral;
             Second = betweenThisLiteral;
             Third = andThatLiteral;
@@ -194,7 +194,7 @@ namespace dg.Sql
             object andThatObject, ValueObjectType andThatObjectType)
         {
             Condition = condition;
-            Comparision = WhereComparision.Between;
+            Comparison = WhereComparison.Between;
             First = thisObject;
             FirstType = thisObjectType;
             Second = betweenThisObject;
@@ -205,10 +205,10 @@ namespace dg.Sql
 
         public Where(WhereCondition condition,
             string tableName, string columnName,
-            WhereComparision comparedBy, object value)
+            WhereComparison comparedBy, object value)
         {
             Condition = condition;
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             FirstTableName = tableName;
             First = columnName;
             FirstType = ValueObjectType.ColumnName;
@@ -218,10 +218,10 @@ namespace dg.Sql
 
         public Where(WhereCondition condition,
             string tableName, string columnName,
-            WhereComparision comparedBy, string thatTableName, string thatColumnName)
+            WhereComparison comparedBy, string thatTableName, string thatColumnName)
         {
             Condition = condition;
-            Comparision = comparedBy;
+            Comparison = comparedBy;
             FirstTableName = tableName;
             First = columnName;
             FirstType = ValueObjectType.ColumnName;
@@ -250,7 +250,7 @@ namespace dg.Sql
                 }
             }
 
-            if (Comparision == WhereComparision.None &&  // Its not a comparison
+            if (Comparison == WhereComparison.None &&  // Its not a comparison
                 // And there's no list or the list is empty
                 (!(First is WhereList) || ((WhereList)First).Count == 0) &&
                 // And it's not a literal expression
@@ -325,51 +325,51 @@ namespace dg.Sql
                     outputBuilder.Append(First == null ? @"NULL" : First);
                 }
 
-                if (Comparision != WhereComparision.None)
+                if (Comparison != WhereComparison.None)
                 {
-                    switch (Comparision)
+                    switch (Comparison)
                     {
-                        case WhereComparision.EqualsTo:
+                        case WhereComparison.EqualsTo:
                             if (First == null || Second == null) outputBuilder.Append(@" IS ");
                             else outputBuilder.Append(@" = ");
                             break;
-                        case WhereComparision.NotEqualsTo:
+                        case WhereComparison.NotEqualsTo:
                             if (First == null || Second == null) outputBuilder.Append(@" IS NOT ");
                             else outputBuilder.Append(@" <> ");
                             break;
-                        case WhereComparision.GreaterThan:
+                        case WhereComparison.GreaterThan:
                             outputBuilder.Append(@" > ");
                             break;
-                        case WhereComparision.GreaterThanOrEqual:
+                        case WhereComparison.GreaterThanOrEqual:
                             outputBuilder.Append(@" >= ");
                             break;
-                        case WhereComparision.LessThan:
+                        case WhereComparison.LessThan:
                             outputBuilder.Append(@" < ");
                             break;
-                        case WhereComparision.LessThanOrEqual:
+                        case WhereComparison.LessThanOrEqual:
                             outputBuilder.Append(@" <= ");
                             break;
-                        case WhereComparision.Is:
+                        case WhereComparison.Is:
                             outputBuilder.Append(@" IS ");
                             break;
-                        case WhereComparision.IsNot:
+                        case WhereComparison.IsNot:
                             outputBuilder.Append(@" IS NOT ");
                             break;
-                        case WhereComparision.Like:
+                        case WhereComparison.Like:
                             outputBuilder.Append(@" LIKE ");
                             break;
-                        case WhereComparision.Between:
+                        case WhereComparison.Between:
                             outputBuilder.Append(@" BETWEEN ");
                             break;
-                        case WhereComparision.In:
+                        case WhereComparison.In:
                             outputBuilder.Append(@" IN ");
                             break;
-                        case WhereComparision.NotIn:
+                        case WhereComparison.NotIn:
                             outputBuilder.Append(@" NOT IN ");
                             break;
                     }
 
-                    if (Comparision != WhereComparision.In && Comparision != WhereComparision.NotIn)
+                    if (Comparison != WhereComparison.In && Comparison != WhereComparison.NotIn)
                     {
                         if (SecondType == ValueObjectType.Value)
                         {
@@ -487,7 +487,7 @@ namespace dg.Sql
                         }
                     }
 
-                    if (Comparision == WhereComparision.Between)
+                    if (Comparison == WhereComparison.Between)
                     {
                         outputBuilder.Append(@" AND ");
                         if (ThirdType == ValueObjectType.Value)
@@ -543,7 +543,7 @@ namespace dg.Sql
                         else outputBuilder.Append(Third == null ? @"NULL" : Third);
                     }
 
-                    if (Comparision == WhereComparision.Like)
+                    if (Comparison == WhereComparison.Like)
                     {
                         outputBuilder.Append(' ');
                         outputBuilder.Append(conn.LikeEscapingStatement);

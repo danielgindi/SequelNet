@@ -27,29 +27,29 @@ namespace dg.Sql
         }
 
 
-        public Query Having(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        public Query Having(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Having(new Where(condition, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
         }
 
         public Query Having(WhereCondition condition, string columnName, object value)
         {
-            return Having(new Where(condition, columnName, ValueObjectType.ColumnName, WhereComparision.EqualsTo, value, ValueObjectType.Value));
+            return Having(new Where(condition, columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value));
         }
 
-        public Query Having(WhereCondition condition, string columnName, WhereComparision comparison, object value)
+        public Query Having(WhereCondition condition, string columnName, WhereComparison comparison, object value)
         {
             return Having(new Where(condition, columnName, ValueObjectType.ColumnName, comparison, value, ValueObjectType.Value));
         }
 
         public Query Having(WhereCondition condition, string literalExpression)
         {
-            return Having(new Where(condition, literalExpression, ValueObjectType.Literal, WhereComparision.None, null, ValueObjectType.Literal));
+            return Having(new Where(condition, literalExpression, ValueObjectType.Literal, WhereComparison.None, null, ValueObjectType.Literal));
         }
 
         public Query Having(WhereCondition condition, IPhrase phrase)
         {
-            return Having(new Where(condition, phrase, ValueObjectType.Value, WhereComparision.None, null, ValueObjectType.Literal));
+            return Having(new Where(condition, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
         }
 
         public Query Having(WhereCondition condition, WhereList whereList)
@@ -57,13 +57,13 @@ namespace dg.Sql
             return Having(new Where(condition, whereList));
         }
 
-        public Query Having(WhereCondition condition, string tableName, string columnName, WhereComparision comparison, object value)
+        public Query Having(WhereCondition condition, string tableName, string columnName, WhereComparison comparison, object value)
         {
             Having(new Where(condition, tableName, columnName, comparison, value));
             return this;
         }
 
-        public Query Having(WhereCondition condition, string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        public Query Having(WhereCondition condition, string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
         {
             Having(new Where(condition, tableName, columnName, comparison, otherTableName, otherColumnName));
             return this;
@@ -82,7 +82,7 @@ namespace dg.Sql
         }
 
 
-        public Query Having(object thisObject, ValueObjectType thisObjectType, WhereComparision comparison, object thatObject, ValueObjectType thatObjectType)
+        public Query Having(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Having(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType);
         }
@@ -92,7 +92,7 @@ namespace dg.Sql
             return Having(WhereCondition.AND, columnName, value);
         }
 
-        public Query Having(string columnName, WhereComparision comparison, object value)
+        public Query Having(string columnName, WhereComparison comparison, object value)
         {
             return Having(WhereCondition.AND, columnName, comparison, value);
         }
@@ -112,12 +112,12 @@ namespace dg.Sql
             return Having(WhereCondition.AND, whereList);
         }
 
-        public Query Having(string tableName, string columnName, WhereComparision comparison, object value)
+        public Query Having(string tableName, string columnName, WhereComparison comparison, object value)
         {
             return Having(WhereCondition.AND, tableName, columnName, comparison, value);
         }
 
-        public Query Having(string tableName, string columnName, WhereComparision comparison, string otherTableName, string otherColumnName)
+        public Query Having(string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
         {
             return Having(WhereCondition.AND, tableName, columnName, comparison, otherTableName, otherColumnName);
         }

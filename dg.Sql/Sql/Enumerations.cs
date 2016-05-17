@@ -44,7 +44,7 @@ namespace dg.Sql
         ExecuteStoredProcedure
     }
 
-    public enum WhereComparision
+    public enum WhereComparison
     {
         None = 0,
         EqualsTo = 1,

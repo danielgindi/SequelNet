@@ -16,61 +16,61 @@ namespace dg.Sql
 
         public JoinColumnPair(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
         }
 
         public JoinColumnPair(string leftTableNameOrAlias, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
         }
 
         public JoinColumnPair(object value, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value));
+            this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
         }
 
         public JoinColumnPair(object value, bool literalValue, string rightColumn)
         {
-            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
         }
 
         public JoinColumnPair(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
         {
-            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
         }
 
         public JoinColumnPair JoinAND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
         public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
         public JoinColumnPair JoinAND(object value, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value));
+            this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
             return this;
         }
 
         public JoinColumnPair JoinAND(object value, bool literalValue, string rightColumn)
         {
-            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
         }
         public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
         {
-            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
@@ -78,25 +78,25 @@ namespace dg.Sql
 
         public JoinColumnPair JoinOR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.OR, leftTableSchema.Name, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.OR, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
         public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
+            this.Add(new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
         public JoinColumnPair JoinOR(object value, string rightColumn)
         {
-            this.Add(new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value));
+            this.Add(new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
             return this;
         }
 
         public JoinColumnPair JoinOR(object value, bool literalValue, string rightColumn)
         {
-            Where w = new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
@@ -104,7 +104,7 @@ namespace dg.Sql
 
         public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
         {
-            Where w = new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparision.EqualsTo, value);
+            Where w = new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
