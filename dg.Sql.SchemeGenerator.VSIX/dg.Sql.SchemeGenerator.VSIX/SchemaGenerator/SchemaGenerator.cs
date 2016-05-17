@@ -740,7 +740,7 @@ namespace dg.Sql.SchemaGenerator
 
             stringBuilder.AppendFormat("#region Table Schema{0}", "\r\n");
 
-            stringBuilder.AppendFormat("private static TableSchema _TableSchema;{0}public struct Columns{0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("private static TableSchema _Schema;{0}public struct Columns{0}{{{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
                 stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";", "\r\n", context.StaticColumns ? @"static" : @"const", dalCol.Name, dalCol.NameX);
@@ -751,7 +751,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.Append("\r\n");
             }
             stringBuilder.AppendFormat("}}{0}", "\r\n");
-            stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _TableSchema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.SchemaName = @\"{1}\";{0}", "\r\n", context.SchemaName);
+            stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _Schema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.Name = @\"{1}\";{0}", "\r\n", context.SchemaName);
             if (context.DatabaseOwner != null && context.DatabaseOwner.Length > 0)
             {
                 stringBuilder.AppendFormat("schema.DatabaseOwner = @\"{1}\";{0}", "\r\n", context.DatabaseOwner);
@@ -782,7 +782,7 @@ namespace dg.Sql.SchemaGenerator
                 }
             }
 
-            stringBuilder.AppendFormat("{0}_TableSchema = schema;{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}_Schema = schema;{0}", "\r\n");
             if (context.Indices.Count > 0)
             {
                 stringBuilder.AppendFormat("{0}", "\r\n");
@@ -808,7 +808,7 @@ namespace dg.Sql.SchemaGenerator
             {
                 stringBuilder.AppendFormat("{0}schema.SetMySqlEngine(MySqlEngineType.{1});{0}", "\r\n", context.MySqlEngineName);
             }
-            stringBuilder.AppendFormat("{0}}}{0}{0}return _TableSchema;{0}}}{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}}}{0}{0}return _Schema;{0}}}{0}", "\r\n");
 
             stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
@@ -983,7 +983,7 @@ namespace dg.Sql.SchemaGenerator
             {
                 stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
             }
-            stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
+            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
                 if ((dalCol.AutoIncrement && !context.InsertAutoIncrement) || dalCol.NoSave)
@@ -1148,7 +1148,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
             }
 
-            stringBuilder.AppendFormat("Query qry = new Query(TableSchema);{0}", "\r\n");
+            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
                 if (dalCol.AutoIncrement || dalCol.NoSave)
@@ -1502,7 +1502,7 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -1535,7 +1535,7 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -1568,7 +1568,7 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -1601,7 +1601,7 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(TableSchema){0}", "\r\n");
+                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
                 first = true;
                 foreach (DalColumn dalCol in primaryKeyColumns)
                 {
@@ -2055,11 +2055,11 @@ namespace dg.Sql.SchemaGenerator
             }
             if (dalFK.ForeignTable != context.ClassName)
             {
-                stringBuilder.AppendFormat("{0}.TableSchema.SchemaName, ", dalFK.ForeignTable);
+                stringBuilder.AppendFormat("{0}.SchemaName, ", dalFK.ForeignTable);
             }
             else
             {
-                stringBuilder.Append("schema.SchemaName, ");
+                stringBuilder.Append("schema.Name, ");
             }
             if (dalFK.ForeignColumns.Count <= 1)
             {

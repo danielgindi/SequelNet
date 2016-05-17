@@ -85,12 +85,12 @@ namespace dg.Sql
 
         public static Query New<T>() where T : AbstractRecord<T>, new()
         {
-            return new Query(AbstractRecord<T>.TableSchema);
+            return new Query(AbstractRecord<T>.Schema);
         }
 
         public static Query New<T>(string schemaName) where T : AbstractRecord<T>, new()
         {
-            return new Query(AbstractRecord<T>.TableSchema, schemaName);
+            return new Query(AbstractRecord<T>.Schema, schemaName);
         }
 
         public static Query New(TableSchema schema)

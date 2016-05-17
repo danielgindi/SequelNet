@@ -67,21 +67,21 @@ namespace dg.Sql
         }
         public static TListType FetchAll()
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.TableSchema).ExecuteReader())
+            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
             {
                 return FromReader(reader);
             }
         }
         public static TListType FetchAll(ConnectorBase conn)
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.TableSchema).ExecuteReader(conn))
+            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
             {
                 return FromReader(reader);
             }
         }
         public static TListType Where(string columnName, object columnValue)
         {
-            Query qry = new Query(AbstractRecord<TItemType>.TableSchema);
+            Query qry = new Query(AbstractRecord<TItemType>.Schema);
             qry.Where(columnName, columnValue);
             return FetchByQuery(qry);
         }
