@@ -5,26 +5,12 @@ using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
-    public class UnionAll : IPhrase
+    public class UnionAll : Union
     {
-        public Query[] Queries;
-
         public UnionAll(params Query[] queries)
+            : base(queries)
         {
-            Queries = queries;
-        }
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
-        {
-            StringBuilder sb = new StringBuilder();
-            bool first = true;
-            //sb.Append(@"(");
-            foreach (Query qry in Queries)
-            {
-                if (first) first = false; else sb.Append(@" UNION ALL");
-                sb.Append(qry.BuildCommand(conn));
-            }
-            //sb.Append(@")");
-            return sb.ToString();
+            this.All = true;
         }
     }
 }
