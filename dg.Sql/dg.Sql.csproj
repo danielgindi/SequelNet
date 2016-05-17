@@ -141,7 +141,7 @@
     <Compile Include="Sql\Phrases\Quantitative\Max.cs" />
     <Compile Include="Sql\Phrases\Quantitative\Min.cs" />
     <Compile Include="Sql\Phrases\Quantitative\Count.cs" />
-    <Compile Include="Sql\Phrases\General\RandPerRow.cs" />
+    <Compile Include="Sql\Phrases\General\RandWeight.cs" />
     <Compile Include="Sql\QueryKeywords\GroupBy.cs" />
     <Compile Include="Sql\Phrases\General\IfNull.cs" />
     <Compile Include="Sql\Schema\TableSchema.ForeignKey.cs" />
