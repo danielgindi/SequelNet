@@ -13,6 +13,7 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
+        [Obsolete]
         public Lower(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -21,22 +22,30 @@ namespace dg.Sql.Phrases
         }
 
         public Lower(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public Lower(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public Lower(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+            : this(null, columnName)
         {
         }
 
         public Lower(IPhrase phrase)
-            : this(null, phrase, ValueObjectType.Value)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
         public Lower(Where where)
-            : this(null, where, ValueObjectType.Value)
+            : this(where, ValueObjectType.Value)
         {
         }
 

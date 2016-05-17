@@ -13,6 +13,7 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
+        [Obsolete]
         public MD5(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -21,22 +22,30 @@ namespace dg.Sql.Phrases
         }
 
         public MD5(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public MD5(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public MD5(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+            : this(null, columnName)
         {
         }
 
         public MD5(IPhrase phrase)
-            : this(null, phrase, ValueObjectType.Value)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
         public MD5(Where where)
-            : this(null, where, ValueObjectType.Value)
+            : this(where, ValueObjectType.Value)
         {
         }
 

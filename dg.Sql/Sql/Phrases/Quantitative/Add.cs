@@ -14,6 +14,9 @@ namespace dg.Sql.Phrases
         public object Value2;
         public ValueObjectType ValueType2;
 
+        #region Constructors
+
+        [Obsolete]
         public Add(string tableName1, object value1, ValueObjectType valueType1, 
             string tableName2, object value2, ValueObjectType valueType2)
         {
@@ -25,25 +28,136 @@ namespace dg.Sql.Phrases
             this.ValueType2 = valueType2;
         }
 
-        public Add(string tableName, string columnName, Int64 value)
-            : this(tableName, columnName, ValueObjectType.ColumnName, null, value, ValueObjectType.Value)
+        public Add(
+            string tableName1, string columnName1,
+            string tableName2, string columnName2)
         {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.TableName2 = tableName2;
+            this.Value2 = columnName2;
+            this.ValueType2 = ValueObjectType.ColumnName;
         }
 
-        public Add(string columnName, Int64 value)
-            : this(null, columnName, ValueObjectType.ColumnName, null, value, ValueObjectType.Value)
+        public Add(
+            string tableName1, string columnName1,
+            object value2, ValueObjectType valueType2)
         {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
         }
 
-        public Add(string tableName1, string columnName1, string tableName2, string columnName2)
-            : this(tableName1, columnName1, ValueObjectType.ColumnName, tableName2, columnName2, ValueObjectType.ColumnName)
+        public Add(
+            object value1, ValueObjectType valueType1,
+            string tableName2, string columnName2)
         {
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
+            this.TableName2 = tableName2;
+            this.Value2 = columnName2;
+            this.ValueType2 = ValueObjectType.ColumnName;
         }
 
-        public Add(string columnName1, string columnName2)
-            : this(null, columnName1, ValueObjectType.ColumnName, null, columnName2, ValueObjectType.ColumnName)
+        public Add(
+            object value1, ValueObjectType valueType1,
+            object value2, ValueObjectType valueType2)
         {
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
         }
+
+        public Add(string tableName1, string columnName1, Int32 value2)
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string tableName1, string columnName1, Int64 value2)
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string tableName1, string columnName1, decimal value2)
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string tableName1, string columnName1, double value2)
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string tableName1, string columnName1, float value2)
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string columnName1, Int32 value2)
+        {
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string columnName1, Int64 value2)
+        {
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string columnName1, decimal value2)
+        {
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string columnName1, double value2)
+        {
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Add(string columnName1, float value2)
+        {
+            this.Value1 = columnName1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

@@ -13,6 +13,7 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
+        [Obsolete]
         public Second(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -21,22 +22,30 @@ namespace dg.Sql.Phrases
         }
 
         public Second(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public Second(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public Second(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+            : this(null, columnName)
         {
         }
 
         public Second(IPhrase phrase)
-            : this(null, phrase, ValueObjectType.Value)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
         public Second(Where where)
-            : this(null, where, ValueObjectType.Value)
+            : this(where, ValueObjectType.Value)
         {
         }
 

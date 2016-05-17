@@ -45,6 +45,11 @@ namespace dg.Sql.Phrases
             this.ValueType = valueType;
         }
 
+        public StandardDeviationOfPopulation(IPhrase phrase)
+            : this(phrase, ValueObjectType.Value)
+        {
+        }
+
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)

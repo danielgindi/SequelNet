@@ -14,6 +14,9 @@ namespace dg.Sql.Phrases
         public object Value2;
         public ValueObjectType ValueType2;
 
+        #region Constructors
+
+        [Obsolete]
         public Multiply(
             string tableName1, object value1, ValueObjectType valueType1,
             string tableName2, object value2, ValueObjectType valueType2
@@ -28,36 +31,89 @@ namespace dg.Sql.Phrases
         }
 
         public Multiply(
+            object value1, ValueObjectType valueType1,
+            object value2, ValueObjectType valueType2
+            )
+        {
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
+        }
+
+        public Multiply(
             string tableName1, string column1,
             string tableName2, string column2
             )
-            : this(tableName1, column1, ValueObjectType.ColumnName, tableName2, column2, ValueObjectType.ColumnName)
         {
+            this.TableName1 = tableName1;
+            this.Value1 = column1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.TableName2 = tableName2;
+            this.Value2 = column2;
+            this.ValueType2 = ValueObjectType.ColumnName;
+        }
+
+        public Multiply(
+            string tableName1, string column1,
+            object value2, ValueObjectType valueType2
+            )
+        {
+            this.TableName1 = tableName1;
+            this.Value1 = column1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = valueType2;
         }
 
         public Multiply(
             string tableName1, string column1,
             object value2
             )
-            : this(tableName1, column1, ValueObjectType.ColumnName, null, value2, ValueObjectType.Value)
         {
+            this.TableName1 = tableName1;
+            this.Value1 = column1;
+            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
+        }
+
+        public Multiply(
+            object value1, ValueObjectType valueType1,
+            string tableName2, string column2
+            )
+        {
+            this.Value1 = value1;
+            this.ValueType1 = valueType1;
+            this.TableName2 = tableName2;
+            this.Value2 = column2;
+            this.ValueType2 = ValueObjectType.ColumnName;
         }
 
         public Multiply(
             object value1,
             string tableName2, string column2
             )
-            : this(null, value1, ValueObjectType.Value, tableName2, column2, ValueObjectType.ColumnName)
         {
+            this.Value1 = value1;
+            this.ValueType1 = ValueObjectType.Value;
+            this.TableName2 = tableName2;
+            this.Value2 = column2;
+            this.ValueType2 = ValueObjectType.ColumnName;
         }
 
         public Multiply(
             object value1,
             object value2
             )
-            : this(null, value1, ValueObjectType.Value, null, value2, ValueObjectType.Value)
         {
+            this.Value1 = value1;
+            this.ValueType1 = ValueObjectType.Value;
+            this.Value2 = value2;
+            this.ValueType2 = ValueObjectType.Value;
         }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

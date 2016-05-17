@@ -8,22 +8,48 @@ namespace dg.Sql.Phrases
     public class RandWeight : IPhrase
     {
         public string TableName;
-        public string Value;
+        public object Value;
         public ValueObjectType ValueType;
 
-        public RandWeight(
-            string tableName, string value, ValueObjectType valueType)
+        #region Constructors
+
+        [Obsolete]
+        public RandWeight(string tableName, string value, ValueObjectType valueType)
         {
             this.TableName = tableName;
             this.Value = value;
             this.ValueType = valueType;
         }
 
-        public RandWeight(
-             string Object, ValueObjectType valueType)
-            : this(null, Object, valueType)
+        public RandWeight(object value, ValueObjectType valueType)
+        {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public RandWeight(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
+        }
+
+        public RandWeight(string columnName)
+            : this(null, columnName)
         {
         }
+
+        public RandWeight(IPhrase phrase)
+            : this(phrase, ValueObjectType.Value)
+        {
+        }
+
+        public RandWeight(Where where)
+            : this(where, ValueObjectType.Value)
+        {
+        }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
@@ -42,11 +68,11 @@ namespace dg.Sql.Phrases
                     ret += conn.EncloseFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Value);
+                ret += conn.EncloseFieldName(Value.ToString());
             }
             else if (ValueType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Value);
+                ret += conn.PrepareValue(Value, relatedQuery);
             }
             else ret += Value;
 

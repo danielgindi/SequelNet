@@ -13,6 +13,7 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
+        [Obsolete]
         public Upper(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -21,22 +22,30 @@ namespace dg.Sql.Phrases
         }
 
         public Upper(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public Upper(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public Upper(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+            : this(null, columnName)
         {
         }
 
         public Upper(IPhrase phrase)
-            : this(null, phrase, ValueObjectType.Value)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
         public Upper(Where where)
-            : this(null, where, ValueObjectType.Value)
+            : this(where, ValueObjectType.Value)
         {
         }
 

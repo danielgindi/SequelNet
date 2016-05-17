@@ -13,6 +13,9 @@ namespace dg.Sql.Phrases
         public DateTimeUnit Unit;
         public Int64 Interval;
 
+        #region Constructors
+
+        [Obsolete]
         public DateTimeAdd(string tableName, object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
             this.TableName = tableName;
@@ -23,14 +26,33 @@ namespace dg.Sql.Phrases
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
-            : this(null, value, valueType, unit, interval)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+            this.Unit = unit;
+            this.Interval = interval;
+        }
+
+        public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, Int64 interval)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
+            this.Unit = unit;
+            this.Interval = interval;
         }
 
         public DateTimeAdd(string columnName, DateTimeUnit unit, Int64 interval)
-            : this(null, columnName, ValueObjectType.ColumnName, unit, interval)
+            : this(null, columnName, unit, interval)
         {
         }
+
+        public DateTimeAdd(IPhrase phrase, DateTimeUnit unit, Int64 interval)
+            : this(phrase, ValueObjectType.Value, unit, interval)
+        {
+        }
+
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {

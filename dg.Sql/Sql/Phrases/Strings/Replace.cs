@@ -7,42 +7,138 @@ namespace dg.Sql.Phrases
 {
     public class Replace : IPhrase
     {
-        public string Source;
         public string SourceTableName;
+        public object SourceValue;
         public ValueObjectType SourceType;
-        public string Search;
         public string SearchTableName;
+        public object SearchValue;
         public ValueObjectType SearchType;
-        public string ReplaceWith;
         public string ReplaceWithTableName;
+        public object ReplaceWithValue;
         public ValueObjectType ReplaceWithType;
 
+        #region Constructors
+
+        [Obsolete]
         public Replace(
             string sourceTableName, string source, ValueObjectType sourceType,
             string searchTableName, string search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWith, ValueObjectType replaceWithType)
         {
             this.SourceTableName = sourceTableName;
-            this.Source = source;
+            this.SourceValue = source;
             this.SourceType = sourceType;
             this.SearchTableName = searchTableName;
-            this.Search = search;
+            this.SearchValue = search;
             this.SearchType = searchType;
             this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWith = replaceWith;
+            this.ReplaceWithValue = replaceWith;
             this.ReplaceWithType = replaceWithType;
         }
 
         public Replace(
-             string source, ValueObjectType sourceType,
-             string search, ValueObjectType searchType,
-             string replaceWith, ValueObjectType replaceWithType)
-            : this(
-            null, source, sourceType,
-            null, search, searchType,
-            null, replaceWith, replaceWithType)
+            string sourceTableName, string sourceColumn,
+            string searchTableName, string searchColumn,
+            string replaceWithTableName, string replaceWithColumn)
         {
+            this.SourceTableName = sourceTableName;
+            this.SourceValue = sourceColumn;
+            this.SourceType = ValueObjectType.ColumnName;
+            this.SearchTableName = searchTableName;
+            this.SearchValue = searchColumn;
+            this.SearchType = ValueObjectType.ColumnName;
+            this.ReplaceWithTableName = replaceWithTableName;
+            this.ReplaceWithValue = replaceWithColumn;
+            this.ReplaceWithType = ValueObjectType.ColumnName;
         }
+
+        public Replace(
+            object source, ValueObjectType sourceType,
+            string searchTableName, string searchColumn,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceValue = source;
+            this.SourceType = sourceType;
+            this.SearchTableName = searchTableName;
+            this.SearchValue = searchColumn;
+            this.SearchType = ValueObjectType.ColumnName;
+            this.ReplaceWithTableName = replaceWithTableName;
+            this.ReplaceWithValue = replaceWithColumn;
+            this.ReplaceWithType = ValueObjectType.ColumnName;
+        }
+
+        public Replace(
+            string sourceTableName, string sourceColumn,
+            object search, ValueObjectType searchType,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceTableName = sourceTableName;
+            this.SourceValue = sourceColumn;
+            this.SourceType = ValueObjectType.ColumnName;
+            this.SearchValue = search;
+            this.SearchType = searchType;
+            this.ReplaceWithTableName = replaceWithTableName;
+            this.ReplaceWithValue = replaceWithColumn;
+            this.ReplaceWithType = ValueObjectType.ColumnName;
+        }
+
+        public Replace(
+            string sourceTableName, string sourceColumn,
+            string searchTableName, string searchColumn,
+            object replace, ValueObjectType replaceWithType)
+        {
+            this.SourceTableName = sourceTableName;
+            this.SourceValue = sourceColumn;
+            this.SourceType = ValueObjectType.ColumnName;
+            this.SearchTableName = searchTableName;
+            this.SearchValue = searchColumn;
+            this.SearchType = ValueObjectType.ColumnName;
+            this.ReplaceWithValue = replace;
+            this.ReplaceWithType = replaceWithType;
+        }
+
+        public Replace(
+            object source, ValueObjectType sourceType,
+            object search, ValueObjectType searchType,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceValue = source;
+            this.SourceType = sourceType;
+            this.SearchValue = search;
+            this.SearchType = searchType;
+            this.ReplaceWithTableName = replaceWithTableName;
+            this.ReplaceWithValue = replaceWithColumn;
+            this.ReplaceWithType = ValueObjectType.ColumnName;
+        }
+
+        public Replace(
+            string sourceTableName, string sourceColumn,
+            object search, ValueObjectType searchType,
+            object replace, ValueObjectType replaceWithType)
+        {
+            this.SourceTableName = sourceTableName;
+            this.SourceValue = sourceColumn;
+            this.SourceType = ValueObjectType.ColumnName;
+            this.SearchValue = search;
+            this.SearchType = searchType;
+            this.ReplaceWithValue = replace;
+            this.ReplaceWithType = replaceWithType;
+        }
+
+        public Replace(
+            object source, ValueObjectType sourceType,
+            object search, ValueObjectType searchType,
+            object replace, ValueObjectType replaceWithType)
+        {
+            this.SourceValue = source;
+            this.SourceType = sourceType;
+            this.SearchValue = search;
+            this.SearchType = searchType;
+            this.ReplaceWithValue = replace;
+            this.ReplaceWithType = replaceWithType;
+        }
+        
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
@@ -55,13 +151,13 @@ namespace dg.Sql.Phrases
                     ret += conn.EncloseFieldName(SourceTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Source);
+                ret += conn.EncloseFieldName(SourceValue.ToString());
             }
             else if (SourceType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Source);
+                ret += conn.PrepareValue(SourceValue);
             }
-            else ret += Source;
+            else ret += SourceValue;
 
             ret += ",";
 
@@ -72,13 +168,13 @@ namespace dg.Sql.Phrases
                     ret += conn.EncloseFieldName(SearchTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Search);
+                ret += conn.EncloseFieldName(SearchValue.ToString());
             }
             else if (SearchType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Search);
+                ret += conn.PrepareValue(SearchValue);
             }
-            else ret += Search;
+            else ret += SearchValue;
 
             ret += ",";
 
@@ -89,13 +185,13 @@ namespace dg.Sql.Phrases
                     ret += conn.EncloseFieldName(ReplaceWithTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(ReplaceWith);
+                ret += conn.EncloseFieldName(ReplaceWithValue.ToString());
             }
             else if (ReplaceWithType == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(ReplaceWith);
+                ret += conn.PrepareValue(ReplaceWithValue);
             }
-            else ret += ReplaceWith;
+            else ret += ReplaceWithValue;
 
             ret += ")";
 

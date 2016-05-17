@@ -13,6 +13,7 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
+        [Obsolete]
         public Hour(string tableName, object value, ValueObjectType valueType)
         {
             this.TableName = tableName;
@@ -21,22 +22,30 @@ namespace dg.Sql.Phrases
         }
 
         public Hour(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
         {
+            this.Value = value;
+            this.ValueType = valueType;
+        }
+
+        public Hour(string tableName, string columnName)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
         }
 
         public Hour(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+            : this(null, columnName)
         {
         }
 
         public Hour(IPhrase phrase)
-            : this(null, phrase, ValueObjectType.Value)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
         public Hour(Where where)
-            : this(null, where, ValueObjectType.Value)
+            : this(where, ValueObjectType.Value)
         {
         }
 

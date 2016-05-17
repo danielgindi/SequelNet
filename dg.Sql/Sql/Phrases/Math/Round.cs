@@ -12,41 +12,48 @@ namespace dg.Sql.Phrases
         public ValueObjectType ValueType;
         public int DecimalPlaces;
 
-        public Round(string tableName, object value, ValueObjectType valueType)
+        #region Constructors
+        
+        [Obsolete]
+        public Round(string tableName, object value, ValueObjectType valueType, int decimalPlaces = 0)
         {
             this.TableName = tableName;
             this.Value = value;
             this.ValueType = valueType;
-            this.DecimalPlaces = 0;
+            this.DecimalPlaces = decimalPlaces;
         }
 
-        public Round(string tableName, object value, ValueObjectType valueType, int DecimalPlaces)
+        public Round(object value, ValueObjectType valueType, int decimalPlaces = 0)
         {
-            this.TableName = tableName;
             this.Value = value;
             this.ValueType = valueType;
-            this.DecimalPlaces = DecimalPlaces;
+            this.DecimalPlaces = decimalPlaces;
         }
 
-        public Round(object value, ValueObjectType valueType)
-            : this(null, value, valueType)
+        public Round(string tableName, string columnName, int decimalPlaces = 0)
+        {
+            this.TableName = tableName;
+            this.Value = columnName;
+            this.ValueType = ValueObjectType.ColumnName;
+            this.DecimalPlaces = decimalPlaces;
+        }
+
+        public Round(string columnName, int decimalPlaces = 0)
+            : this(null, columnName, decimalPlaces)
         {
         }
 
-        public Round(object value, ValueObjectType valueType, int DecimalPlaces)
-            : this(null, value, valueType, DecimalPlaces)
+        public Round(IPhrase phrase, int decimalPlaces = 0)
+            : this(phrase, ValueObjectType.Value, decimalPlaces)
         {
         }
 
-        public Round(string columnName)
-            : this(null, columnName, ValueObjectType.ColumnName)
+        public Round(Where where)
+            : this(where, ValueObjectType.Value)
         {
         }
-
-        public Round(string columnName, int DecimalPlaces)
-            : this(null, columnName, ValueObjectType.ColumnName, DecimalPlaces)
-        {
-        }
+        
+        #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
