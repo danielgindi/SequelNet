@@ -13,6 +13,8 @@ namespace dg.Sql
         /// Changes query type to SELECT.
         /// If the query type was not already SELECT, then existing selects will be cleared.
         /// If the query type was already SELECT, then this is a No-op.
+        /// 
+        /// Note: All `Select...` methods clear the select list first.
         /// </summary>
         /// <returns></returns>
         public Query Select()
@@ -25,39 +27,44 @@ namespace dg.Sql
         }
 
         /// <summary>
-        /// Select *
+        /// Select * or table_name.*
         /// This will select all fields from all involved tables.
-        /// Note that DISTINCT will probably not generate the expected results, as a DISTINCT row contains the fields from all involved tables.
+        /// 
+        /// Note: All `Select...` methods clear the select list first.
         /// </summary>
-        /// <param name="Connection">Optional connection. (Used for escaping the table name).</param>
+        /// <param name="tableName">Optional. Table name to select all (table_name.*). If null, then it simply selects all (*).</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query SelectAll()
+        public Query SelectAll(string tableName = null)
         {
-            return ClearSelect();
+            if (tableName != null)
+            {
+                return Select(tableName, null, null, true);
+            }
+            else
+            {
+                return ClearSelect();
+            }
         }
 
         /// <summary>
         /// Select [Table].*
         /// This will only return the fields which belong to the main table in the Query.
-        /// Use this if using DISTINCT.
+        /// 
+        /// Note: All `Select...` methods clear the select list first.
         /// </summary>
-        /// <param name="Connection">Optional connection. (Used for escaping the table name).</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query SelectAllTableColumns(ConnectorBase Connection = null)
+        public Query SelectAllTableColumns()
         {
-            if (Connection == null)
-            {
-                Connection = ConnectorBase.NewInstance();
-            }
             if (_Schema != null)
             {
-                return Select(Connection.EncloseFieldName(_SchemaName) + @".*", true, true);
+                return SelectAll(_SchemaName);
             }
             else
             {
-                return Select(Connection.EncloseFieldName(this._FromExpressionTableAlias) + @".*", true, true);
+                return SelectAll(this._FromExpressionTableAlias);
             }
         }
+
 
         public Query Select(string ColumnName, bool ColumnNameIsLiteral, bool ClearSelectList)
         {
