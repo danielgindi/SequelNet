@@ -33,7 +33,7 @@ namespace dg.Sql
         #region Private variables
 
         private static bool _AtomicUpdates = false;
-        private HashSet<string> _DirtyColumns = null;
+        private HashSet<string> _MutatedColumns = null;
 
         #endregion
 
@@ -191,7 +191,7 @@ namespace dg.Sql
 
         #endregion
 
-        #region Dirty
+        #region Mutated
 
         [HiddenForDataBinding(true), XmlIgnore]
         public bool IsNewRecord
@@ -215,38 +215,38 @@ namespace dg.Sql
             set { _AtomicUpdates = value; }
         }
 
-        public void MarkColumnDirty(string column)
+        public void MarkColumnMutated(string column)
         {
-            if (_DirtyColumns == null)
+            if (_MutatedColumns == null)
             {
-                _DirtyColumns = new HashSet<string>();
+                _MutatedColumns = new HashSet<string>();
             }
 
-            _DirtyColumns.Add(column);
+            _MutatedColumns.Add(column);
         }
 
-        public void MarkColumnNotDirty(string column)
+        public void MarkColumnNotMutated(string column)
         {
-            if (_DirtyColumns == null) return;
+            if (_MutatedColumns == null) return;
 
-            _DirtyColumns.Remove(column);
+            _MutatedColumns.Remove(column);
         }
 
-        public void MarkAllColumnsNotDirty()
+        public void MarkAllColumnsNotMutated()
         {
-            if (_DirtyColumns == null) return;
+            if (_MutatedColumns == null) return;
 
-            _DirtyColumns.Clear();
+            _MutatedColumns.Clear();
         }
 
-        public bool IsColumnDirty(string column)
+        public bool IsColumnMutated(string column)
         {
-            return _DirtyColumns != null && _DirtyColumns.Contains(column);
+            return _MutatedColumns != null && _MutatedColumns.Contains(column);
         }
 
-        public bool HasDirtyColumns()
+        public bool HasMutatedColumns()
         {
-            return _DirtyColumns != null && _DirtyColumns.Count > 0;
+            return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }
         
         public void MarkOld()
@@ -320,7 +320,7 @@ namespace dg.Sql
             qry.Execute(connection);
 
             _NewRecord = false;
-            MarkAllColumnsNotDirty();
+            MarkAllColumnsNotMutated();
         }
 
         public virtual void Update(ConnectorBase connection)
@@ -349,7 +349,7 @@ namespace dg.Sql
                 if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
                 if (propInfo != null)
                 {
-                    if (_AtomicUpdates && !IsColumnDirty(Column.Name)) continue;
+                    if (_AtomicUpdates && !IsColumnMutated(Column.Name)) continue;
 
                     qry.Update(Column.Name, propInfo.GetValue(this, null));
                 }
@@ -391,7 +391,7 @@ namespace dg.Sql
                 qry.Execute(connection);
             }
 
-            MarkAllColumnsNotDirty();
+            MarkAllColumnsNotMutated();
         }
 
         public virtual void Read(DataReaderBase reader)
@@ -413,7 +413,7 @@ namespace dg.Sql
             }
 
             _NewRecord = false;
-            MarkAllColumnsNotDirty();
+            MarkAllColumnsNotMutated();
         }
 
         public virtual void Save()

@@ -936,7 +936,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("get{{ return _{2}; }}{0}", formatArgs);
                 if (context.AtomicUpdates)
                 {
-                    stringBuilder.AppendFormat("set{{ _{2}=value; MarkColumnDirty(Columns.{2}); }}{0}", formatArgs);
+                    stringBuilder.AppendFormat("set{{ _{2}=value; MarkColumnMutated(Columns.{2}); }}{0}", formatArgs);
                 }
                 else
                 {
@@ -1107,7 +1107,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (context.AtomicUpdates)
             {
-                stringBuilder.AppendFormat("MarkAllColumnsNotDirty();{0}", "\r\n");
+                stringBuilder.AppendFormat("MarkAllColumnsNotMutated();{0}", "\r\n");
             }
 
             stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
@@ -1120,7 +1120,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
             {
-                stringBuilder.AppendFormat(@"if (HasDirtyColumns()){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat(@"if (HasMutatedColumns()){0}{{{0}", "\r\n");
             }
             if (context.Columns.Find((DalColumn c) => c.Name == "ModifiedBy") != null)
             {
@@ -1154,7 +1154,7 @@ namespace dg.Sql.SchemaGenerator
 
                 if (context.AtomicUpdates)
                 {
-                    stringBuilder.AppendFormat(@"if (IsColumnDirty(Columns.{1})){0}{{{0}", "\r\n", dalCol.Name);
+                    stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.Name);
                 }
 
                 if (string.IsNullOrEmpty(dalCol.ToDb))
@@ -1189,7 +1189,7 @@ namespace dg.Sql.SchemaGenerator
             if (context.AtomicUpdates)
             {
                 stringBuilder.AppendFormat("}}{0}", "\r\n");
-                stringBuilder.AppendFormat("{0}MarkAllColumnsNotDirty();{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}MarkAllColumnsNotMutated();{0}", "\r\n");
             }
 
             stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
@@ -1406,7 +1406,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (context.AtomicUpdates)
             {
-                stringBuilder.AppendFormat("MarkAllColumnsNotDirty();{0}", "\r\n");
+                stringBuilder.AppendFormat("MarkAllColumnsNotMutated();{0}", "\r\n");
             }
 
             stringBuilder.AppendFormat("}}{0}", "\r\n");
