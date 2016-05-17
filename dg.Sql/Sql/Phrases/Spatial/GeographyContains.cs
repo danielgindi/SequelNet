@@ -41,11 +41,11 @@ namespace dg.Sql.Phrases
 
         public GeographyContains(
             object outerValue, ValueObjectType outerValueType,
-            string CctainedColumnName)
+            string innerColumnName)
         {
             this.OuterValue = outerValue;
             this.OuterValueType = outerValueType;
-            this.InnerValue = CctainedColumnName;
+            this.InnerValue = innerColumnName;
             this.InnerValueType = ValueObjectType.ColumnName;
         }
 
@@ -91,22 +91,22 @@ namespace dg.Sql.Phrases
 
         public GeographyContains(
             string outerColumnName,
-            Geometry InnerObject)
+            Geometry innerObject)
         {
             this.OuterValue = outerColumnName;
             this.OuterValueType = ValueObjectType.ColumnName;
-            this.InnerValue = InnerObject;
+            this.InnerValue = innerObject;
             this.InnerValueType = ValueObjectType.Value;
         }
 
         public GeographyContains(
             string outerTableName, string outerColumnName, 
-            Geometry InnerObject)
+            Geometry innerObject)
         {
             this.OuterTableName = outerTableName;
             this.OuterValue = outerColumnName;
             this.OuterValueType = ValueObjectType.ColumnName;
-            this.InnerValue = InnerObject;
+            this.InnerValue = innerObject;
             this.InnerValueType = ValueObjectType.Value;
         }
 
