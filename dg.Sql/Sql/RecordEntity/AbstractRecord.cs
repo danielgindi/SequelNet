@@ -215,7 +215,7 @@ namespace dg.Sql
             set { _AtomicUpdates = value; }
         }
 
-        public void MarkColumnMutated(string column)
+        public virtual void MarkColumnMutated(string column)
         {
             if (_MutatedColumns == null)
             {
@@ -225,26 +225,26 @@ namespace dg.Sql
             _MutatedColumns.Add(column);
         }
 
-        public void MarkColumnNotMutated(string column)
+        public virtual void MarkColumnNotMutated(string column)
         {
             if (_MutatedColumns == null) return;
 
             _MutatedColumns.Remove(column);
         }
 
-        public void MarkAllColumnsNotMutated()
+        public virtual void MarkAllColumnsNotMutated()
         {
             if (_MutatedColumns == null) return;
 
             _MutatedColumns.Clear();
         }
 
-        public bool IsColumnMutated(string column)
+        public virtual bool IsColumnMutated(string column)
         {
             return _MutatedColumns != null && _MutatedColumns.Contains(column);
         }
 
-        public bool HasMutatedColumns()
+        public virtual bool HasMutatedColumns()
         {
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }

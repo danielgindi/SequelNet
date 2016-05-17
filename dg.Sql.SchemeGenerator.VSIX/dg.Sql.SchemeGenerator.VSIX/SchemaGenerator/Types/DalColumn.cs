@@ -23,8 +23,9 @@ namespace dg.Sql.SchemaGenerator
 		public string ActualType;
 		public string ToDb;
         public string FromDb;
+        public string IsMutatedProperty;
         public string Charset;
         public string Collate;
-		public bool Virtual;
+        public bool Virtual;
 	}
 }

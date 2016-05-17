@@ -670,6 +670,10 @@ namespace dg.Sql.SchemaGenerator
                             dalFk.Columns.Add(dalColumn.Name);
                             context.ForeignKeys.Add(dalFk);
                         }
+                        else if (columnKeyword.StartsWith("IsMutatedProperty ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.IsMutatedProperty = columnKeyword.Substring(18);
+                        }
                         else if (columnKeyword.StartsWith("Charset ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.Charset = columnKeyword.Substring(8);
@@ -1415,6 +1419,67 @@ namespace dg.Sql.SchemaGenerator
 
             #endregion
 
+            #region Mutated
+
+            var customMutatedColumns = context.Columns.FindAll(x => !string.IsNullOrEmpty(x.IsMutatedProperty));
+            if (customMutatedColumns.Count > 0)
+            {
+                stringBuilder.AppendFormat("{0}#region Mutated{0}{0}", "\r\n");
+
+                // MarkColumnMutated
+                stringBuilder.AppendFormat("public override void MarkColumnMutated(string column){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("base.MarkColumnMutated(column);{0}{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = true;{0}", "\r\n", dalCol.Name, dalCol.NameX, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                // MarkColumnNotMutated
+                stringBuilder.AppendFormat("public override void MarkColumnNotMutated(string column){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("base.MarkColumnNotMutated(column);{0}{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = false;{0}", "\r\n", dalCol.Name, dalCol.NameX, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                // MarkAllColumnsNotMutated
+                stringBuilder.AppendFormat("public override void MarkAllColumnsNotMutated(){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("base.MarkAllColumnsNotMutated();{0}{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("if ({1} != null) {1}.{2} = false;{0}", "\r\n", dalCol.NameX, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                // IsColumnMutated
+                stringBuilder.AppendFormat("public override bool IsColumnMutated(string column){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("if (base.IsColumnMutated(column)) return true;{0}{0}", "\r\n");
+                stringBuilder.AppendFormat("switch (column){0}{{{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("case Columns.{1}:{0}if ({2} != null && {2}.{3}) return true;{0}break;{0}", "\r\n", dalCol.Name, dalCol.NameX, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+                stringBuilder.AppendFormat("return false;{0}", "\r\n");
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                // HasMutatedColumns
+                stringBuilder.AppendFormat("public override bool HasMutatedColumns(){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("if (base.HasMutatedColumns()) return true;{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) return true;{0}", "\r\n", dalCol.NameX, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("return false;{0}", "\r\n");
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            }
+
+            #endregion
+            
             #region Helpers
 
             stringBuilder.AppendFormat("{0}#region Helpers{0}", "\r\n");

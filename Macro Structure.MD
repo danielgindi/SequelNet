@@ -25,6 +25,7 @@
  `AutoIncrement` / `Auto Increment` / `AUTO_INCREMENT` - Defines the column as a serial column  
  `Default` _value_ - Sets the DEFAULT value for the column  
  `Nullable` - Defines the column as NULLABLE. Default is NOT NULL.  
+ `IsMutatedProperty` - the name of a property specifying whether the column is mutated. Goes hand-in-hand with `@AtomicUpdates`
  `Charset` - the name of a character set for this column  
  `Collate` - the name of a collation for this column  
  `Unique` / `Unique Index` - Defines a UNIQUE index on this column  
