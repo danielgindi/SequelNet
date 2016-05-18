@@ -9,6 +9,93 @@ namespace dg.Sql
 {
     public partial class Query
     {
+        private void BuildSelectList(StringBuilder sb, ConnectorBase connection)
+        {
+            if (_ListSelect == null || _ListSelect.Count == 0)
+            {
+                sb.Append("*");
+            }
+            else
+            {
+                bool bFirst = true;
+                foreach (SelectColumn sel in _ListSelect)
+                {
+                    if (bFirst) bFirst = false;
+                    else sb.Append(',');
+
+                    if (sel.ObjectType == ValueObjectType.Value)
+                    {
+                        if (sel.Value is Query)
+                        {
+                            sb.Append('(');
+                            sb.Append(((Query)sel.Value).BuildCommand(connection));
+                            sb.Append(')');
+                        }
+                        else
+                        {
+                            sb.Append(connection.PrepareValue(sel.Value, this));
+                        }
+
+                        if (!string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else if (sel.ObjectType == ValueObjectType.Literal)
+                    {
+                        if (string.IsNullOrEmpty(sel.Alias))
+                        {
+                            sb.Append(sel.Value.ToString());
+                        }
+                        else
+                        {
+                            sb.Append(sel.Value.ToString());
+                            sb.Append(@" AS ");
+                            sb.Append(connection.EncloseFieldName(sel.Alias));
+                        }
+                    }
+                    else
+                    {
+                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
+                        {
+                            if (Schema != null)
+                            {
+                                if (Schema.DatabaseOwner.Length > 0)
+                                {
+                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
+                                    sb.Append('.');
+                                }
+                                sb.Append(connection.EncloseFieldName(_SchemaName));
+                            }
+                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
+                            sb.Append('.');
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
+                        }
+                        else
+                        {
+                            if (!string.IsNullOrEmpty(sel.TableName))
+                            {
+                                sb.Append(connection.EncloseFieldName(sel.TableName));
+                                sb.Append('.');
+                            }
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
+                            if (!string.IsNullOrEmpty(sel.Alias))
+                            {
+                                sb.Append(@" AS ");
+                                sb.Append(connection.EncloseFieldName(sel.Alias));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         private void BuildJoin(StringBuilder sb, ConnectorBase connection)
         {
             if (_ListJoin != null)
@@ -984,89 +1071,7 @@ namespace dg.Sql
                                         sb.Append(' ');
                                     }
 
-                                    if (_ListSelect == null || _ListSelect.Count == 0)
-                                    {
-                                        sb.Append("*");
-                                    }
-                                    else
-                                    {
-                                        bFirst = true;
-                                        foreach (SelectColumn sel in _ListSelect)
-                                        {
-                                            if (bFirst) bFirst = false;
-                                            else sb.Append(',');
-
-                                            if (sel.ObjectType == ValueObjectType.Value)
-                                            {
-                                                if (sel.Value is Query)
-                                                {
-                                                    sb.Append('(');
-                                                    sb.Append(((Query)sel.Value).BuildCommand(connection));
-                                                    sb.Append(')');
-                                                }
-                                                else
-                                                {
-                                                    sb.Append(connection.PrepareValue(sel.Value, this));
-                                                }
-
-                                                if (!string.IsNullOrEmpty(sel.Alias))
-                                                {
-                                                    sb.Append(@" AS ");
-                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
-                                                }
-                                            }
-                                            else if (sel.ObjectType == ValueObjectType.Literal)
-                                            {
-                                                if (string.IsNullOrEmpty(sel.Alias))
-                                                {
-                                                    sb.Append(sel.Value.ToString());
-                                                }
-                                                else
-                                                {
-                                                    sb.Append(sel.Value.ToString());
-                                                    sb.Append(@" AS ");
-                                                    sb.Append(connection.EncloseFieldName(sel.Alias));
-                                                }
-                                            }
-                                            else
-                                            {
-                                                if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                                                {
-                                                    if (Schema != null)
-                                                    {
-                                                        if (Schema.DatabaseOwner.Length > 0)
-                                                        {
-                                                            sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                                            sb.Append('.');
-                                                        }
-                                                        sb.Append(connection.EncloseFieldName(_SchemaName));
-                                                    }
-                                                    else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                                                    sb.Append('.');
-                                                    sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                                                    if (!string.IsNullOrEmpty(sel.Alias))
-                                                    {
-                                                        sb.Append(@" AS ");
-                                                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if (!string.IsNullOrEmpty(sel.TableName))
-                                                    {
-                                                        sb.Append(connection.EncloseFieldName(sel.TableName));
-                                                        sb.Append('.');
-                                                    }
-                                                    sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                                                    if (!string.IsNullOrEmpty(sel.Alias))
-                                                    {
-                                                        sb.Append(@" AS ");
-                                                        sb.Append(connection.EncloseFieldName(sel.Alias));
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    BuildSelectList(sb, connection);
 
                                     sb.Append(@" FROM ");
                                     if (Schema != null)
@@ -1793,88 +1798,7 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            if (_ListSelect == null || _ListSelect.Count == 0)
-            {
-                sb.Append("*");
-            }
-            else
-            {
-                bool bFirst = true;
-                foreach (SelectColumn sel in _ListSelect)
-                {
-                    if (bFirst) bFirst = false;
-                    else sb.Append(',');
-                    if (sel.ObjectType == ValueObjectType.Value)
-                    {
-                        if (sel.Value is Query)
-                        {
-                            sb.Append('(');
-                            sb.Append(((Query)sel.Value).BuildCommand(connection));
-                            sb.Append(')');
-                        }
-                        else
-                        {
-                            sb.Append(connection.PrepareValue(sel.Value, this));
-                        }
-
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else if (sel.ObjectType == ValueObjectType.Literal)
-                    {
-                        if (string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(sel.Value.ToString());
-                        }
-                        else
-                        {
-                            sb.Append(sel.Value.ToString());
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                        {
-                            if (Schema != null)
-                            {
-                                if (Schema.DatabaseOwner.Length > 0)
-                                {
-                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                    sb.Append('.');
-                                }
-                                sb.Append(connection.EncloseFieldName(_SchemaName));
-                            }
-                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                            sb.Append('.');
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(sel.TableName))
-                            {
-                                sb.Append(connection.EncloseFieldName(sel.TableName));
-                                sb.Append('.');
-                            }
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                    }
-                }
-            }
+            BuildSelectList(sb, connection);
 
             sb.Append(@",ROW_NUMBER() OVER(");
             BuildOrderBy(sb, connection, false);
@@ -1948,88 +1872,7 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            if (_ListSelect == null || _ListSelect.Count == 0)
-            {
-                sb.Append("*");
-            }
-            else
-            {
-                bool bFirst = true;
-                foreach (SelectColumn sel in _ListSelect)
-                {
-                    if (bFirst) bFirst = false;
-                    else sb.Append(',');
-                    if (sel.ObjectType == ValueObjectType.Value)
-                    {
-                        if (sel.Value is Query)
-                        {
-                            sb.Append('(');
-                            sb.Append(((Query)sel.Value).BuildCommand(connection));
-                            sb.Append(')');
-                        }
-                        else
-                        {
-                            sb.Append(connection.PrepareValue(sel.Value, this));
-                        }
-
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else if (sel.ObjectType == ValueObjectType.Literal)
-                    {
-                        if (string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(sel.Value.ToString());
-                        }
-                        else
-                        {
-                            sb.Append(sel.Value.ToString());
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                        {
-                            if (Schema != null)
-                            {
-                                if (Schema.DatabaseOwner.Length > 0)
-                                {
-                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                    sb.Append('.');
-                                }
-                                sb.Append(connection.EncloseFieldName(_SchemaName));
-                            }
-                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                            sb.Append('.');
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(sel.TableName))
-                            {
-                                sb.Append(connection.EncloseFieldName(sel.TableName));
-                                sb.Append('.');
-                            }
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                    }
-                }
-            }
+            BuildSelectList(sb, connection);
 
             sb.Append(@" FROM ");
             if (Schema != null)
@@ -2086,88 +1929,7 @@ namespace dg.Sql
 
             if (IsDistinct) sb.Append(@"DISTINCT ");
 
-            if (_ListSelect == null || _ListSelect.Count == 0)
-            {
-                sb.Append("*");
-            }
-            else
-            {
-                bool bFirst = true;
-                foreach (SelectColumn sel in _ListSelect)
-                {
-                    if (bFirst) bFirst = false;
-                    else sb.Append(',');
-                    if (sel.ObjectType == ValueObjectType.Value)
-                    {
-                        if (sel.Value is Query)
-                        {
-                            sb.Append('(');
-                            sb.Append(((Query)sel.Value).BuildCommand(connection));
-                            sb.Append(')');
-                        }
-                        else
-                        {
-                            sb.Append(connection.PrepareValue(sel.Value, this));
-                        }
-
-                        if (!string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else if (sel.ObjectType == ValueObjectType.Literal)
-                    {
-                        if (string.IsNullOrEmpty(sel.Alias))
-                        {
-                            sb.Append(sel.Value.ToString());
-                        }
-                        else
-                        {
-                            sb.Append(sel.Value.ToString());
-                            sb.Append(@" AS ");
-                            sb.Append(connection.EncloseFieldName(sel.Alias));
-                        }
-                    }
-                    else
-                    {
-                        if (_ListJoin != null && _ListJoin.Count > 0 && string.IsNullOrEmpty(sel.TableName))
-                        {
-                            if (Schema != null)
-                            {
-                                if (Schema.DatabaseOwner.Length > 0)
-                                {
-                                    sb.Append(connection.EncloseFieldName(Schema.DatabaseOwner));
-                                    sb.Append('.');
-                                }
-                                sb.Append(connection.EncloseFieldName(_SchemaName));
-                            }
-                            else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
-                            sb.Append('.');
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                        else
-                        {
-                            if (!string.IsNullOrEmpty(sel.TableName))
-                            {
-                                sb.Append(connection.EncloseFieldName(sel.TableName));
-                                sb.Append('.');
-                            }
-                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
-                            if (!string.IsNullOrEmpty(sel.Alias))
-                            {
-                                sb.Append(@" AS ");
-                                sb.Append(connection.EncloseFieldName(sel.Alias));
-                            }
-                        }
-                    }
-                }
-            }
+            BuildSelectList(sb, connection);
 
             sb.Append(@" FROM ");
             if (Schema != null)
