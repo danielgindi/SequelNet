@@ -1019,11 +1019,11 @@ namespace dg.Sql
                                             {
                                                 if (string.IsNullOrEmpty(sel.Alias))
                                                 {
-                                                    sb.Append(sel.ColumnName);
+                                                    sb.Append(sel.Value.ToString());
                                                 }
                                                 else
                                                 {
-                                                    sb.Append(sel.ColumnName);
+                                                    sb.Append(sel.Value.ToString());
                                                     sb.Append(@" AS ");
                                                     sb.Append(connection.EncloseFieldName(sel.Alias));
                                                 }
@@ -1043,7 +1043,7 @@ namespace dg.Sql
                                                     }
                                                     else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                                                     sb.Append('.');
-                                                    sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                                                    sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                                                     if (!string.IsNullOrEmpty(sel.Alias))
                                                     {
                                                         sb.Append(@" AS ");
@@ -1057,7 +1057,7 @@ namespace dg.Sql
                                                         sb.Append(connection.EncloseFieldName(sel.TableName));
                                                         sb.Append('.');
                                                     }
-                                                    sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                                                    sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                                                     if (!string.IsNullOrEmpty(sel.Alias))
                                                     {
                                                         sb.Append(@" AS ");
@@ -1827,11 +1827,11 @@ namespace dg.Sql
                     {
                         if (string.IsNullOrEmpty(sel.Alias))
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                         }
                         else
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                             sb.Append(@" AS ");
                             sb.Append(connection.EncloseFieldName(sel.Alias));
                         }
@@ -1851,7 +1851,7 @@ namespace dg.Sql
                             }
                             else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                             sb.Append('.');
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
@@ -1865,7 +1865,7 @@ namespace dg.Sql
                                 sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
@@ -1982,11 +1982,11 @@ namespace dg.Sql
                     {
                         if (string.IsNullOrEmpty(sel.Alias))
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                         }
                         else
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                             sb.Append(@" AS ");
                             sb.Append(connection.EncloseFieldName(sel.Alias));
                         }
@@ -2006,7 +2006,7 @@ namespace dg.Sql
                             }
                             else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                             sb.Append('.');
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
@@ -2020,7 +2020,7 @@ namespace dg.Sql
                                 sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
@@ -2120,11 +2120,11 @@ namespace dg.Sql
                     {
                         if (string.IsNullOrEmpty(sel.Alias))
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                         }
                         else
                         {
-                            sb.Append(sel.ColumnName);
+                            sb.Append(sel.Value.ToString());
                             sb.Append(@" AS ");
                             sb.Append(connection.EncloseFieldName(sel.Alias));
                         }
@@ -2144,7 +2144,7 @@ namespace dg.Sql
                             }
                             else sb.Append(connection.EncloseFieldName(_FromExpressionTableAlias));
                             sb.Append('.');
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
@@ -2158,7 +2158,7 @@ namespace dg.Sql
                                 sb.Append(connection.EncloseFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(sel.ColumnName == null ? "*" : connection.EncloseFieldName(sel.ColumnName));
+                            sb.Append(sel.Value == null ? "*" : connection.EncloseFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");

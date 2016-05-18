@@ -21,6 +21,7 @@ namespace dg.Sql
         {
             if (this.QueryMode != QueryMode.Select)
             {
+                this.QueryMode = QueryMode.Select;
                 return ClearSelect();
             }
             return this;
@@ -38,7 +39,7 @@ namespace dg.Sql
         {
             if (tableName != null)
             {
-                return Select(tableName, null, null, true);
+                return Select(tableName, null, null);
             }
             else
             {
@@ -65,70 +66,119 @@ namespace dg.Sql
             }
         }
 
+        public Query Select(string columnName)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(columnName, false));
 
-        public Query Select(string ColumnName, bool ColumnNameIsLiteral, bool ClearSelectList)
+            return this;
+        }
+
+        public Query Select(string columnName, string alias)
         {
             this.QueryMode = QueryMode.Select;
             if (_ListSelect == null) _ListSelect = new SelectColumnList();
-            if (ClearSelectList) _ListSelect.Clear();
-            _ListSelect.Add(new SelectColumn(ColumnName, ColumnNameIsLiteral));
+            _ListSelect.Add(new SelectColumn(columnName, alias, false));
+
             return this;
         }
-        public Query Select(string ColumnName, string Alias, bool ColumnNameIsLiteral, bool ClearSelectList)
+
+        public Query Select(string tableName, string columnName, string alias)
         {
             this.QueryMode = QueryMode.Select;
             if (_ListSelect == null) _ListSelect = new SelectColumnList();
-            if (ClearSelectList) _ListSelect.Clear();
-            _ListSelect.Add(new SelectColumn(ColumnName, Alias, ColumnNameIsLiteral));
+            _ListSelect.Add(new SelectColumn(tableName, columnName, alias));
+
             return this;
         }
-        public Query Select(string TableName, string ColumnName, string Alias, bool ClearSelectList)
+
+        [Obsolete]
+        public Query Select(string tableName, string columnName, string alias, bool clearSelectList)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null)
+            {
+                _ListSelect = new SelectColumnList();
+            }
+            else if (clearSelectList)
+            {
+                _ListSelect.Clear();
+            }
+            _ListSelect.Add(new SelectColumn(tableName, columnName, alias));
+
+            return this;
+        }
+
+        public Query SelectLiteral(string literalExpression)
         {
             this.QueryMode = QueryMode.Select;
             if (_ListSelect == null) _ListSelect = new SelectColumnList();
-            if (ClearSelectList) _ListSelect.Clear();
-            _ListSelect.Add(new SelectColumn(TableName, ColumnName, Alias));
+            _ListSelect.Add(new SelectColumn(literalExpression, true));
+
             return this;
         }
-        public Query Select(string ColumnName)
-        {
-            return Select(ColumnName, false, true);
-        }
-        public Query SelectLiteral(string ColumnName)
-        {
-            return Select(ColumnName, true, true);
-        }
-        public Query SelectValue(object Value, string Alias, bool ClearSelectList)
+
+        public Query SelectLiteral(string literalExpression, string alias)
         {
             this.QueryMode = QueryMode.Select;
             if (_ListSelect == null) _ListSelect = new SelectColumnList();
-            if (ClearSelectList) _ListSelect.Clear();
-            _ListSelect.Add(new SelectColumn(Value, Alias));
+            _ListSelect.Add(new SelectColumn(literalExpression, alias, true));
+
             return this;
         }
-        public Query SelectValue(object Value, string Alias)
+
+        public Query SelectValue(object value)
         {
-            return SelectValue(Value, Alias, true);
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(value, null));
+
+            return this;
         }
-        public Query AddSelect(string ColumnName)
+
+        public Query SelectValue(object value, string alias)
         {
-            return Select(ColumnName, false, false);
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(value, alias));
+
+            return this;
         }
-        public Query AddSelect(string TableName, string ColumnName, string Alias)
+
+        public Query AddSelect(string columnName)
         {
-            return Select(TableName, ColumnName, Alias, false);
+            return Select(columnName);
         }
-        public Query AddSelectLiteral(string Expression)
+
+        public Query AddSelect(string columnName, string alias)
         {
-            return Select(Expression, true, false);
+            return Select(columnName, alias);
         }
-        public Query AddSelectLiteral(string Expression, string Alias)
+
+        public Query AddSelect(string tableName, string columnName, string alias)
         {
-            return Select(Expression, Alias, true, false);
+            return Select(tableName, columnName, alias);
         }
-        public Query AddSelectValue(object Value, string Alias)
+
+        public Query AddSelectLiteral(string literalExpression)
         {
-            return SelectValue(Value, Alias, false);
+            return SelectLiteral(literalExpression);
+        }
+
+        public Query AddSelectLiteral(string literalExpression, string alias)
+        {
+            return SelectLiteral(literalExpression, alias);
+        }
+
+        public Query AddSelectValue(object value)
+        {
+            return SelectValue(value);
+        }
+
+        public Query AddSelectValue(object value, string alias)
+        {
+            return SelectValue(value, alias);
         }
     }
 }

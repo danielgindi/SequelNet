@@ -433,7 +433,8 @@ namespace dg.Sql
                 if (_ListSelect == null ||
                     (_ListSelect.Count == 1 &&
                     _ListSelect[0].ObjectType == ValueObjectType.Literal && 
-                    _ListSelect[0].ColumnName == "*"))
+                    _ListSelect[0].TableName == null &&
+                    Object.Equals(_ListSelect[0].Value, "*")))
                 {
                     _ListSelect = new SelectColumnList();
                 }
