@@ -17,6 +17,7 @@ namespace dg.Sql.Bindable
             }
             return BindableCollection.GetPropertyDescriptors(this.GetType());
         }
+
         // Support for Data Binding
         internal static PropertyDescriptorCollection GetPropertyDescriptors(Type typeOfObject)
         {

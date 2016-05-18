@@ -34,6 +34,7 @@ namespace dg.Sql.Connector
             }
             return (ConnectorBase)System.Activator.CreateInstance(s_ConnectorType);
         }
+
         static public ConnectorBase NewInstance(string connectionStringKey)
         {
             if (s_ConnectorType == null)
@@ -158,7 +159,13 @@ namespace dg.Sql.Connector
 
         #region Preparing values for SQL
 
-        abstract public string EncloseFieldName(string FieldName);
+        abstract public string WrapFieldName(string fieldName);
+
+        [Obsolete]
+        public string EncloseFieldName(string fieldName)
+        {
+            return WrapFieldName(fieldName);
+        }
 
         public virtual string EscapeString(string value)
         {
@@ -244,12 +251,13 @@ namespace dg.Sql.Connector
             else return value.ToString();
         }
 
-        abstract public string FormatDate(DateTime DateTime);
+        abstract public string FormatDate(DateTime dateTime);
 
-        public virtual string EscapeLike(string LikeExpression)
+        public virtual string EscapeLike(string expression)
         {
-            return LikeExpression.Replace(@"\", @"\\").Replace(@"%", @"\%");
+            return expression.Replace(@"\", @"\\").Replace(@"%", @"\%");
         }
+
         public virtual string LikeEscapingStatement
         {
             get { return @"ESCAPE('\')"; }
@@ -265,7 +273,7 @@ namespace dg.Sql.Connector
         /// <param name="i">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column in Geometry type.</returns>
         /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found</exception>
-        public virtual Geometry ReadGeometry(object Value)
+        public virtual Geometry ReadGeometry(object value)
         {
             throw new NotImplementedException(@"ReadGeometry not implemented for this connector");
         }
@@ -284,46 +292,54 @@ namespace dg.Sql.Connector
             get { return null; } // Not supported
         }
 
-        public virtual string func_UTC_NOW
+        public virtual string func_UTC_NOW()
         {
-            get { return @"NOW()"; }
-        }
-        public virtual string func_LOWER
-        {
-            get { return @"LOWER"; }
-        }
-        public virtual string func_UPPER
-        {
-            get { return @"UPPER"; }
-        }
-        public virtual string func_LENGTH
-        {
-            get { return @"LENGTH"; }
+            return @"NOW()";
         }
 
-        public virtual string func_YEAR(string Date)
+        public virtual string func_LOWER(string value)
         {
-            return @"YEAR(" + Date + ")";
+            return @"LOWER(" + value + ")";
         }
-        public virtual string func_MONTH(string Date)
+
+        public virtual string func_UPPER(string value)
         {
-            return @"MONTH(" + Date + ")";
+            return @"UPPER(" + value + ")";
         }
-        public virtual string func_DAY(string Date)
+
+        public virtual string func_LENGTH(string value)
         {
-            return @"DAY(" + Date + ")";
+            return @"LENGTH(" + value + ")";
         }
-        public virtual string func_HOUR(string Date)
+
+        public virtual string func_YEAR(string date)
         {
-            return @"HOUR(" + Date + ")";
+            return @"YEAR(" + date + ")";
         }
-        public virtual string func_MINUTE(string Date)
+
+        public virtual string func_MONTH(string date)
         {
-            return @"MINUTE(" + Date + ")";
+            return @"MONTH(" + date + ")";
         }
-        public virtual string func_SECOND(string Date)
+
+        public virtual string func_DAY(string date)
         {
-            return @"SECONDS(" + Date + ")";
+            return @"DAY(" + date + ")";
+        }
+
+        public virtual string func_HOUR(string date)
+        {
+            return @"HOUR(" + date + ")";
+        }
+
+        public virtual string func_MINUTE(string date)
+        {
+            return @"MINUTE(" + date + ")";
+        }
+
+        public virtual string func_SECOND(string date)
+        {
+            return @"SECONDS(" + date + ")";
         }
 
         public virtual string func_MD5(string value)

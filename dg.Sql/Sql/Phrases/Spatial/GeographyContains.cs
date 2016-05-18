@@ -135,10 +135,10 @@ namespace dg.Sql.Phrases
             {
                 if (OuterTableName != null && OuterTableName.Length > 0)
                 {
-                    sb.Append(conn.EncloseFieldName(OuterTableName));
+                    sb.Append(conn.WrapFieldName(OuterTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.EncloseFieldName(OuterValue.ToString()));
+                sb.Append(conn.WrapFieldName(OuterValue.ToString()));
             }
             else if (OuterValueType == ValueObjectType.Value)
             {
@@ -166,10 +166,10 @@ namespace dg.Sql.Phrases
             {
                 if (InnerTableName != null && InnerTableName.Length > 0)
                 {
-                    sb.Append(conn.EncloseFieldName(InnerTableName));
+                    sb.Append(conn.WrapFieldName(InnerTableName));
                     sb.Append(".");
                 }
-                sb.Append(conn.EncloseFieldName(InnerValue.ToString()));
+                sb.Append(conn.WrapFieldName(InnerValue.ToString()));
             }
             else if (InnerValueType == ValueObjectType.Value)
             {

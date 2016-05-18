@@ -148,10 +148,10 @@ namespace dg.Sql.Phrases
             {
                 if (SourceTableName != null && SourceTableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(SourceTableName);
+                    ret += conn.WrapFieldName(SourceTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(SourceValue.ToString());
+                ret += conn.WrapFieldName(SourceValue.ToString());
             }
             else if (SourceType == ValueObjectType.Value)
             {
@@ -165,10 +165,10 @@ namespace dg.Sql.Phrases
             {
                 if (SearchTableName != null && SearchTableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(SearchTableName);
+                    ret += conn.WrapFieldName(SearchTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(SearchValue.ToString());
+                ret += conn.WrapFieldName(SearchValue.ToString());
             }
             else if (SearchType == ValueObjectType.Value)
             {
@@ -182,10 +182,10 @@ namespace dg.Sql.Phrases
             {
                 if (ReplaceWithTableName != null && ReplaceWithTableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(ReplaceWithTableName);
+                    ret += conn.WrapFieldName(ReplaceWithTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(ReplaceWithValue.ToString());
+                ret += conn.WrapFieldName(ReplaceWithValue.ToString());
             }
             else if (ReplaceWithType == ValueObjectType.Value)
             {

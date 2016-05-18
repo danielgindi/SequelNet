@@ -47,19 +47,23 @@ namespace dg.Sql.Connector
             return type;
         }
 
-        public abstract DbParameter NewParameter(string Name, object Value);
-        public abstract DbParameter NewParameter(string Name, DbType Type, object Value);
-        public abstract DbParameter NewParameter(string Name, object Value, ParameterDirection ParameterDirection);
-        public abstract DbParameter NewParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value);
+        public abstract DbParameter NewParameter(string name, object value);
+        public abstract DbParameter NewParameter(string name, DbType type, object value);
+        public abstract DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection);
+        public abstract DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
+            int size, bool isNullable,
+            byte precision, byte scale,
+            string sourceColumn, DataRowVersion sourceVersion,
+            object value);
 
         public abstract DbCommand NewCommand();
-        public abstract DbCommand NewCommand(string CommandText);
-        public abstract DbCommand NewCommand(string CommandText, DbConnection Connection);
-        public abstract DbCommand NewCommand(string CommandText, DbConnection Connection, DbTransaction Transaction);
+        public abstract DbCommand NewCommand(string commandText);
+        public abstract DbCommand NewCommand(string commandText, DbConnection connection);
+        public abstract DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction);
 
         public abstract DbDataAdapter NewDataAdapter();
-        public abstract DbDataAdapter NewDataAdapter(DbCommand SelectCommand);
-        public abstract DbDataAdapter NewDataAdapter(string SelectCommandText, DbConnection Connection);
-        public abstract DbDataAdapter NewDataAdapter(string SelectCommandText, string SelectConnString);
+        public abstract DbDataAdapter NewDataAdapter(DbCommand selectCommand);
+        public abstract DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection);
+        public abstract DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString);
     }
 }

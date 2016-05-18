@@ -20,6 +20,7 @@ namespace dg.Sql.Connector
         {
             _Reader = Reader;
         }
+
         public PostgreSQLDataReader(NpgsqlDataReader Reader, ConnectorBase ConnectionToClose)
         {
             _Reader = Reader;
@@ -35,6 +36,7 @@ namespace dg.Sql.Connector
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -43,6 +45,7 @@ namespace dg.Sql.Connector
             }
             // Now clean up Native Resources (Pointers)
         }
+
         ~PostgreSQLDataReader()
         {
             Dispose(false);
@@ -55,103 +58,124 @@ namespace dg.Sql.Connector
             if (_Reader != null) _Reader.Dispose();
             if (_ConnectionToClose != null) _ConnectionToClose.Dispose();
         }
+
         public override bool Read()
         {
             return _Reader.Read();
         }
-        public override bool IsDBNull(int ColumnIndex)
+
+        public override bool IsDBNull(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex);
         }
-        public override int GetInt32(int ColumnIndex)
+
+        public override int GetInt32(int columnIndex)
         {
-            return _Reader.GetInt32(ColumnIndex);
+            return _Reader.GetInt32(columnIndex);
         }
-        public override int GetInt32OrZero(int ColumnIndex)
+
+        public override int GetInt32OrZero(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? 0 : _Reader.GetInt32(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? 0 : _Reader.GetInt32(columnIndex);
         }
-        public override Int64 GetInt64(int ColumnIndex)
+
+        public override Int64 GetInt64(int columnIndex)
         {
-            return _Reader.GetInt64(ColumnIndex);
+            return _Reader.GetInt64(columnIndex);
         }
-        public override Int64 GetInt64OrZero(int ColumnIndex)
+
+        public override Int64 GetInt64OrZero(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? 0 : _Reader.GetInt64(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? 0 : _Reader.GetInt64(columnIndex);
         }
-        public override bool GetBoolean(int ColumnIndex)
+
+        public override bool GetBoolean(int columnIndex)
         {
-            return _Reader.GetBoolean(ColumnIndex);
+            return _Reader.GetBoolean(columnIndex);
         }
-        public override string GetString(int ColumnIndex)
+
+        public override string GetString(int columnIndex)
         {
-            return _Reader.GetString(ColumnIndex);
+            return _Reader.GetString(columnIndex);
         }
-        public override string GetStringOrNull(int ColumnIndex)
+
+        public override string GetStringOrNull(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? null : _Reader.GetString(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? null : _Reader.GetString(columnIndex);
         }
-        public override string GetStringOrEmpty(int ColumnIndex)
+
+        public override string GetStringOrEmpty(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? String.Empty : _Reader.GetString(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? String.Empty : _Reader.GetString(columnIndex);
         }
-        public override DateTime GetDateTime(int ColumnIndex)
+
+        public override DateTime GetDateTime(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? DateTime.FromBinary(0) : _Reader.GetDateTime(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? DateTime.FromBinary(0) : _Reader.GetDateTime(columnIndex);
         }
-        public override DateTime? GetDateTimeOrNull(int ColumnIndex)
+
+        public override DateTime? GetDateTimeOrNull(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? null : (DateTime?)_Reader.GetDateTime(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? null : (DateTime?)_Reader.GetDateTime(columnIndex);
         }
-        public override DateTime GetDateTimeOrMinValue(int ColumnIndex)
+
+        public override DateTime GetDateTimeOrMinValue(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? DateTime.MinValue : _Reader.GetDateTime(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? DateTime.MinValue : _Reader.GetDateTime(columnIndex);
         }
-        public override decimal GetDecimal(int ColumnIndex)
+
+        public override decimal GetDecimal(int columnIndex)
         {
-            return _Reader.GetDecimal(ColumnIndex);
+            return _Reader.GetDecimal(columnIndex);
         }
-        public override decimal GetDecimalOrZero(int ColumnIndex)
+
+        public override decimal GetDecimalOrZero(int columnIndex)
         {
-            return _Reader.IsDBNull(ColumnIndex) ? 0 : _Reader.GetDecimal(ColumnIndex);
+            return _Reader.IsDBNull(columnIndex) ? 0 : _Reader.GetDecimal(columnIndex);
         }
-        public override bool HasColumn(string ColumnName)
+
+        public override bool HasColumn(string columnName)
         {
             for (int j = 0, len = _Reader.VisibleFieldCount; j < len; j++)
             {
-                if (_Reader.GetName(j).Equals(ColumnName, StringComparison.OrdinalIgnoreCase)) return true;
+                if (_Reader.GetName(j).Equals(columnName, StringComparison.OrdinalIgnoreCase)) return true;
             }
             return false;
         }
+
         public override Int32 GetColumnCount()
         {
             return _Reader.VisibleFieldCount;
         }
-        public override string GetColumnName(Int32 ColumnIndex)
+
+        public override string GetColumnName(Int32 columnIndex)
         {
-            return _Reader.GetName(ColumnIndex);
-        }
-        public override object this[int ColumnIndex]
-        {
-            get { return _Reader[ColumnIndex]; }
-        }
-        public override object this[string ColumnName]
-        {
-            get { return _Reader[ColumnName]; }
+            return _Reader.GetName(columnIndex);
         }
 
-        public override Geometry GetGeometry(int ColumnIndex)
+        public override object this[int columnIndex]
         {
-            byte[] geometryData = _Reader[ColumnIndex] as byte[];
+            get { return _Reader[columnIndex]; }
+        }
+
+        public override object this[string columnName]
+        {
+            get { return _Reader[columnName]; }
+        }
+
+        public override Geometry GetGeometry(int columnIndex)
+        {
+            byte[] geometryData = _Reader[columnIndex] as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, false);
             }
             return null;
         }
-        public override Geometry GetGeometry(string ColumnName)
+
+        public override Geometry GetGeometry(string columnName)
         {
-            byte[] geometryData = _Reader[ColumnName] as byte[];
+            byte[] geometryData = _Reader[columnName] as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, false);

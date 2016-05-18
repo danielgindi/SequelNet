@@ -329,36 +329,36 @@ namespace dg.Sql.Connector
 
         #region Preparing values for SQL
 
-        public override string EncloseFieldName(string FieldName)
+        public override string WrapFieldName(string fieldName)
         { // Note: For performance, ignoring enclosed [] signs
-            return '[' + FieldName + ']';
+            return '[' + fieldName + ']';
         }
 
-        public override string PrepareValue(Guid Value)
+        public override string PrepareValue(Guid value)
         {
-            return '\'' + Value.ToString(@"D") + '\'';
+            return '\'' + value.ToString(@"D") + '\'';
         }
-        public override string PrepareValue(string Value)
+        public override string PrepareValue(string value)
         {
-            return @"N'" + EscapeString(Value) + '\'';
+            return @"N'" + EscapeString(value) + '\'';
         }
-        public override string FormatDate(DateTime DateTime)
+        public override string FormatDate(DateTime dateTime)
         {
-            return DateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+            return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
         }
 
-        public override string EscapeLike(string LikeExpression)
+        public override string EscapeLike(string expression)
         {
-            return LikeExpression.Replace(@"\", @"\\").Replace(@"%", @"\%").Replace(@"_", @"\_");
+            return expression.Replace(@"\", @"\\").Replace(@"%", @"\%").Replace(@"_", @"\_");
         }
 
         #endregion
 
         #region Reading values from SQL
 
-        public override Geometry ReadGeometry(object Value)
+        public override Geometry ReadGeometry(object value)
         {
-            byte[] geometryData = Value as byte[];
+            byte[] geometryData = value as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, false);
@@ -380,21 +380,24 @@ namespace dg.Sql.Connector
             get { return "MAX"; }
         }
 
-        public override string func_UTC_NOW
+        public override string func_UTC_NOW()
         {
-            get { return @"GETUTCDATE()"; }
+            return @"GETUTCDATE()";
         }
-        public override string func_HOUR(string Date)
+
+        public override string func_HOUR(string date)
         {
-            return @"DATEPART(hour, " + Date + ")";
+            return @"DATEPART(hour, " + date + ")";
         }
-        public override string func_MINUTE(string Date)
+
+        public override string func_MINUTE(string date)
         {
-            return @"DATEPART(minute, " + Date + ")";
+            return @"DATEPART(minute, " + date + ")";
         }
-        public override string func_SECOND(string Date)
+
+        public override string func_SECOND(string date)
         {
-            return @"DATEPART(second, " + Date + ")";
+            return @"DATEPART(second, " + date + ")";
         }
 
         public override string func_MD5(string value)
@@ -409,9 +412,9 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_LENGTH
+        public override string func_LENGTH(string value)
         {
-            get { return @"LEN"; }
+            return @"LEN(" + value + ")";
         }
 
         public override string type_TINYINT { get { return @"TINYINT"; } }

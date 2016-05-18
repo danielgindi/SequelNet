@@ -103,10 +103,10 @@ namespace dg.Sql.Phrases
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
-                        sb.Append(conn.EncloseFieldName(TableName));
+                        sb.Append(conn.WrapFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Value.ToString()));
+                    sb.Append(conn.WrapFieldName(Value.ToString()));
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {
@@ -122,10 +122,10 @@ namespace dg.Sql.Phrases
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
-                        sb.Append(conn.EncloseFieldName(TableName));
+                        sb.Append(conn.WrapFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Value.ToString()));
+                    sb.Append(conn.WrapFieldName(Value.ToString()));
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {
@@ -227,10 +227,10 @@ namespace dg.Sql.Phrases
                 {
                     if (TableName != null && TableName.Length > 0)
                     {
-                        sb.Append(conn.EncloseFieldName(TableName));
+                        sb.Append(conn.WrapFieldName(TableName));
                         sb.Append(".");
                     }
-                    sb.Append(conn.EncloseFieldName(Value.ToString()));
+                    sb.Append(conn.WrapFieldName(Value.ToString()));
                 }
                 else if (ValueType == ValueObjectType.Value)
                 {

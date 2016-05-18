@@ -9,34 +9,41 @@ namespace dg.Sql.Connector
 {
     public class MsSqlFactory : FactoryBase
     {
-        public override DbParameter NewParameter(string Name, object Value)
+        public override DbParameter NewParameter(string name, object value)
         {
-            SqlParameter p = new SqlParameter(Name, Value);
+            SqlParameter p = new SqlParameter(name, value);
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, object value)
         {
-            SqlParameter p = new SqlParameter(Name, Value);
-            p.DbType = Type;
+            SqlParameter p = new SqlParameter(name, value);
+            p.DbType = type;
             return p;
         }
-        public override DbParameter NewParameter(string Name, object Value, ParameterDirection ParameterDirection)
+
+        public override DbParameter NewParameter(string name, object value, ParameterDirection ParameterDirection)
         {
-            SqlParameter p = new SqlParameter(Name, Value);
+            SqlParameter p = new SqlParameter(name, value);
             p.Direction = ParameterDirection;
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
+            int size, bool isNullable, 
+            byte precision, byte scale,
+            string sourceColumn, DataRowVersion sourceVersion,
+            object value)
         {
-            SqlParameter p = new SqlParameter(Name, Value);
-            p.DbType = Type;
-            p.Direction = ParameterDirection;
-            p.Size = Size;
-            p.IsNullable = IsNullable;
-            p.Precision = Precision;
-            p.Scale = Scale;
-            p.SourceColumn = SourceColumn;
-            p.SourceVersion = SourceVersion;
+            SqlParameter p = new SqlParameter(name, value);
+            p.DbType = type;
+            p.Direction = parameterDirection;
+            p.Size = size;
+            p.IsNullable = isNullable;
+            p.Precision = precision;
+            p.Scale = scale;
+            p.SourceColumn = sourceColumn;
+            p.SourceVersion = sourceVersion;
             return p;
         }
 
@@ -45,19 +52,22 @@ namespace dg.Sql.Connector
             SqlCommand p = new SqlCommand();
             return p;
         }
-        public override DbCommand NewCommand(string CommandText)
+
+        public override DbCommand NewCommand(string commandText)
         {
-            SqlCommand p = new SqlCommand(CommandText);
+            SqlCommand p = new SqlCommand(commandText);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            SqlCommand p = new SqlCommand(CommandText, (SqlConnection)Connection);
+            SqlCommand p = new SqlCommand(commandText, (SqlConnection)connection);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection, DbTransaction Transaction)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            SqlCommand p = new SqlCommand(CommandText, (SqlConnection)Connection, (SqlTransaction)Transaction);
+            SqlCommand p = new SqlCommand(commandText, (SqlConnection)connection, (SqlTransaction)transaction);
             return p;
         }
 
@@ -66,19 +76,22 @@ namespace dg.Sql.Connector
             SqlDataAdapter da = new SqlDataAdapter();
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(DbCommand SelectCommand)
+
+        public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            SqlDataAdapter da = new SqlDataAdapter((SqlCommand)SelectCommand);
+            SqlDataAdapter da = new SqlDataAdapter((SqlCommand)selectCommand);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, DbConnection Connection)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            SqlDataAdapter da = new SqlDataAdapter(SelectCommandText, (SqlConnection)Connection);
+            SqlDataAdapter da = new SqlDataAdapter(selectCommandText, (SqlConnection)connection);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, string SelectConnString)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            SqlDataAdapter da = new SqlDataAdapter(SelectCommandText, SelectConnString);
+            SqlDataAdapter da = new SqlDataAdapter(selectCommandText, selectConnString);
             return da;
         }
     }

@@ -342,9 +342,9 @@ namespace dg.Sql.Connector
 
         #region Preparing values for SQL
 
-        public override string EncloseFieldName(string FieldName)
-        { // Note: For performance, ignoring enclosed ` signs
-            return '`' + FieldName + '`';
+        public override string WrapFieldName(string fieldName)
+        {
+            return '`' + fieldName.Replace("`", "``") + '`';
         }
 
 
@@ -402,15 +402,16 @@ namespace dg.Sql.Connector
             return '\'' + value.ToString(@"D") + '\'';
         }
 
-        public override string FormatDate(DateTime DateTime)
+        public override string FormatDate(DateTime dateTime)
         {
-            return DateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+            return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
         }
 
-        public override string EscapeLike(string Expression)
+        public override string EscapeLike(string expression)
         {
-            return Expression.Replace(@"'", @"''").Replace(@"%", @"%%");
+            return expression.Replace(@"'", @"''").Replace(@"%", @"%%");
         }
+
         public override string LikeEscapingStatement
         {
             get { return @"ESCAPE('\\')"; }
@@ -420,9 +421,9 @@ namespace dg.Sql.Connector
 
         #region Reading values from SQL
 
-        public override Geometry ReadGeometry(object Value)
+        public override Geometry ReadGeometry(object value)
         {
-            byte[] geometryData = Value as byte[];
+            byte[] geometryData = value as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, true);
@@ -449,9 +450,9 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_UTC_NOW
+        public override string func_UTC_NOW()
         {
-            get { return @"UTC_TIMESTAMP()"; }
+            return @"UTC_TIMESTAMP()";
         }
 
         public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }

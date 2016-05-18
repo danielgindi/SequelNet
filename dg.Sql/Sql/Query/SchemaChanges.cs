@@ -258,7 +258,7 @@ namespace dg.Sql
         {
             using (ConnectorBase connection = ConnectorBase.NewInstance())
             {
-                string sql = string.Format(@"DROP TABLE {0}", connection.EncloseFieldName(tableName));
+                string sql = string.Format(@"DROP TABLE {0}", connection.WrapFieldName(tableName));
                 connection.ExecuteNonQuery(sql);
             }
         }

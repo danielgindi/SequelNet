@@ -31,6 +31,7 @@ namespace dg.Sql.Bindable
             }
         }
     }
+
     public interface IBindableCollection
     {
         // Support for Data Binding

@@ -344,15 +344,15 @@ namespace dg.Sql.Connector
 
         #region Preparing values for SQL
 
-        public override string EncloseFieldName(string FieldName)
+        public override string WrapFieldName(string fieldName)
         { // Note: For performance, ignoring enclosed " signs
-            return '"' + FieldName + '"';
+            return '"' + fieldName + '"';
         }
 
-        public static string EscapeStringWithBackslashes(string Value)
+        public static string EscapeStringWithBackslashes(string value)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (char c in Value)
+            foreach (char c in value)
             {
                 if (c == '\'' || c == '\\')
                 {
@@ -363,10 +363,10 @@ namespace dg.Sql.Connector
             return sb.ToString();
         }
 
-        public static string EscapeStringWithoutBackslashes(string Value)
+        public static string EscapeStringWithoutBackslashes(string value)
         {
             StringBuilder sb = new StringBuilder();
-            foreach (char c in Value)
+            foreach (char c in value)
             {
                 if (c == '\'')
                 {
@@ -399,15 +399,16 @@ namespace dg.Sql.Connector
             return '\'' + value.ToString(@"D") + '\'';
         }
 
-        public override string FormatDate(DateTime DateTime)
+        public override string FormatDate(DateTime dateTime)
         {
-            return DateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+            return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
         }
 
-        public override string EscapeLike(string Expression)
+        public override string EscapeLike(string expression)
         {
-            return Expression.Replace(@"_", @"\_").Replace(@"%", @"\%");
+            return expression.Replace(@"_", @"\_").Replace(@"%", @"\%");
         }
+
         public override string LikeEscapingStatement
         {
             get 
@@ -427,9 +428,9 @@ namespace dg.Sql.Connector
 
         #region Reading values from SQL
 
-        public override Geometry ReadGeometry(object Value)
+        public override Geometry ReadGeometry(object value)
         {
-            byte[] geometryData = Value as byte[];
+            byte[] geometryData = value as byte[];
             if (geometryData != null)
             {
                 return WkbReader.GeometryFromWkb(geometryData, false);
@@ -446,34 +447,39 @@ namespace dg.Sql.Connector
             get { return 357913937; }
         }
 
-        public override string func_UTC_NOW
+        public override string func_UTC_NOW()
         {
-            get { return @"now() at time zone 'utc'"; }
+            return @"now() at time zone 'utc'";
         }
 
-        public override string func_YEAR(string Date)
+        public override string func_YEAR(string date)
         {
-            return @"EXTRACT(YEAR FROM " + Date + @")";
+            return @"EXTRACT(YEAR FROM " + date + @")";
         }
-        public override string func_MONTH(string Date)
+
+        public override string func_MONTH(string date)
         {
-            return @"EXTRACT(MONTH FROM " + Date + @")";
+            return @"EXTRACT(MONTH FROM " + date + @")";
         }
-        public override string func_DAY(string Date)
+
+        public override string func_DAY(string date)
         {
-            return @"EXTRACT(DAY FROM " + Date + @")";
+            return @"EXTRACT(DAY FROM " + date + @")";
         }
-        public override string func_HOUR(string Date)
+
+        public override string func_HOUR(string date)
         {
-            return @"EXTRACT(HOUR FROM " + Date + @")";
+            return @"EXTRACT(HOUR FROM " + date + @")";
         }
-        public override string func_MINUTE(string Date)
+
+        public override string func_MINUTE(string date)
         {
-            return @"EXTRACT(MINUTE FROM " + Date + @")";
+            return @"EXTRACT(MINUTE FROM " + date + @")";
         }
-        public override string func_SECOND(string Date)
+
+        public override string func_SECOND(string date)
         {
-            return @"EXTRACT(SECOND FROM " + Date + @")";
+            return @"EXTRACT(SECOND FROM " + date + @")";
         }
 
         public override string type_AUTOINCREMENT { get { return @"SERIAL"; } } 

@@ -59,10 +59,10 @@ namespace dg.Sql.Phrases
             {
                 if (TableName != null && TableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(TableName);
+                    ret += conn.WrapFieldName(TableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName(Value.ToString());
+                ret += conn.WrapFieldName(Value.ToString());
             }
             else if (ValueType == ValueObjectType.Value)
             {
@@ -70,7 +70,7 @@ namespace dg.Sql.Phrases
             }
             else ret += Value;
 
-            return conn.func_LOWER + @"(" + (ret) + @")";
+            return conn.func_LOWER(ret);
         }
     }
 }

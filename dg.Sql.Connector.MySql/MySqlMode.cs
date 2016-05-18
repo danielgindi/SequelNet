@@ -16,6 +16,7 @@ namespace dg.Sql.Connector
             get { return _SqlMode; }
             set { _SqlMode = value; }
         }
+
         public bool NoBackSlashes
         {
             get
@@ -29,6 +30,7 @@ namespace dg.Sql.Connector
             }
             set { _NoBackSlashes = value; }
         }
+
         public bool AnsiQuotes
         {
             get

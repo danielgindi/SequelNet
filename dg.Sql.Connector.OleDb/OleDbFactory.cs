@@ -9,34 +9,41 @@ namespace dg.Sql.Connector
 {
     public class OleDbFactory : FactoryBase
     {
-        public override DbParameter NewParameter(string Name, object Value)
+        public override DbParameter NewParameter(string name, object value)
         {
-            OleDbParameter p = new OleDbParameter(Name, Value);
+            OleDbParameter p = new OleDbParameter(name, value);
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, object value)
         {
-            OleDbParameter p = new OleDbParameter(Name, Value);
-            p.DbType = Type;
+            OleDbParameter p = new OleDbParameter(name, value);
+            p.DbType = type;
             return p;
         }
-        public override DbParameter NewParameter(string Name, object Value, ParameterDirection ParameterDirection)
+
+        public override DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection)
         {
-            OleDbParameter p = new OleDbParameter(Name, Value);
-            p.Direction = ParameterDirection;
+            OleDbParameter p = new OleDbParameter(name, value);
+            p.Direction = parameterDirection;
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection, 
+            int size, bool isNullable, 
+            byte precision, byte scale, 
+            string sourceColumn, DataRowVersion sourceVersion,
+            object value)
         {
-            OleDbParameter p = new OleDbParameter(Name, Value);
-            p.DbType = Type;
-            p.Direction = ParameterDirection;
-            p.Size = Size;
-            p.IsNullable = IsNullable;
-            p.Precision = Precision;
-            p.Scale = Scale;
-            p.SourceColumn = SourceColumn;
-            p.SourceVersion = SourceVersion;
+            OleDbParameter p = new OleDbParameter(name, value);
+            p.DbType = type;
+            p.Direction = parameterDirection;
+            p.Size = size;
+            p.IsNullable = isNullable;
+            p.Precision = precision;
+            p.Scale = scale;
+            p.SourceColumn = sourceColumn;
+            p.SourceVersion = sourceVersion;
             return p;
         }
 
@@ -45,19 +52,22 @@ namespace dg.Sql.Connector
             OleDbCommand p = new OleDbCommand();
             return p;
         }
-        public override DbCommand NewCommand(string CommandText)
+
+        public override DbCommand NewCommand(string commandText)
         {
-            OleDbCommand p = new OleDbCommand(CommandText);
+            OleDbCommand p = new OleDbCommand(commandText);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            OleDbCommand p = new OleDbCommand(CommandText, (OleDbConnection)Connection);
+            OleDbCommand p = new OleDbCommand(commandText, (OleDbConnection)connection);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection, DbTransaction Transaction)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            OleDbCommand p = new OleDbCommand(CommandText, (OleDbConnection)Connection, (OleDbTransaction)Transaction);
+            OleDbCommand p = new OleDbCommand(commandText, (OleDbConnection)connection, (OleDbTransaction)transaction);
             return p;
         }
 
@@ -66,19 +76,22 @@ namespace dg.Sql.Connector
             OleDbDataAdapter da = new OleDbDataAdapter();
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(DbCommand SelectCommand)
+
+        public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter((OleDbCommand)SelectCommand);
+            OleDbDataAdapter da = new OleDbDataAdapter((OleDbCommand)selectCommand);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, DbConnection Connection)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter(SelectCommandText, (OleDbConnection)Connection);
+            OleDbDataAdapter da = new OleDbDataAdapter(selectCommandText, (OleDbConnection)connection);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, string SelectConnString)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter(SelectCommandText, SelectConnString);
+            OleDbDataAdapter da = new OleDbDataAdapter(selectCommandText, selectConnString);
             return da;
         }
     }

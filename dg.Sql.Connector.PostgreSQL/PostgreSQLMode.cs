@@ -15,6 +15,7 @@ namespace dg.Sql.Connector
             get { return _StandardConformingStrings == true; }
             set { _StandardConformingStrings = value; }
         }
+
         public bool BackslashQuote
         {
             get { return _BackslashQuote == true; }

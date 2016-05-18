@@ -62,11 +62,11 @@ namespace dg.Sql.Phrases
 
                 if (point.LatitudeTableName != null)
                 {
-                    pt = conn.EncloseFieldName(point.LatitudeTableName) + @"." + conn.EncloseFieldName(point.PointColumnName);
+                    pt = conn.WrapFieldName(point.LatitudeTableName) + @"." + conn.WrapFieldName(point.PointColumnName);
                 }
                 else
                 {
-                    pt = conn.EncloseFieldName(point.PointColumnName);
+                    pt = conn.WrapFieldName(point.PointColumnName);
                 }
 
                 if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
@@ -92,8 +92,8 @@ namespace dg.Sql.Phrases
             {
                 if (point.LatitudeColumnName != null)
                 {
-                    x = (point.LatitudeTableName != null ? conn.EncloseFieldName(point.LatitudeTableName) + "." : "")
-                        + conn.EncloseFieldName(point.LatitudeColumnName);
+                    x = (point.LatitudeTableName != null ? conn.WrapFieldName(point.LatitudeTableName) + "." : "")
+                        + conn.WrapFieldName(point.LatitudeColumnName);
                 }
                 else
                 {
@@ -102,8 +102,8 @@ namespace dg.Sql.Phrases
 
                 if (point.LongitudeColumnName != null)
                 {
-                    y = (point.LongitudeTableName != null ? conn.EncloseFieldName(point.LongitudeTableName) + "." : "")
-                        + conn.EncloseFieldName(point.LongitudeColumnName);
+                    y = (point.LongitudeTableName != null ? conn.WrapFieldName(point.LongitudeTableName) + "." : "")
+                        + conn.WrapFieldName(point.LongitudeColumnName);
                 }
                 else
                 {

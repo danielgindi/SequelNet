@@ -10,34 +10,41 @@ namespace dg.Sql.Connector
 {
     public class PostgreSQLFactory : FactoryBase
     {
-        public override DbParameter NewParameter(string Name, object Value)
+        public override DbParameter NewParameter(string name, object value)
         {
-            NpgsqlParameter p = new NpgsqlParameter(Name, Value);
+            NpgsqlParameter p = new NpgsqlParameter(name, value);
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, object value)
         {
-            NpgsqlParameter p = new NpgsqlParameter(Name, Value);
-            p.DbType = Type;
+            NpgsqlParameter p = new NpgsqlParameter(name, value);
+            p.DbType = type;
             return p;
         }
-        public override DbParameter NewParameter(string Name, object Value, ParameterDirection ParameterDirection)
+
+        public override DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection)
         {
-            NpgsqlParameter p = new NpgsqlParameter(Name, Value);
-            p.Direction = ParameterDirection;
+            NpgsqlParameter p = new NpgsqlParameter(name, value);
+            p.Direction = parameterDirection;
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
+            int size, bool isNullable,
+            byte precision, byte scale,
+            string sourceColumn, DataRowVersion sourceVersion,
+            object value)
         {
-            NpgsqlParameter p = new NpgsqlParameter(Name, Value);
-            p.DbType = Type;
-            p.Direction = ParameterDirection;
-            p.Size = Size;
-            p.IsNullable = IsNullable;
-            p.Precision = Precision;
-            p.Scale = Scale;
-            p.SourceColumn = SourceColumn;
-            p.SourceVersion = SourceVersion;
+            NpgsqlParameter p = new NpgsqlParameter(name, value);
+            p.DbType = type;
+            p.Direction = parameterDirection;
+            p.Size = size;
+            p.IsNullable = isNullable;
+            p.Precision = precision;
+            p.Scale = scale;
+            p.SourceColumn = sourceColumn;
+            p.SourceVersion = sourceVersion;
             return p;
         }
 
@@ -46,19 +53,22 @@ namespace dg.Sql.Connector
             NpgsqlCommand p = new NpgsqlCommand();
             return p;
         }
-        public override DbCommand NewCommand(string CommandText)
+
+        public override DbCommand NewCommand(string commandText)
         {
-            NpgsqlCommand p = new NpgsqlCommand(CommandText);
+            NpgsqlCommand p = new NpgsqlCommand(commandText);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            NpgsqlCommand p = new NpgsqlCommand(CommandText, (NpgsqlConnection)Connection);
+            NpgsqlCommand p = new NpgsqlCommand(commandText, (NpgsqlConnection)connection);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection, DbTransaction Transaction)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            NpgsqlCommand p = new NpgsqlCommand(CommandText, (NpgsqlConnection)Connection, (NpgsqlTransaction)Transaction);
+            NpgsqlCommand p = new NpgsqlCommand(commandText, (NpgsqlConnection)connection, (NpgsqlTransaction)transaction);
             return p;
         }
 
@@ -67,19 +77,22 @@ namespace dg.Sql.Connector
             NpgsqlDataAdapter da = new NpgsqlDataAdapter();
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(DbCommand SelectCommand)
+
+        public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter((NpgsqlCommand)SelectCommand);
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter((NpgsqlCommand)selectCommand);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, DbConnection Connection)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(SelectCommandText, (NpgsqlConnection)Connection);
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(selectCommandText, (NpgsqlConnection)connection);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, string SelectConnString)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(SelectCommandText, SelectConnString);
+            NpgsqlDataAdapter da = new NpgsqlDataAdapter(selectCommandText, selectConnString);
             return da;
         }
     }

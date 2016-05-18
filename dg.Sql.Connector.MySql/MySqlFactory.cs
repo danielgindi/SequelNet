@@ -10,34 +10,41 @@ namespace dg.Sql.Connector
 {
     public class MySqlFactory : FactoryBase
     {
-        public override DbParameter NewParameter(string Name, object Value)
+        public override DbParameter NewParameter(string name, object value)
         {
-            MySqlParameter p = new MySqlParameter(Name, Value);
+            MySqlParameter p = new MySqlParameter(name, value);
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, object value)
         {
-            MySqlParameter p = new MySqlParameter(Name, Value);
-            p.DbType = Type;
+            MySqlParameter p = new MySqlParameter(name, value);
+            p.DbType = type;
             return p;
         }
-        public override DbParameter NewParameter(string Name, object Value, ParameterDirection ParameterDirection)
+
+        public override DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection)
         {
-            MySqlParameter p = new MySqlParameter(Name, Value);
-            p.Direction = ParameterDirection;
+            MySqlParameter p = new MySqlParameter(name, value);
+            p.Direction = parameterDirection;
             return p;
         }
-        public override DbParameter NewParameter(string Name, DbType Type, ParameterDirection ParameterDirection, int Size, bool IsNullable, byte Precision, byte Scale, string SourceColumn, DataRowVersion SourceVersion, object Value)
+
+        public override DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
+            int size, bool isNullable,
+            byte precision, byte scale,
+            string sourceColumn, DataRowVersion sourceVersion,
+            object value)
         {
-            MySqlParameter p = new MySqlParameter(Name, Value);
-            p.DbType = Type;
-            p.Direction = ParameterDirection;
-            p.Size = Size;
-            p.IsNullable = IsNullable;
-            p.Precision = Precision;
-            p.Scale = Scale;
-            p.SourceColumn = SourceColumn;
-            p.SourceVersion = SourceVersion;
+            MySqlParameter p = new MySqlParameter(name, value);
+            p.DbType = type;
+            p.Direction = parameterDirection;
+            p.Size = size;
+            p.IsNullable = isNullable;
+            p.Precision = precision;
+            p.Scale = scale;
+            p.SourceColumn = sourceColumn;
+            p.SourceVersion = sourceVersion;
             return p;
         }
 
@@ -46,19 +53,22 @@ namespace dg.Sql.Connector
             MySqlCommand p = new MySqlCommand();
             return p;
         }
-        public override DbCommand NewCommand(string CommandText)
+
+        public override DbCommand NewCommand(string commandText)
         {
-            MySqlCommand p = new MySqlCommand(CommandText);
+            MySqlCommand p = new MySqlCommand(commandText);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            MySqlCommand p = new MySqlCommand(CommandText, (MySqlConnection)Connection);
+            MySqlCommand p = new MySqlCommand(commandText, (MySqlConnection)connection);
             return p;
         }
-        public override DbCommand NewCommand(string CommandText, DbConnection Connection, DbTransaction Transaction)
+
+        public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            MySqlCommand p = new MySqlCommand(CommandText, (MySqlConnection)Connection, (MySqlTransaction)Transaction);
+            MySqlCommand p = new MySqlCommand(commandText, (MySqlConnection)connection, (MySqlTransaction)transaction);
             return p;
         }
 
@@ -67,19 +77,22 @@ namespace dg.Sql.Connector
             MySqlDataAdapter da = new MySqlDataAdapter();
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(DbCommand SelectCommand)
+
+        public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter((MySqlCommand)SelectCommand);
+            MySqlDataAdapter da = new MySqlDataAdapter((MySqlCommand)selectCommand);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, DbConnection Connection)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter(SelectCommandText, (MySqlConnection)Connection);
+            MySqlDataAdapter da = new MySqlDataAdapter(selectCommandText, (MySqlConnection)connection);
             return da;
         }
-        public override DbDataAdapter NewDataAdapter(string SelectCommandText, string SelectConnString)
+
+        public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter(SelectCommandText, SelectConnString);
+            MySqlDataAdapter da = new MySqlDataAdapter(selectCommandText, selectConnString);
             return da;
         }
     }

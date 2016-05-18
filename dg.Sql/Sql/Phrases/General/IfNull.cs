@@ -73,10 +73,10 @@ namespace dg.Sql.Phrases
             {
                 if (FirstTableName != null && FirstTableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(FirstTableName);
+                    ret += conn.WrapFieldName(FirstTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName((string)FirstValue);
+                ret += conn.WrapFieldName((string)FirstValue);
             }
             else if (FirstValueType == ValueObjectType.Value)
             {
@@ -90,10 +90,10 @@ namespace dg.Sql.Phrases
             {
                 if (SecondTableName != null && SecondTableName.Length > 0)
                 {
-                    ret += conn.EncloseFieldName(SecondTableName);
+                    ret += conn.WrapFieldName(SecondTableName);
                     ret += ".";
                 }
-                ret += conn.EncloseFieldName((string)SecondValue);
+                ret += conn.WrapFieldName((string)SecondValue);
             }
             else if (SecondValueType == ValueObjectType.Value)
             {

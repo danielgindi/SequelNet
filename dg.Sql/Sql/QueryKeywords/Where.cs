@@ -310,15 +310,15 @@ namespace dg.Sql
                     {
                         if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                         {
-                            outputBuilder.Append(conn.EncloseFieldName(rightTableName));
+                            outputBuilder.Append(conn.WrapFieldName(rightTableName));
                         }
                         else
                         {
-                            outputBuilder.Append(conn.EncloseFieldName(FirstTableName));
+                            outputBuilder.Append(conn.WrapFieldName(FirstTableName));
                         }
                         outputBuilder.Append('.');
                     }
-                    outputBuilder.Append(conn.EncloseFieldName((string)First));
+                    outputBuilder.Append(conn.WrapFieldName((string)First));
                 }
                 else
                 {
@@ -421,15 +421,15 @@ namespace dg.Sql
                             {
                                 if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                                 {
-                                    outputBuilder.Append(conn.EncloseFieldName(rightTableName));
+                                    outputBuilder.Append(conn.WrapFieldName(rightTableName));
                                 }
                                 else
                                 {
-                                    outputBuilder.Append(conn.EncloseFieldName(SecondTableName));
+                                    outputBuilder.Append(conn.WrapFieldName(SecondTableName));
                                 }
                                 outputBuilder.Append('.');
                             }
-                            outputBuilder.Append(conn.EncloseFieldName((string)Second));
+                            outputBuilder.Append(conn.WrapFieldName((string)Second));
                         }
                         else
                         {
@@ -530,15 +530,15 @@ namespace dg.Sql
                             {
                                 if (object.ReferenceEquals(ThirdTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                                 {
-                                    outputBuilder.Append(conn.EncloseFieldName(rightTableName));
+                                    outputBuilder.Append(conn.WrapFieldName(rightTableName));
                                 }
                                 else
                                 {
-                                    outputBuilder.Append(conn.EncloseFieldName(ThirdTableName));
+                                    outputBuilder.Append(conn.WrapFieldName(ThirdTableName));
                                 }
                                 outputBuilder.Append('.');
                             }
-                            outputBuilder.Append(conn.EncloseFieldName((string)Third));
+                            outputBuilder.Append(conn.WrapFieldName((string)Third));
                         }
                         else outputBuilder.Append(Third == null ? @"NULL" : Third);
                     }

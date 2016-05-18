@@ -9,6 +9,7 @@ namespace dg.Sql.Connector
     {
         private const string NEW_LINE = "\r\n";
         private const string DELIMITER = "$$";
+
         public static void GenerateBackup(MySqlConnector conn, Stream outputStream, BackupOptions options)
         {
             using (StreamWriter writer = new StreamWriter(outputStream, Encoding.UTF8))
@@ -32,6 +33,7 @@ namespace dg.Sql.Connector
                 if (options.WrapInTransaction) writer.Write(string.Format(@"COMMIT {0}{1}", DELIMITER, NEW_LINE));
             }
         }
+
         public class BackupOptions
         {
             public bool BOM;
@@ -55,6 +57,7 @@ namespace dg.Sql.Connector
                     tableDataQueries[tableName] = query;
                 }
             }
+
             public Query GetTableDataQuery(string tableName)
             {
                 return tableDataQueries.ContainsKey(tableName) ? tableDataQueries[tableName] : null;
@@ -69,6 +72,7 @@ namespace dg.Sql.Connector
             VIEW,
             TABLE
         }
+
         static public string GetObjectCreate(MySqlConnector conn, DbObjectType type, string objectName, bool ifNotExists)
         {
             string resultColumn = "";
@@ -109,6 +113,7 @@ namespace dg.Sql.Connector
             }
             return null;
         }
+
         static public List<string> GetObjectList(MySqlConnector conn, DbObjectType type)
         {
             string sql = null;
@@ -139,6 +144,7 @@ namespace dg.Sql.Connector
             }
             return lstResults;
         }
+
         static public bool IsView(MySqlConnector conn, string tableName)
         {
             string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.PrepareValue(tableName));
@@ -161,6 +167,7 @@ namespace dg.Sql.Connector
                 writer.Write(string.Format(@"{2} {0}{1}", DELIMITER, NEW_LINE, GetObjectCreate(conn, DbObjectType.FUNCTION, func, false)));
             }
         }
+
         static private void ExportTableCreate(MySqlConnector conn, StreamWriter writer, bool dropTables)
         {
             List<string> lstTables = GetObjectList(conn, DbObjectType.TABLE);
@@ -194,6 +201,7 @@ namespace dg.Sql.Connector
                 writer.Write(string.Format(@"{2} {0}{1}", DELIMITER, NEW_LINE, create));
             }
         }
+
         static private void ExportTableData(MySqlConnector conn, StreamWriter writer, BackupOptions options)
         {
             List<string> lstTables = GetObjectList(conn, DbObjectType.TABLE);
@@ -228,6 +236,7 @@ namespace dg.Sql.Connector
                 }
             }
         }
+
         static private void ExportTriggers(MySqlConnector conn, StreamWriter writer)
         {
             using (DataReaderBase reader = conn.ExecuteReader(@"SHOW TRIGGERS"))
@@ -249,6 +258,7 @@ namespace dg.Sql.Connector
             if (value is DBNull) return true;
             else return false;
         }
+
         static private string StringFromDb(object str)
         {
             if (IsNull(str)) return null;

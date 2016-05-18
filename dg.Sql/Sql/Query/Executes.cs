@@ -404,18 +404,22 @@ namespace dg.Sql
         {
             return ExecuteAggregate(null, null, columnName, aggregateFunction, isDistinctQuery, null);
         }
+
         public object ExecuteAggregate(string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery)
         {
             return ExecuteAggregate(null, schemaName, columnName, aggregateFunction, isDistinctQuery, null);
         }
+
         public object ExecuteAggregate(string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery, ConnectorBase connection)
         {
             return ExecuteAggregate(null, schemaName, columnName, aggregateFunction, isDistinctQuery, connection);
         }
+
         public object ExecuteAggregate(string databaseOwner, string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery)
         {
             return ExecuteAggregate(databaseOwner, schemaName, columnName, aggregateFunction, isDistinctQuery, null);
         }
+
         public object ExecuteAggregate(string databaseOwner, string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery, ConnectorBase connection)
         {
             bool ownsConnection = false;
@@ -442,31 +446,31 @@ namespace dg.Sql
                 {
                     if (databaseOwner != null && databaseOwner.Length > 0)
                     {
-                        schemaName = connection.EncloseFieldName(databaseOwner) + @"." + connection.EncloseFieldName(schemaName);
+                        schemaName = connection.WrapFieldName(databaseOwner) + @"." + connection.WrapFieldName(schemaName);
                     }
                     else
                     {
-                        schemaName = connection.EncloseFieldName(schemaName);
+                        schemaName = connection.WrapFieldName(schemaName);
                     }
                 }
                 else
                 {
                     if (Schema == null)
                     {
-                        schemaName = connection.EncloseFieldName(_FromExpressionTableAlias);
+                        schemaName = connection.WrapFieldName(_FromExpressionTableAlias);
                     }
                     else
                     {
                         schemaName = @"";
                         if (Schema.DatabaseOwner.Length > 0)
                         {
-                            schemaName = connection.EncloseFieldName(Schema.DatabaseOwner) + @".";
+                            schemaName = connection.WrapFieldName(Schema.DatabaseOwner) + @".";
                         }
-                        schemaName += connection.EncloseFieldName(_SchemaName);
+                        schemaName += connection.WrapFieldName(_SchemaName);
                     }
                 }
                 SelectColumn select = new SelectColumn(aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
-                    (columnName == "*" ? columnName : (schemaName + "." + connection.EncloseFieldName(columnName))) + @")", true);
+                    (columnName == "*" ? columnName : (schemaName + "." + connection.WrapFieldName(columnName))) + @")", true);
                 _ListSelect.Insert(0, select);
 
                 object ret = ExecuteScalar(connection);
