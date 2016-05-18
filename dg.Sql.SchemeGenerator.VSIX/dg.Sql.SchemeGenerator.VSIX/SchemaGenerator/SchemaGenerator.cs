@@ -1485,71 +1485,7 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("{0}#region Helpers{0}", "\r\n");
             if (primaryKeyColumns.Count > 0)
             {
-                // FetchByID(...) function
-                stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", context.ClassName);
-                bool first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.Append(", ");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-                }
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
-
-                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
-                first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-                    }
-                    else
-                    {
-                        stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
-                        first = false;
-                    }
-                }
-                stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader()){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
-
-                // Delete() function
-                stringBuilder.AppendFormat("public static int Delete(", "\r\n");
-                first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.Append(", ");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
-                }
-                stringBuilder.AppendFormat("){0}{{{0}", "\r\n");
-
-                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
-                first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
-                    }
-                    else
-                    {
-                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
-                        first = false;
-                    }
-                }
-                stringBuilder.AppendFormat(";{0}return qry.Execute();{0}}}{0}{0}", "\r\n");
+                bool first;
 
                 // FetchByID(..., ConnectorBase conn = null) function
                 stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", context.ClassName);
