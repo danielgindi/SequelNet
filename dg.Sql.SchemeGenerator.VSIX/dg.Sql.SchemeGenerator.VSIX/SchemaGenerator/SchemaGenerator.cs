@@ -1014,15 +1014,8 @@ namespace dg.Sql.SchemaGenerator
                         stringBuilder.AppendFormat("if ({1} != null){0}{{{0}", "\r\n", dalCol.Name);
                     }
                 }
-
-                if (string.IsNullOrEmpty(dalCol.ToDb))
-                {
-                    stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
-                }
-                else
-                {
-                    stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
-                }
+                
+                stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", ValueToDb(dalCol.Name, dalCol));
 
                 if (dalCol.AutoIncrement)
                 {
@@ -1161,14 +1154,7 @@ namespace dg.Sql.SchemaGenerator
                     stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.Name);
                 }
 
-                if (string.IsNullOrEmpty(dalCol.ToDb))
-                {
-                    stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", dalCol.Name);
-                }
-                else
-                {
-                    stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, string.Format(dalCol.ToDb, dalCol.Name));
-                }
+                stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", ValueToDb(dalCol.Name, dalCol));
 
                 if (context.AtomicUpdates)
                 {
@@ -1179,7 +1165,7 @@ namespace dg.Sql.SchemaGenerator
             bool flag1 = true;
             foreach (DalColumn dalCol in primaryKeyColumns)
             {
-                stringBuilder.AppendFormat("qry.{2}(Columns.{1}, {1});{0}", "\r\n", dalCol.Name, (flag1 ? "Where" : "AND"));
+                stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol), (flag1 ? "Where" : "AND"));
                 flag1 = false;
             }
 
@@ -1510,11 +1496,11 @@ namespace dg.Sql.SchemaGenerator
                 {
                     if (!first)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
+                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Where(Columns.{0}, {2})", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
+                        stringBuilder.AppendFormat(".Where(Columns.{0}, {2})", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
                         first = false;
                     }
                 }
@@ -1543,11 +1529,11 @@ namespace dg.Sql.SchemaGenerator
                 {
                     if (!first)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
+                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {1})", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
+                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {1})", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
                         first = false;
                     }
                 }
@@ -2029,6 +2015,18 @@ namespace dg.Sql.SchemaGenerator
         {
             if (name.Length == 0) return name;
             return name.Substring(0, 1).ToLowerInvariant() + name.Remove(0, 1);
+        }
+
+        public static string ValueToDb(string varName, DalColumn dalCol)
+        {
+            if (string.IsNullOrEmpty(dalCol.ToDb))
+            {
+                return varName;
+            }
+            else
+            {
+                return string.Format(dalCol.ToDb, varName);
+            }
         }
 	}
 
