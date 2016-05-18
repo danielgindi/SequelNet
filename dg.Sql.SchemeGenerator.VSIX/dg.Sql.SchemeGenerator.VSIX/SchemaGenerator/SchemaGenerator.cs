@@ -1500,7 +1500,7 @@ namespace dg.Sql.SchemaGenerator
                     {
                         first = false;
                     }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.Name));
                 }
                 stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
@@ -1510,11 +1510,11 @@ namespace dg.Sql.SchemaGenerator
                 {
                     if (!first)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Where(Columns.{0}, {0})", dalCol.Name);
+                        stringBuilder.AppendFormat(".Where(Columns.{0}, {2})", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
                         first = false;
                     }
                 }
@@ -1533,7 +1533,7 @@ namespace dg.Sql.SchemaGenerator
                     {
                         first = false;
                     }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, dalCol.Name);
+                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.Name));
                 }
                 stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
@@ -1543,11 +1543,11 @@ namespace dg.Sql.SchemaGenerator
                 {
                     if (!first)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {1})", "\r\n", dalCol.Name);
+                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {0})", dalCol.Name);
+                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {1})", dalCol.Name, FirstLetterLowerCase(dalCol.Name));
                         first = false;
                     }
                 }
@@ -2023,6 +2023,12 @@ namespace dg.Sql.SchemaGenerator
             while (columnName.Length > 0 && !Regex.IsMatch(columnName, @"^[a-zA-Z_]")) columnName = columnName.Remove(0, 1);
             columnName = Regex.Replace(columnName, @"[^a-zA-Z_0-9]", @"");
             return columnName;
+        }
+
+        public static string FirstLetterLowerCase(string name)
+        {
+            if (name.Length == 0) return name;
+            return name.Substring(0, 1).ToLowerInvariant() + name.Remove(0, 1);
         }
 	}
 
