@@ -1015,7 +1015,7 @@ namespace dg.Sql.SchemaGenerator
                     }
                 }
                 
-                stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {1});{0}", "\r\n", ValueToDb(dalCol.Name, dalCol));
+                stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, ValueToDb(dalCol.NameX, dalCol));
 
                 if (dalCol.AutoIncrement)
                 {
@@ -1154,7 +1154,7 @@ namespace dg.Sql.SchemaGenerator
                     stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.Name);
                 }
 
-                stringBuilder.AppendFormat("qry.Update(Columns.{1}, {1});{0}", "\r\n", ValueToDb(dalCol.Name, dalCol));
+                stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, ValueToDb(dalCol.NameX, dalCol));
 
                 if (context.AtomicUpdates)
                 {
@@ -1165,7 +1165,7 @@ namespace dg.Sql.SchemaGenerator
             bool flag1 = true;
             foreach (DalColumn dalCol in primaryKeyColumns)
             {
-                stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol), (flag1 ? "Where" : "AND"));
+                stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n", dalCol.Name, ValueToDb(dalCol.NameX, dalCol), (flag1 ? "Where" : "AND"));
                 flag1 = false;
             }
 
@@ -1500,7 +1500,7 @@ namespace dg.Sql.SchemaGenerator
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Where(Columns.{0}, {2})", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
+                        stringBuilder.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.Name, ValueToDb(FirstLetterLowerCase(dalCol.Name), dalCol));
                         first = false;
                     }
                 }
