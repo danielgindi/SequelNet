@@ -433,15 +433,8 @@ namespace dg.Sql
                 SelectColumnList oldSelectList = _ListSelect;
                 bool oldIsDistinct = IsDistinct;
                 IsDistinct = false;
-
-                if (_ListSelect == null ||
-                    (_ListSelect.Count == 1 &&
-                    _ListSelect[0].ObjectType == ValueObjectType.Literal && 
-                    _ListSelect[0].TableName == null &&
-                    Object.Equals(_ListSelect[0].Value, "*")))
-                {
-                    _ListSelect = new SelectColumnList();
-                }
+                
+                _ListSelect = new SelectColumnList();
                 if (schemaName != null)
                 {
                     if (databaseOwner != null && databaseOwner.Length > 0)
