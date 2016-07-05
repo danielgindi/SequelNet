@@ -223,7 +223,7 @@ namespace dg.Sql.Connector
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
                         {
                             if (idx > 0) writer.Write(@",");
-                            writer.Write(conn.EncloseFieldName(reader.GetColumnName(idx)));
+                            writer.Write(conn.WrapFieldName(reader.GetColumnName(idx)));
                         }
                         writer.Write(@") VALUES(");
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)

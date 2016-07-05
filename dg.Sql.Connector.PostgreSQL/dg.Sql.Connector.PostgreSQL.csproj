@@ -71,7 +71,6 @@
   <ItemGroup>
     <Compile Include="PostgreSQLConnector.cs" />
     <Compile Include="PostgreSQLFactory.cs" />
-    <Compile Include="PostgreSQLDataReader.cs" />
     <Compile Include="PostgreSQLMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -71,7 +71,6 @@
     <Compile Include="MySqlBackup.cs" />
     <Compile Include="MySqlConnector.cs" />
     <Compile Include="MySqlFactory.cs" />
-    <Compile Include="MySqlDataReader.cs" />
     <Compile Include="MySqlMode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TableOptions.cs" />

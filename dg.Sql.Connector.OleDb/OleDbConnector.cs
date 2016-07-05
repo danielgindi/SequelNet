@@ -78,70 +78,78 @@ namespace dg.Sql.Connector
 
         #region Executing
 
-        public override int ExecuteNonQuery(string QuerySql)
+        public override int ExecuteNonQuery(string querySql)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
+            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
             {
                 return command.ExecuteNonQuery();
             }
         }
-        public override int ExecuteNonQuery(DbCommand Command)
+
+        public override int ExecuteNonQuery(DbCommand command)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            Command.Connection = _Connection;
-            Command.Transaction = _Transaction;
-            return Command.ExecuteNonQuery();
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
+            return command.ExecuteNonQuery();
         }
-        public override object ExecuteScalar(string QuerySql)
+
+        public override object ExecuteScalar(string querySql)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
+            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
             {
                 return command.ExecuteScalar();
             }
         }
-        public override object ExecuteScalar(DbCommand Command)
+
+        public override object ExecuteScalar(DbCommand command)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            Command.Connection = _Connection;
-            Command.Transaction = _Transaction;
-            return Command.ExecuteScalar();
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
+            return command.ExecuteScalar();
         }
-        public override DataReaderBase ExecuteReader(string QuerySql)
+
+        public override DataReaderBase ExecuteReader(string querySql)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
+            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
             {
-                return new OleDbDataReader(command.ExecuteReader());
+                return new DataReaderBase(command.ExecuteReader());
             }
         }
-        public override DataReaderBase ExecuteReader(string QuerySql, bool AttachConnectionToReader)
+
+        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(QuerySql, _Connection, _Transaction))
+            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
             {
-                return new OleDbDataReader(command.ExecuteReader(), AttachConnectionToReader ? this : null);
+                return new DataReaderBase(command.ExecuteReader(), attachConnectionToReader ? this : null);
             }
         }
-        public override DataReaderBase ExecuteReader(DbCommand Command)
+
+        public override DataReaderBase ExecuteReader(DbCommand command)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            Command.Connection = _Connection;
-            Command.Transaction = _Transaction;
-            return new OleDbDataReader(((OleDbCommand)Command).ExecuteReader());
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
+            return new DataReaderBase(((OleDbCommand)command).ExecuteReader());
         }
-        public override DataReaderBase ExecuteReader(DbCommand Command, bool AttachConnectionToReader)
+
+        public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            Command.Connection = _Connection;
-            Command.Transaction = _Transaction;
-            return new OleDbDataReader(((OleDbCommand)Command).ExecuteReader(), AttachConnectionToReader ? this : null);
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
+            return new DataReaderBase(((OleDbCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
         }
-        public override DataSet ExecuteDataSet(string QuerySql)
+
+        public override DataSet ExecuteDataSet(string querySql)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand cmd = new OleDbCommand(QuerySql, _Connection, _Transaction))
+            using (OleDbCommand cmd = new OleDbCommand(querySql, _Connection, _Transaction))
             {
                 DataSet dataSet = new DataSet();
                 using (OleDbDataAdapter adapter = new OleDbDataAdapter(cmd))
@@ -151,19 +159,21 @@ namespace dg.Sql.Connector
                 return dataSet;
             }
         }
-        public override DataSet ExecuteDataSet(DbCommand Command)
+
+        public override DataSet ExecuteDataSet(DbCommand command)
         {
             if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            Command.Connection = _Connection;
-            Command.Transaction = _Transaction;
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
             DataSet dataSet = new DataSet();
-            using (OleDbDataAdapter adapter = new OleDbDataAdapter((OleDbCommand)Command))
+            using (OleDbDataAdapter adapter = new OleDbDataAdapter((OleDbCommand)command))
             {
                 adapter.Fill(dataSet);
             }
             return dataSet;
         }
-        public override int ExecuteScript(string QuerySql)
+
+        public override int ExecuteScript(string querySql)
         {
             throw new NotImplementedException(@"ExecuteScript");
         }

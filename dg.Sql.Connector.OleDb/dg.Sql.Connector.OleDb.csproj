@@ -66,7 +66,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OleDbConnector.cs" />
-    <Compile Include="OleDbDataReader.cs" />
     <Compile Include="OleDbFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
