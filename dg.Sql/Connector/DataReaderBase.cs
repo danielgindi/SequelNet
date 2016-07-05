@@ -9,7 +9,9 @@ namespace dg.Sql.Connector
         abstract public void Dispose();
         abstract public void Close();
         abstract public bool Read();
+
         abstract public bool IsDBNull(int columnIndex);
+
         abstract public int GetInt32(int columnIndex);
         abstract public int GetInt32OrZero(int columnIndex);
         abstract public Int64 GetInt64(int columnIndex);
@@ -23,9 +25,11 @@ namespace dg.Sql.Connector
         abstract public DateTime GetDateTimeOrMinValue(int columnIndex);
         abstract public decimal GetDecimal(int columnIndex);
         abstract public decimal GetDecimalOrZero(int columnIndex);
-        abstract public bool HasColumn(string columnIndex);
+
+        abstract public bool HasColumn(string columnName);
         abstract public Int32 GetColumnCount();
         abstract public string GetColumnName(Int32 columnIndex);
+        abstract public int GetOrdinal(string columnName);
 
         /// <summary>
         /// Gets the value of the specified column in its native format given the column index.

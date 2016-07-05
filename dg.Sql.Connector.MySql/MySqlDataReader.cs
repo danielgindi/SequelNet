@@ -153,6 +153,11 @@ namespace dg.Sql.Connector
             return _Reader.GetName(columnIndex);
         }
 
+        public override int GetOrdinal(string columnName)
+        {
+            return _Reader.GetOrdinal(columnName);
+        }
+
         public override object this[int columnIndex]
         {
             get { return _Reader[columnIndex]; }
