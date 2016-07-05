@@ -512,41 +512,295 @@ namespace dg.Sql.Connector
             }
         }
 
+        #region Column-name base getters
+        
+        public byte GetByte(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetByte(ordinal);
+        }
+        
+        public long GetBytes(string columnName, long dataOffset, byte[] buffer, int bufferOffset, int length)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetBytes(ordinal, dataOffset, buffer, bufferOffset, length);
+        }
+        
+        public char GetChar(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetChar(ordinal);
+        }
+        
+        public long GetChars(string columnName, long dataOffset, char[] buffer, int bufferOffset, int length)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetChars(ordinal, dataOffset, buffer, bufferOffset, length);
+        }
+        
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public DataReaderBase GetData(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return new DataReaderBase(UnderlyingReader.GetData(ordinal));
+        }
+        
+        public string GetDataTypeName(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetDataTypeName(ordinal);
+        }
+        
+        public DateTime GetDateTime(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetDateTime(ordinal);
+        }
+        
+        public decimal GetDecimal(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetDecimal(ordinal);
+        }
+        
+        public double GetDouble(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetDouble(ordinal);
+        }
+        
+        public Type GetFieldType(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetFieldType(ordinal);
+        }
+        
+        public float GetFloat(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetFloat(ordinal);
+        }
+        
+        public Guid GetGuid(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetGuid(ordinal);
+        }
+        
+        public short GetInt16(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetInt16(ordinal);
+        }
+        
+        public int GetInt32(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetInt32(ordinal);
+        }
+        
+        public long GetInt64(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetInt64(ordinal);
+        }
+                
+        public string GetString(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetString(ordinal);
+        }
+        
+        public object GetValue(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetValue(ordinal);
+        }
+
+        #endregion
+
         #region Convenience Functions
 
-        public int GetInt32OrZero(int columnIndex)
+        public bool? GetBooleanOrNull(int ordinal)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? 0 : UnderlyingReader.GetInt32(columnIndex);
+            return UnderlyingReader.IsDBNull(ordinal) ? (bool?)null : UnderlyingReader.GetBoolean(ordinal);
         }
 
-        public Int64 GetInt64OrZero(int columnIndex)
+        public bool? GetBooleanOrNull(string columnName)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? 0 : UnderlyingReader.GetInt64(columnIndex);
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (bool?)null : UnderlyingReader.GetBoolean(ordinal);
         }
 
-        public string GetStringOrNull(int columnIndex)
+        public bool GetBooleanOrDefault(int ordinal, bool defaultValue)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? null : UnderlyingReader.GetString(columnIndex);
+            return UnderlyingReader.IsDBNull(ordinal) ? defaultValue : UnderlyingReader.GetBoolean(ordinal);
         }
 
-        public string GetStringOrEmpty(int columnIndex)
+        public bool GetBooleanOrDefault(string columnName, bool defaultValue)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? String.Empty : UnderlyingReader.GetString(columnIndex);
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? defaultValue : UnderlyingReader.GetBoolean(ordinal);
         }
 
-        public DateTime? GetDateTimeOrNull(int columnIndex)
+        public int? GetInt32OrNull(int ordinal)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? null : (DateTime?)UnderlyingReader.GetDateTime(columnIndex);
+            return UnderlyingReader.IsDBNull(ordinal) ? (int?)null : UnderlyingReader.GetInt32(ordinal);
         }
 
-        public DateTime GetDateTimeOrMinValue(int columnIndex)
+        public int? GetInt32OrNull(string columnName)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? DateTime.MinValue : UnderlyingReader.GetDateTime(columnIndex);
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (int?)null : UnderlyingReader.GetInt32(ordinal);
         }
 
-        public decimal GetDecimalOrZero(int columnIndex)
+        public int GetInt32OrZero(int ordinal)
         {
-            return UnderlyingReader.IsDBNull(columnIndex) ? 0 : UnderlyingReader.GetDecimal(columnIndex);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt32(ordinal);
+        }
+
+        public int GetInt32OrZero(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt32(ordinal);
+        }
+
+        public Int64? GetInt64OrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (Int64?)null : UnderlyingReader.GetInt64(ordinal);
+        }
+
+        public Int64? GetInt64OrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (Int64?)null : UnderlyingReader.GetInt64(ordinal);
+        }
+
+        public Int64 GetInt64OrZero(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt64(ordinal);
+        }
+
+        public Int64 GetInt64OrZero(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt64(ordinal);
+        }
+
+        public string GetStringOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? null : UnderlyingReader.GetString(ordinal);
+        }
+
+        public string GetStringOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? null : UnderlyingReader.GetString(ordinal);
+        }
+
+        public string GetStringOrEmpty(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? String.Empty : UnderlyingReader.GetString(ordinal);
+        }
+
+        public string GetStringOrEmpty(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? String.Empty : UnderlyingReader.GetString(ordinal);
+        }
+
+        public DateTime? GetDateTimeOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? null : (DateTime?)UnderlyingReader.GetDateTime(ordinal);
+        }
+
+        public DateTime? GetDateTimeOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? null : (DateTime?)UnderlyingReader.GetDateTime(ordinal);
+        }
+
+        public DateTime GetDateTimeOrMinValue(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? DateTime.MinValue : UnderlyingReader.GetDateTime(ordinal);
+        }
+
+        public DateTime GetDateTimeOrMinValue(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? DateTime.MinValue : UnderlyingReader.GetDateTime(ordinal);
+        }
+
+        public float? GetFloatOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (float?)null : UnderlyingReader.GetFloat(ordinal);
+        }
+
+        public float? GetFloatOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (float?)null : UnderlyingReader.GetFloat(ordinal);
+        }
+
+        public float GetFloatOrZero(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetFloat(ordinal);
+        }
+
+        public float GetFloatOrZero(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetFloat(ordinal);
+        }
+
+        public double? GetDoubleOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (double?)null : UnderlyingReader.GetDouble(ordinal);
+        }
+
+        public double? GetDoubleOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (double?)null : UnderlyingReader.GetDouble(ordinal);
+        }
+
+        public double GetDoubleOrZero(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDouble(ordinal);
+        }
+
+        public double GetDoubleOrZero(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDouble(ordinal);
+        }
+
+        public decimal? GetDecimalOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (decimal?)null : UnderlyingReader.GetDecimal(ordinal);
+        }
+
+        public decimal? GetDecimalOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (decimal?)null : UnderlyingReader.GetDecimal(ordinal);
+        }
+
+        public decimal GetDecimalOrZero(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDecimal(ordinal);
+        }
+
+        public decimal GetDecimalOrZero(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDecimal(ordinal);
+        }
+
+        public bool IsDBNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal);
         }
 
         public bool HasColumn(string columnName)
@@ -564,11 +818,23 @@ namespace dg.Sql.Connector
             return UnderlyingReader.VisibleFieldCount;
         }
 
-        public string GetColumnName(int columnIndex)
+        /// <summary>
+        /// This is a synonym for <see cref="GetName(int)"/>,
+        /// as sometimes the developer looks for it and can't find it. As he looks for a GetColumnName(...)
+        /// </summary>
+        /// <param name="ordinal"></param>
+        /// <returns></returns>
+        public string GetColumnName(int ordinal)
         {
-            return UnderlyingReader.GetName(columnIndex);
+            return UnderlyingReader.GetName(ordinal);
         }
 
+        /// <summary>
+        /// This is a synonym for <see cref="GetOrdinal(int)"/>,
+        /// as sometimes the developer looks for it and can't find it. As he looks for a GetColumnIndex(...)
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public int GetColumnIndex(string columnName)
         {
             return UnderlyingReader.GetOrdinal(columnName);
