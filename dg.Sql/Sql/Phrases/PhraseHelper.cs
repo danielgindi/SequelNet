@@ -1,4 +1,5 @@
-﻿using dg.Sql.Phrases;
+﻿using dg.Sql.Connector;
+using dg.Sql.Phrases;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -27,6 +28,36 @@ namespace dg.Sql
         public static DateTimeAdd DateTimeAdd(IPhrase phrase, DateTimeUnit unit, Int64 interval)
         {
             return new DateTimeAdd(phrase, unit, interval);
+        }
+
+        public static DateTimeAdd DateTimeAdd(IPhrase phrase, DateTimeUnit unit, string addTableName, string addColumnName)
+        {
+            return new DateTimeAdd(phrase, unit, addTableName, addColumnName);
+        }
+
+        public static DateTimeAdd DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addTableName, string addColumnName)
+        {
+            return new DateTimeAdd(tableName, columnName, unit, addTableName, addColumnName);
+        }
+
+        public static DateTimeAdd DateTimeAdd(string columnName, DateTimeUnit unit, string addTableName, string addColumnName)
+        {
+            return new DateTimeAdd(columnName, unit, addTableName, addColumnName);
+        }
+
+        public static DateTimeAdd DateTimeAdd(IPhrase phrase, DateTimeUnit unit, string addColumnName)
+        {
+            return new DateTimeAdd(phrase, unit, addColumnName);
+        }
+
+        public static DateTimeAdd DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addColumnName)
+        {
+            return new DateTimeAdd(tableName, columnName, unit, addColumnName);
+        }
+
+        public static DateTimeAdd DateTimeAdd(string columnName, DateTimeUnit unit, string addColumnName)
+        {
+            return new DateTimeAdd(columnName, unit, addColumnName);
         }
 
         public static UTC_TIMESTAMP UtcTimestamp()
@@ -969,5 +1000,31 @@ namespace dg.Sql
         }
 
         #endregion
+
+        internal static string StringifyValue(string tableName, object value, ValueObjectType type,
+            ConnectorBase conn, Query relatedQuery = null)
+        {
+            string ret = "";
+
+            if (type == ValueObjectType.ColumnName)
+            {
+                if (tableName != null && tableName.Length > 0)
+                {
+                    ret += conn.WrapFieldName(tableName);
+                    ret += ".";
+                }
+                ret += conn.WrapFieldName(value.ToString());
+            }
+            else if (type == ValueObjectType.Value)
+            {
+                ret += @"(" + conn.PrepareValue(value, relatedQuery) + @")";
+            }
+            else
+            {
+                ret += value;
+            }
+
+            return ret;
+        }
     }
 }
