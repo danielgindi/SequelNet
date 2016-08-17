@@ -621,6 +621,25 @@ namespace dg.Sql.Connector
 
         #region Convenience Functions
 
+        /// <summary>
+        /// Gets the column ordinal given the name of the column.
+        /// Returns -1 if the column does not exist.
+        /// This is a "safe" version that will not throw an IndexOutOfRangeException.
+        /// </summary>
+        /// <param name="name">The name of the column.</param>
+        /// <returns>The zero-based column ordinal.</returns>
+        public int GetSafeOrdinal(string name)
+        {
+            try
+            {
+                return UnderlyingReader.GetOrdinal(name);
+            }
+            catch (IndexOutOfRangeException)
+            {
+                return -1;
+            }
+        }
+
         public bool? GetBooleanOrNull(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? (bool?)null : UnderlyingReader.GetBoolean(ordinal);
