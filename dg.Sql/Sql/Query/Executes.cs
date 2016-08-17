@@ -462,9 +462,15 @@ namespace dg.Sql
                         schemaName += connection.WrapFieldName(_SchemaName);
                     }
                 }
-                SelectColumn select = new SelectColumn(aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
-                    (columnName == "*" ? columnName : (schemaName + "." + connection.WrapFieldName(columnName))) + @")", true);
-                _ListSelect.Insert(0, select);
+
+                SelectColumn select = new SelectColumn(
+                    aggregateFunction + " " + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
+                    (columnName == "*" 
+                    ? columnName 
+                    : (schemaName + "." + connection.WrapFieldName(columnName)))
+                    + @")", true);
+
+                _ListSelect.Add(select);
 
                 object ret = ExecuteScalar(connection);
 
