@@ -464,7 +464,7 @@ namespace dg.Sql
                 }
 
                 SelectColumn select = new SelectColumn(
-                    aggregateFunction + " " + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
+                    aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
                     (columnName == "*" 
                     ? columnName 
                     : (schemaName + "." + connection.WrapFieldName(columnName)))
