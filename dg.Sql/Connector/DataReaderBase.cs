@@ -513,7 +513,13 @@ namespace dg.Sql.Connector
         }
 
         #region Column-name base getters
-        
+
+        public bool GetBoolean(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.GetBoolean(ordinal);
+        }
+
         public byte GetByte(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
