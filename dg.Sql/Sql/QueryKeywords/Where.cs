@@ -272,7 +272,7 @@ namespace dg.Sql
             FirstType = ValueObjectType.Value;
             Comparison = WhereComparison.None;
         }
-
+        
         public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value)
         {
             Condition = condition;
@@ -303,6 +303,8 @@ namespace dg.Sql
             Second = columnName;
             SecondType = ValueObjectType.ColumnName;
         }
+        
+        #region Builders
         
         public void BuildCommand(StringBuilder outputBuilder, bool isFirst, ConnectorBase conn, Query relatedQuery)
         {
@@ -626,5 +628,194 @@ namespace dg.Sql
                 }
             }
         }
+
+        #endregion
+
+        #region Chainable
+        
+        public WhereList AND(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(thisObject, thisObjectType, comparison, thatObject, thatObjectType);
+        }
+
+        public WhereList AND(string columnName, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(columnName, columnValue);
+        }
+
+        public WhereList AND(string columnName, WhereComparison comparison, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(columnName, comparison, columnValue);
+        }
+
+        public WhereList AND(string literalExpression)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(literalExpression);
+        }
+
+        public WhereList AND(IPhrase phrase)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(phrase);
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(phrase, comparison, value);
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(phrase, comparison, value, valueType);
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(phrase, comparison, tableName, columnName);
+        }
+
+        public WhereList AND(WhereList whereList)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(whereList);
+        }
+
+        public WhereList AND(string tableName, string columnName, WhereComparison comparison, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(tableName, columnName, comparison, columnValue);
+        }
+
+        public WhereList AND(string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(tableName, columnName, comparison, otherTableName, otherColumnName);
+        }
+
+        public WhereList AND(string tableName, string columnName, object betweenValue, object andValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(tableName, columnName, betweenValue, andValue);
+        }
+
+        public WhereList AND(string columnName, object betweenValue, object andValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(columnName, betweenValue, andValue);
+        }
+
+        public WhereList OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(thisObject, thisObjectType, comparison, thatObject, thatObjectType);
+        }
+
+        public WhereList OR(string columnName, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(columnName, columnValue);
+        }
+
+        public WhereList OR(string columnName, WhereComparison comparison, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(columnName, comparison, columnValue);
+        }
+
+        public WhereList OR(string literalExpression)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(literalExpression);
+        }
+
+        public WhereList OR(IPhrase phrase)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(phrase);
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(phrase, comparison, value);
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(phrase, comparison, value, valueType);
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(phrase, comparison, tableName, columnName);
+        }
+
+        public WhereList OR(WhereList whereList)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(whereList);
+        }
+
+        public WhereList OR(string tableName, string columnName, WhereComparison comparison, object columnValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(tableName, columnName, comparison, columnValue);
+        }
+
+        public WhereList OR(string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(tableName, columnName, comparison, otherTableName, otherColumnName);
+        }
+
+        public WhereList OR(string tableName, string columnName, object betweenValue, object andValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(tableName, columnName, betweenValue, andValue);
+        }
+
+        public WhereList OR(string columnName, object betweenValue, object andValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(columnName, betweenValue, andValue);
+        }
+
+        #endregion
+
     }
 }
