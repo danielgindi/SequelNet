@@ -163,7 +163,27 @@ namespace dg.Sql
 
         public WhereList AND(IPhrase phrase)
         {
-            this.Add(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            this.Add(new Where(WhereCondition.AND, phrase));
+            return this;
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            this.Add(new Where(WhereCondition.AND, phrase, comparison, value));
+            return this;
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            this.Add(new Where(WhereCondition.AND, phrase, comparison, value, valueType));
+            return this;
+        }
+
+        public WhereList AND(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            var w = new Where(WhereCondition.AND, phrase, comparison, tableName, columnName);
+            w.SecondTableName = tableName;
+            this.Add(w);
             return this;
         }
 
@@ -226,7 +246,27 @@ namespace dg.Sql
 
         public WhereList OR(IPhrase phrase)
         {
-            this.Add(new Where(WhereCondition.OR, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            this.Add(new Where(WhereCondition.OR, phrase));
+            return this;
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            this.Add(new Where(WhereCondition.OR, phrase, comparison, value));
+            return this;
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            this.Add(new Where(WhereCondition.OR, phrase, comparison, value, valueType));
+            return this;
+        }
+
+        public WhereList OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            var w = new Where(WhereCondition.OR, phrase, comparison, tableName, columnName);
+            w.SecondTableName = tableName;
+            this.Add(w);
             return this;
         }
 

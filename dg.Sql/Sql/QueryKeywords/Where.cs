@@ -155,6 +155,41 @@ namespace dg.Sql
             SecondType = ValueObjectType.ColumnName;
         }
 
+        public Where(IPhrase phrase)
+        {
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = WhereComparison.None;
+        }
+
+        public Where(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = ValueObjectType.Value;
+        }
+
+        public Where(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = valueType;
+        }
+
+        public Where(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            SecondTableName = tableName;
+            Second = columnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+
         public Where(WhereCondition condition, WhereList whereList)
         {
             Condition = condition;
@@ -229,7 +264,46 @@ namespace dg.Sql
             Second = thatColumnName;
             SecondType = ValueObjectType.ColumnName;
         }
+        
+        public Where(WhereCondition condition, IPhrase phrase)
+        {
+            Condition = condition;
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = WhereComparison.None;
+        }
 
+        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value)
+        {
+            Condition = condition;
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = ValueObjectType.Value;
+        }
+
+        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            Condition = condition;
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = valueType;
+        }
+
+        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            Condition = condition;
+            First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            SecondTableName = tableName;
+            Second = columnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+        
         public void BuildCommand(StringBuilder outputBuilder, bool isFirst, ConnectorBase conn, Query relatedQuery)
         {
             BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
