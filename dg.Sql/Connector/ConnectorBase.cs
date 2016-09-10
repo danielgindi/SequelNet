@@ -248,6 +248,12 @@ namespace dg.Sql.Connector
                 ((dg.Sql.Where)value).BuildCommand(sb, true, this, relatedQuery);
                 return sb.ToString();
             }
+            else if (value is dg.Sql.WhereList)
+            {
+                StringBuilder sb = new StringBuilder();
+                ((dg.Sql.WhereList)value).BuildCommand(sb, this, relatedQuery);
+                return sb.ToString();
+            }
             else return value.ToString();
         }
 
