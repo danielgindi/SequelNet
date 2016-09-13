@@ -621,6 +621,14 @@ namespace dg.Sql.SchemaGenerator
                         {
                             dalColumn.Type = DalColumnType.TDateTime;
                         }
+                        else if (columnKeyword.Equals("DATETIME_UTC", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TDateTimeUtc;
+                        }
+                        else if (columnKeyword.Equals("DATETIME_LOCAL", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TDateTimeLocal;
+                        }
                         else if (columnKeyword.StartsWith("Default ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.DefaultValue = columnKeyword.Substring(8);
@@ -842,6 +850,14 @@ namespace dg.Sql.SchemaGenerator
                     else if (dalColumn.Type == DalColumnType.TDateTime)
                     {
                         defaultValue = "DateTime.UtcNow";
+                    }
+                    else if (dalColumn.Type == DalColumnType.TDateTimeUtc)
+                    {
+                        defaultValue = "DateTime.UtcNow";
+                    }
+                    else if (dalColumn.Type == DalColumnType.TDateTimeLocal)
+                    {
+                        defaultValue = "DateTime.Now";
                     }
                     else if (dalColumn.Type == DalColumnType.TInt)
                     {
@@ -1091,6 +1107,14 @@ namespace dg.Sql.SchemaGenerator
                 else if (dalCol.Type == DalColumnType.TDateTime)
                 {
                     valueConvertorFormat = "Convert.ToDateTime({0})";
+                }
+                else if (dalCol.Type == DalColumnType.TDateTimeUtc)
+                {
+                    valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Utc)";
+                }
+                else if (dalCol.Type == DalColumnType.TDateTimeLocal)
+                {
+                    valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Local)";
                 }
                 else if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
                 {
@@ -1353,42 +1377,87 @@ namespace dg.Sql.SchemaGenerator
                         fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", dalCol.ActualType));
                     }
                 }
-                else if (dalCol.Type != DalColumnType.TDateTime)
+                else if (dalCol.Type == DalColumnType.TLongText ||
+                    dalCol.Type == DalColumnType.TMediumText ||
+                    dalCol.Type == DalColumnType.TText ||
+                    dalCol.Type == DalColumnType.TString ||
+                    dalCol.Type == DalColumnType.TFixedString)
                 {
-                    if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
+                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                }
+                else if (dalCol.Type == DalColumnType.TGeometry ||
+                    dalCol.Type == DalColumnType.TGeometryCollection ||
+                    dalCol.Type == DalColumnType.TPoint ||
+                    dalCol.Type == DalColumnType.TLineString ||
+                    dalCol.Type == DalColumnType.TPolygon ||
+                    dalCol.Type == DalColumnType.TLine ||
+                    dalCol.Type == DalColumnType.TCurve ||
+                    dalCol.Type == DalColumnType.TSurface ||
+                    dalCol.Type == DalColumnType.TLinearRing ||
+                    dalCol.Type == DalColumnType.TMultiPoint ||
+                    dalCol.Type == DalColumnType.TMultiLineString ||
+                    dalCol.Type == DalColumnType.TMultiPolygon ||
+                    dalCol.Type == DalColumnType.TMultiCurve ||
+                    dalCol.Type == DalColumnType.TMultiSurface ||
+                    dalCol.Type == DalColumnType.TGeographic ||
+                    dalCol.Type == DalColumnType.TGeographicCollection ||
+                    dalCol.Type == DalColumnType.TGeographicPoint ||
+                    dalCol.Type == DalColumnType.TGeographicLineString ||
+                    dalCol.Type == DalColumnType.TGeographicPolygon ||
+                    dalCol.Type == DalColumnType.TGeographicLine ||
+                    dalCol.Type == DalColumnType.TGeographicCurve ||
+                    dalCol.Type == DalColumnType.TGeographicSurface ||
+                    dalCol.Type == DalColumnType.TGeographicLinearRing ||
+                    dalCol.Type == DalColumnType.TGeographicMultiPoint ||
+                    dalCol.Type == DalColumnType.TGeographicMultiLineString ||
+                    dalCol.Type == DalColumnType.TGeographicMultiPolygon ||
+                    dalCol.Type == DalColumnType.TGeographicMultiCurve ||
+                    dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                {
+                    fromReader = "reader.GetGeometry(Columns.{0}) as " + dalCol.ActualType;
+                }
+
+                else if (dalCol.Type == DalColumnType.TDateTime ||
+                    dalCol.Type == DalColumnType.TDateTimeUtc ||
+                    dalCol.Type == DalColumnType.TDateTimeLocal)
+                {
+                    fromReader = "reader.GetDateTime";
+
+                    if (dalCol.Type == DalColumnType.TDateTimeUtc)
                     {
-                        fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                        fromReader += "Utc";
                     }
-                    else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                    else if (dalCol.Type == DalColumnType.TDateTimeLocal)
                     {
-                        fromReader = "reader.GetGeometry(Columns.{0}) as " + dalCol.ActualType;
+                        fromReader += "Local";
+                    }
+
+                    if (dalCol.IsNullable)
+                    {
+                        fromReader += "OrNull";
+                    }
+
+                    fromReader += "(Columns.{0})";
+
+                    if (dalCol.IsNullable &&
+                        !string.IsNullOrEmpty(dalCol.DefaultValue) &&
+                        dalCol.DefaultValue != "null")
+                    {
+                        fromReader += " ?? " + dalCol.DefaultValue;
                     }
                 }
-                else if (!dalCol.IsNullable)
-                {
-                    fromDb = "Convert.ToDateTime({0})";
-                }
-                else if (dalCol.DefaultValue == "DateTime.UtcNow")
-                {
-                    fromDb = "DateTimeOrNow({0})";
-                }
-                else if (dalCol.DefaultValue != "null")
-                {
-                    fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDateTime({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDateTime({{0}})", dalCol.ActualType));
-                }
-                else
-                {
-                    fromDb = "DateTimeOrNullFromDb({0})";
-                }
+
                 if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
                 {
                     fromDb = "(" + dalCol.EnumTypeName + ")" + fromDb;
                 }
+
                 if (!string.IsNullOrEmpty(dalCol.FromDb))
                 {
                     fromDb = dalCol.FromDb;
                 }
-                stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.NameX, string.Format(fromDb, string.Format(fromReader, dalCol.NameX), dalCol.DefaultValue));
+
+                stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.NameX, string.Format(fromDb, string.Format(fromReader, dalCol.NameX), dalCol.DefaultValue, dalCol.NameX));
             }
             if (!string.IsNullOrEmpty(context.CustomAfterRead))
             {
@@ -1566,7 +1635,9 @@ namespace dg.Sql.SchemaGenerator
             {
                 dalCol.ActualType = "Guid";
             }
-            else if (dalCol.Type == DalColumnType.TDateTime)
+            else if (dalCol.Type == DalColumnType.TDateTime ||
+                dalCol.Type == DalColumnType.TDateTimeUtc ||
+                dalCol.Type == DalColumnType.TDateTimeLocal)
             {
                 dalCol.ActualType = "DateTime";
             }

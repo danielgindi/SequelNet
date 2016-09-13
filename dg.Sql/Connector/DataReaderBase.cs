@@ -556,13 +556,13 @@ namespace dg.Sql.Connector
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.GetDataTypeName(ordinal);
         }
-        
+
         public DateTime GetDateTime(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.GetDateTime(ordinal);
         }
-        
+
         public decimal GetDecimal(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -734,6 +734,46 @@ namespace dg.Sql.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? String.Empty : UnderlyingReader.GetString(ordinal);
         }
 
+        public DateTime GetDateTimeLocal(string columnName)
+        {
+            var date = GetDateTime(columnName);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeUtc(string columnName)
+        {
+            var date = GetDateTime(columnName);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeLocal(int ordinal)
+        {
+            var date = GetDateTime(ordinal);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeUtc(int ordinal)
+        {
+            var date = GetDateTime(ordinal);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            }
+            return date;
+        }
+
         public DateTime? GetDateTimeOrNull(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? null : (DateTime?)UnderlyingReader.GetDateTime(ordinal);
@@ -754,6 +794,86 @@ namespace dg.Sql.Connector
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.IsDBNull(ordinal) ? DateTime.MinValue : UnderlyingReader.GetDateTime(ordinal);
+        }
+
+        public DateTime? GetDateTimeLocalOrNull(int ordinal)
+        {
+            var date = GetDateTimeOrNull(ordinal);
+            if (date != null && date.Value.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date.Value, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime? GetDateTimeUtcOrNull(int ordinal)
+        {
+            var date = GetDateTimeOrNull(ordinal);
+            if (date != null && date.Value.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date.Value, DateTimeKind.Utc);
+            }
+            return date;
+        }
+
+        public DateTime? GetDateTimeLocalOrNull(string columnName)
+        {
+            var date = GetDateTimeOrNull(columnName);
+            if (date != null && date.Value.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date.Value, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime? GetDateTimeUtcOrNull(string columnName)
+        {
+            var date = GetDateTimeOrNull(columnName);
+            if (date != null && date.Value.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date.Value, DateTimeKind.Utc);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeLocalOrMinValue(int ordinal)
+        {
+            var date = GetDateTimeOrMinValue(ordinal);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeUtcOrMinValue(int ordinal)
+        {
+            var date = GetDateTimeOrMinValue(ordinal);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeLocalOrMinValue(string columnName)
+        {
+            var date = GetDateTimeOrMinValue(columnName);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Local);
+            }
+            return date;
+        }
+
+        public DateTime GetDateTimeUtcOrMinValue(string columnName)
+        {
+            var date = GetDateTimeOrMinValue(columnName);
+            if (date.Kind == DateTimeKind.Unspecified)
+            {
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            }
+            return date;
         }
 
         public float? GetFloatOrNull(int ordinal)

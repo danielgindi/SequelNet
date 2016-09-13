@@ -48,7 +48,8 @@
  `DECIMAL(precision,scale)`; `MONEY(precision,scale)`;
  `DECIMAL(precision)`; `MONEY(precision)`;
  `FIXEDSTRING(length)`; `STRING(length)`; `TEXT`; `LONGTEXT(length)`; `MEDIUMTEXT(length)`; 
- `BOOL`; `GUID`; `DATETIME`; 
+ `BOOL`; `GUID`;
+ `DATETIME`; `DATETIME_UTC`; `DATETIME_LOCAL`; 
  `LITERALTYPE _some_literal_type_here_`
 
 **NOTE:** `LITERALTYPE` must come with an `ActualType` 
