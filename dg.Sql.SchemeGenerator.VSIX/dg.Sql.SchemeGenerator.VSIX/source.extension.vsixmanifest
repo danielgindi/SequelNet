@@ -3,7 +3,7 @@
   <Identifier Id="0a283a43-25bf-454c-b5eb-3571c5c1864d">
     <Name>dg.Sql Scheme Generator</Name>
     <Author>Daniel Cohen Gindi</Author>
-    <Version>1.2.2.0</Version>
+    <Version>1.2.3.0</Version>
     <Description xml:space="preserve">A DAL code generator for dg.Sql. Takes a pseudo-script, and outputs a full C# code.</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>https://github.com/danielgindi/dg.Sql</MoreInfoUrl>
