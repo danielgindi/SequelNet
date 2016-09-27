@@ -492,6 +492,26 @@ namespace dg.Sql.Connector
             return @"EXTRACT(SECOND FROM " + date + @")";
         }
 
+        public override string func_MD5_Hex(string value)
+        {
+            return @"md5(" + value + ")";
+        }
+
+        public override string func_SHA1_Hex(string value)
+        {
+            throw new NotSupportedException("SHA1 is not supported by Postgresql");
+        }
+
+        public override string func_MD5_Binary(string value)
+        {
+            return @"decode(md5(" + value + "), 'hex')";
+        }
+
+        public override string func_SHA1_Binary(string value)
+        {
+            throw new NotSupportedException("SHA1 is not supported by Postgresql");
+        }
+
         public override string type_AUTOINCREMENT { get { return @"SERIAL"; } } 
         public override string type_AUTOINCREMENT_BIGINT { get { return @"BIGSERIAL"; } }
 

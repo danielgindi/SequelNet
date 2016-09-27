@@ -74,7 +74,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Sql\Phrases\Encoding\MD5.cs" />
+    <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
+    <Compile Include="Sql\Phrases\Hash\MD5.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
     <Compile Include="Sql\Phrases\IPhrase.cs" />
     <Compile Include="Bindable\BindableCollection.cs" />

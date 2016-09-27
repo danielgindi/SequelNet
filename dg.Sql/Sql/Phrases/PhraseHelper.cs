@@ -187,26 +187,46 @@ namespace dg.Sql
 
         #endregion
 
-        #region Encoding
+        #region Hash functions
 
-        public static MD5 MD5(object value, ValueObjectType valueType)
+        public static MD5 MD5(object value, ValueObjectType valueType, bool binary = false)
         {
-            return new MD5(value, valueType);
+            return new MD5(value, valueType, binary);
         }
 
-        public static MD5 MD5(string tableName, string columnName)
+        public static MD5 MD5(string tableName, string columnName, bool binary = false)
         {
-            return new MD5(tableName, columnName);
+            return new MD5(tableName, columnName, binary);
         }
 
-        public static MD5 MD5(string columnName)
+        public static MD5 MD5(string columnName, bool binary = false)
         {
-            return new MD5(columnName);
+            return new MD5(columnName, binary);
         }
 
-        public static MD5 MD5(IPhrase phrase)
+        public static MD5 MD5(IPhrase phrase, bool binary = false)
         {
-            return new MD5(phrase);
+            return new MD5(phrase, binary);
+        }
+
+        public static SHA1 SHA1(object value, ValueObjectType valueType, bool binary = false)
+        {
+            return new SHA1(value, valueType, binary);
+        }
+
+        public static SHA1 SHA1(string tableName, string columnName, bool binary = false)
+        {
+            return new SHA1(tableName, columnName, binary);
+        }
+
+        public static SHA1 SHA1(string columnName, bool binary = false)
+        {
+            return new SHA1(columnName, binary);
+        }
+
+        public static SHA1 SHA1(IPhrase phrase, bool binary = false)
+        {
+            return new SHA1(phrase, binary);
         }
 
         #endregion

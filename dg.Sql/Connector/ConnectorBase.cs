@@ -348,9 +348,24 @@ namespace dg.Sql.Connector
             return @"SECONDS(" + date + ")";
         }
 
-        public virtual string func_MD5(string value)
+        public virtual string func_MD5_Hex(string value)
         {
             return @"MD5(" + value + ")";
+        }
+
+        public virtual string func_SHA1_Hex(string value)
+        {
+            return @"SHA1(" + value + ")";
+        }
+
+        public virtual string func_MD5_Binary(string value)
+        {
+            return @"UNHEX(MD5(" + value + "))";
+        }
+
+        public virtual string func_SHA1_Binary(string value)
+        {
+            return @"UNHEX(SHA1(" + value + "))";
         }
 
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }

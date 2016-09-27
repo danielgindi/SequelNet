@@ -410,7 +410,7 @@ namespace dg.Sql.Connector
             return @"DATEPART(second, " + date + ")";
         }
 
-        public override string func_MD5(string value)
+        public override string func_MD5_Hex(string value)
         {
             if (GetVersionData().MajorVersion < 10)
             {
@@ -418,8 +418,30 @@ namespace dg.Sql.Connector
             }
             else
             {
-                return @"CONVERT(VARCHAR(32), HashBytes('MD5', " + value + "), 2)";
+                return @"CONVERT(VARCHAR(32), HASHBYTES('MD5', " + value + "), 2)";
             }
+        }
+
+        public override string func_SHA1_Hex(string value)
+        {
+            if (GetVersionData().MajorVersion < 10)
+            {
+                return @"SUBSTRING(sys.fn_sqlvarbasetostr(HASHBYTES('SHA1', " + value + ")), 3, 32)";
+            }
+            else
+            {
+                return @"CONVERT(VARCHAR(32), HASHBYTES('SHA1', " + value + "), 2)";
+            }
+        }
+
+        public override string func_MD5_Binary(string value)
+        {
+            return @"HASHBYTES('MD5', " + value + ")";
+        }
+
+        public override string func_SHA1_Binary(string value)
+        {
+            return @"HASHBYTES('SHA1', " + value + ")";
         }
 
         public override string func_LENGTH(string value)

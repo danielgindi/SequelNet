@@ -10,6 +10,7 @@ namespace dg.Sql.Phrases
         public string TableName;
         public object Value;
         public ValueObjectType ValueType;
+        public bool Binary = false;
 
         #region Constructors
 
@@ -21,31 +22,33 @@ namespace dg.Sql.Phrases
             this.ValueType = valueType;
         }
 
-        public MD5(object value, ValueObjectType valueType)
+        public MD5(object value, ValueObjectType valueType, bool binary = false)
         {
             this.Value = value;
             this.ValueType = valueType;
+            this.Binary = binary;
         }
 
-        public MD5(string tableName, string columnName)
+        public MD5(string tableName, string columnName, bool binary = false)
         {
             this.TableName = tableName;
             this.Value = columnName;
             this.ValueType = ValueObjectType.ColumnName;
+            this.Binary = binary;
         }
 
-        public MD5(string columnName)
-            : this(null, columnName)
+        public MD5(string columnName, bool binary = false)
+            : this(null, columnName, binary)
         {
         }
 
-        public MD5(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public MD5(IPhrase phrase, bool binary = false)
+            : this(phrase, ValueObjectType.Value, binary)
         {
         }
 
-        public MD5(Where where)
-            : this(where, ValueObjectType.Value)
+        public MD5(Where where, bool binary = false)
+            : this(where, ValueObjectType.Value, binary)
         {
         }
 
@@ -70,7 +73,7 @@ namespace dg.Sql.Phrases
             }
             else ret += Value;
 
-            return conn.func_MD5(ret);
+            return Binary ? conn.func_MD5_Binary(ret) : conn.func_MD5_Hex(ret);
         }
     }
 }
