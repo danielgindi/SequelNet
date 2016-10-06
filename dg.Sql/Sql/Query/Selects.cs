@@ -16,7 +16,7 @@ namespace dg.Sql
         /// 
         /// Note: All `Select...` methods clear the select list first.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query Select()
         {
             if (this.QueryMode != QueryMode.Select)
