@@ -599,9 +599,9 @@ namespace dg.Sql
             return new Avg(phrase);
         }
 
-        public static Count Count(object value, ValueObjectType valueType, bool distinct = false)
+        public static Count Count(bool distinct = false)
         {
-            return new Count(value, valueType, distinct);
+            return new Count(distinct);
         }
 
         public static Count Count(string tableName, string columnName, bool distinct = false)
@@ -612,6 +612,11 @@ namespace dg.Sql
         public static Count Count(string columnName, bool distinct = false)
         {
             return new Count(columnName, distinct);
+        }
+
+        public static Count Count(object value, ValueObjectType valueType, bool distinct = false)
+        {
+            return new Count(value, valueType, distinct);
         }
 
         public static Count Count(IPhrase phrase, bool distinct = false)
