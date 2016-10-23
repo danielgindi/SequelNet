@@ -7,9 +7,7 @@ namespace dg.Sql.Phrases
 {
     public class MD5 : IPhrase
     {
-        public string TableName;
-        public object Value;
-        public ValueObjectType ValueType;
+        public ValueWrapper Value;
         public bool Binary = false;
 
         #region Constructors
@@ -17,23 +15,18 @@ namespace dg.Sql.Phrases
         [Obsolete]
         public MD5(string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = tableName;
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(tableName, value, valueType);
         }
 
         public MD5(object value, ValueObjectType valueType, bool binary = false)
         {
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(value, valueType);
             this.Binary = binary;
         }
 
         public MD5(string tableName, string columnName, bool binary = false)
         {
-            this.TableName = tableName;
-            this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Value = new ValueWrapper(tableName, columnName);
             this.Binary = binary;
         }
 
@@ -58,20 +51,7 @@ namespace dg.Sql.Phrases
         {
             string ret = "";
 
-            if (ValueType == ValueObjectType.ColumnName)
-            {
-                if (TableName != null && TableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(TableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(Value.ToString());
-            }
-            else if (ValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(Value, relatedQuery);
-            }
-            else ret += Value;
+            ret += Value.Build(conn, relatedQuery);
 
             return Binary ? conn.func_MD5_Binary(ret) : conn.func_MD5_Hex(ret);
         }

@@ -7,15 +7,9 @@ namespace dg.Sql.Phrases
 {
     public class Replace : IPhrase
     {
-        public string SourceTableName;
-        public object SourceValue;
-        public ValueObjectType SourceType;
-        public string SearchTableName;
-        public object SearchValue;
-        public ValueObjectType SearchType;
-        public string ReplaceWithTableName;
-        public object ReplaceWithValue;
-        public ValueObjectType ReplaceWithType;
+        public ValueWrapper SourceValue;
+        public ValueWrapper SearchValue;
+        public ValueWrapper ReplaceWithValue;
 
         #region Constructors
 
@@ -25,15 +19,9 @@ namespace dg.Sql.Phrases
             string searchTableName, string search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWith, ValueObjectType replaceWithType)
         {
-            this.SourceTableName = sourceTableName;
-            this.SourceValue = source;
-            this.SourceType = sourceType;
-            this.SearchTableName = searchTableName;
-            this.SearchValue = search;
-            this.SearchType = searchType;
-            this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWithValue = replaceWith;
-            this.ReplaceWithType = replaceWithType;
+            this.SourceValue = new ValueWrapper(sourceTableName, source, sourceType);
+            this.SearchValue = new ValueWrapper(searchTableName, search, searchType);
+            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWith, replaceWithType);
         }
 
         public Replace(
@@ -41,15 +29,9 @@ namespace dg.Sql.Phrases
             string searchTableName, string searchColumn,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceTableName = sourceTableName;
-            this.SourceValue = sourceColumn;
-            this.SourceType = ValueObjectType.ColumnName;
-            this.SearchTableName = searchTableName;
-            this.SearchValue = searchColumn;
-            this.SearchType = ValueObjectType.ColumnName;
-            this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWithValue = replaceWithColumn;
-            this.ReplaceWithType = ValueObjectType.ColumnName;
+            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
+            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
+            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -57,14 +39,9 @@ namespace dg.Sql.Phrases
             string searchTableName, string searchColumn,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = source;
-            this.SourceType = sourceType;
-            this.SearchTableName = searchTableName;
-            this.SearchValue = searchColumn;
-            this.SearchType = ValueObjectType.ColumnName;
-            this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWithValue = replaceWithColumn;
-            this.ReplaceWithType = ValueObjectType.ColumnName;
+            this.SourceValue = new ValueWrapper(source, sourceType);
+            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
+            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -72,14 +49,9 @@ namespace dg.Sql.Phrases
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceTableName = sourceTableName;
-            this.SourceValue = sourceColumn;
-            this.SourceType = ValueObjectType.ColumnName;
-            this.SearchValue = search;
-            this.SearchType = searchType;
-            this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWithValue = replaceWithColumn;
-            this.ReplaceWithType = ValueObjectType.ColumnName;
+            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
+            this.SearchValue = new ValueWrapper(search, searchType);
+            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -87,14 +59,9 @@ namespace dg.Sql.Phrases
             string searchTableName, string searchColumn,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceTableName = sourceTableName;
-            this.SourceValue = sourceColumn;
-            this.SourceType = ValueObjectType.ColumnName;
-            this.SearchTableName = searchTableName;
-            this.SearchValue = searchColumn;
-            this.SearchType = ValueObjectType.ColumnName;
-            this.ReplaceWithValue = replace;
-            this.ReplaceWithType = replaceWithType;
+            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
+            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
+            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
         }
 
         public Replace(
@@ -102,13 +69,9 @@ namespace dg.Sql.Phrases
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = source;
-            this.SourceType = sourceType;
-            this.SearchValue = search;
-            this.SearchType = searchType;
-            this.ReplaceWithTableName = replaceWithTableName;
-            this.ReplaceWithValue = replaceWithColumn;
-            this.ReplaceWithType = ValueObjectType.ColumnName;
+            this.SourceValue = new ValueWrapper(source, sourceType);
+            this.SearchValue = new ValueWrapper(search, searchType);
+            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -116,13 +79,9 @@ namespace dg.Sql.Phrases
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceTableName = sourceTableName;
-            this.SourceValue = sourceColumn;
-            this.SourceType = ValueObjectType.ColumnName;
-            this.SearchValue = search;
-            this.SearchType = searchType;
-            this.ReplaceWithValue = replace;
-            this.ReplaceWithType = replaceWithType;
+            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
+            this.SearchValue = new ValueWrapper(search, searchType);
+            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
         }
 
         public Replace(
@@ -130,12 +89,9 @@ namespace dg.Sql.Phrases
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceValue = source;
-            this.SourceType = sourceType;
-            this.SearchValue = search;
-            this.SearchType = searchType;
-            this.ReplaceWithValue = replace;
-            this.ReplaceWithType = replaceWithType;
+            this.SourceValue = new ValueWrapper(source, sourceType);
+            this.SearchValue = new ValueWrapper(search, searchType);
+            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
         }
         
         #endregion
@@ -144,54 +100,15 @@ namespace dg.Sql.Phrases
         {
             string ret = @"REPLACE(";
 
-            if (SourceType == ValueObjectType.ColumnName)
-            {
-                if (SourceTableName != null && SourceTableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(SourceTableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(SourceValue.ToString());
-            }
-            else if (SourceType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(SourceValue);
-            }
-            else ret += SourceValue;
+            ret += SourceValue.Build(conn, relatedQuery);
 
             ret += ",";
 
-            if (SearchType == ValueObjectType.ColumnName)
-            {
-                if (SearchTableName != null && SearchTableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(SearchTableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(SearchValue.ToString());
-            }
-            else if (SearchType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(SearchValue);
-            }
-            else ret += SearchValue;
+            ret += SearchValue.Build(conn, relatedQuery);
 
             ret += ",";
 
-            if (ReplaceWithType == ValueObjectType.ColumnName)
-            {
-                if (ReplaceWithTableName != null && ReplaceWithTableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(ReplaceWithTableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(ReplaceWithValue.ToString());
-            }
-            else if (ReplaceWithType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(ReplaceWithValue);
-            }
-            else ret += ReplaceWithValue;
+            ret += ReplaceWithValue.Build(conn, relatedQuery);
 
             ret += ")";
 

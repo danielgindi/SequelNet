@@ -7,9 +7,7 @@ namespace dg.Sql.Phrases
 {
     public class PassThroughAggregate : IPhrase
     {
-        public string TableName;
-        public object Value;
-        public ValueObjectType ValueType;
+        public ValueWrapper Value;
         public string AggregateType;
 
         #region Constructors
@@ -17,17 +15,13 @@ namespace dg.Sql.Phrases
         [Obsolete]
         public PassThroughAggregate(string aggregateType, string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = tableName;
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(tableName, value, valueType);
             this.AggregateType = aggregateType;
         }
 
         public PassThroughAggregate(string aggregateType, string tableName, string columnName)
         {
-            this.TableName = tableName;
-            this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Value = new ValueWrapper(tableName, columnName);
             this.AggregateType = aggregateType;
         }
 
@@ -38,8 +32,7 @@ namespace dg.Sql.Phrases
 
         public PassThroughAggregate(string aggregateType, object value, ValueObjectType valueType)
         {
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(value, valueType);
             this.AggregateType = aggregateType;
         }
 
@@ -56,20 +49,7 @@ namespace dg.Sql.Phrases
 
             ret = AggregateType + @"(";
 
-            if (ValueType == ValueObjectType.ColumnName)
-            {
-                if (TableName != null && TableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(TableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(Value.ToString());
-            }
-            else if (ValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(Value, relatedQuery);
-            }
-            else ret += Value;
+            ret += Value.Build(conn, relatedQuery);
 
             ret += ")";
 

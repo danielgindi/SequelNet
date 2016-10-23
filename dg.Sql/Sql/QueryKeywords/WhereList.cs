@@ -10,43 +10,23 @@ namespace dg.Sql
     {
         public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery)
         {
-            bool isFirst = true;
-            bool isForJoinList = this is JoinColumnPair;
-            foreach (Where where in this)
-            {
-                where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
-                if (isFirst) isFirst = false;
-            }
+            BuildCommand(outputBuilder, conn, relatedQuery, null, null);
         }
 
         public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery)
         {
-            using (ConnectorBase conn = ConnectorBase.NewInstance())
-            {
-                bool isFirst = true;
-                bool isForJoinList = this is JoinColumnPair;
-                foreach (Where where in this)
-                {
-                    where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
-                    if (isFirst) isFirst = false;
-                }
-            }
+            BuildCommand(outputBuilder, null, relatedQuery, null, null);
         }
 
         public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
         {
-            bool isFirst = true;
-            bool isForJoinList = this is JoinColumnPair;
-            foreach (Where where in this)
+            bool ownsConn = conn == null;
+            if (ownsConn)
             {
-                where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, rightTableSchema, rightTableName);
-                if (isFirst) isFirst = false;
+                conn = ConnectorBase.NewInstance();
             }
-        }
 
-        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
-        {
-            using (ConnectorBase conn = ConnectorBase.NewInstance())
+            try
             {
                 bool isFirst = true;
                 bool isForJoinList = this is JoinColumnPair;
@@ -56,6 +36,18 @@ namespace dg.Sql
                     if (isFirst) isFirst = false;
                 }
             }
+            finally
+            {
+                if (ownsConn)
+                {
+                    conn.Dispose();
+                }
+            }
+        }
+
+        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+        {
+            BuildCommand(outputBuilder, null, relatedQuery, rightTableSchema, rightTableName);
         }
 
         public WhereList ClearWhere()

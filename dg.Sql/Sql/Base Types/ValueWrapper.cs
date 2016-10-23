@@ -9,7 +9,7 @@ namespace dg.Sql
     {
         public string TableName;
         public object Value;
-        public ValueObjectType ValueType;
+        public ValueObjectType Type;
 
         #region Constructors
 
@@ -17,55 +17,55 @@ namespace dg.Sql
         {
         }
 
-        public ValueWrapper(string tableName, object value, ValueObjectType valueType)
+        public ValueWrapper(string tableName, object value, ValueObjectType type)
         {
             this.TableName = tableName;
             this.Value = value;
-            this.ValueType = valueType;
+            this.Type = type;
         }
 
         public ValueWrapper(string tableName, string columnName)
         {
             this.TableName = tableName;
             this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Type = ValueObjectType.ColumnName;
         }
 
         public ValueWrapper(string column)
         {
             this.TableName = null;
             this.Value = column;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Type = ValueObjectType.ColumnName;
         }
 
-        public ValueWrapper(object value, ValueObjectType valueType)
+        public ValueWrapper(object value, ValueObjectType type)
         {
             this.TableName = null;
             this.Value = value;
-            this.ValueType = valueType;
+            this.Type = type;
         }
 
         public ValueWrapper(IPhrase phrase)
         {
             this.TableName = null;
             this.Value = phrase;
-            this.ValueType = ValueObjectType.Value;
+            this.Type = ValueObjectType.Value;
         }
 
         public ValueWrapper(Where where)
         {
             this.TableName = null;
             this.Value = where;
-            this.ValueType = ValueObjectType.Value;
+            this.Type = ValueObjectType.Value;
         }
 
         #endregion
 
         #region Convenience
         
-        public static ValueWrapper From(string tableName, object value, ValueObjectType valueType)
+        public static ValueWrapper From(string tableName, object value, ValueObjectType type)
         {
-            return new ValueWrapper(tableName, value, valueType);
+            return new ValueWrapper(tableName, value, type);
         }
 
         public static ValueWrapper From(string tableName, string column)
@@ -73,9 +73,9 @@ namespace dg.Sql
             return new ValueWrapper(tableName, column);
         }
 
-        public static ValueWrapper From(object value, ValueObjectType valueType)
+        public static ValueWrapper From(object value, ValueObjectType type)
         {
-            return new ValueWrapper(value, valueType);
+            return new ValueWrapper(value, type);
         }
 
         public static ValueWrapper From(IPhrase phrase)
@@ -101,7 +101,7 @@ namespace dg.Sql
         {
             string ret = "";
 
-            if (ValueType == ValueObjectType.ColumnName)
+            if (Type == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
@@ -111,9 +111,9 @@ namespace dg.Sql
 
                 ret += conn.WrapFieldName(Value.ToString());
             }
-            else if (ValueType == ValueObjectType.Value)
+            else if (Type == ValueObjectType.Value)
             {
-                ret += conn.PrepareValue(Value, relatedQuery);
+                ret += @"(" + conn.PrepareValue(Value, relatedQuery) + @")";
             }
             else
             {

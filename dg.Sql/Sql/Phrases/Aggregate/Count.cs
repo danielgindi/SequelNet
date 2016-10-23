@@ -8,33 +8,26 @@ namespace dg.Sql.Phrases
     public class Count : IPhrase
     {
         public bool Distinct = false;
-        public string TableName;
-        public object Value;
-        public ValueObjectType ValueType;
+        public ValueWrapper Value;
 
         #region Constructors
 
         [Obsolete]
         public Count(string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = tableName;
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(tableName, value, valueType);
         }
 
         public Count(bool distinct = false)
         {
             this.Distinct = distinct;
-            this.Value = "*";
-            this.ValueType = ValueObjectType.Literal;
+            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
         }
 
         public Count(string tableName, string columnName, bool distinct = false)
         {
             this.Distinct = distinct;
-            this.TableName = tableName;
-            this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Value = new ValueWrapper(tableName, columnName);
         }
 
         public Count(string columnName, bool distinct = false)
@@ -45,8 +38,7 @@ namespace dg.Sql.Phrases
         public Count(object value, ValueObjectType valueType, bool distinct = false)
         {
             this.Distinct = distinct;
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(value, valueType);
         }
 
         public Count(IPhrase phrase, bool distinct = false)
@@ -69,20 +61,7 @@ namespace dg.Sql.Phrases
                 ret = @"COUNT(";
             }
 
-            if (ValueType == ValueObjectType.ColumnName)
-            {
-                if (TableName != null && TableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(TableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(Value.ToString());
-            }
-            else if (ValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(Value, relatedQuery);
-            }
-            else ret += Value;
+            ret += Value.Build(conn, relatedQuery);
 
             ret += ")";
 

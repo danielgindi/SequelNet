@@ -1110,31 +1110,5 @@ namespace dg.Sql
         }
 
         #endregion
-
-        internal static string StringifyValue(string tableName, object value, ValueObjectType type,
-            ConnectorBase conn, Query relatedQuery = null)
-        {
-            string ret = "";
-
-            if (type == ValueObjectType.ColumnName)
-            {
-                if (tableName != null && tableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(tableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(value.ToString());
-            }
-            else if (type == ValueObjectType.Value)
-            {
-                ret += @"(" + conn.PrepareValue(value, relatedQuery) + @")";
-            }
-            else
-            {
-                ret += value;
-            }
-
-            return ret;
-        }
     }
 }

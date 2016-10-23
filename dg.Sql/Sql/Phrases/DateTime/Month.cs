@@ -7,31 +7,24 @@ namespace dg.Sql.Phrases
 {
     public class Month : IPhrase
     {
-        public string TableName;
-        public object Value;
-        public ValueObjectType ValueType;
+        public ValueWrapper Value;
 
         #region Constructors
 
         [Obsolete]
         public Month(string tableName, object value, ValueObjectType valueType)
         {
-            this.TableName = tableName;
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(tableName, value, valueType);
         }
 
         public Month(object value, ValueObjectType valueType)
         {
-            this.Value = value;
-            this.ValueType = valueType;
+            this.Value = new ValueWrapper(value, valueType);
         }
 
         public Month(string tableName, string columnName)
         {
-            this.TableName = tableName;
-            this.Value = columnName;
-            this.ValueType = ValueObjectType.ColumnName;
+            this.Value = new ValueWrapper(tableName, columnName);
         }
 
         public Month(string columnName)
@@ -55,20 +48,7 @@ namespace dg.Sql.Phrases
         {
             string ret = "";
 
-            if (ValueType == ValueObjectType.ColumnName)
-            {
-                if (TableName != null && TableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(TableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName(Value.ToString());
-            }
-            else if (ValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(Value, relatedQuery);
-            }
-            else ret += Value;
+            ret += Value.Build(conn, relatedQuery);
 
             return conn.func_MONTH(ret);
         }

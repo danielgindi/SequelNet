@@ -7,12 +7,8 @@ namespace dg.Sql.Phrases
 {
     public class DateTimeAdd : IPhrase
     {
-        public string TableName1;
-        public object Value1;
-        public ValueObjectType ValueType1;
-        public string TableName2;
-        public object Value2;
-        public ValueObjectType ValueType2;
+        public ValueWrapper Value1;
+        public ValueWrapper Value2;
         public DateTimeUnit Unit;
 
         #region Constructors
@@ -20,71 +16,51 @@ namespace dg.Sql.Phrases
         [Obsolete]
         public DateTimeAdd(string tableName, object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
-            this.TableName1 = tableName;
-            this.Value1 = value;
-            this.ValueType1 = valueType;
+            this.Value1 = new ValueWrapper(tableName, value, valueType);
             this.Unit = unit;
-            this.Value2 = interval;
-            this.ValueType2 = ValueObjectType.Value;
+            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
-            this.Value1 = value;
-            this.ValueType1 = valueType;
+            this.Value1 = new ValueWrapper(value, valueType);
             this.Unit = unit;
-            this.Value2 = interval;
-            this.ValueType2 = ValueObjectType.Value;
+            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, Int64 interval)
         {
-            this.TableName1 = tableName;
-            this.Value1 = columnName;
-            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value1 = new ValueWrapper(tableName, columnName);
             this.Unit = unit;
-            this.Value2 = interval;
-            this.ValueType2 = ValueObjectType.Value;
+            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, string addTableName, string addColumnName)
         {
-            this.Value1 = value;
-            this.ValueType1 = valueType;
+            this.Value1 = new ValueWrapper(value, valueType);
             this.Unit = unit;
-            this.TableName2 = addTableName;
-            this.Value2 = addColumnName;
-            this.ValueType2 = ValueObjectType.ColumnName;
+            this.Value2 = new ValueWrapper(addTableName, addColumnName);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addTableName, string addColumnName)
         {
-            this.TableName1 = tableName;
-            this.Value1 = columnName;
-            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value1 = new ValueWrapper(tableName, columnName);
             this.Unit = unit;
-            this.TableName2 = addTableName;
-            this.Value2 = addColumnName;
-            this.ValueType2 = ValueObjectType.ColumnName;
+            this.Value2 = new ValueWrapper(addTableName, addColumnName);
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, string addColumnName)
         {
-            this.Value1 = value;
-            this.ValueType1 = valueType;
+            this.Value1 = new ValueWrapper(value, valueType);
             this.Unit = unit;
-            this.Value2 = addColumnName;
-            this.ValueType2 = ValueObjectType.ColumnName;
+            this.Value2 = new ValueWrapper(addColumnName);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addColumnName)
         {
-            this.TableName1 = tableName;
-            this.Value1 = columnName;
-            this.ValueType1 = ValueObjectType.ColumnName;
+            this.Value1 = new ValueWrapper(tableName, columnName);
             this.Unit = unit;
-            this.Value2 = addColumnName;
-            this.ValueType2 = ValueObjectType.ColumnName;
+            this.Value2 = new ValueWrapper(addColumnName);
         }
 
         public DateTimeAdd(string columnName, DateTimeUnit unit, Int64 interval)
@@ -162,7 +138,7 @@ namespace dg.Sql.Phrases
                 }
                 sb.Append(',');
 
-                sb.Append(PhraseHelper.StringifyValue(TableName2, Value2, ValueType2, conn, relatedQuery));
+                sb.Append(Value2.Build(conn, relatedQuery));
 
                 if (Unit == DateTimeUnit.Millisecond)
                 {
@@ -171,43 +147,17 @@ namespace dg.Sql.Phrases
 
                 sb.Append(',');
 
-                if (ValueType1 == ValueObjectType.ColumnName)
-                {
-                    if (TableName1 != null && TableName1.Length > 0)
-                    {
-                        sb.Append(conn.WrapFieldName(TableName1));
-                        sb.Append(".");
-                    }
-                    sb.Append(conn.WrapFieldName(Value1.ToString()));
-                }
-                else if (ValueType1 == ValueObjectType.Value)
-                {
-                    sb.Append(conn.PrepareValue(Value1, relatedQuery));
-                }
-                else sb.Append(Value1);
+                sb.Append(Value1.Build(conn, relatedQuery));
 
                 sb.Append(')');
             }
             else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
             {
-                if (ValueType1 == ValueObjectType.ColumnName)
-                {
-                    if (TableName1 != null && TableName1.Length > 0)
-                    {
-                        sb.Append(conn.WrapFieldName(TableName1));
-                        sb.Append(".");
-                    }
-                    sb.Append(conn.WrapFieldName(Value1.ToString()));
-                }
-                else if (ValueType1 == ValueObjectType.Value)
-                {
-                    sb.Append(conn.PrepareValue(Value1, relatedQuery));
-                }
-                else sb.Append(Value1);
+                sb.Append(Value1.Build(conn, relatedQuery));
 
                 sb.Append(" + INTERVAL '");
 
-                sb.Append(PhraseHelper.StringifyValue(TableName2, Value2, ValueType2, conn, relatedQuery));
+                sb.Append(Value2.Build(conn, relatedQuery));
 
                 switch (Unit)
                 {
@@ -284,24 +234,9 @@ namespace dg.Sql.Phrases
                         break;
                 }
                 sb.Append(',');
-                sb.Append(PhraseHelper.StringifyValue(TableName2, Value2, ValueType2, conn, relatedQuery));
+                sb.Append(Value2.Build(conn, relatedQuery));
                 sb.Append(',');
-
-                if (ValueType1 == ValueObjectType.ColumnName)
-                {
-                    if (TableName1 != null && TableName1.Length > 0)
-                    {
-                        sb.Append(conn.WrapFieldName(TableName1));
-                        sb.Append(".");
-                    }
-                    sb.Append(conn.WrapFieldName(Value1.ToString()));
-                }
-                else if (ValueType1 == ValueObjectType.Value)
-                {
-                    sb.Append(conn.PrepareValue(Value1, relatedQuery));
-                }
-                else sb.Append(Value1);
-
+                sb.Append(Value1.Build(conn, relatedQuery));
                 sb.Append(')');
             }
 

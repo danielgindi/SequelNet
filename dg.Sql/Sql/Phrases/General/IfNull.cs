@@ -7,12 +7,8 @@ namespace dg.Sql.Phrases
 {
     public class IfNull : IPhrase
     {
-        public string FirstTableName;
-        public object FirstValue;
-        public ValueObjectType FirstValueType;
-        public string SecondTableName;
-        public object SecondValue;
-        public ValueObjectType SecondValueType;
+        public ValueWrapper Value1;
+        public ValueWrapper Value2;
 
         #region Constructors
 
@@ -20,44 +16,32 @@ namespace dg.Sql.Phrases
             string firstTableName, string firstColumnName,
             string secondTableName, string secondColumnName)
         {
-            this.FirstTableName = firstTableName;
-            this.FirstValue = firstColumnName;
-            this.FirstValueType = ValueObjectType.ColumnName;
-            this.SecondTableName = secondTableName;
-            this.SecondValue = secondColumnName;
-            this.SecondValueType = ValueObjectType.ColumnName;
+            this.Value1 = new ValueWrapper(firstTableName, firstColumnName);
+            this.Value2 = new ValueWrapper(secondTableName, secondColumnName);
         }
 
         public IfNull(
              object firstValue, ValueObjectType firstValueType,
              object secondValue, ValueObjectType secondValueType)
         {
-            this.FirstValue = firstValue;
-            this.FirstValueType = firstValueType;
-            this.SecondValue = secondValue;
-            this.SecondValueType = secondValueType;
+            this.Value1 = new ValueWrapper(firstValue, firstValueType);
+            this.Value2 = new ValueWrapper(secondValue, secondValueType);
         }
 
         public IfNull(
              string firstTableName, string firstColumnName,
              object secondValue, ValueObjectType secondValueType)
         {
-            this.FirstTableName = firstTableName;
-            this.FirstValue = firstColumnName;
-            this.FirstValueType = ValueObjectType.ColumnName;
-            this.SecondValue = secondValue;
-            this.SecondValueType = secondValueType;
+            this.Value1 = new ValueWrapper(firstTableName, firstColumnName);
+            this.Value2 = new ValueWrapper(secondValue, secondValueType);
         }
 
         public IfNull(
              object firstValue, ValueObjectType firstValueType,
              string secondTableName, string secondColumnName)
         {
-            this.FirstValue = firstValue;
-            this.FirstValueType = firstValueType;
-            this.SecondTableName = secondTableName;
-            this.SecondValue = secondColumnName;
-            this.SecondValueType = ValueObjectType.ColumnName;
+            this.Value1 = new ValueWrapper(firstValue, firstValueType);
+            this.Value2 = new ValueWrapper(secondTableName, secondColumnName);
         }
 
         #endregion
@@ -69,37 +53,11 @@ namespace dg.Sql.Phrases
                 ret = @"IFNULL(";
             else ret = @"ISNULL(";
 
-            if (FirstValueType == ValueObjectType.ColumnName)
-            {
-                if (FirstTableName != null && FirstTableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(FirstTableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName((string)FirstValue);
-            }
-            else if (FirstValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(FirstValue, relatedQuery);
-            }
-            else ret += FirstValue;
+            ret += Value1.Build(conn, relatedQuery);
 
             ret += ", ";
 
-            if (SecondValueType == ValueObjectType.ColumnName)
-            {
-                if (SecondTableName != null && SecondTableName.Length > 0)
-                {
-                    ret += conn.WrapFieldName(SecondTableName);
-                    ret += ".";
-                }
-                ret += conn.WrapFieldName((string)SecondValue);
-            }
-            else if (SecondValueType == ValueObjectType.Value)
-            {
-                ret += conn.PrepareValue(SecondValue, relatedQuery);
-            }
-            else ret += SecondValue;
+            ret += Value2.Build(conn, relatedQuery);
 
             ret += ")";
 
