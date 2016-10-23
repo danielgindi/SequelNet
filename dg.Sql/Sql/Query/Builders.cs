@@ -180,78 +180,7 @@ namespace dg.Sql
         {
             if (_ListOrderBy != null && _ListOrderBy.Count > 0)
             {
-                sb.Append(@" ORDER BY ");
-                bool bFirst = true;
-                foreach (OrderBy orderBy in _ListOrderBy)
-                {
-                    if (bFirst) bFirst = false;
-                    else sb.Append(',');
-                    if (orderBy.Randomize)
-                    {
-                        switch (connection.TYPE)
-                        {
-                            case ConnectorBase.SqlServiceType.MSSQL:
-                                sb.Append(@"NEWID()");
-                                break;
-                            case ConnectorBase.SqlServiceType.POSTGRESQL:
-                                sb.Append(@"RANDOM()");
-                                break;
-                            default:
-                            case ConnectorBase.SqlServiceType.MYSQL:
-                                sb.Append(@"RAND()");
-                                break;
-                            case ConnectorBase.SqlServiceType.MSACCESS:
-                                if (orderBy.TableName != null) sb.Append(@"RND(" + connection.WrapFieldName(orderBy.TableName) + @"." + connection.WrapFieldName(orderBy.ColumnName.ToString()) + @")");
-                                else sb.Append(@"RND(" + connection.WrapFieldName(orderBy.ColumnName.ToString()) + @")");
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        if (connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS && Schema != null && !orderBy.IsLiteral)
-                        {
-                            TableSchema.Column col = Schema.Columns.Find(orderBy.ColumnName.ToString());
-                            if (col != null && col.ActualDataType == DataType.Boolean) sb.Append(@" NOT ");
-                        }
-
-                        if (orderBy.ColumnName is dg.Sql.IPhrase)
-                        {
-                            sb.Append(((dg.Sql.IPhrase)orderBy.ColumnName).BuildPhrase(connection, this));
-                        }
-                        else if (orderBy.ColumnName is dg.Sql.Where)
-                        {
-                            ((dg.Sql.Where)orderBy.ColumnName).BuildCommand(sb, true, connection, this);
-                        }
-                        else if (orderBy.IsLiteral)
-                        {
-                            sb.Append(orderBy.ColumnName);
-                        }
-                        else
-                        {
-                            if (orderBy.TableName != null)
-                            {
-                                sb.Append(connection.WrapFieldName(orderBy.TableName) + @"." + connection.WrapFieldName(orderBy.ColumnName.ToString()));
-                            }
-                            else
-                            {
-                                sb.Append(connection.WrapFieldName(orderBy.ColumnName.ToString()));
-                            }
-                        }
-
-                        switch (orderBy.SortDirection)
-                        {
-                            default:
-                            case SortDirection.None:
-                                break;
-                            case SortDirection.ASC:
-                                sb.Append(invert ? @" DESC" : @" ASC");
-                                break;
-                            case SortDirection.DESC:
-                                sb.Append(invert ? @" ASC" : @" DESC");
-                                break;
-                        }
-                    }
-                }
+                _ListOrderBy.BuildCommand(sb, connection, this, invert);
             }
         }
 

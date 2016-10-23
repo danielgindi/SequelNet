@@ -471,7 +471,7 @@ namespace dg.Sql
 
         #endregion
 
-        #region Quantitative
+        #region Aggregate
 
         public static Add Add(
             string tableName1, string columnName1,
@@ -637,6 +637,86 @@ namespace dg.Sql
         public static CountDistinct CountDistinct(IPhrase phrase)
         {
             return new CountDistinct(phrase);
+        }
+        
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, tableName, columnName, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator)
+        {
+            return new GroupConcat(distinct, tableName, columnName, separator);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, tableName, columnName, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName)
+        {
+            return new GroupConcat(distinct, tableName, columnName);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, value, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator)
+        {
+            return new GroupConcat(distinct, value, separator);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, value, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value)
+        {
+            return new GroupConcat(distinct, value);
+        }
+
+        public static GroupConcat GroupConcat(string tableName, string columnName, string separator, OrderByList orderBy)
+        {
+            return new GroupConcat(tableName, columnName, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(string tableName, string columnName, string separator)
+        {
+            return new GroupConcat(tableName, columnName, separator);
+        }
+
+        public static GroupConcat GroupConcat(string tableName, string columnName, OrderByList orderBy)
+        {
+            return new GroupConcat(tableName, columnName, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(string tableName, string columnName)
+        {
+            return new GroupConcat(tableName, columnName);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value, string separator, OrderByList orderBy)
+        {
+            return new GroupConcat(value, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value, string separator)
+        {
+            return new GroupConcat(value, separator);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value, OrderByList orderBy)
+        {
+            return new GroupConcat(value, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value)
+        {
+            return new GroupConcat(value);
         }
 
         public static Max Max(object value, ValueObjectType valueType)

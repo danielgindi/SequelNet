@@ -74,6 +74,8 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sql\Base Types\ValueWrapper.cs" />
+    <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
     <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
