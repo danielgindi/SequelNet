@@ -97,6 +97,7 @@
     <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfSample.cs" />
     <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfPopulation.cs" />
     <Compile Include="Sql\Phrases\Strings\Length.cs" />
+    <Compile Include="Sql\Phrases\Strings\Concat.cs" />
     <Compile Include="Sql\QueryKeywords\GroupByHint.cs" />
     <Compile Include="Sql\Query\Builders.cs" />
     <Compile Include="Sql\Query\Having.cs" />

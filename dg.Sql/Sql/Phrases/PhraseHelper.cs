@@ -1019,6 +1019,16 @@ namespace dg.Sql
                 replace, replaceWithType);
         }
 
+        public static Concat Concat(params ValueWrapper[] values)
+        {
+            return new Concat(values);
+        }
+
+        public static Concat Concat(bool ignoreNulls, params ValueWrapper[] values)
+        {
+            return new Concat(ignoreNulls, values);
+        }
+
         #endregion
 
         internal static string StringifyValue(string tableName, object value, ValueObjectType type,
