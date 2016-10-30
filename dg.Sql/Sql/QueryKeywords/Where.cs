@@ -326,12 +326,9 @@ namespace dg.Sql
                 }
             }
 
-            if (Comparison == WhereComparison.None &&  // Its not a comparison
-                // And there's no list or the list is empty
-                (!(First is WhereList) || ((WhereList)First).Count == 0) &&
-                // And it's not a literal expression
-                FirstType != ValueObjectType.Literal &&
-                FirstType != ValueObjectType.Value
+            // The list is empty?
+            if (Comparison == WhereComparison.None && 
+                (First is WhereList && ((WhereList)First).Count == 0)
                 )
             {
                 outputBuilder.Append(@"1"); // dump a dummy TRUE condition to fill the blank
@@ -346,61 +343,12 @@ namespace dg.Sql
             }
             else
             {
-                if (FirstType == ValueObjectType.Value)
-                {
-                    if (SecondType == ValueObjectType.ColumnName)
-                    {
-                        if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                        {
-                            outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)Second), First, conn, relatedQuery));
-                        }
-                        else
-                        {
-                            TableSchema schema = null;
-                            if (relatedQuery != null)
-                            {
-                                if (SecondTableName == null || !relatedQuery.TableAliasMap.TryGetValue(SecondTableName, out schema))
-                                {
-                                    schema = relatedQuery.Schema;
-                                }
-                            }
-
-                            if (schema != null)
-                            {
-                                outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)Second), First, conn, relatedQuery));
-                            }
-                            else
-                            {
-                                outputBuilder.Append(conn.PrepareValue(First, relatedQuery));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        outputBuilder.Append(conn.PrepareValue(First, relatedQuery));
-                    }
-                }
-                else if (FirstType == ValueObjectType.ColumnName)
-                {
-                    if (FirstTableName != null)
-                    {
-                        if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                        {
-                            outputBuilder.Append(conn.WrapFieldName(rightTableName));
-                        }
-                        else
-                        {
-                            outputBuilder.Append(conn.WrapFieldName(FirstTableName));
-                        }
-                        outputBuilder.Append('.');
-                    }
-                    outputBuilder.Append(conn.WrapFieldName((string)First));
-                }
-                else
-                {
-                    outputBuilder.Append(First == null ? @"NULL" : First);
-                }
-
+                BuildSingleValue(
+                    outputBuilder, conn, 
+                    FirstTableName, First, FirstType,
+                    SecondTableName, Second, SecondType,
+                    relatedQuery, rightTableSchema, rightTableName);
+                
                 if (Comparison != WhereComparison.None)
                 {
                     switch (Comparison)
@@ -445,187 +393,152 @@ namespace dg.Sql
                             break;
                     }
 
-                    if (Comparison != WhereComparison.In && Comparison != WhereComparison.NotIn)
-                    {
-                        if (SecondType == ValueObjectType.Value)
-                        {
-                            if (Second is Query)
-                            {
-                                outputBuilder.Append('(');
-                                outputBuilder.Append(((Query)Second).BuildCommand(conn));
-                                outputBuilder.Append(')');
-                            }
-                            else
-                            {
-                                if (FirstType == ValueObjectType.ColumnName)
-                                {
-                                    // Match SECOND value to FIRST's column type
-                                    if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                                    {
-                                        outputBuilder.Append(Query.PrepareColumnValue(rightTableSchema.Columns.Find((string)First), Second, conn, relatedQuery));
-                                    }
-                                    else
-                                    {
-                                        TableSchema schema = null;
-                                        if (relatedQuery != null)
-                                        {
-                                            if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
-                                            {
-                                                schema = relatedQuery.Schema;
-                                            }
-                                        }
-
-                                        if (schema != null)
-                                        {
-                                            outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Second, conn, relatedQuery));
-                                        }
-                                        else
-                                        {
-                                            outputBuilder.Append(conn.PrepareValue(Second, relatedQuery));
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    outputBuilder.Append(conn.PrepareValue(Second, relatedQuery));
-                                }
-                            }
-                        }
-                        else if (SecondType == ValueObjectType.ColumnName)
-                        {
-                            if (SecondTableName != null)
-                            {
-                                if (object.ReferenceEquals(SecondTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                                {
-                                    outputBuilder.Append(conn.WrapFieldName(rightTableName));
-                                }
-                                else
-                                {
-                                    outputBuilder.Append(conn.WrapFieldName(SecondTableName));
-                                }
-                                outputBuilder.Append('.');
-                            }
-                            outputBuilder.Append(conn.WrapFieldName((string)Second));
-                        }
-                        else
-                        {
-                            if (Second == null) outputBuilder.Append(@"NULL");
-                            else outputBuilder.Append(Second);
-                        }
-                    }
-                    else
-                    {
-                        if (Second is Query) outputBuilder.AppendFormat(@"({0})", Second.ToString());
-                        else
-                        {
-                            ICollection collIn = Second as ICollection;
-                            if (collIn != null)
-                            {
-                                StringBuilder sbIn = new StringBuilder();
-                                sbIn.Append('(');
-                                bool first = true;
-
-                                TableSchema schema = null;
-                                if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                                {
-                                    schema = rightTableSchema;
-                                }
-                                else
-                                {
-                                    if (relatedQuery != null)
-                                    {
-                                        if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
-                                        {
-                                            schema = relatedQuery.Schema;
-                                        }
-                                    }
-                                }
-
-                                foreach (object objIn in collIn)
-                                {
-                                    if (first) first = false;
-                                    else sbIn.Append(',');
-
-                                    if (schema != null)
-                                    {
-                                        sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), objIn, conn, relatedQuery));
-                                    }
-                                    else
-                                    {
-                                        sbIn.Append(conn.PrepareValue(objIn, relatedQuery));
-                                    }
-                                }
-
-                                sbIn.Append(')');
-                                outputBuilder.Append(sbIn.ToString());
-                            }
-                            else outputBuilder.Append(Second);
-                        }
-                    }
-
+                    BuildSingleValue(
+                        outputBuilder, conn,
+                        SecondTableName, Second, SecondType,
+                        FirstTableName, First, FirstType,
+                        relatedQuery, rightTableSchema, rightTableName);
+                    
                     if (Comparison == WhereComparison.Between)
                     {
                         outputBuilder.Append(@" AND ");
-                        if (ThirdType == ValueObjectType.Value)
-                        {
-                            if (FirstType == ValueObjectType.ColumnName)
-                            {
-                                TableSchema schema = null;
-                                if (object.ReferenceEquals(FirstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                                {
-                                    schema = rightTableSchema;
-                                }
-                                else
-                                {
-                                    if (relatedQuery != null)
-                                    {
-                                        if (FirstTableName == null || !relatedQuery.TableAliasMap.TryGetValue(FirstTableName, out schema))
-                                        {
-                                            schema = relatedQuery.Schema;
-                                        }
-                                    }
-                                }
 
-                                if (schema != null)
-                                {
-                                    outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)First), Third, conn, relatedQuery));
-                                }
-                                else
-                                {
-                                    outputBuilder.Append(conn.PrepareValue(Third, relatedQuery));
-                                }
-                            }
-                            else
-                            {
-                                outputBuilder.Append(conn.PrepareValue(Third, relatedQuery));
-                            }
-                        }
-                        else if (ThirdType == ValueObjectType.ColumnName)
-                        {
-                            if (ThirdTableName != null)
-                            {
-                                if (object.ReferenceEquals(ThirdTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
-                                {
-                                    outputBuilder.Append(conn.WrapFieldName(rightTableName));
-                                }
-                                else
-                                {
-                                    outputBuilder.Append(conn.WrapFieldName(ThirdTableName));
-                                }
-                                outputBuilder.Append('.');
-                            }
-                            outputBuilder.Append(conn.WrapFieldName((string)Third));
-                        }
-                        else outputBuilder.Append(Third == null ? @"NULL" : Third);
+                        BuildSingleValue(
+                            outputBuilder, conn,
+                            ThirdTableName, Third, ThirdType,
+                            FirstTableName, First, FirstType,
+                            relatedQuery, rightTableSchema, rightTableName);
                     }
-
-                    if (Comparison == WhereComparison.Like)
+                    else if (Comparison == WhereComparison.Like)
                     {
                         outputBuilder.Append(' ');
                         outputBuilder.Append(conn.LikeEscapingStatement);
                         outputBuilder.Append(' ');
                     }
                 }
+            }
+        }
+
+        private static void BuildSingleValue(
+            StringBuilder outputBuilder, ConnectorBase conn, 
+            string firstTableName, object value, ValueObjectType valueType,
+            string otherTableName, object otherValue, ValueObjectType otherType,
+            Query relatedQuery, 
+            TableSchema rightTableSchema, string rightTableName)
+        {
+            if (valueType == ValueObjectType.Value)
+            {
+                if (value is Query)
+                {
+                    outputBuilder.Append('(');
+                    outputBuilder.Append(((Query)value).BuildCommand(conn));
+                    outputBuilder.Append(')');
+                }
+                else if (value is WhereList)
+                {
+                    outputBuilder.Append('(');
+                    ((WhereList)value).BuildCommand(outputBuilder, conn, relatedQuery, rightTableSchema, rightTableName);
+                    outputBuilder.Append(')');
+                }
+                else if (value is ICollection)
+                {
+                    ICollection collIn = value as ICollection;
+                    StringBuilder sbIn = new StringBuilder();
+                    sbIn.Append('(');
+                    bool first = true;
+
+                    TableSchema schema = null;
+                    if (object.ReferenceEquals(otherTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                    {
+                        schema = rightTableSchema;
+                    }
+                    else
+                    {
+                        if (relatedQuery != null)
+                        {
+                            if (otherTableName == null || !relatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
+                            {
+                                schema = relatedQuery.Schema;
+                            }
+                        }
+                    }
+
+                    foreach (object objIn in collIn)
+                    {
+                        if (first) first = false;
+                        else sbIn.Append(',');
+
+                        if (schema != null)
+                        {
+                            sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), objIn, conn, relatedQuery));
+                        }
+                        else
+                        {
+                            sbIn.Append(conn.PrepareValue(objIn, relatedQuery));
+                        }
+                    }
+
+                    if (first)
+                    {
+                        sbIn.Append("NULL"); // Avoid exceptions, create a NULL list, where the condition will always return FALSE
+                    }
+
+                    sbIn.Append(')');
+                    outputBuilder.Append(sbIn.ToString());
+                }
+                else if (otherType == ValueObjectType.ColumnName)
+                {
+                    TableSchema schema = null;
+                    if (object.ReferenceEquals(otherTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                    {
+                        schema = rightTableSchema;
+                    }
+                    else
+                    {
+                        if (relatedQuery != null)
+                        {
+                            if (otherTableName == null || !relatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
+                            {
+                                schema = relatedQuery.Schema;
+                            }
+                        }
+                    }
+
+                    if (schema != null)
+                    {
+                        // Try to match value type to the other value type
+                        outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), value, conn, relatedQuery));
+                    }
+                    else
+                    {
+                        // Format it according to generic rules
+                        outputBuilder.Append(conn.PrepareValue(value, relatedQuery));
+                    }
+                }
+                else
+                {
+                    outputBuilder.Append(conn.PrepareValue(value, relatedQuery));
+                }
+            }
+            else if (valueType == ValueObjectType.ColumnName)
+            {
+                if (firstTableName != null)
+                {
+                    if (object.ReferenceEquals(firstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
+                    {
+                        outputBuilder.Append(conn.WrapFieldName(rightTableName));
+                    }
+                    else
+                    {
+                        outputBuilder.Append(conn.WrapFieldName(firstTableName));
+                    }
+                    outputBuilder.Append('.');
+                }
+                outputBuilder.Append(conn.WrapFieldName((string)value));
+            }
+            else
+            {
+                outputBuilder.Append(value == null ? @"NULL" : value);
             }
         }
 
