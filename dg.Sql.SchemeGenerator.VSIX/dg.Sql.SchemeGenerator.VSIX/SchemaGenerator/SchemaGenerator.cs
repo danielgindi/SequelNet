@@ -1578,38 +1578,58 @@ namespace dg.Sql.SchemaGenerator
                 }
                 stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
 
-                // Delete(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static int Delete(", "\r\n");
-                first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
+                if (primaryKeyColumns.Count > 1)
                 {
-                    if (!first)
+                    // Delete(..., ConnectorBase conn = null) function
+                    stringBuilder.AppendFormat("public static int Delete(", "\r\n");
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
                     {
-                        stringBuilder.Append(", ");
+                        if (!first)
+                        {
+                            stringBuilder.Append(", ");
+                        }
+                        else
+                        {
+                            first = false;
+                        }
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.NameX));
                     }
-                    else
-                    {
-                        first = false;
-                    }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.NameX));
-                }
-                stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
+                    stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
-                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
-                first = true;
-                foreach (DalColumn dalCol in primaryKeyColumns)
-                {
-                    if (!first)
+                    stringBuilder.AppendFormat("Query qry = new Query(Schema)", "\r\n");
+
+                    var colIsDeleted = context.Columns.Find(x => x.Name.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase));
+                    var colDeleted = context.Columns.Find(x => x.Name.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase));
+
+                    if (colIsDeleted != null)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colIsDeleted.NameX);
+                    }
+                    else if (colDeleted != null)
+                    {
+                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colDeleted.NameX);
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Delete().Where(Columns.{0}, {1})", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
-                        first = false;
+                        stringBuilder.AppendFormat("{0}    .Delete", "\r\n");
                     }
+
+                    first = true;
+                    foreach (DalColumn dalCol in primaryKeyColumns)
+                    {
+                        if (!first)
+                        {
+                            stringBuilder.AppendFormat("{0}    .AND(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                        }
+                        else
+                        {
+                            stringBuilder.AppendFormat("{0}    .Where(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                            first = false;
+                        }
+                    }
+                    stringBuilder.AppendFormat(";{0}return qry.Execute(conn);{0}}}{0}", "\r\n");
                 }
-                stringBuilder.AppendFormat(";{0}return qry.Execute(conn);{0}}}{0}", "\r\n");
             }
             stringBuilder.AppendFormat("#endregion{0}", "\r\n");
 
