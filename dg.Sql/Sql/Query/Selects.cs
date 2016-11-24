@@ -93,6 +93,24 @@ namespace dg.Sql
             return this;
         }
 
+        public Query Select(IPhrase phrase, string alias = null)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(phrase, alias));
+
+            return this;
+        }
+
+        public Query Select(Query query, string alias = null)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(query, alias));
+
+            return this;
+        }
+
         [Obsolete]
         public Query Select(string tableName, string columnName, string alias, bool clearSelectList)
         {
@@ -159,6 +177,16 @@ namespace dg.Sql
         public Query AddSelect(string tableName, string columnName, string alias)
         {
             return Select(tableName, columnName, alias);
+        }
+
+        public Query AddSelect(IPhrase phrase, string alias = null)
+        {
+            return Select(phrase, alias);
+        }
+
+        public Query AddSelect(Query query, string alias = null)
+        {
+            return Select(query, alias);
         }
 
         public Query AddSelectLiteral(string literalExpression)

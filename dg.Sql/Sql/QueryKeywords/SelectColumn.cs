@@ -44,5 +44,19 @@ namespace dg.Sql
             Alias = alias;
             ObjectType = ValueObjectType.Value;
         }
+
+        public SelectColumn(IPhrase phrase, string alias = null)
+        {
+            Value = phrase;
+            Alias = alias;
+            ObjectType = ValueObjectType.Value;
+        }
+
+        public SelectColumn(Query query, string alias = null)
+        {
+            Value = query;
+            Alias = alias;
+            ObjectType = ValueObjectType.Value;
+        }
     }
 }

@@ -273,17 +273,7 @@ namespace dg.Sql
             Comparison = WhereComparison.None;
         }
         
-        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value)
-        {
-            Condition = condition;
-            First = phrase;
-            FirstType = ValueObjectType.Value;
-            Comparison = comparison;
-            Second = value;
-            SecondType = ValueObjectType.Value;
-        }
-
-        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        public Where(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
         {
             Condition = condition;
             First = phrase;
@@ -303,9 +293,30 @@ namespace dg.Sql
             Second = columnName;
             SecondType = ValueObjectType.ColumnName;
         }
-        
+
+        public Where(WhereCondition condition, Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            Condition = condition;
+            First = query;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = valueType;
+        }
+
+        public Where(WhereCondition condition, Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            Condition = condition;
+            First = query;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            SecondTableName = tableName;
+            Second = columnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+
         #region Builders
-        
+
         public void BuildCommand(StringBuilder outputBuilder, bool isFirst, ConnectorBase conn, Query relatedQuery)
         {
             BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);

@@ -79,6 +79,26 @@ namespace dg.Sql
             return Where(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value));
         }
 
+        public Query Where(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, comparison, tableName, columnName));
+        }
+
+        public Query Where(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, comparison, value, valueType));
+        }
+
+        public Query Where(Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, query, comparison, tableName, columnName));
+        }
+
+        public Query Where(Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, query, comparison, value, valueType));
+        }
+
         public Query AND(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Where(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -132,6 +152,26 @@ namespace dg.Sql
             return Where(where);
         }
 
+        public Query AND(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, comparison, tableName, columnName));
+        }
+
+        public Query AND(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, phrase, comparison, value, valueType));
+        }
+
+        public Query AND(Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, query, comparison, tableName, columnName));
+        }
+
+        public Query AND(Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, query, comparison, value, valueType));
+        }
+
         public Query OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Where(new Where(WhereCondition.OR, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -182,6 +222,26 @@ namespace dg.Sql
         public Query OR(string columnName, object betweenValue, object andValue)
         {
             return Where(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value));
+        }
+
+        public Query OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.OR, phrase, comparison, tableName, columnName));
+        }
+
+        public Query OR(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.OR, phrase, comparison, value, valueType));
+        }
+
+        public Query OR(Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.OR, query, comparison, tableName, columnName));
+        }
+
+        public Query OR(Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.OR, query, comparison, value, valueType));
         }
 
         public Query AddFromList(WhereList whereList)
