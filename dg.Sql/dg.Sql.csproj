@@ -78,6 +78,7 @@
     <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
     <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
     <Compile Include="Sql\Phrases\IPhrase.cs" />
     <Compile Include="Bindable\BindableCollection.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="Sql\Schema\TableSchema.cs" />
     <Compile Include="Sql\Enumerations.cs" />
     <Compile Include="Sql\QueryKeywords\Where.cs" />
+    <Compile Include="Utilities\StringUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">

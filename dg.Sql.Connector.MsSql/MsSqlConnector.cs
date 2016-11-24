@@ -473,6 +473,8 @@ namespace dg.Sql.Connector
         public override string type_GUID { get { return @"UNIQUEIDENTIFIER"; } }
         public override string type_AUTOINCREMENT { get { return @"IDENTITY"; } }
         public override string type_AUTOINCREMENT_BIGINT { get { return @"IDENTITY"; } }
+        public override string type_JSON { get { return @"TEXT"; } }
+        public override string type_JSON_BINARY { get { return @"TEXT"; } }
 
         public override string type_GEOMETRY { get { return @"GEOMETRY"; } }
         public override string type_GEOMETRYCOLLECTION { get { return @"GEOMETRY"; } }

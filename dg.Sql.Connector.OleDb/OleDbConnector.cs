@@ -397,6 +397,8 @@ namespace dg.Sql.Connector
         public override string type_BLOB { get { return @"IMAGE"; } }
         public override string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
         public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
+        public override string type_JSON { get { return @"TEXT"; } }
+        public override string type_JSON_BINARY { get { return @"TEXT"; } }
 
         #endregion
     }

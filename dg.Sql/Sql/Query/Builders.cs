@@ -610,6 +610,7 @@ namespace dg.Sql
                         isTextField = true;
                     }
                 }
+
                 if (dataType == DataType.Char)
                 {
                     if (column.MaxLength < 0)
@@ -753,6 +754,14 @@ namespace dg.Sql
                 else if (dataType == DataType.UnsignedBigInt)
                 {
                     sb.Append(connection.type_UNSIGNEDBIGINT);
+                }
+                else if (dataType == DataType.Json)
+                {
+                    sb.Append(connection.type_JSON);
+                }
+                else if (dataType == DataType.JsonBinary)
+                {
+                    sb.Append(connection.type_JSON_BINARY);
                 }
                 else if (dataType == DataType.Blob)
                 {

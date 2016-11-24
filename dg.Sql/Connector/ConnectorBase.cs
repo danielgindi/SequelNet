@@ -393,6 +393,8 @@ namespace dg.Sql.Connector
         public virtual string type_DATETIME { get { return @"DATETIME"; } }
         public virtual string type_BLOB { get { return @"BLOB"; } }
         public virtual string type_GUID { get { return @"GUID"; } }
+        public virtual string type_JSON { get { return @"TEXT"; } }
+        public virtual string type_JSON_BINARY { get { return @"TEXT"; } }
 
         public virtual string type_GEOMETRY { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
         public virtual string type_GEOMETRYCOLLECTION { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }

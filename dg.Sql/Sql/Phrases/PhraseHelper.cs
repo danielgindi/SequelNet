@@ -231,6 +231,35 @@ namespace dg.Sql
 
         #endregion
 
+        #region Json
+
+        public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path = "$")
+        {
+            return new JsonExtract(value, valueType, path);
+        }
+
+        public static JsonExtract JsonExtract(string tableName, string columnName, string path = "$")
+        {
+            return new JsonExtract(tableName, columnName, path);
+        }
+
+        public static JsonExtract JsonExtract(string columnName, string path = "$")
+        {
+            return new JsonExtract(columnName, path);
+        }
+
+        public static JsonExtract JsonExtract(IPhrase phrase, string path = "$")
+        {
+            return new JsonExtract(phrase, path);
+        }
+
+        public static JsonExtract JsonExtract(Where where, string path = "$")
+        {
+            return new JsonExtract(where, path);
+        }
+
+        #endregion
+
         #region General
 
         public static IfNull IfNull(

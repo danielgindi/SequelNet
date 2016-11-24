@@ -505,6 +505,14 @@ namespace dg.Sql.SchemaGenerator
                         {
                             dalColumn.Type = DalColumnType.TUInt64;
                         }
+                        else if (columnKeyword.Equals("JSON", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TJson;
+                        }
+                        else if (columnKeyword.Equals("JSON_BINARY", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TJsonBinary;
+                        }
                         else if (columnKeyword.Equals("GEOMETRY", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.Type = DalColumnType.TGeometry;
@@ -911,6 +919,10 @@ namespace dg.Sql.SchemaGenerator
                     {
                         defaultValue = "0f";
                     }
+                    else if (dalColumn.Type == DalColumnType.TJson || dalColumn.Type == DalColumnType.TJsonBinary)
+                    {
+                        defaultValue = "null";
+                    }
                 }
                 if (dalColumn.ActualDefaultValue.Length > 0)
                 {
@@ -1116,11 +1128,47 @@ namespace dg.Sql.SchemaGenerator
                 {
                     valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Local)";
                 }
-                else if (dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString)
+                else if (dalCol.Type == DalColumnType.TJson ||
+                    dalCol.Type == DalColumnType.TJsonBinary)
                 {
                     valueConvertorFormat = "(string){0}";
                 }
-                else if (dalCol.Type == DalColumnType.TGeometry || dalCol.Type == DalColumnType.TGeometryCollection || dalCol.Type == DalColumnType.TPoint || dalCol.Type == DalColumnType.TLineString || dalCol.Type == DalColumnType.TPolygon || dalCol.Type == DalColumnType.TLine || dalCol.Type == DalColumnType.TCurve || dalCol.Type == DalColumnType.TSurface || dalCol.Type == DalColumnType.TLinearRing || dalCol.Type == DalColumnType.TMultiPoint || dalCol.Type == DalColumnType.TMultiLineString || dalCol.Type == DalColumnType.TMultiPolygon || dalCol.Type == DalColumnType.TMultiCurve || dalCol.Type == DalColumnType.TMultiSurface || dalCol.Type == DalColumnType.TGeographic || dalCol.Type == DalColumnType.TGeographicCollection || dalCol.Type == DalColumnType.TGeographicPoint || dalCol.Type == DalColumnType.TGeographicLineString || dalCol.Type == DalColumnType.TGeographicPolygon || dalCol.Type == DalColumnType.TGeographicLine || dalCol.Type == DalColumnType.TGeographicCurve || dalCol.Type == DalColumnType.TGeographicSurface || dalCol.Type == DalColumnType.TGeographicLinearRing || dalCol.Type == DalColumnType.TGeographicMultiPoint || dalCol.Type == DalColumnType.TGeographicMultiLineString || dalCol.Type == DalColumnType.TGeographicMultiPolygon || dalCol.Type == DalColumnType.TGeographicMultiCurve || dalCol.Type == DalColumnType.TGeographicMultiSurface)
+                else if (dalCol.Type == DalColumnType.TLongText ||
+                    dalCol.Type == DalColumnType.TMediumText ||
+                    dalCol.Type == DalColumnType.TText ||
+                    dalCol.Type == DalColumnType.TString ||
+                    dalCol.Type == DalColumnType.TFixedString)
+                {
+                    valueConvertorFormat = "(string){0}";
+                }
+                else if (dalCol.Type == DalColumnType.TGeometry 
+                    || dalCol.Type == DalColumnType.TGeometryCollection
+                    || dalCol.Type == DalColumnType.TPoint 
+                    || dalCol.Type == DalColumnType.TLineString
+                    || dalCol.Type == DalColumnType.TPolygon
+                    || dalCol.Type == DalColumnType.TLine 
+                    || dalCol.Type == DalColumnType.TCurve
+                    || dalCol.Type == DalColumnType.TSurface
+                    || dalCol.Type == DalColumnType.TLinearRing 
+                    || dalCol.Type == DalColumnType.TMultiPoint 
+                    || dalCol.Type == DalColumnType.TMultiLineString 
+                    || dalCol.Type == DalColumnType.TMultiPolygon
+                    || dalCol.Type == DalColumnType.TMultiCurve
+                    || dalCol.Type == DalColumnType.TMultiSurface
+                    || dalCol.Type == DalColumnType.TGeographic 
+                    || dalCol.Type == DalColumnType.TGeographicCollection
+                    || dalCol.Type == DalColumnType.TGeographicPoint 
+                    || dalCol.Type == DalColumnType.TGeographicLineString
+                    || dalCol.Type == DalColumnType.TGeographicPolygon 
+                    || dalCol.Type == DalColumnType.TGeographicLine
+                    || dalCol.Type == DalColumnType.TGeographicCurve 
+                    || dalCol.Type == DalColumnType.TGeographicSurface
+                    || dalCol.Type == DalColumnType.TGeographicLinearRing 
+                    || dalCol.Type == DalColumnType.TGeographicMultiPoint 
+                    || dalCol.Type == DalColumnType.TGeographicMultiLineString
+                    || dalCol.Type == DalColumnType.TGeographicMultiPolygon 
+                    || dalCol.Type == DalColumnType.TGeographicMultiCurve 
+                    || dalCol.Type == DalColumnType.TGeographicMultiSurface)
                 {
                     valueConvertorFormat = "conn.ReadGeometry({0}) as " + dalCol.ActualType;
                 }
@@ -1377,6 +1425,11 @@ namespace dg.Sql.SchemaGenerator
                         fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", dalCol.ActualType));
                     }
                 }
+                else if (dalCol.Type == DalColumnType.TJson 
+                    || dalCol.Type == DalColumnType.TJsonBinary)
+                {
+                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                }
                 else if (dalCol.Type == DalColumnType.TLongText ||
                     dalCol.Type == DalColumnType.TMediumText ||
                     dalCol.Type == DalColumnType.TText ||
@@ -1445,6 +1498,12 @@ namespace dg.Sql.SchemaGenerator
                     {
                         fromReader += " ?? " + dalCol.DefaultValue;
                     }
+                }
+
+                else if (dalCol.Type == DalColumnType.TJson ||
+                    dalCol.Type == DalColumnType.TJsonBinary)
+                {
+                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
                 }
 
                 if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
@@ -1697,11 +1756,16 @@ namespace dg.Sql.SchemaGenerator
             {
                 dalCol.ActualType = "UInt64";
             }
-            else if (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TText || dalCol.Type == DalColumnType.TLongText || dalCol.Type == DalColumnType.TMediumText || dalCol.Type == DalColumnType.TFixedString)
+            else if (dalCol.Type == DalColumnType.TString ||
+                dalCol.Type == DalColumnType.TText ||
+                dalCol.Type == DalColumnType.TLongText ||
+                dalCol.Type == DalColumnType.TMediumText || 
+                dalCol.Type == DalColumnType.TFixedString)
             {
                 dalCol.ActualType = "string";
             }
-            else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
+            else if (dalCol.Type == DalColumnType.TDecimal ||
+                dalCol.Type == DalColumnType.TMoney)
             {
                 dalCol.ActualType = "decimal";
             }
@@ -1712,6 +1776,11 @@ namespace dg.Sql.SchemaGenerator
             else if (dalCol.Type == DalColumnType.TFloat)
             {
                 dalCol.ActualType = "float";
+            }
+            else if (dalCol.Type == DalColumnType.TJson ||
+                dalCol.Type == DalColumnType.TJsonBinary)
+            {
+                dalCol.ActualType = "string";
             }
             else if (dalCol.Type == DalColumnType.TGeometry)
             {
@@ -1851,6 +1920,14 @@ namespace dg.Sql.SchemaGenerator
             else if (dalCol.Type == DalColumnType.TMoney)
             {
                 stringBuilder.Append(", DataType.Money");
+            }
+            else if (dalCol.Type == DalColumnType.TJson)
+            {
+                stringBuilder.Append(", DataType.Json");
+            }
+            else if (dalCol.Type == DalColumnType.TJsonBinary)
+            {
+                stringBuilder.Append(", DataType.JsonBinary");
             }
             else if (dalCol.Type == DalColumnType.TGeometry)
             {

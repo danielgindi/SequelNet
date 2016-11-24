@@ -537,6 +537,8 @@ namespace dg.Sql.Connector
         public override string type_DATETIME { get { return @"TIMESTAMP"; } }
         public override string type_BLOB { get { return @"BYTEA"; } }
         public override string type_GUID { get { return @"UUID"; } }
+        public override string type_JSON { get { return @"JSON"; } }
+        public override string type_JSON_BINARY { get { return @"JSONB"; } }
 
         public override string type_GEOMETRY { get { return @"GEOMETRY"; } }
         public override string type_GEOMETRYCOLLECTION { get { return @"GEOMETRY"; } }
