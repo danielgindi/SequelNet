@@ -81,6 +81,26 @@ namespace dg.Sql
             return Having(new Where(condition, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value));
         }
 
+        public Query Having(WhereCondition condition, IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Having(new Where(condition, phrase, comparison, tableName, columnName));
+        }
+
+        public Query Having(WhereCondition condition, IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Having(new Where(condition, phrase, comparison, value, valueType));
+        }
+
+        public Query Having(WhereCondition condition, Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Having(new Where(condition, query, comparison, tableName, columnName));
+        }
+
+        public Query Having(WhereCondition condition, Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Having(new Where(condition, query, comparison, value, valueType));
+        }
+
 
         public Query Having(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
@@ -130,6 +150,26 @@ namespace dg.Sql
         public Query Having(string columnName, object betweenValue, object andValue)
         {
             return Having(WhereCondition.AND, columnName, betweenValue, andValue);
+        }
+
+        public Query Having(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Having(WhereCondition.AND, phrase, comparison, tableName, columnName);
+        }
+
+        public Query Having(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Having(WhereCondition.AND, phrase, comparison, value, valueType);
+        }
+
+        public Query Having(Query query, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Having(WhereCondition.AND, query, comparison, tableName, columnName);
+        }
+
+        public Query Having(Query query, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Having(WhereCondition.AND, query, comparison, value, valueType);
         }
     }
 }
