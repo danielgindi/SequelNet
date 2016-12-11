@@ -1671,7 +1671,7 @@ namespace dg.Sql.SchemaGenerator
                     }
                     else
                     {
-                        stringBuilder.AppendFormat("{0}    .Delete", "\r\n");
+                        stringBuilder.AppendFormat("{0}    .Delete()", "\r\n");
                     }
 
                     first = true;
