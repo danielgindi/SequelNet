@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.Collections;
-using dg.Sql.Bindable;
 using dg.Sql.Connector;
 
 namespace dg.Sql
 {
     [Serializable]
-    public abstract class AbstractRecordList<TItemType, TListType> : BindableList<TItemType>
+    public abstract class AbstractRecordList<TItemType, TListType> : List<TItemType>
         where TItemType : AbstractRecord<TItemType>, new()
         where TListType : AbstractRecordList<TItemType, TListType>, new()
         
@@ -18,10 +17,12 @@ namespace dg.Sql
         {
             foreach (TItemType item in this) item.Save(conn);
         }
+
         public virtual void SaveAll()
         {
             foreach (TItemType item in this) item.Save();
         }
+
         public virtual void SaveAll(ConnectorBase conn, bool withTransaction)
         {
             bool ownsConnection = conn == null;
@@ -55,16 +56,19 @@ namespace dg.Sql
                 }
             }
         }
+
         public virtual void SaveAll(bool withTransaction)
         {
             SaveAll(null, withTransaction);
         }
+
         public static TListType FromReader(DataReaderBase reader)
         {
             TListType coll = new TListType();
             while (reader.Read()) coll.Add(AbstractRecord<TItemType>.FromReader(reader));
             return coll;
         }
+
         public static TListType FetchAll()
         {
             using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
@@ -72,6 +76,7 @@ namespace dg.Sql
                 return FromReader(reader);
             }
         }
+
         public static TListType FetchAll(ConnectorBase conn)
         {
             using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
@@ -79,12 +84,14 @@ namespace dg.Sql
                 return FromReader(reader);
             }
         }
+
         public static TListType Where(string columnName, object columnValue)
         {
             Query qry = new Query(AbstractRecord<TItemType>.Schema);
             qry.Where(columnName, columnValue);
             return FetchByQuery(qry);
         }
+
         public static TListType FetchByQuery(Query qry)
         {
             using (DataReaderBase reader = qry.ExecuteReader())
@@ -92,6 +99,7 @@ namespace dg.Sql
                 return FromReader(reader);
             }
         }
+
         public static TListType FetchByQuery(Query qry, ConnectorBase conn)
         {
             using (DataReaderBase reader = qry.ExecuteReader(conn))
@@ -99,6 +107,7 @@ namespace dg.Sql
                 return FromReader(reader);
             }
         }
+
         public TListType Clone()
         {
             TListType coll = new TListType();

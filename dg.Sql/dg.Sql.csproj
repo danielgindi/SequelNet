@@ -81,9 +81,6 @@
     <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
     <Compile Include="Sql\Phrases\IPhrase.cs" />
-    <Compile Include="Bindable\BindableCollection.cs" />
-    <Compile Include="Bindable\BindableList.cs" />
-    <Compile Include="Bindable\IBindableCollection.cs" />
     <Compile Include="Connector\ConnectorBase.cs" />
     <Compile Include="Connector\DataReaderBase.cs" />
     <Compile Include="Connector\FactoryBase.cs" />

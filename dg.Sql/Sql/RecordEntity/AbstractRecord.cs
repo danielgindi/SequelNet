@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
-using dg.Sql.Bindable;
 using dg.Sql.Connector;
 using System.Collections;
 using System.Reflection;
@@ -105,7 +104,7 @@ namespace dg.Sql
 
         public abstract TableSchema GetTableSchema();
 
-        [HiddenForDataBinding(true), XmlIgnore]
+        [XmlIgnore]
         public static TableSchema Schema
         {
             get
@@ -122,7 +121,7 @@ namespace dg.Sql
         /// <summary>
         /// Synonym for <see cref="Schema"/>
         /// </summary>
-        [HiddenForDataBinding(true), XmlIgnore]
+        [XmlIgnore]
         public static TableSchema TableSchema
         {
             get
@@ -135,7 +134,7 @@ namespace dg.Sql
             }
         }
 
-        [HiddenForDataBinding(true), XmlIgnore]
+        [XmlIgnore]
         public static string SchemaName
         {
             get
@@ -149,7 +148,7 @@ namespace dg.Sql
         /// It is found automatically and cached.
         /// Could be either a String, an <typeparamref name="Array&lt;String&gt;"/> or <value>null</value>.
         /// </summary>
-        [HiddenForDataBinding(true), XmlIgnore]
+        [XmlIgnore]
         public static object SchemaPrimaryKeyName
         {
             get
@@ -193,7 +192,6 @@ namespace dg.Sql
 
         #region Mutated
 
-        [HiddenForDataBinding(true), XmlIgnore]
         public bool IsNewRecord
         {
             get { return _NewRecord; }
@@ -201,14 +199,12 @@ namespace dg.Sql
         }
 
         // Deprecate this
-        [HiddenForDataBinding(true), XmlIgnore]
         public bool IsThisANewRecord
         {
             get { return _NewRecord; }
             set { _NewRecord = value; }
         }
-
-        [HiddenForDataBinding(true), XmlIgnore]
+        
         public static bool AtomicUpdates
         {
             get { return _AtomicUpdates; }
