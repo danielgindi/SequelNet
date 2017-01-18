@@ -479,7 +479,7 @@ namespace dg.Sql
                         if (first) first = false;
                         else sbIn.Append(',');
 
-                        if (schema != null)
+                        if (schema != null && otherValue is string)
                         {
                             sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), objIn, conn, relatedQuery));
                         }
@@ -515,7 +515,7 @@ namespace dg.Sql
                         }
                     }
 
-                    if (schema != null)
+                    if (schema != null && otherValue is string)
                     {
                         // Try to match value type to the other value type
                         outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), value, conn, relatedQuery));
