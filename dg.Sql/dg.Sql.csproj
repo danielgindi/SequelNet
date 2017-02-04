@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Sql\Base Types\ValueWrapper.cs" />
     <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
+    <Compile Include="Sql\Phrases\FlowControl\Case.cs" />
     <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />
     <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
@@ -147,7 +148,7 @@
     <Compile Include="Sql\Phrases\Aggregate\Count.cs" />
     <Compile Include="Sql\Phrases\General\RandWeight.cs" />
     <Compile Include="Sql\QueryKeywords\GroupBy.cs" />
-    <Compile Include="Sql\Phrases\General\IfNull.cs" />
+    <Compile Include="Sql\Phrases\FlowControl\IfNull.cs" />
     <Compile Include="Sql\Schema\TableSchema.ForeignKey.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sql\RecordEntity\AbstractRecord.cs" />

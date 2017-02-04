@@ -260,7 +260,37 @@ namespace dg.Sql
 
         #endregion
 
-        #region General
+        #region Flow Control
+
+        public static Case Case()
+        {
+            return new Case();
+        }
+
+        public static Case Case(ValueWrapper value)
+        {
+            return new Case(value);
+        }
+
+        public static Case Case(Where condition)
+        {
+            return new Case(condition);
+        }
+
+        public static Case Case(WhereList condition)
+        {
+            return new Case(condition);
+        }
+
+        public static Case Case(string tableName, string columnName)
+        {
+            return new Case(tableName, columnName);
+        }
+
+        public static Case Case(object value, ValueObjectType valueType)
+        {
+            return new Case(value, valueType);
+        }
 
         public static IfNull IfNull(
             string firstTableName, string firstColumnName,
@@ -268,7 +298,7 @@ namespace dg.Sql
         {
             return new IfNull(
                 firstTableName, firstColumnName,
-                secondTableName,  secondColumnName);
+                secondTableName, secondColumnName);
         }
 
         public static IfNull IfNull(
@@ -297,6 +327,10 @@ namespace dg.Sql
                 firstValue, firstValueType,
                 secondTableName, secondColumnName);
         }
+
+        #endregion
+
+        #region General
 
         public static RandWeight RandWeight(object value, ValueObjectType valueType)
         {
