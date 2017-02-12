@@ -26,6 +26,8 @@ namespace dg.Sql.SchemaGenerator
         public string IsMutatedProperty;
         public string Charset;
         public string Collate;
-        public bool Virtual;
+        public bool VirtualProp;
+        public string Computed;
+        public bool ComputedStored;
 	}
 }

@@ -39,7 +39,11 @@
  `ActualType` _type_ - The actual .Net type name  
  `ToDB` - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format  
  `FromDB` - Define a format to be used in Read(...). Can use the {0} specifier for column value in format  
- `Virtual` - Defines the property as virtual  
+ `VirtualProp` - Defines the property as virtual  
+
+##### Computed Columns:
+
+ Specify "`Computed` _expression_here_ _[STORED]_"
 
 ##### Data types:
 

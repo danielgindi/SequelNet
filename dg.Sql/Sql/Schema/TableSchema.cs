@@ -101,8 +101,17 @@ namespace dg.Sql
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
-            Column column = new Column(name, type, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
-            AddColumn(column);
+            AddColumn(new Column {
+                Name = name,
+                Type = type,
+                MaxLength = maxLength,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue
+            });
         }
 
         public void AddColumn(
@@ -112,19 +121,41 @@ namespace dg.Sql
             bool autoIncrement, bool isPrimaryKey,
             bool nullable, object defaultValue)
         {
-            Column column = new Column(name, type, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                MaxLength = maxLength,
+                LiteralType = literalType,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue
+            });
         }
 
         public void AddColumn(
-            string Name, System.Type type, DataType dataType, 
+            string name, System.Type type, DataType dataType, 
             int maxLength,
             int numberPrecision, int numberScale,
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
-            Column column = new Column(Name, type, dataType, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                DataType = dataType,
+                MaxLength = maxLength,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue
+            });
         }
 
         public void AddColumn(
@@ -134,8 +165,20 @@ namespace dg.Sql
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
-            Column column = new Column(name, type, dataType, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                DataType = dataType,
+                MaxLength = maxLength,
+                LiteralType = literalType,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue
+            });
         }
 
         public void AddColumn(
@@ -146,8 +189,20 @@ namespace dg.Sql
             bool nullable, object defaultValue,
             string charset, string collate)
         {
-            Column column = new Column(name, type, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                MaxLength = maxLength,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue,
+                Charset = charset,
+                Collate = collate
+            });
         }
 
         public void AddColumn(
@@ -158,8 +213,21 @@ namespace dg.Sql
             bool nullable, object defaultValue, 
             string charset, string collate)
         {
-            Column column = new Column(name, type, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                MaxLength = maxLength,
+                LiteralType = literalType,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue,
+                Charset = charset,
+                Collate = collate
+            });
         }
 
         public void AddColumn(
@@ -170,8 +238,21 @@ namespace dg.Sql
             bool nullable, object defaultValue,
             string charset, string collate)
         {
-            Column column = new Column(name, type, dataType, maxLength, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                DataType = dataType,
+                MaxLength = maxLength,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue,
+                Charset = charset,
+                Collate = collate
+            });
         }
 
         public void AddColumn(
@@ -182,8 +263,22 @@ namespace dg.Sql
             bool nullable, object defaultValue,
             string charset, string collate)
         {
-            Column column = new Column(name, type, dataType, maxLength, literalType, numberPrecision, numberScale, autoIncrement, isPrimaryKey, nullable, defaultValue, charset, collate);
-            AddColumn(column);
+            AddColumn(new Column
+            {
+                Name = name,
+                Type = type,
+                DataType = dataType,
+                MaxLength = maxLength,
+                LiteralType = literalType,
+                NumberPrecision = numberPrecision,
+                NumberScale = numberScale,
+                AutoIncrement = autoIncrement,
+                IsPrimaryKey = isPrimaryKey,
+                Nullable = nullable,
+                Default = defaultValue,
+                Charset = charset,
+                Collate = collate
+            });
         }
 
         public void AddIndex(Index index)

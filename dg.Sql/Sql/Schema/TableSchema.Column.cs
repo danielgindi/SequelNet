@@ -18,8 +18,10 @@ namespace dg.Sql
                 return null;
             }
         }
+
         public class Column
         {
+            public string Comment;
             public string Name;
             private System.Type _Type;
             private DataType _DataType;
@@ -34,137 +36,11 @@ namespace dg.Sql
             public int NumberScale;
             public string Charset;
             public string Collate;
+            public ValueWrapper ComputedColumn;
+            public bool ComputedColumnStored;
 
             public Column() { }
-
-            public Column(string Name, System.Type Type, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-            }
-
-            public Column(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this.LiteralType = LiteralType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-            }
-
-            public Column(string Name, System.Type Type, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-                this.Charset = Charset;
-                this.Collate = Collate;
-            }
-
-            public Column(string Name, System.Type Type, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this.LiteralType = LiteralType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-                this.Charset = Charset;
-                this.Collate = Collate;
-            }
-
-            public Column(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this._DataType = DataType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-            }
-
-            public Column(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this.LiteralType = LiteralType;
-                this._DataType = DataType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-            }
-
-            public Column(string Name, System.Type Type, DataType DataType, int MaxLength, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this._DataType = DataType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-                this.Charset = Charset;
-                this.Collate = Collate;
-            }
-
-            public Column(string Name, System.Type Type, DataType DataType, int MaxLength, string LiteralType, int NumberPrecision, int NumberScale, bool AutoIncrement, bool IsPrimaryKey, bool Nullable, object Default, string Charset, string Collate)
-            {
-                this.Name = Name;
-                this.Type = Type;
-                this.LiteralType = LiteralType;
-                this._DataType = DataType;
-                this._MaxLength = MaxLength;
-                this.NumberPrecision = NumberPrecision;
-                this.NumberScale = NumberScale;
-                this.AutoIncrement = AutoIncrement;
-                this.IsPrimaryKey = IsPrimaryKey;
-                this.Nullable = Nullable;
-                this.Default = Default;
-                this._ActualDataType = GetDataType();
-                this.Charset = Charset;
-                this.Collate = Collate;
-            }
-
+            
             public System.Type Type
             {
                 get { return this._Type; }
@@ -174,6 +50,7 @@ namespace dg.Sql
                     this._ActualDataType = GetDataType();
                 }
             }
+
             public DataType DataType
             {
                 get { return this._DataType; }
@@ -183,10 +60,12 @@ namespace dg.Sql
                     this._ActualDataType = GetDataType();
                 }
             }
+
             public DataType ActualDataType
             {
                 get { return this._ActualDataType; }
             }
+
             public int MaxLength
             {
                 set { _MaxLength = value; _ActualDataType = GetDataType(); }
@@ -196,6 +75,7 @@ namespace dg.Sql
             private DataType GetDataType()
             {
                 if (this._DataType != DataType.Automatic) return _DataType;
+
                 if (this.Type.Equals(typeof(string)))
                 {
                     if (this.MaxLength != 0) return DataType.VarChar;
@@ -289,7 +169,10 @@ namespace dg.Sql
                 {
                     return DataType.Geometry;
                 }
-                else return DataType.Int;
+                else
+                {
+                    return DataType.Int;
+                }
             }
         }
     }

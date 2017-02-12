@@ -649,9 +649,10 @@ namespace dg.Sql.SchemaGenerator
                         {
                             dalColumn.ToDb = columnKeyword.Substring(5);
                         }
-                        else if (columnKeyword.Equals("Virtual", StringComparison.OrdinalIgnoreCase))
+                        else if (columnKeyword.Equals("VirtualProp", StringComparison.OrdinalIgnoreCase) ||
+                            /* deprecated */ columnKeyword.Equals("Virtual", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.Virtual = true;
+                            dalColumn.VirtualProp = true;
                         }
                         else if (columnKeyword.StartsWith("FromDB ", StringComparison.OrdinalIgnoreCase))
                         {
@@ -660,6 +661,19 @@ namespace dg.Sql.SchemaGenerator
                         else if (columnKeyword.StartsWith("ActualType ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.ActualType = columnKeyword.Substring(11);
+                        }
+                        else if (columnKeyword.StartsWith("Computed ", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var computed = columnKeyword.Substring(9);
+                            var isStored = computed.EndsWith(" STORED", StringComparison.OrdinalIgnoreCase);
+                            if (isStored)
+                            {
+                                computed = computed.Remove(computed.Length - 7, 7);
+                            }
+
+                            dalColumn.Computed = ProcessComputedColumn(computed);
+                            dalColumn.ComputedStored = isStored;
+                            dalColumn.NoSave = true;
                         }
                         else if (columnKeyword.StartsWith("ColumnName ", StringComparison.OrdinalIgnoreCase))
                         {
@@ -759,12 +773,8 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("private static TableSchema _Schema;{0}public struct Columns{0}{{{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
-                stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";", "\r\n", context.StaticColumns ? @"static" : @"const", dalCol.NameX, dalCol.Name);
-                if (!string.IsNullOrEmpty(dalCol.Comment))
-                {
-                    stringBuilder.AppendFormat(" // {1}", "\r\n", dalCol.Comment);
-                }
-                stringBuilder.Append("\r\n");
+                stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";{0}", "\r\n", 
+                    context.StaticColumns ? @"static" : @"const", dalCol.NameX, dalCol.Name);
             }
             stringBuilder.AppendFormat("}}{0}", "\r\n");
             stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _Schema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.Name = @\"{1}\";{0}", "\r\n", context.SchemaName);
@@ -775,9 +785,9 @@ namespace dg.Sql.SchemaGenerator
 
             foreach (DalColumn dalCol in context.Columns)
             {
-                stringBuilder.Append("schema.AddColumn(");
+                stringBuilder.Append("schema.AddColumn(new TableSchema.Column {");
                 WriteSchemaAddColumnArguments(dalCol, stringBuilder);
-                stringBuilder.AppendFormat(");{0}", "\r\n");
+                stringBuilder.AppendFormat("}});{0}", "\r\n");
             }
 
             // Create a list of all columns that participate in the Primary Key
@@ -963,10 +973,17 @@ namespace dg.Sql.SchemaGenerator
                     continue;
                 }
                 object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.NameX, null };
-                formatArgs[3] = (dalCol.Virtual ? "virtual " : "");
+                formatArgs[3] = (dalCol.VirtualProp ? "virtual " : "");
+
+                if (!string.IsNullOrEmpty(dalCol.Comment))
+                {
+                    stringBuilder.AppendFormat("/// <summary>{0}/// {1}{0}/// </summary>{0}", "\r\n", 
+                        dalCol.Comment.Replace("\r\n", "/// ").Replace("\r", "/// ").Replace("\n", "/// "));
+                }
+
                 stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}", formatArgs);
                 stringBuilder.AppendFormat("get{{ return _{2}; }}{0}", formatArgs);
-                if (context.AtomicUpdates)
+                if (context.AtomicUpdates && dalCol.Computed == null)
                 {
                     stringBuilder.AppendFormat("set{{ _{2} = value; MarkColumnMutated(Columns.{2}); }}{0}", formatArgs);
                 }
@@ -1899,184 +1916,199 @@ namespace dg.Sql.SchemaGenerator
                 // Do not change it, specified by ACTUALTYPE
             }
 
-            stringBuilder.AppendFormat("Columns.{0}, typeof({1})", dalCol.NameX, dalCol.ActualType);
+            stringBuilder.AppendFormat("{0}Name = Columns.{1},",
+                "\r\n",
+                dalCol.NameX);
+
+            stringBuilder.AppendFormat("{0}Type = typeof({1}),",
+                "\r\n",
+                dalCol.ActualType);
+
+            var dataTypeString = "";
 
             if (dalCol.Type == DalColumnType.TText)
             {
-                stringBuilder.Append(", DataType.Text");
+                dataTypeString = "DataType.Text";
             }
             else if (dalCol.Type == DalColumnType.TLongText)
             {
-                stringBuilder.Append(", DataType.LongText");
+                dataTypeString = "DataType.LongText";
             }
             else if (dalCol.Type == DalColumnType.TMediumText)
             {
-                stringBuilder.Append(", DataType.MediumText");
+                dataTypeString = "DataType.MediumText";
             }
             else if (dalCol.Type == DalColumnType.TFixedString)
             {
-                stringBuilder.Append(", DataType.Char");
+                dataTypeString = "DataType.Char";
             }
             else if (dalCol.Type == DalColumnType.TMoney)
             {
-                stringBuilder.Append(", DataType.Money");
+                dataTypeString = "DataType.Money";
             }
             else if (dalCol.Type == DalColumnType.TJson)
             {
-                stringBuilder.Append(", DataType.Json");
+                dataTypeString = "DataType.Json";
             }
             else if (dalCol.Type == DalColumnType.TJsonBinary)
             {
-                stringBuilder.Append(", DataType.JsonBinary");
+                dataTypeString = "DataType.JsonBinary";
             }
             else if (dalCol.Type == DalColumnType.TGeometry)
             {
-                stringBuilder.Append(", DataType.Geometry");
+                dataTypeString = "DataType.Geometry";
             }
             else if (dalCol.Type == DalColumnType.TGeometryCollection)
             {
-                stringBuilder.Append(", DataType.GeometryCollection");
+                dataTypeString = "DataType.GeometryCollection";
             }
             else if (dalCol.Type == DalColumnType.TPoint)
             {
-                stringBuilder.Append(", DataType.Point");
+                dataTypeString = "DataType.Point";
             }
             else if (dalCol.Type == DalColumnType.TLineString)
             {
-                stringBuilder.Append(", DataType.LineString");
+                dataTypeString = "DataType.LineString";
             }
             else if (dalCol.Type == DalColumnType.TPolygon)
             {
-                stringBuilder.Append(", DataType.Polygon");
+                dataTypeString = "DataType.Polygon";
             }
             else if (dalCol.Type == DalColumnType.TLine)
             {
-                stringBuilder.Append(", DataType.Line");
+                dataTypeString = "DataType.Line";
             }
             else if (dalCol.Type == DalColumnType.TCurve)
             {
-                stringBuilder.Append(", DataType.Curve");
+                dataTypeString = "DataType.Curve";
             }
             else if (dalCol.Type == DalColumnType.TSurface)
             {
-                stringBuilder.Append(", DataType.Surface");
+                dataTypeString = "DataType.Surface";
             }
             else if (dalCol.Type == DalColumnType.TLinearRing)
             {
-                stringBuilder.Append(", DataType.LinearRing");
+                dataTypeString = "DataType.LinearRing";
             }
             else if (dalCol.Type == DalColumnType.TMultiPoint)
             {
-                stringBuilder.Append(", DataType.MultiPoint");
+                dataTypeString = "DataType.MultiPoint";
             }
             else if (dalCol.Type == DalColumnType.TMultiLineString)
             {
-                stringBuilder.Append(", DataType.MultiLineString");
+                dataTypeString = "DataType.MultiLineString";
             }
             else if (dalCol.Type == DalColumnType.TMultiPolygon)
             {
-                stringBuilder.Append(", DataType.MultiPolygon");
+                dataTypeString = "DataType.MultiPolygon";
             }
             else if (dalCol.Type == DalColumnType.TMultiCurve)
             {
-                stringBuilder.Append(", DataType.MultiCurve");
+                dataTypeString = "DataType.MultiCurve";
             }
             else if (dalCol.Type == DalColumnType.TMultiSurface)
             {
-                stringBuilder.Append(", DataType.MultiSurface");
+                dataTypeString = "DataType.MultiSurface";
             }
             else if (dalCol.Type == DalColumnType.TGeographic)
             {
-                stringBuilder.Append(", DataType.Geographic");
+                dataTypeString = "DataType.Geographic";
             }
             else if (dalCol.Type == DalColumnType.TGeographicCollection)
             {
-                stringBuilder.Append(", DataType.GeographicCollection");
+                dataTypeString = "DataType.GeographicCollection";
             }
             else if (dalCol.Type == DalColumnType.TGeographicPoint)
             {
-                stringBuilder.Append(", DataType.GeographicPoint");
+                dataTypeString = "DataType.GeographicPoint";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLineString)
             {
-                stringBuilder.Append(", DataType.GeographicLineString");
+                dataTypeString = "DataType.GeographicLineString";
             }
             else if (dalCol.Type == DalColumnType.TGeographicPolygon)
             {
-                stringBuilder.Append(", DataType.GeographicPolygon");
+                dataTypeString = "DataType.GeographicPolygon";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLine)
             {
-                stringBuilder.Append(", DataType.GeographicLine");
+                dataTypeString = "DataType.GeographicLine";
             }
             else if (dalCol.Type == DalColumnType.TGeographicCurve)
             {
-                stringBuilder.Append(", DataType.GeographicCurve");
+                dataTypeString = "DataType.GeographicCurve";
             }
             else if (dalCol.Type == DalColumnType.TGeographicSurface)
             {
-                stringBuilder.Append(", DataType.GeographicSurface");
+                dataTypeString = "DataType.GeographicSurface";
             }
             else if (dalCol.Type == DalColumnType.TGeographicLinearRing)
             {
-                stringBuilder.Append(", DataType.GeographicLinearRing");
+                dataTypeString = "DataType.GeographicLinearRing";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiPoint)
             {
-                stringBuilder.Append(", DataType.GeographicMultiPoint");
+                dataTypeString = "DataType.GeographicMultiPoint";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiLineString)
             {
-                stringBuilder.Append(", DataType.GeographicMultiLineString");
+                dataTypeString = "DataType.GeographicMultiLineString";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiPolygon)
             {
-                stringBuilder.Append(", DataType.GeographicMultiPolygon");
+                dataTypeString = "DataType.GeographicMultiPolygon";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiCurve)
             {
-                stringBuilder.Append(", DataType.GeographicMultiCurve");
+                dataTypeString = "DataType.GeographicMultiCurve";
             }
             else if (dalCol.Type == DalColumnType.TGeographicMultiSurface)
             {
-                stringBuilder.Append(", DataType.GeographicMultiSurface");
+                dataTypeString = "DataType.GeographicMultiSurface";
             }
             else if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
             {
                 if (dalCol.Type == DalColumnType.TInt8)
                 {
-                    stringBuilder.Append(", DataType.TinyInt");
+                    dataTypeString = "DataType.TinyInt";
                 }
                 else if (dalCol.Type == DalColumnType.TInt16)
                 {
-                    stringBuilder.Append(", DataType.SmallInt");
+                    dataTypeString = "DataType.SmallInt";
                 }
                 else if (dalCol.Type == DalColumnType.TInt32)
                 {
-                    stringBuilder.Append(", DataType.Int");
+                    dataTypeString = "DataType.Int";
                 }
                 else if (dalCol.Type == DalColumnType.TInt64)
                 {
-                    stringBuilder.Append(", DataType.BigInt");
+                    dataTypeString = "DataType.BigInt";
                 }
                 else if (dalCol.Type == DalColumnType.TUInt8)
                 {
-                    stringBuilder.Append(", DataType.UnsignedTinyInt");
+                    dataTypeString = "DataType.UnsignedTinyInt";
                 }
                 else if (dalCol.Type == DalColumnType.TUInt16)
                 {
-                    stringBuilder.Append(", DataType.UnsignedSmallInt");
+                    dataTypeString = "DataType.UnsignedSmallInt";
                 }
                 else if (dalCol.Type == DalColumnType.TUInt32)
                 {
-                    stringBuilder.Append(", DataType.UnsignedInt");
+                    dataTypeString = "DataType.UnsignedInt";
                 }
                 else if (dalCol.Type == DalColumnType.TUInt64)
                 {
-                    stringBuilder.Append(", DataType.UnsignedBigInt");
+                    dataTypeString = "DataType.UnsignedBigInt";
                 }
             }
-            
+
+            if (!string.IsNullOrEmpty(dataTypeString))
+            {
+                stringBuilder.AppendFormat("{0}DataType = {1},",
+                "\r\n",
+                dataTypeString);
+            }
+
             if (!string.IsNullOrEmpty(customActualType))
             {
                 dalCol.ActualType = customActualType;
@@ -2086,21 +2118,80 @@ namespace dg.Sql.SchemaGenerator
                 dalCol.ActualType += "?";
             }
 
-            stringBuilder.AppendFormat(", {0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}",
-                dalCol.MaxLength,
-                string.IsNullOrEmpty(dalCol.LiteralType) ? "null" : (@"""" + dalCol.LiteralType.Replace(@"""", @"""""") + @""""),
-                dalCol.Precision,
-                dalCol.Scale,
-                dalCol.AutoIncrement ? "true" : "false",
-                dalCol.IsPrimaryKey ? "true" : "false",
-                dalCol.IsNullable ? "true" : "false",
+            stringBuilder.AppendFormat("{0}MaxLength = {1},",
+                "\r\n",
+                dalCol.MaxLength);
+
+            if (!string.IsNullOrEmpty(dalCol.LiteralType))
+            {
+                stringBuilder.AppendFormat("{0}LiteralType = {1},",
+                    "\r\n",
+                    (@"""" + dalCol.LiteralType.Replace(@"""", @"\""") + @""""));
+            }
+
+            stringBuilder.AppendFormat("{0}NumberPrecision = {1},",
+                "\r\n",
+                dalCol.Precision);
+
+            stringBuilder.AppendFormat("{0}NumberScale = {1},",
+                "\r\n",
+                dalCol.Scale);
+
+            if (dalCol.AutoIncrement)
+            {
+                stringBuilder.AppendFormat("{0}AutoIncrement = {1},",
+                    "\r\n",
+                    "true");
+            }
+
+            if (dalCol.IsPrimaryKey)
+            {
+                stringBuilder.AppendFormat("{0}IsPrimaryKey = {1},",
+                    "\r\n",
+                    "true");
+            }
+
+            if (dalCol.IsNullable)
+            {
+                stringBuilder.AppendFormat("{0}Nullable = {1},",
+                    "\r\n",
+                    "true");
+            }
+
+            stringBuilder.AppendFormat("{0}Default = {1},",
+                "\r\n",
                 dalCol.DefaultValue);
 
-            if (!string.IsNullOrEmpty(dalCol.Charset) || !string.IsNullOrEmpty(dalCol.Collate))
+            if (!string.IsNullOrEmpty(dalCol.Computed))
             {
-                stringBuilder.AppendFormat(@", {0}, {1}",
-                    string.IsNullOrEmpty(dalCol.Charset) ? "null" : (@"""" + dalCol.Charset + @""""),
-                    string.IsNullOrEmpty(dalCol.Collate) ? "null" : (@"""" + dalCol.Collate + @""""));
+                stringBuilder.AppendFormat("{0}ComputedColumn = {1},",
+                    "\r\n",
+                    dalCol.Computed);
+
+                stringBuilder.AppendFormat("{0}ComputedColumnStored = {1},",
+                    "\r\n",
+                    dalCol.ComputedStored ? "true" : "false");
+            }
+
+            if (!string.IsNullOrEmpty(dalCol.Charset))
+            {
+                stringBuilder.AppendFormat("{0}Charset = {1},",
+                    "\r\n",
+                    CsharpString(dalCol.Charset));
+            }
+
+            if (!string.IsNullOrEmpty(dalCol.Collate))
+            {
+                stringBuilder.AppendFormat("{0}Collate = {1},",
+                    "\r\n",
+                    CsharpString(dalCol.Collate));
+            }
+
+            if (!string.IsNullOrEmpty(dalCol.Comment))
+            {
+                stringBuilder.AppendFormat("{0}Comment = {1},",
+                    "\r\n",
+                    CsharpString(dalCol.Comment));
             }
         }
 
@@ -2172,6 +2263,21 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.Append("}, ");
             }
             stringBuilder.AppendFormat("TableSchema.ForeignKeyReference.{0}, TableSchema.ForeignKeyReference.{1}", dalFK.OnDelete.ToString(), dalFK.OnUpdate.ToString());
+        }
+
+        private static string CsharpString(string value)
+        {
+            return (@"""" + value
+                        .Replace("\\", "\\\\")
+                        .Replace("\"", "\\\"")
+                        .Replace("\r", "\\\r")
+                        .Replace("\n", "\\\n")
+                        + @"""");
+        }
+        
+        private static string ProcessComputedColumn(string computed)
+        {
+            return "new ValueWrapper(" + computed + ")";
         }
 
         public static string StripColumnName(string columnName)

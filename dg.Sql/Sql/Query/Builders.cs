@@ -538,16 +538,27 @@ namespace dg.Sql
             bool isTextField;
             BuildColumnPropertiesDataType(sb, connection, column, out isTextField);
 
+            if (!string.IsNullOrEmpty(column.Comment) && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+            {
+                sb.AppendFormat(@" COMMENT {0}",
+                    connection.PrepareValue(column.Comment));
+            }
+
             if (!column.Nullable)
             {
-                sb.Append(@"NOT NULL ");
+                sb.Append(@" NOT NULL");
             }
-            if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
+
+            if (column.ComputedColumn != null)
             {
-                sb.Append(@"DEFAULT ");
-                Query.PrepareColumnValue(column, column.Default, sb, connection, this);
-                sb.Append(' ');
+                if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
+                {
+                    sb.Append(@" DEFAULT");
+                    Query.PrepareColumnValue(column, column.Default, sb, connection, this);
+                }
             }
+
+            sb.Append(' ');
         }
 
         public void BuildColumnPropertiesDataType(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, out bool isTextField)
@@ -883,11 +894,11 @@ namespace dg.Sql
                 {
                     sb.Append(connection.type_GEOGRAPHIC_MULTISURFACE);
                 }
-                sb.Append(' ');
             }
 
             if (column.AutoIncrement)
             {
+                sb.Append(' ');
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
                 { // Specifically for PostgreSQL
                     sb.Append(connection.type_AUTOINCREMENT_BIGINT);
@@ -896,21 +907,37 @@ namespace dg.Sql
                 {
                     sb.Append(connection.type_AUTOINCREMENT);
                 }
-                sb.Append(' ');
+            }
+
+            if (column.ComputedColumn != null)
+            {
+                sb.Append(" AS ");
+
+                sb.Append(column.ComputedColumn.Build(connection, this));
+
+                if (column.ComputedColumnStored)
+                {
+                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
+                    {
+                        sb.Append(" PERSISTED");
+                    }
+                    else
+                    {
+                        sb.Append(" STORED");
+                    }
+                }
             }
 
             if (connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL && !string.IsNullOrEmpty(column.Charset))
             {
-                sb.Append(@"COLLATE ");
+                sb.Append(@" COLLATE");
                 sb.Append(column.Collate);
-                sb.Append(' ');
             }
 
             if (!string.IsNullOrEmpty(column.Charset))
             {
-                sb.Append(@"CHARACTER SET ");
+                sb.Append(@" CHARACTER SET");
                 sb.Append(column.Charset);
-                sb.Append(' ');
             }
         }
 
@@ -1418,6 +1445,7 @@ namespace dg.Sql
                             }
 
                             break;
+
                         case QueryMode.CreateTable:
                             {
                                 sb.Append(@"CREATE TABLE ");
@@ -1438,6 +1466,7 @@ namespace dg.Sql
                                     if (bSep) sb.Append(@", "); else bSep = true;
                                     BuildColumnProperties(sb, connection, col, false);
                                 }
+
                                 if (iPrimaryKeys > 0)
                                 {
                                     if (bSep) sb.Append(@", ");
@@ -1489,6 +1518,7 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.AddColumn:
                             {
                                 sb.Append(@"ALTER TABLE ");
@@ -1506,7 +1536,9 @@ namespace dg.Sql
                                 {
                                     sb.Append(@"COLUMN ");
                                 }
+
                                 BuildColumnProperties(sb, connection, _AlterColumn, false);
+
                                 if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                 {
                                     int idx = Schema.Columns.IndexOf(_AlterColumn);
@@ -1515,9 +1547,11 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.ChangeColumn:
                             {
                                 if (_AlterColumnOldName != null && _AlterColumnOldName.Length == 0) _AlterColumnOldName = null;
+
                                 if (_AlterColumnOldName != null)
                                 {
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
@@ -1551,6 +1585,7 @@ namespace dg.Sql
                                         sb.Append(';');
                                     }
                                 }
+
                                 if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                 {
                                     // Very limited syntax, will have to do this with several statements
@@ -1608,6 +1643,7 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.DropColumn:
                             {
                                 sb.Append(@"ALTER TABLE ");
