@@ -1166,6 +1166,26 @@ namespace dg.Sql
                 search, searchType,
                 replace, replaceWithType);
         }
+        
+        public static Substring Substring(object value, ValueObjectType valueType, int from, int length)
+        {
+            return new Substring(value, valueType, from, length);
+        }
+
+        public static Substring Substring(string tableName, string columnName, int from, int length)
+        {
+            return new Substring(tableName, columnName, from, length);
+        }
+
+        public static Substring Substring(string columnName, int from, int length)
+        {
+            return new Substring(columnName, from, length);
+        }
+
+        public static Substring Substring(IPhrase phrase, int from, int length)
+        {
+            return new Substring(phrase, from, length);
+        }
 
         public static Concat Concat(params ValueWrapper[] values)
         {
