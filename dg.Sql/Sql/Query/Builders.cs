@@ -549,11 +549,11 @@ namespace dg.Sql
                 sb.Append(@" NOT NULL");
             }
 
-            if (column.ComputedColumn != null)
+            if (column.ComputedColumn == null)
             {
                 if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
                 {
-                    sb.Append(@" DEFAULT");
+                    sb.Append(@" DEFAULT ");
                     Query.PrepareColumnValue(column, column.Default, sb, connection, this);
                 }
             }
