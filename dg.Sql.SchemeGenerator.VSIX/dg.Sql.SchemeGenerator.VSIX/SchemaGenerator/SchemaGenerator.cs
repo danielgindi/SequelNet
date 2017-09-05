@@ -252,6 +252,22 @@ namespace dg.Sql.SchemaGenerator
                 {
                     context.InsertAutoIncrement = true;
                 }
+                else if (currentLineTrimmed.StartsWith("@NoCreatedBy", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NoCreatedBy = true;
+                }
+                else if (currentLineTrimmed.StartsWith("@NoCreatedOn", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NoCreatedOn = true;
+                }
+                else if (currentLineTrimmed.StartsWith("@NoModifiedBy", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NoModifiedBy = true;
+                }
+                else if (currentLineTrimmed.StartsWith("@NoModifiedOn", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NoModifiedOn = true;
+                }
                 else if (!currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
                 {
                     int startPos = currentLineTrimmed.IndexOf(":");
@@ -1009,16 +1025,25 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn){0}{{{0}", "\r\n");
 
             bool printExtraNewLine = false;
-            if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedBy") != null)
+
+            if (!context.NoCreatedBy)
             {
-                stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
-                printExtraNewLine = true;
+                if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedBy") != null)
+                {
+                    stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
             }
-            if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedOn") != null)
+
+            if (!context.NoCreatedOn)
             {
-                stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
-                printExtraNewLine = true;
+                if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedOn") != null)
+                {
+                    stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
+                    printExtraNewLine = true;
+                }
             }
+
             if (printExtraNewLine)
             {
                 stringBuilder.Append("\r\n");
@@ -1211,14 +1236,23 @@ namespace dg.Sql.SchemaGenerator
             {
                 stringBuilder.AppendFormat(@"if (HasMutatedColumns()){0}{{{0}", "\r\n");
             }
-            if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedBy") != null)
+
+            if (!context.NoModifiedBy)
             {
-                stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedBy") != null)
+                {
+                    stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                }
             }
-            if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedOn") != null)
+
+            if (!context.NoModifiedOn)
             {
-                stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
+                if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedOn") != null)
+                {
+                    stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
+                }
             }
+
             if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
             {
                 stringBuilder.AppendFormat(@"}}{0}", "\r\n");
@@ -2325,6 +2359,10 @@ namespace dg.Sql.SchemaGenerator
         public bool ExportCollection = true;
         public bool AtomicUpdates = false;
         public bool InsertAutoIncrement = false;
+        public bool NoCreatedBy = false;
+        public bool NoCreatedOn = false;
+        public bool NoModifiedBy = false;
+        public bool NoModifiedOn = false;
 
         public string SingleColumnPrimaryKeyName = null;
         public string CustomBeforeInsert = null;

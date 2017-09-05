@@ -14,6 +14,10 @@
  *  @OmitCollection         Omit collection class
  *  @AtomicUpdates          Track atomic column updates
  *  @InsertAutoIncrement    Allow inserting autoincrement values
+ *  @NoCreatedBy			Disable the automatic "CreatedBy" setting on Insert
+ *  @NoCreatedOn			Disable the automatic "CreatedOn" setting on Insert
+ *  @NoModifiedBy			Disable the automatic "ModifiedBy" setting on Update
+ *  @NoModifiedOn			Disable the automatic "ModifiedOn" setting on Update
  */
  ```
 
