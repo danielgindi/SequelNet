@@ -47,5 +47,5 @@ There's a Visual Studio AddIn, called the "SchemaGeneratorAddIn", which assists 
 This little tool makes rapid db prototyping easy, and gets you much further in development in significantly less time than when using any other tool known to humanity.
 
 I will soon post here some examples on how to use it. 
-(Although there is a full documentation of the syntax in the Macro Structure.txt file)
+(Although there is a full documentation of the syntax in the [Macro Structure.MD](https://github.com/danielgindi/dg.Sql/blob/master/Macro%20Structure.MD) file)
 
