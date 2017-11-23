@@ -15,6 +15,7 @@ namespace dg.Sql
 
         public ValueWrapper()
         {
+            this.Type = ValueObjectType.Value;
         }
 
         public ValueWrapper(string tableName, object value, ValueObjectType type)
@@ -113,14 +114,45 @@ namespace dg.Sql
             }
             else if (Type == ValueObjectType.Value)
             {
-                ret += @"(" + conn.PrepareValue(Value, relatedQuery) + @")";
+                ret += "(" + conn.PrepareValue(Value, relatedQuery) + ")";
             }
             else
             {
-                ret += Value;
+                ret += Value.ToString();
             }
 
             return ret;
+        }
+
+        public void Build(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery = null)
+        {
+            if (Type == ValueObjectType.ColumnName)
+            {
+                if (TableName != null && TableName.Length > 0)
+                {
+                    outputBuilder.Append(conn.WrapFieldName(TableName));
+                    outputBuilder.Append(".");
+                }
+
+                outputBuilder.Append(conn.WrapFieldName(Value.ToString()));
+            }
+            else if (Type == ValueObjectType.Value)
+            {
+                if (Value is dg.Sql.Where)
+                {
+                    outputBuilder.Append("(");
+                    ((dg.Sql.Where)Value).BuildCommand(outputBuilder, true, conn, relatedQuery);
+                    outputBuilder.Append(")");
+                }
+                else
+                {
+                    outputBuilder.Append("(" + conn.PrepareValue(Value, relatedQuery) + ")");
+                }
+            }
+            else
+            {
+                outputBuilder.Append(Value.ToString());
+            }
         }
 
         #endregion

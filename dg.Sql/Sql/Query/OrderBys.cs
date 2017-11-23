@@ -39,6 +39,20 @@ namespace dg.Sql
             return this;
         }
 
+        public Query OrderBy(object value, ValueObjectType valueType, SortDirection sortDirection)
+        {
+            if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
+            _ListOrderBy.Add(new OrderBy(value, valueType, sortDirection));
+            return this;
+        }
+
+        public Query OrderBy(IPhrase phrase, SortDirection sortDirection)
+        {
+            if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
+            _ListOrderBy.Add(new OrderBy(phrase, sortDirection));
+            return this;
+        }
+
         private Query OrderBy(OrderBy orderBy)
         {
             if (_ListOrderBy == null) _ListOrderBy = new OrderByList();

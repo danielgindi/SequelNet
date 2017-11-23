@@ -45,31 +45,60 @@ namespace dg.Sql
 
     public class OrderBy
     {
-        public string TableName;
-        public object ColumnName;
+        public ValueWrapper Value = new ValueWrapper();
+
+        [Obsolete]
+        public string TableName
+        {
+            get { return Value.TableName; }
+            set { Value.TableName = value; }
+        }
+
+        [Obsolete]
+        public object ColumnName
+        {
+            get { return Value.Value; }
+            set { Value.Value = value; }
+        }
+
         public SortDirection SortDirection;
         internal bool Randomize = false;
-        internal bool IsLiteral = false;
 
         #region Constructors
 
         public OrderBy(string columnName, SortDirection sortDirection)
         {
-            this.ColumnName = columnName;
+            Value.Value = columnName;
+            Value.Type = ValueObjectType.ColumnName;
             this.SortDirection = sortDirection;
-        }
-
-        public OrderBy(object columnName, SortDirection sortDirection, bool isLiteral)
-        {
-            this.ColumnName = columnName;
-            this.SortDirection = sortDirection;
-            this.IsLiteral = isLiteral;
         }
 
         public OrderBy(string tableName, string columnName, SortDirection sortDirection)
         {
-            this.TableName = tableName;
-            this.ColumnName = columnName;
+            Value.TableName = tableName;
+            Value.Value = columnName;
+            Value.Type = ValueObjectType.ColumnName;
+            this.SortDirection = sortDirection;
+        }
+
+        public OrderBy(object value, SortDirection sortDirection, bool isLiteral)
+        {
+            Value.Value = value;
+            Value.Type = isLiteral ? ValueObjectType.Literal : ValueObjectType.Value;
+            this.SortDirection = sortDirection;
+        }
+
+        public OrderBy(object value, ValueObjectType valueType, SortDirection sortDirection)
+        {
+            Value.Value = value;
+            Value.Type = valueType;
+            this.SortDirection = sortDirection;
+        }
+
+        public OrderBy(IPhrase phrase, SortDirection sortDirection)
+        {
+            Value.Value = phrase;
+            Value.Type = ValueObjectType.Value;
             this.SortDirection = sortDirection;
         }
 
@@ -85,11 +114,11 @@ namespace dg.Sql
             return list;
         }
 
-        public OrderByList Then(object columnName, SortDirection sortDirection, bool isLiteral)
+        public OrderByList Then(object value, SortDirection sortDirection, bool isLiteral)
         {
             var list = new OrderByList();
             list.Add(this);
-            list.Add(new OrderBy(columnName, sortDirection, isLiteral));
+            list.Add(new OrderBy(value, sortDirection, isLiteral));
             return list;
         }
 
@@ -101,8 +130,24 @@ namespace dg.Sql
             return list;
         }
 
+        public OrderByList Then(object value, ValueObjectType valueType, SortDirection sortDirection)
+        {
+            var list = new OrderByList();
+            list.Add(this);
+            list.Add(new OrderBy(value, valueType, sortDirection));
+            return list;
+        }
+
+        public OrderByList Then(IPhrase phrase, SortDirection sortDirection)
+        {
+            var list = new OrderByList();
+            list.Add(this);
+            list.Add(new OrderBy(phrase, sortDirection));
+            return list;
+        }
+
         #endregion
-        
+
         public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery, bool invert = false)
         {
             if (this.Randomize)
@@ -123,42 +168,26 @@ namespace dg.Sql
                         break;
 
                     case ConnectorBase.SqlServiceType.MSACCESS:
-                        if (this.TableName != null) outputBuilder.Append(@"RND(" + conn.WrapFieldName(this.TableName) + @"." + conn.WrapFieldName(this.ColumnName.ToString()) + @")");
-                        else outputBuilder.Append(@"RND(" + conn.WrapFieldName(this.ColumnName.ToString()) + @")");
+                        if (Value != null)
+                        {
+                            outputBuilder.Append(@"RND(" + Value.Build(conn) + @")");
+                        }
+                        else
+                        {
+                            outputBuilder.Append(@"RND(NULL)");
+                        }
                         break;
                 }
             }
             else
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSACCESS && relatedQuery != null && relatedQuery.Schema != null && !this.IsLiteral)
+                if (conn.TYPE == ConnectorBase.SqlServiceType.MSACCESS && relatedQuery != null && relatedQuery.Schema != null && Value.Type != ValueObjectType.Literal)
                 {
-                    TableSchema.Column col = relatedQuery.Schema.Columns.Find(this.ColumnName.ToString());
+                    TableSchema.Column col = relatedQuery.Schema.Columns.Find(Value.Value.ToString());
                     if (col != null && col.ActualDataType == DataType.Boolean) outputBuilder.Append(@" NOT ");
                 }
 
-                if (this.ColumnName is dg.Sql.IPhrase)
-                {
-                    outputBuilder.Append(((dg.Sql.IPhrase)this.ColumnName).BuildPhrase(conn, relatedQuery));
-                }
-                else if (this.ColumnName is dg.Sql.Where)
-                {
-                    ((dg.Sql.Where)this.ColumnName).BuildCommand(outputBuilder, true, conn, relatedQuery);
-                }
-                else if (this.IsLiteral)
-                {
-                    outputBuilder.Append(this.ColumnName);
-                }
-                else
-                {
-                    if (this.TableName != null)
-                    {
-                        outputBuilder.Append(conn.WrapFieldName(this.TableName) + @"." + conn.WrapFieldName(this.ColumnName.ToString()));
-                    }
-                    else
-                    {
-                        outputBuilder.Append(conn.WrapFieldName(this.ColumnName.ToString()));
-                    }
-                }
+                Value.Build(outputBuilder, conn);
 
                 switch (this.SortDirection)
                 {
