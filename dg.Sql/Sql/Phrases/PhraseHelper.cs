@@ -543,6 +543,74 @@ namespace dg.Sql
         {
             return new Divide(value1, value2);
         }
+        
+        public static Greatest Greatest(
+            object value1, ValueObjectType valueType1,
+            object value2, ValueObjectType valueType2
+            )
+        {
+            return new Greatest(
+                value1, valueType1,
+                value2, valueType2);
+        }
+
+        public static Greatest Greatest(
+            string tableName1, string column1,
+            string tableName2, string column2
+            )
+        {
+            return new Greatest(
+                tableName1, column1,
+                tableName2, column2);
+        }
+
+        public static Greatest Greatest(
+            string tableName1, string column1,
+            object value2, ValueObjectType valueType2
+            )
+        {
+            return new Greatest(
+                tableName1, column1,
+                value2, valueType2);
+        }
+
+        public static Greatest Greatest(
+            string tableName1, string column1,
+            object value2
+            )
+        {
+            return new Greatest(
+                tableName1, column1,
+                value2);
+        }
+
+        public static Greatest Greatest(
+            object value1, ValueObjectType valueType1,
+            string tableName2, string column2
+            )
+        {
+            return new Greatest(
+                value1, valueType1,
+                tableName2, column2);
+        }
+
+        public static Greatest Greatest(
+            object value1,
+            string tableName2, string column2
+            )
+        {
+            return new Greatest(
+                value1,
+                tableName2, column2);
+        }
+
+        public static Greatest Greatest(
+            object value1,
+            object value2
+            )
+        {
+            return new Greatest(value1, value2);
+        }
 
         public static Multiply Multiply(
             object value1, ValueObjectType valueType1,

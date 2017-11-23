@@ -82,6 +82,7 @@
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />
     <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
     <Compile Include="Sql\Phrases\Math\Abs.cs" />
+    <Compile Include="Sql\Phrases\Math\Greatest.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
     <Compile Include="Sql\Phrases\IPhrase.cs" />
     <Compile Include="Connector\ConnectorBase.cs" />
