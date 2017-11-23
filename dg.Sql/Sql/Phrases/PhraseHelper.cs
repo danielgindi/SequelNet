@@ -451,6 +451,31 @@ namespace dg.Sql
 
         #region Math
 
+        public static Abs Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        {
+            return new Abs(value, valueType, decimalPlaces);
+        }
+
+        public static Abs Abs(string tableName, string columnName, int decimalPlaces = 0)
+        {
+            return new Abs(tableName, columnName, decimalPlaces);
+        }
+
+        public static Abs Abs(string columnName, int decimalPlaces = 0)
+        {
+            return new Abs(columnName, decimalPlaces);
+        }
+
+        public static Abs Abs(IPhrase phrase, int decimalPlaces = 0)
+        {
+            return new Abs(phrase, decimalPlaces);
+        }
+
+        public static Abs Abs(Where where)
+        {
+            return new Abs(where);
+        }
+
         public static Divide Divide(
             object value1, ValueObjectType valueType1,
             object value2, ValueObjectType valueType2
