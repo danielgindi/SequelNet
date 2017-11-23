@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Sql\Base Types\ValueWrapper.cs" />
     <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
+    <Compile Include="Sql\Phrases\DateTime\DateTimeDiff.cs" />
     <Compile Include="Sql\Phrases\FlowControl\Case.cs" />
     <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />

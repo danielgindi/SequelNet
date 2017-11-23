@@ -60,6 +60,86 @@ namespace dg.Sql
             return new DateTimeAdd(columnName, unit, addColumnName);
         }
 
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, object value1, ValueObjectType value1Type, object value2, ValueObjectType value2Type)
+        {
+            return new DateTimeDiff(unit, value1, value1Type, value2, value2Type);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, object value1, ValueObjectType value1Type, DateTime value2)
+        {
+            return new DateTimeDiff(unit, value1, value1Type, value2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, DateTime value1, object value2, ValueObjectType value2Type)
+        {
+            return new DateTimeDiff(unit, value1, value2, value2Type);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, DateTime value2)
+        {
+            return new DateTimeDiff(unit, tableName1, columnName1, value2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, DateTime value1, string tableName2, string columnName2)
+        {
+            return new DateTimeDiff(unit, value1, tableName2, columnName2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, string tableName2, string columnName2)
+        {
+            return new DateTimeDiff(unit, tableName1, columnName1, tableName2, columnName2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, string columnName1, string columnName2)
+        {
+            return new DateTimeDiff(unit, columnName1, columnName2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, IPhrase phrase2)
+        {
+            return new DateTimeDiff(unit, phrase1, phrase2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, object value2, ValueObjectType value2Type)
+        {
+            return new DateTimeDiff(unit, phrase1, value2, value2Type);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, object value1, ValueObjectType value1Type, IPhrase phrase2)
+        {
+            return new DateTimeDiff(unit, value1, value1Type, phrase2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, DateTime value2)
+        {
+            return new DateTimeDiff(unit, phrase1, value2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, DateTime value1, IPhrase phrase2)
+        {
+            return new DateTimeDiff(unit, value1, phrase2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, string tableName2, string columnName2)
+        {
+            return new DateTimeDiff(unit, phrase1, tableName2, columnName2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, IPhrase phrase2)
+        {
+            return new DateTimeDiff(unit, tableName1, columnName1, phrase2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, string columnName2)
+        {
+            return new DateTimeDiff(unit, phrase1, columnName2);
+        }
+
+        public static DateTimeDiff DateTimeDiff(DateTimeUnit unit, string columnName1, IPhrase phrase2)
+        {
+            return new DateTimeDiff(unit, columnName1, phrase2);
+        }
+
         public static UTC_TIMESTAMP UtcTimestamp()
         {
             return new UTC_TIMESTAMP();
