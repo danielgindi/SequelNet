@@ -74,6 +74,13 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Migrations\DecoratedMigration.cs" />
+    <Compile Include="Migrations\MigrationState.cs" />
+    <Compile Include="Migrations\MigrationController.cs" />
+    <Compile Include="Migrations\Migration.cs" />
+    <Compile Include="Migrations\MigrationAttribute.cs" />
+    <Compile Include="Migrations\MigrationItemEventArgs.cs" />
+    <Compile Include="Migrations\MigrationVersionEventArgs.cs" />
     <Compile Include="Sql\Base Types\JsonPathValue.cs" />
     <Compile Include="Sql\Base Types\ValueWrapper.cs" />
     <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
