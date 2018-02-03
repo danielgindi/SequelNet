@@ -1226,6 +1226,7 @@ namespace dg.Sql
                             }
 
                             break;
+
                         case QueryMode.Update:
                             {
                                 bool hasJoins = _ListJoin != null && _ListJoin.Count > 0;
@@ -1272,7 +1273,18 @@ namespace dg.Sql
                                         bFirst = false;
                                     }
                                     else sb.Append(',');
+
+                                    if (_ListJoin.Count > 0 && upd.TableName != null)
+                                    {
+                                        if (upd.TableName != null)
+                                        {
+                                            sb.Append(connection.WrapFieldName(upd.TableName));
+                                            sb.Append(@".");
+                                        }
+                                    }
+
                                     sb.Append(connection.WrapFieldName(upd.ColumnName));
+
                                     sb.Append('=');
 
                                     if (upd.SecondType == ValueObjectType.Literal)
@@ -1327,6 +1339,7 @@ namespace dg.Sql
                             }
 
                             break;
+
                         case QueryMode.InsertOrUpdate:
                             {
                                 if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
