@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace dg.Sql.Migrations
 {
-    internal class DecoratedMigration
+    public class DecoratedMigration
     {
-        internal Type Type;
+        public Type Type { get; internal set; }
         internal Migration _Migration;
-        internal MigrationAttribute Attribute;
+        public MigrationAttribute Attribute { get; internal set; }
 
         internal DecoratedMigration(Type migrationType)
         {
@@ -44,6 +44,5 @@ namespace dg.Sql.Migrations
                 _Migration = value;
             }
         }
-
     }
 }

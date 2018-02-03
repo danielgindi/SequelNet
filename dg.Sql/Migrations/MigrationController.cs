@@ -12,6 +12,8 @@ namespace dg.Sql.Migrations
         public delegate void MigrationVersionEventHandler(object sender, MigrationVersionEventArgs args);
         public delegate void MigrationItemEventHandler(object sender, MigrationItemEventArgs args);
         public delegate Int64 MigrationVersionQueryDelegate();
+        public delegate List<DecoratedMigration> MigrationFilterDelegate(Int64 fromVersion, Int64 toVersion, List<DecoratedMigration> migrations);
+
         public event MigrationVersionEventHandler MigrationVersionEvent;
         public event MigrationItemEventHandler ItemStartEvent;
         public event MigrationItemEventHandler ItemEndEvent;
@@ -116,12 +118,22 @@ namespace dg.Sql.Migrations
             }
 
             var up = targetVersion > _State.StartVersion;
-            var migrations = _Migrations
-                .Where(x => up
-                    ? (x.Attribute.Version > _State.StartVersion && x.Attribute.Version <= targetVersion)
-                    : (x.Attribute.Version <= _State.StartVersion && x.Attribute.Version > targetVersion))
-                .OrderBy(x => x.Attribute.Version)
-                .ToList();
+
+            // Try to get a predicate from the user
+            var migrations = MigrationFilterHandler != null 
+                ? MigrationFilterHandler(_State.StartVersion, targetVersion, new List<DecoratedMigration>(_Migrations))
+                : null;
+
+            if (migrations == null)
+            {
+                // Default predicate - filter by versions in range
+                migrations = _Migrations
+                    .FindAll(x => up
+                        ? (x.Attribute.Version > _State.StartVersion && x.Attribute.Version <= targetVersion)
+                        : (x.Attribute.Version <= _State.StartVersion && x.Attribute.Version > targetVersion));
+            }
+
+            migrations.Sort((a, b) => a.Attribute.Version.CompareTo(b.Attribute.Version));
 
             if (up)
                 migrations.Reverse();
@@ -193,6 +205,11 @@ namespace dg.Sql.Migrations
         /// Should return the current recorded version of the db.
         /// </summary>
         public MigrationVersionQueryDelegate VersionQueryHandler { get; set; }
+
+        /// <summary>
+        /// A way to supply a custom predicate for which migrations to run
+        /// </summary>
+        public MigrationFilterDelegate MigrationFilterHandler { get; set; }
 
         /// <summary>
         /// Query the current known version of the database.
