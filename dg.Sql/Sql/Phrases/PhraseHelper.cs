@@ -1267,6 +1267,26 @@ namespace dg.Sql
             return new GeographyDistance(from, to);
         }
 
+        public static ST_X ST_X(string tableName, string columnName)
+        {
+            return new ST_X(tableName, columnName);
+        }
+        
+        public static ST_X ST_X(IPhrase phrase)
+        {
+            return new ST_X(phrase);
+        }
+
+        public static ST_Y ST_Y(string tableName, string columnName)
+        {
+            return new ST_Y(tableName, columnName);
+        }
+        
+        public static ST_Y ST_Y(IPhrase phrase)
+        {
+            return new ST_Y(phrase);
+        }
+
         #endregion
 
         #region Strings

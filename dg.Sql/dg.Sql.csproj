@@ -101,6 +101,8 @@
     <Compile Include="Sql\Phrases\Aggregate\StandardDeviationOfSample.cs" />
     <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfSample.cs" />
     <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfPopulation.cs" />
+    <Compile Include="Sql\Phrases\Spatial\ST_Y.cs" />
+    <Compile Include="Sql\Phrases\Spatial\ST_X.cs" />
     <Compile Include="Sql\Phrases\Strings\Length.cs" />
     <Compile Include="Sql\Phrases\Strings\Concat.cs" />
     <Compile Include="Sql\Phrases\Strings\Substring.cs" />
