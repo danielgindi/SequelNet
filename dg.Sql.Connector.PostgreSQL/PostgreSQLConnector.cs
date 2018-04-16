@@ -44,6 +44,13 @@ namespace dg.Sql.Connector
             {
                 if (_Connection != null && _Connection.State != ConnectionState.Closed)
                 {
+                    try
+                    {
+                        while (HasTransaction)
+                            RollbackTransaction();
+                    }
+                    catch { /*ignore errors here*/ }
+
                     _Connection.Close();
                 }
             }
@@ -306,12 +313,14 @@ namespace dg.Sql.Connector
             if (_Transaction == null) return false;
             else
             {
+                _Transactions.Pop();
+
                 try
                 {
                     _Transaction.Commit();
                 }
                 catch (NpgsqlException) { return false; }
-                _Transactions.Pop();
+
                 if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
                 else _Transaction = null;
                 return true;
@@ -323,12 +332,14 @@ namespace dg.Sql.Connector
             if (_Transaction == null) return false;
             else
             {
+                _Transactions.Pop();
+
                 try
                 {
                     _Transaction.Rollback();
                 }
                 catch (NpgsqlException) { return false; }
-                _Transactions.Pop();
+
                 if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
                 else _Transaction = null;
                 return true;
@@ -337,7 +348,7 @@ namespace dg.Sql.Connector
 
         public override bool HasTransaction
         {
-            get { return _Transactions != null && _Transactions.Count > 0; }
+            get { return _Transaction != null; }
         }
 
         public override int CurrentTransactions
