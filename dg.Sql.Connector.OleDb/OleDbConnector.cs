@@ -22,73 +22,28 @@ namespace dg.Sql.Connector
             return new OleDbConnection(FindConnectionString(connectionStringKey));
         }
 
-        private OleDbConnection _Connection = null;
-
         public OleDbConnector()
         {
-            _Connection = CreateSqlConnection(null);
+            Connection = CreateSqlConnection(null);
         }
         public OleDbConnector(string connectionStringKey)
         {
-            _Connection = CreateSqlConnection(connectionStringKey);
+            Connection = CreateSqlConnection(connectionStringKey);
         }
         ~OleDbConnector()
         {
             Dispose(false);
         }
-
-        public override void Close()
-        {
-            try
-            {
-                if (_Connection != null && _Connection.State != ConnectionState.Closed)
-                {
-                    try
-                    {
-                        while (HasTransaction)
-                            RollbackTransaction();
-                    }
-                    catch { /*ignore errors here*/ }
-
-                    _Connection.Close();
-                }
-            }
-            catch { }
-            if (_Connection != null) _Connection.Dispose();
-            _Connection = null;
-        }
-
-        public override DbConnection Connection
-        {
-            get { return _Connection; }
-        }
-
-        #endregion
-
-        #region IDisposable
-
-        public override void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Close();
-            }
-            // Now clean up Native Resources (Pointers)
-        }
-
+        
         #endregion
 
         #region Executing
 
         public override int ExecuteNonQuery(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new OleDbCommand(querySql, (OleDbConnection)Connection, Transaction as OleDbTransaction))
             {
                 return command.ExecuteNonQuery();
             }
@@ -96,16 +51,17 @@ namespace dg.Sql.Connector
 
         public override int ExecuteNonQuery(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteNonQuery();
         }
 
         public override object ExecuteScalar(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new OleDbCommand(querySql, (OleDbConnection)Connection, Transaction as OleDbTransaction))
             {
                 return command.ExecuteScalar();
             }
@@ -113,53 +69,73 @@ namespace dg.Sql.Connector
 
         public override object ExecuteScalar(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteScalar();
         }
 
         public override DataReaderBase ExecuteReader(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new OleDbCommand(querySql, (OleDbConnection)Connection, Transaction as OleDbTransaction);
+            try
             {
-                return new DataReaderBase(command.ExecuteReader());
+                return new DataReaderBase(command.ExecuteReader(), command);
+            }
+            catch (Exception ex)
+            {
+                command.Dispose();
+                throw ex;
             }
         }
 
         public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand command = new OleDbCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new OleDbCommand(querySql, (OleDbConnection)Connection, Transaction as OleDbTransaction);
+            try
             {
-                return new DataReaderBase(command.ExecuteReader(), attachConnectionToReader ? this : null);
+                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
+            }
+            catch (Exception ex)
+            {
+                command.Dispose();
+                throw ex;
             }
         }
 
-        public override DataReaderBase ExecuteReader(DbCommand command)
+        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
-            return new DataReaderBase(((OleDbCommand)command).ExecuteReader());
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+
+            return new DataReaderBase(
+                command.ExecuteReader(),
+                attachCommandToReader ? command : null,
+                attachConnectionToReader ? this : null);
         }
 
         public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return new DataReaderBase(((OleDbCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
         }
 
         public override DataSet ExecuteDataSet(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (OleDbCommand cmd = new OleDbCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var cmd = new OleDbCommand(querySql, (OleDbConnection)Connection, Transaction as OleDbTransaction))
             {
                 DataSet dataSet = new DataSet();
-                using (OleDbDataAdapter adapter = new OleDbDataAdapter(cmd))
+                using (var adapter = new OleDbDataAdapter(cmd))
                 {
                     adapter.Fill(dataSet);
                 }
@@ -169,14 +145,16 @@ namespace dg.Sql.Connector
 
         public override DataSet ExecuteDataSet(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             DataSet dataSet = new DataSet();
-            using (OleDbDataAdapter adapter = new OleDbDataAdapter((OleDbCommand)command))
+
+            using (var adapter = new OleDbDataAdapter((OleDbCommand)command))
             {
                 adapter.Fill(dataSet);
             }
+
             return dataSet;
         }
 
@@ -196,7 +174,7 @@ namespace dg.Sql.Connector
 
         public OleDbConnection GetUnderlyingConnection()
         {
-            return _Connection;
+            return (OleDbConnection)Connection;
         }
 
         public override object GetLastInsertID()
@@ -206,95 +184,8 @@ namespace dg.Sql.Connector
 
         public override bool CheckIfTableExists(string TableName)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SELECT name FROM MSysObjects WHERE name like '" + EscapeString(TableName) + "'") != null;
-        }
-
-        #endregion
-
-        #region Transactions
-
-        private OleDbTransaction _Transaction = null;
-        private Stack<OleDbTransaction> _Transactions = null;
-
-        public override bool BeginTransaction()
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction();
-                if (_Transactions == null) _Transactions = new Stack<OleDbTransaction>(1);
-                _Transactions.Push(_Transaction);
-                return (_Transaction != null);
-            }
-            catch (OleDbException) { }
-            return false;
-        }
-
-        public override bool BeginTransaction(IsolationLevel IsolationLevel)
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction(IsolationLevel);
-                if (_Transactions == null) _Transactions = new Stack<OleDbTransaction>(1);
-                _Transactions.Push(_Transaction);
-            }
-            catch (OleDbException) { return false; }
-            return (_Transaction != null);
-        }
-
-        public override bool CommitTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Commit();
-                }
-                catch (OleDbException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool RollbackTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Rollback();
-                }
-                catch (OleDbException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool HasTransaction
-        {
-            get { return _Transaction != null; }
-        }
-
-        public override int CurrentTransactions
-        {
-            get { return _Transactions == null ? 0 : _Transactions.Count; }
-        }
-
-        public override DbTransaction Transaction
-        {
-            get { return _Transaction; }
         }
 
         #endregion

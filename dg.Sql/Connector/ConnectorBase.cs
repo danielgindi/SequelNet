@@ -25,6 +25,8 @@ namespace dg.Sql.Connector
 
         #region Instancing
 
+        private DbConnection _Connection = null;
+
         static Type s_ConnectorType = null;
         static public ConnectorBase NewInstance()
         {
@@ -97,14 +99,51 @@ namespace dg.Sql.Connector
             return FindConnectionString(null);
         }
 
-        abstract public DbConnection Connection { get; }
+        public DbConnection Connection
+        {
+            get { return _Connection; }
+            protected set { _Connection = value; }
+        }
 
         #endregion
 
-        #region Closing / Disposing
+        #region IDisposable
 
-        abstract public void Dispose();
-        abstract public void Close();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Close();
+            }
+            // Now clean up Native Resources (Pointers)
+        }
+
+        public virtual void Close()
+        {
+            try
+            {
+                if (_Connection != null && _Connection.State != ConnectionState.Closed)
+                {
+                    try
+                    {
+                        while (HasTransaction)
+                            RollbackTransaction();
+                    }
+                    catch { /*ignore errors here*/ }
+
+                    _Connection.Close();
+                }
+            }
+            catch { }
+            if (_Connection != null) _Connection.Dispose();
+            _Connection = null;
+        }
 
         #endregion
 
@@ -116,7 +155,20 @@ namespace dg.Sql.Connector
         abstract public object ExecuteScalar(DbCommand Command);
         abstract public DataReaderBase ExecuteReader(string QuerySql);
         abstract public DataReaderBase ExecuteReader(string QuerySql, bool AttachConnectionToReader);
-        abstract public DataReaderBase ExecuteReader(DbCommand Command);
+
+        public virtual DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
+        {
+            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+
+            command.Connection = _Connection;
+            command.Transaction = _Transaction;
+
+            return new DataReaderBase(
+                command.ExecuteReader(),
+                attachCommandToReader ? command : null,
+                attachConnectionToReader ? this : null);
+        }
+
         abstract public DataReaderBase ExecuteReader(DbCommand Command, bool AttachConnectionToReader);
         abstract public DataSet ExecuteDataSet(string QuerySql);
         abstract public DataSet ExecuteDataSet(DbCommand Command);
@@ -145,15 +197,89 @@ namespace dg.Sql.Connector
         #endregion
 
         #region Transactions
+        
+        private DbTransaction _Transaction = null;
+        private Stack<DbTransaction> _Transactions = null;
 
-        abstract public bool BeginTransaction();
-        abstract public bool BeginTransaction(IsolationLevel IsolationLevel);
-        abstract public bool CommitTransaction();
-        abstract public bool RollbackTransaction();
-        abstract public bool HasTransaction { get; }
-        abstract public int CurrentTransactions { get; }
+        public virtual bool BeginTransaction()
+        {
+            try
+            {
+                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                _Transaction = _Connection.BeginTransaction();
+                if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
+                _Transactions.Push(_Transaction);
+                return (_Transaction != null);
+            }
+            catch (DbException) { }
+            return false;
+        }
 
-        abstract public DbTransaction Transaction { get; }
+        public virtual bool BeginTransaction(IsolationLevel IsolationLevel)
+        {
+            try
+            {
+                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                _Transaction = _Connection.BeginTransaction(IsolationLevel);
+                if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
+                _Transactions.Push(_Transaction);
+            }
+            catch (DbException) { return false; }
+            return (_Transaction != null);
+        }
+
+        public virtual bool CommitTransaction()
+        {
+            if (_Transaction == null) return false;
+            else
+            {
+                _Transactions.Pop();
+
+                try
+                {
+                    _Transaction.Commit();
+                }
+                catch (DbException) { return false; }
+
+                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+                else _Transaction = null;
+                return true;
+            }
+        }
+
+        public virtual bool RollbackTransaction()
+        {
+            if (_Transaction == null) return false;
+            else
+            {
+                _Transactions.Pop();
+
+                try
+                {
+                    _Transaction.Rollback();
+                }
+                catch (DbException) { return false; }
+
+                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+                else _Transaction = null;
+                return true;
+            }
+        }
+
+        public virtual bool HasTransaction
+        {
+            get { return _Transaction != null; }
+        }
+
+        public virtual int CurrentTransactions
+        {
+            get { return _Transactions == null ? 0 : _Transactions.Count; }
+        }
+
+        public DbTransaction Transaction
+        {
+            get { return _Transaction; }
+        }
 
         #endregion
 

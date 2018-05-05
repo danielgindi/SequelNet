@@ -22,74 +22,29 @@ namespace dg.Sql.Connector
         {
             return new NpgsqlConnection(FindConnectionString(connectionStringKey));
         }
-
-        private NpgsqlConnection _Connection = null;
-
+        
         public PostgreSQLConnector()
         {
-            _Connection = CreateSqlConnection(null);
+            Connection = CreateSqlConnection(null);
         }
         public PostgreSQLConnector(string connectionStringKey)
         {
-            _Connection = CreateSqlConnection(connectionStringKey);
+            Connection = CreateSqlConnection(connectionStringKey);
         }
         ~PostgreSQLConnector()
         {
             Dispose(false);
         }
-
-        public override void Close()
-        {
-            try
-            {
-                if (_Connection != null && _Connection.State != ConnectionState.Closed)
-                {
-                    try
-                    {
-                        while (HasTransaction)
-                            RollbackTransaction();
-                    }
-                    catch { /*ignore errors here*/ }
-
-                    _Connection.Close();
-                }
-            }
-            catch { }
-            if (_Connection != null) _Connection.Dispose();
-            _Connection = null;
-        }
-
-        public override DbConnection Connection
-        {
-            get { return _Connection; }
-        }
-
-        #endregion
-
-        #region IDisposable
-
-        public override void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Close();
-            }
-            // Now clean up Native Resources (Pointers)
-        }
-
+        
         #endregion
 
         #region Executing
 
         public override int ExecuteNonQuery(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (NpgsqlCommand command = new NpgsqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
             {
                 return command.ExecuteNonQuery();
             }
@@ -97,16 +52,17 @@ namespace dg.Sql.Connector
 
         public override int ExecuteNonQuery(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteNonQuery();
         }
 
         public override object ExecuteScalar(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (NpgsqlCommand command = new NpgsqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
             {
                 return command.ExecuteScalar();
             }
@@ -114,53 +70,73 @@ namespace dg.Sql.Connector
 
         public override object ExecuteScalar(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteScalar();
         }
 
         public override DataReaderBase ExecuteReader(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (NpgsqlCommand command = new NpgsqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction);
+            try
             {
-                return new DataReaderBase(command.ExecuteReader());
+                return new DataReaderBase(command.ExecuteReader(), command);
+            }
+            catch (Exception ex)
+            {
+                command.Dispose();
+                throw ex;
             }
         }
 
         public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (NpgsqlCommand command = new NpgsqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction);
+            try
             {
-                return new DataReaderBase(command.ExecuteReader(), attachConnectionToReader ? this : null);
+                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
+            }
+            catch (Exception ex)
+            {
+                command.Dispose();
+                throw ex;
             }
         }
 
-        public override DataReaderBase ExecuteReader(DbCommand command)
+        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
-            return new DataReaderBase(((NpgsqlCommand)command).ExecuteReader());
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+
+            return new DataReaderBase(
+                command.ExecuteReader(),
+                attachCommandToReader ? command : null,
+                attachConnectionToReader ? this : null);
         }
 
         public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return new DataReaderBase(((NpgsqlCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
         }
 
         public override DataSet ExecuteDataSet(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (NpgsqlCommand cmd = new NpgsqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var cmd = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
             {
                 DataSet dataSet = new DataSet();
-                using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(cmd))
+                using (var adapter = new NpgsqlDataAdapter(cmd))
                 {
                     adapter.Fill(dataSet);
                 }
@@ -170,14 +146,16 @@ namespace dg.Sql.Connector
 
         public override DataSet ExecuteDataSet(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             DataSet dataSet = new DataSet();
-            using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter((NpgsqlCommand)command))
+
+            using (var adapter = new NpgsqlDataAdapter((NpgsqlCommand)command))
             {
                 adapter.Fill(dataSet);
             }
+
             return dataSet;
         }
 
@@ -201,7 +179,7 @@ namespace dg.Sql.Connector
             if (_PostgreSQLMode == null)
             {
                 PostgreSQLMode sqlMode;
-                if (_Map_ConnStr_SqlMode.TryGetValue(_Connection.ConnectionString, out sqlMode))
+                if (_Map_ConnStr_SqlMode.TryGetValue(Connection.ConnectionString, out sqlMode))
                 {
                     _PostgreSQLMode = sqlMode;
                 }
@@ -218,7 +196,7 @@ namespace dg.Sql.Connector
                         sqlMode.BackslashQuote = ExecuteScalar("show backslash_quote").ToString() == @"on";
                     }
                     catch { }
-                    _Map_ConnStr_SqlMode[_Connection.ConnectionString] = sqlMode;
+                    _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
                     _PostgreSQLMode = sqlMode;
                 }
             }
@@ -230,7 +208,7 @@ namespace dg.Sql.Connector
             if (_Version == null)
             {
                 string version;
-                if (_Map_ConnStr_Version.TryGetValue(_Connection.ConnectionString, out version))
+                if (_Map_ConnStr_Version.TryGetValue(Connection.ConnectionString, out version))
                 {
                     _Version = version;
                 }
@@ -240,7 +218,7 @@ namespace dg.Sql.Connector
                     {
                         version = ExecuteScalar("select version()").ToString();
                         _Version = version;
-                        _Map_ConnStr_Version[_Connection.ConnectionString] = _Version;
+                        _Map_ConnStr_Version[Connection.ConnectionString] = _Version;
                     }
                     catch { }
                 }
@@ -255,7 +233,7 @@ namespace dg.Sql.Connector
 
         public NpgsqlConnection GetUnderlyingConnection()
         {
-            return _Connection;
+            return (NpgsqlConnection)Connection;
         }
 
         public override object GetLastInsertID()
@@ -270,95 +248,8 @@ namespace dg.Sql.Connector
 
         public override bool CheckIfTableExists(string TableName)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"select * from information_schema.tables where table_name= " + PrepareValue(TableName)) != null;
-        }
-
-        #endregion
-
-        #region Transactions
-
-        NpgsqlTransaction _Transaction = null;
-        Stack<NpgsqlTransaction> _Transactions = null;
-
-        public override bool BeginTransaction()
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction();
-                if (_Transactions == null) _Transactions = new Stack<NpgsqlTransaction>(1);
-                _Transactions.Push(_Transaction);
-                return (_Transaction != null);
-            }
-            catch (NpgsqlException) { }
-            return false;
-        }
-
-        public override bool BeginTransaction(IsolationLevel IsolationLevel)
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction(IsolationLevel);
-                if (_Transactions == null) _Transactions = new Stack<NpgsqlTransaction>(1);
-                _Transactions.Push(_Transaction);
-            }
-            catch (NpgsqlException) { return false; }
-            return (_Transaction != null);
-        }
-
-        public override bool CommitTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Commit();
-                }
-                catch (NpgsqlException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool RollbackTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Rollback();
-                }
-                catch (NpgsqlException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool HasTransaction
-        {
-            get { return _Transaction != null; }
-        }
-
-        public override int CurrentTransactions
-        {
-            get { return _Transactions == null ? 0 : _Transactions.Count; }
-        }
-
-        public override DbTransaction Transaction
-        {
-            get { return _Transaction; }
         }
 
         #endregion

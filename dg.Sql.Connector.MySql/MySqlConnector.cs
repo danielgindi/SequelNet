@@ -24,63 +24,17 @@ namespace dg.Sql.Connector
             return new MySqlConnection(FindConnectionString(connectionStringKey));
         }
 
-        private MySqlConnection _Connection = null;
-
         public MySqlConnector()
         {
-            _Connection = CreateSqlConnection(null);
+            Connection = CreateSqlConnection(null);
         }
         public MySqlConnector(string connectionStringKey)
         {
-            _Connection = CreateSqlConnection(connectionStringKey);
+            Connection = CreateSqlConnection(connectionStringKey);
         }
         ~MySqlConnector()
         {
             Dispose(false);
-        }
-
-        public override void Close()
-        {
-            try
-            {
-                if (_Connection != null && _Connection.State != ConnectionState.Closed)
-                {
-                    try
-                    {
-                        while (HasTransaction)
-                            RollbackTransaction();
-                    }
-                    catch { /*ignore errors here*/ }
-
-                    _Connection.Close();
-                }
-            }
-            catch { }
-            if (_Connection != null) _Connection.Dispose();
-            _Connection = null;
-        }
-
-        public override DbConnection Connection
-        {
-            get { return _Connection; }
-        }
-
-        #endregion
-
-        #region IDisposable
-
-        public override void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                Close();
-            }
-            // Now clean up Native Resources (Pointers)
         }
 
         #endregion
@@ -89,8 +43,9 @@ namespace dg.Sql.Connector
 
         public override int ExecuteNonQuery(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (MySqlCommand command = new MySqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
             {
                 return command.ExecuteNonQuery();
             }
@@ -98,16 +53,17 @@ namespace dg.Sql.Connector
 
         public override int ExecuteNonQuery(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteNonQuery();
         }
 
         public override object ExecuteScalar(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (MySqlCommand command = new MySqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
             {
                 return command.ExecuteScalar();
             }
@@ -115,9 +71,9 @@ namespace dg.Sql.Connector
 
         public override object ExecuteScalar(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return command.ExecuteScalar();
         }
 
@@ -168,19 +124,20 @@ namespace dg.Sql.Connector
 
         public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             return new DataReaderBase(((MySqlCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
         }
 
         public override DataSet ExecuteDataSet(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (MySqlCommand cmd = new MySqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var cmd = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
             {
                 DataSet dataSet = new DataSet();
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter(cmd))
+                using (var adapter = new MySqlDataAdapter(cmd))
                 {
                     adapter.Fill(dataSet);
                 }
@@ -190,21 +147,23 @@ namespace dg.Sql.Connector
 
         public override DataSet ExecuteDataSet(DbCommand command)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
             DataSet dataSet = new DataSet();
-            using (MySqlDataAdapter adapter = new MySqlDataAdapter((MySqlCommand)command))
+
+            using (var adapter = new MySqlDataAdapter((MySqlCommand)command))
             {
                 adapter.Fill(dataSet);
             }
+
             return dataSet;
         }
 
         public override int ExecuteScript(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            MySqlScript script = new MySqlScript(_Connection, querySql);
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            MySqlScript script = new MySqlScript((MySqlConnection)Connection, querySql);
             return script.Execute();
         }
 
@@ -223,7 +182,7 @@ namespace dg.Sql.Connector
             if (_MySqlMode == null)
             {
                 MySqlMode sqlMode;
-                if (_Map_ConnStr_SqlMode.TryGetValue(_Connection.ConnectionString, out sqlMode))
+                if (_Map_ConnStr_SqlMode.TryGetValue(Connection.ConnectionString, out sqlMode))
                 {
                     _MySqlMode = sqlMode;
                 }
@@ -235,7 +194,7 @@ namespace dg.Sql.Connector
                         sqlMode.SqlMode = ExecuteScalar("SELECT @@SQL_MODE").ToString();
                     }
                     catch { }
-                    _Map_ConnStr_SqlMode[_Connection.ConnectionString] = sqlMode;
+                    _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
                     _MySqlMode = sqlMode;
                 }
             }
@@ -247,7 +206,7 @@ namespace dg.Sql.Connector
             if (_Version == null)
             {
                 string version;
-                if (_Map_ConnStr_Version.TryGetValue(_Connection.ConnectionString, out version))
+                if (_Map_ConnStr_Version.TryGetValue(Connection.ConnectionString, out version))
                 {
                     _Version = version;
                 }
@@ -257,7 +216,7 @@ namespace dg.Sql.Connector
                     {
                         version = ExecuteScalar("SELECT @@VERSION").ToString();
                         _Version = version;
-                        _Map_ConnStr_Version[_Connection.ConnectionString] = _Version;
+                        _Map_ConnStr_Version[Connection.ConnectionString] = _Version;
                     }
                     catch { }
                 }
@@ -272,7 +231,7 @@ namespace dg.Sql.Connector
 
         public MySqlConnection GetUnderlyingConnection()
         {
-            return _Connection;
+            return (MySqlConnection)Connection;
         }
 
         public override object GetLastInsertID()
@@ -287,95 +246,8 @@ namespace dg.Sql.Connector
 
         public override bool CheckIfTableExists(string TableName)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SHOW TABLES LIKE " + PrepareValue(TableName)) != null;
-        }
-
-        #endregion
-
-        #region Transactions
-
-        MySqlTransaction _Transaction = null;
-        Stack<MySqlTransaction> _Transactions = null;
-
-        public override bool BeginTransaction()
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction();
-                if (_Transactions == null) _Transactions = new Stack<MySqlTransaction>(1);
-                _Transactions.Push(_Transaction);
-                return (_Transaction != null);
-            }
-            catch (MySqlException) { }
-            return false;
-        }
-
-        public override bool BeginTransaction(IsolationLevel IsolationLevel)
-        {
-            try
-            {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-                _Transaction = _Connection.BeginTransaction(IsolationLevel);
-                if (_Transactions == null) _Transactions = new Stack<MySqlTransaction>(1);
-                _Transactions.Push(_Transaction);
-            }
-            catch (MySqlException) { return false; }
-            return (_Transaction != null);
-        }
-
-        public override bool CommitTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Commit();
-                }
-                catch (MySqlException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool RollbackTransaction()
-        {
-            if (_Transaction == null) return false;
-            else
-            {
-                _Transactions.Pop();
-
-                try
-                {
-                    _Transaction.Rollback();
-                }
-                catch (MySqlException) { return false; }
-
-                if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
-                else _Transaction = null;
-                return true;
-            }
-        }
-
-        public override bool HasTransaction
-        {
-            get { return _Transaction != null; }
-        }
-
-        public override int CurrentTransactions
-        {
-            get { return _Transactions == null ? 0 : _Transactions.Count; }
-        }
-
-        public override DbTransaction Transaction
-        {
-            get { return _Transaction; }
         }
 
         #endregion
