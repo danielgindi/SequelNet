@@ -13,10 +13,13 @@ namespace dg.Sql.Connector
 
         protected DbDataReader UnderlyingReader = null;
         protected ConnectorBase AttachedConnection = null;
+        protected DbCommand AttachedDbCommand = null;
 
-        public DataReaderBase(DbDataReader reader)
+        public DataReaderBase(DbDataReader reader, DbCommand attachedDbCommand = null, ConnectorBase attachedConnection = null)
         {
             UnderlyingReader = reader;
+            AttachedDbCommand = attachedDbCommand;
+            AttachedConnection = attachedConnection;
         }
 
         public DataReaderBase(DbDataReader reader, ConnectorBase connectionToClose)
@@ -48,6 +51,11 @@ namespace dg.Sql.Connector
                 {
                     AttachedConnection.Dispose();
                     AttachedConnection = null;
+                }
+                if (AttachedDbCommand != null)
+                {
+                    AttachedDbCommand.Dispose();
+                    AttachedDbCommand = null;
                 }
             }
             // Now clean up Native Resources (Pointers)
@@ -380,6 +388,11 @@ namespace dg.Sql.Connector
             if (AttachedConnection != null)
             {
                 AttachedConnection.Close();
+            }
+
+            if (AttachedDbCommand != null)
+            {
+                AttachedDbCommand.Dispose();
             }
         }
 

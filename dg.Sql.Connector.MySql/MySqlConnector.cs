@@ -123,27 +123,47 @@ namespace dg.Sql.Connector
 
         public override DataReaderBase ExecuteReader(string querySql)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (MySqlCommand command = new MySqlCommand(querySql, _Connection, _Transaction))
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction);
+            try
             {
-                return new DataReaderBase(command.ExecuteReader());
+                return new DataReaderBase(command.ExecuteReader(), command);
             }
-        }
-        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
-        {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            using (MySqlCommand command = new MySqlCommand(querySql, _Connection, _Transaction))
+            catch (Exception ex)
             {
-                return new DataReaderBase(command.ExecuteReader(), attachConnectionToReader ? this : null);
+                command.Dispose();
+                throw ex;
             }
         }
 
-        public override DataReaderBase ExecuteReader(DbCommand command)
+        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
-            return new DataReaderBase(((MySqlCommand)command).ExecuteReader());
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction);
+            try
+            {
+                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
+            }
+            catch (Exception ex)
+            {
+                command.Dispose();
+                throw ex;
+            }
+        }
+
+        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+
+            return new DataReaderBase(
+                command.ExecuteReader(),
+                attachCommandToReader ? command : null,
+                attachConnectionToReader ? this : null);
         }
 
         public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
