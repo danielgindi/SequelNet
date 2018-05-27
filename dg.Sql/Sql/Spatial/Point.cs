@@ -64,48 +64,11 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"geography::STGeomFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"geometry::STGeomFromText('");
-                    }
-                }
-                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"ST_GeogFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"ST_GeomFromText('");
-                    }
-                }
-                else
-                {
-                    sb.Append(@"GeomFromText('");
-                }
+                var geom = "POINT(" + X.ToString(formatProvider) + " " + Y.ToString(formatProvider) + ")";
 
-                sb.Append(@"POINT(");
-                sb.Append(X.ToString(formatProvider));
-                sb.Append(' ');
-                sb.Append(Y.ToString(formatProvider));
-
-                if (SRID != null)
-                {
-                    sb.Append(@")',");
-                    sb.Append(SRID.Value);
-                    sb.Append(')');
-                }
-                else
-                {
-                    sb.Append(@")')");
-                }
+                sb.Append(IsGeographyType
+                    ? conn.func_ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString()) 
+                    : conn.func_ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)

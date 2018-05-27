@@ -61,52 +61,22 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"geography::STGeomFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"geometry::STGeomFromText('");
-                    }
-                }
-                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"ST_GeogFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"ST_GeomFromText('");
-                    }
-                }
-                else
-                {
-                    sb.Append(@"GeomFromText('");
-                }
+                var sbGeom = new StringBuilder();
 
-                sb.Append(@"GEOMETRYCOLLECTION(");
+                sbGeom.Append(@"GEOMETRYCOLLECTION(");
 
                 bool firstGeometry = true;
-                foreach (GeometryType geometry in _Geometries)
+                foreach (var geometry in _Geometries)
                 {
-                    if (firstGeometry) firstGeometry = false; else sb.Append(',');
-                    geometry.BuildValueForCollection(sb, conn);
+                    if (firstGeometry) firstGeometry = false; else sbGeom.Append(',');
+                    geometry.BuildValueForCollection(sbGeom, conn);
                 }
 
-                if (SRID != null)
-                {
-                    sb.Append(@")',");
-                    sb.Append(SRID.Value);
-                    sb.Append(')');
-                }
-                else
-                {
-                    sb.Append(@")')");
-                }
+                sbGeom.Append(')');
+
+                sb.Append(IsGeographyType
+                    ? conn.func_ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString())
+                    : conn.func_ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)

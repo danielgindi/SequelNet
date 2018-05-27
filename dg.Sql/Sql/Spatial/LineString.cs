@@ -129,54 +129,23 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"geography::STGeomFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"geometry::STGeomFromText('");
-                    }
-                }
-                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"ST_GeogFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"ST_GeomFromText('");
-                    }
-                }
-                else
-                {
-                    sb.Append(@"GeomFromText('");
-                }
-
-                sb.Append(@"LINESTRING(");
+                var sbGeom = new StringBuilder();
+                sbGeom.Append(@"LINESTRING(");
 
                 bool first = true;
-                foreach (Point pt in _Points)
+                foreach (var pt in _Points)
                 {
-                    if (first) first = false; else sb.Append(',');
-                    sb.Append(pt.X.ToString(formatProvider));
-                    sb.Append(' ');
-                    sb.Append(pt.Y.ToString(formatProvider));
+                    if (first) first = false; else sbGeom.Append(',');
+                    sbGeom.Append(pt.X.ToString(formatProvider));
+                    sbGeom.Append(' ');
+                    sbGeom.Append(pt.Y.ToString(formatProvider));
                 }
 
-                if (SRID != null)
-                {
-                    sb.Append(@")',");
-                    sb.Append(SRID.Value);
-                    sb.Append(')');
-                }
-                else
-                {
-                    sb.Append(@")')");
-                }
+                sbGeom.Append(')');
+
+                sb.Append(IsGeographyType
+                    ? conn.func_ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString())
+                    : conn.func_ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)

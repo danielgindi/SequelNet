@@ -79,51 +79,19 @@ namespace dg.Sql
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"geography::STGeomFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"geometry::STGeomFromText('");
-                    }
-                }
-                else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    if (this.IsGeographyType)
-                    {
-                        sb.Append(@"ST_GeogFromText('");
-                    }
-                    else
-                    {
-                        sb.Append(@"ST_GeomFromText('");
-                    }
-                }
-                else
-                {
-                    sb.Append(@"GeomFromText('");
-                }
+                var sbGeom = new StringBuilder();
+                BuildValueForCollection(sbGeom, conn);
 
-                BuildValueForCollection(sb, conn);
-                
-                if (SRID != null)
-                {
-                    sb.Append(@"',");
-                    sb.Append(SRID.Value);
-                    sb.Append(')');
-                }
-                else
-                {
-                    sb.Append(@"')");
-                }
+                sb.Append(IsGeographyType
+                    ? conn.func_ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()) 
+                    : conn.func_ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
                 bool firstLineString = true, first;
                 sb.Append(@"POLYGON(");
+
                 if (_Exterior != null)
                 {
                     firstLineString = false; ;
@@ -138,12 +106,13 @@ namespace dg.Sql
                     }
                     sb.Append(')');
                 }
-                foreach (LineString ring in _Holes)
+
+                foreach (var ring in _Holes)
                 {
                     if (firstLineString) firstLineString = false; else sb.Append(',');
                     sb.Append('(');
                     first = true;
-                    foreach (Point pt in ring.Points)
+                    foreach (var pt in ring.Points)
                     {
                         if (first) first = false; else sb.Append(',');
                         sb.Append(pt.X.ToString(formatProvider));

@@ -494,6 +494,31 @@ namespace dg.Sql.Connector
             return @"UNHEX(SHA1(" + value + "))";
         }
 
+        public virtual string func_ST_X(string pt)
+        {
+            return "ST_X(" + pt + ")";
+        }
+
+        public virtual string func_ST_Y(string pt)
+        {
+            return "ST_Y(" + pt + ")";
+        }
+
+        public virtual string func_ST_Contains(string g1, string g2)
+        {
+            return "ST_Contains(" + g1 + ", " + g2 + ")";
+        }
+
+        public virtual string func_ST_GeomFromText(string text, string srid = null)
+        {
+            return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
+        public virtual string func_ST_GeogFromText(string text, string srid = null)
+        {
+            return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
         public virtual string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
 

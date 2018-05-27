@@ -21,42 +21,16 @@ namespace dg.Sql.Phrases
             this.Value = new ValueWrapper(tableName, column);
         }
 
+        public ST_X(ValueWrapper value)
+        {
+            this.Value = value;
+        }
+
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "(";
-
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-            {
-            }
-            else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-            {
-                ret += "ST_X(";
-            }
-            else
-            {
-                ret += "X(";
-            }
-                        
-            ret += Value.Build(conn, relatedQuery);
-            
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-            {
-                ret += ".STX";
-            }
-            else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-            {
-                ret += ")";
-            }
-            else
-            {
-                ret += ")";
-            }
-
-            ret += ')';
-
-            return ret;
+            return conn.func_ST_X(Value.Build(conn, relatedQuery));
         }
     }
 }

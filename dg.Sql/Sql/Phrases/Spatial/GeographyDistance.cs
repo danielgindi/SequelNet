@@ -34,7 +34,7 @@ namespace dg.Sql.Phrases
             GenerateXY(conn, To, out tx, out ty);
             
             StringBuilder sb = new StringBuilder();
-            sb.Append(@"12742.0*ASIN(SQRT(POWER(SIN(((");
+            sb.Append(@"12742.0 * ASIN(SQRT(POWER(SIN(((");
             sb.Append(fx);
             sb.Append(@")-(");
             sb.Append(tx);
@@ -69,24 +69,8 @@ namespace dg.Sql.Phrases
                     pt = conn.WrapFieldName(point.PointColumnName);
                 }
 
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    x = pt + @".STX";
-                    y = pt + @".STY";
-                }
-                else
-                {
-                    if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                    {
-                        x = @"ST_X(" + pt + @")";
-                        y = @"ST_Y(" + pt + @")";
-                    }
-                    else // MYSQL
-                    {
-                        x = @"X(" + pt + @")";
-                        y = @"Y(" + pt + @")";
-                    }
-                }
+                x = conn.func_ST_X(pt);
+                y = conn.func_ST_Y(pt);
             }
             else
             {

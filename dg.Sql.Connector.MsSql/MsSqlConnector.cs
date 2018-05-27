@@ -351,6 +351,31 @@ namespace dg.Sql.Connector
             return @"LEN(" + value + ")";
         }
 
+        public override string func_ST_X(string pt)
+        {
+            return pt + ".STX";
+        }
+
+        public override string func_ST_Y(string pt)
+        {
+            return pt + ".STY";
+        }
+
+        public override string func_ST_Contains(string g1, string g2)
+        {
+            return g1 + ".STContains(" + g2 + ")";
+        }
+
+        public override string func_ST_GeomFromText(string text, string srid = null)
+        {
+            return "geometry::STGeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
+        public override string func_ST_GeogFromText(string text, string srid = null)
+        {
+            return "geography::STGeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
         public override string type_TINYINT { get { return @"TINYINT"; } }
         public override string type_UNSIGNEDTINYINT { get { return @"TINYINT"; } }
         public override string type_SMALLINT { get { return @"SMALLINT"; } }

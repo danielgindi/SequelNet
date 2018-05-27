@@ -224,6 +224,36 @@ namespace dg.Sql.Connector
             return _Version;
         }
 
+        bool? _Is5_0_3OrLater = null;
+        private bool Is5_0_3OrLater()
+        {
+            if (_Is5_0_3OrLater == null)
+            {
+                _Is5_0_3OrLater = GetVersion().CompareTo("5.0.3") >= 0;
+            }
+            return _Is5_0_3OrLater.Value;
+        }
+
+        bool? _Is5_7OrLater = null;
+        private bool Is5_7OrLater()
+        {
+            if (_Is5_7OrLater == null)
+            {
+                _Is5_7OrLater = GetVersion().CompareTo("5.7") >= 0;
+            }
+            return _Is5_7OrLater.Value;
+        }
+
+        bool? _Is8_0OrLater = null;
+        private bool Is8_0OrLater()
+        {
+            if (_Is8_0OrLater == null)
+            {
+                _Is8_0OrLater = GetVersion().CompareTo("8.0") >= 0;
+            }
+            return _Is8_0OrLater.Value;
+        }
+
         public override bool SupportsSelectPaging()
         {
             return true;
@@ -351,7 +381,7 @@ namespace dg.Sql.Connector
         {
             get 
             {
-                if (GetVersion().CompareTo("5.0.3") >= 0)
+                if (Is5_0_3OrLater())
                 {
                     return 21845;
                 }
@@ -365,6 +395,59 @@ namespace dg.Sql.Connector
         public override string func_UTC_NOW()
         {
             return @"UTC_TIMESTAMP()";
+        }
+
+        public override string func_ST_X(string pt)
+        {
+            if (Is5_7OrLater())
+            {
+                return "ST_X(" + pt + ")";
+            }
+            else
+            {
+                return "X(" + pt + ")";
+            }
+        }
+
+        public override string func_ST_Y(string pt)
+        {
+            if (Is5_7OrLater())
+            {
+                return "ST_Y(" + pt + ")";
+            }
+            else
+            {
+                return "Y(" + pt + ")";
+            }
+        }
+
+        public override string func_ST_Contains(string g1, string g2)
+        {
+            if (Is5_7OrLater())
+            {
+                return "ST_Contains(" + g1 + ", " + g2 + ")";
+            }
+            else
+            {
+                return "MBRContains(" + g1 + ", " + g2 + ")";
+            }
+        }
+
+        public override string func_ST_GeomFromText(string text, string srid = null)
+        {
+            if (Is5_7OrLater())
+            {
+                return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            }
+            else
+            {
+                return "GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            }
+        }
+
+        public override string func_ST_GeogFromText(string text, string srid = null)
+        {
+            return func_ST_GeomFromText(text, srid);
         }
 
         public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }

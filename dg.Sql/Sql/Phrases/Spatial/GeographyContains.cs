@@ -114,79 +114,54 @@ namespace dg.Sql.Phrases
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-            {
-            }
-            else 
-            {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    sb.Append(@"ST_Contains(");
-                }
-                else // MYSQL
-                {
-                    sb.Append(@"MBRContains(");
-                }
-            }
-
+            StringBuilder sb1 = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
+                        
             if (OuterValueType == ValueObjectType.ColumnName)
             {
                 if (OuterTableName != null && OuterTableName.Length > 0)
                 {
-                    sb.Append(conn.WrapFieldName(OuterTableName));
-                    sb.Append(".");
+                    sb1.Append(conn.WrapFieldName(OuterTableName));
+                    sb1.Append(".");
                 }
-                sb.Append(conn.WrapFieldName(OuterValue.ToString()));
+                sb1.Append(conn.WrapFieldName(OuterValue.ToString()));
             }
             else if (OuterValueType == ValueObjectType.Value)
             {
                 if (OuterValue is Geometry)
                 {
-                    ((Geometry)OuterValue).BuildValue(sb, conn);
+                    ((Geometry)OuterValue).BuildValue(sb1, conn);
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(OuterValue, relatedQuery));
+                    sb1.Append(conn.PrepareValue(OuterValue, relatedQuery));
                 }
             }
-            else sb.Append(OuterValue);
-
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-            {
-                sb.Append(@".STContains(");
-            }
-            else // MYSQL, PostgreSQL
-            {
-                sb.Append(@",");
-            }
-
+            else sb1.Append(OuterValue);
+            
             if (InnerValueType == ValueObjectType.ColumnName)
             {
                 if (InnerTableName != null && InnerTableName.Length > 0)
                 {
-                    sb.Append(conn.WrapFieldName(InnerTableName));
-                    sb.Append(".");
+                    sb2.Append(conn.WrapFieldName(InnerTableName));
+                    sb2.Append(".");
                 }
-                sb.Append(conn.WrapFieldName(InnerValue.ToString()));
+                sb2.Append(conn.WrapFieldName(InnerValue.ToString()));
             }
             else if (InnerValueType == ValueObjectType.Value)
             {
                 if (InnerValue is Geometry)
                 {
-                    ((Geometry)InnerValue).BuildValue(sb, conn);
+                    ((Geometry)InnerValue).BuildValue(sb2, conn);
                 }
                 else
                 {
-                    sb.Append(conn.PrepareValue(InnerValue, relatedQuery));
+                    sb2.Append(conn.PrepareValue(InnerValue, relatedQuery));
                 }
             }
-            else sb.Append(InnerValue);
+            else sb2.Append(InnerValue);
 
-            sb.Append(@")");
-
-            return sb.ToString();
+            return conn.func_ST_Contains(sb1.ToString(), sb2.ToString());
         }
     }
 }

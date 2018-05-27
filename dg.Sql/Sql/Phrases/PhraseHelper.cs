@@ -1277,6 +1277,11 @@ namespace dg.Sql
             return new ST_X(phrase);
         }
 
+        public static ST_X ST_X(ValueWrapper value)
+        {
+            return new ST_X(value);
+        }
+
         public static ST_Y ST_Y(string tableName, string columnName)
         {
             return new ST_Y(tableName, columnName);
@@ -1285,6 +1290,11 @@ namespace dg.Sql
         public static ST_Y ST_Y(IPhrase phrase)
         {
             return new ST_Y(phrase);
+        }
+        
+        public static ST_Y ST_Y(ValueWrapper value)
+        {
+            return new ST_Y(value);
         }
 
         #endregion
