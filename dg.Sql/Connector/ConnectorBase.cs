@@ -99,6 +99,11 @@ namespace dg.Sql.Connector
             return FindConnectionString(null);
         }
 
+        abstract public FactoryBase Factory
+        {
+            get;
+        }
+
         public DbConnection Connection
         {
             get { return _Connection; }
@@ -148,31 +153,112 @@ namespace dg.Sql.Connector
         #endregion
 
         #region Executing
-
-        abstract public int ExecuteNonQuery(string QuerySql);
-        abstract public int ExecuteNonQuery(DbCommand Command);
-        abstract public object ExecuteScalar(string QuerySql);
-        abstract public object ExecuteScalar(DbCommand Command);
-        abstract public DataReaderBase ExecuteReader(string QuerySql);
-        abstract public DataReaderBase ExecuteReader(string QuerySql, bool AttachConnectionToReader);
+        
+        public virtual int ExecuteNonQuery(DbCommand command)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+            return command.ExecuteNonQuery();
+        }
+        
+        public virtual object ExecuteScalar(DbCommand command)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+            return command.ExecuteScalar();
+        }
 
         public virtual DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
         {
-            if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+            try
+            {
+                if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
 
-            command.Connection = _Connection;
-            command.Transaction = _Transaction;
+                command.Connection = Connection;
+                command.Transaction = Transaction;
 
-            return new DataReaderBase(
-                command.ExecuteReader(),
-                attachCommandToReader ? command : null,
-                attachConnectionToReader ? this : null);
+                return new DataReaderBase(
+                    command.ExecuteReader(),
+                    attachCommandToReader ? command : null,
+                    attachConnectionToReader ? this : null);
+            }
+            catch (Exception ex)
+            {
+                if (attachCommandToReader && command != null)
+                    command.Dispose();
+
+                if (attachConnectionToReader && Connection != null)
+                    Connection.Dispose();
+
+                throw ex;
+            }
+        }
+        
+        public virtual DataSet ExecuteDataSet(DbCommand command)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+
+            var dataSet = new DataSet();
+
+            using (var adapter = Factory.NewDataAdapter(command))
+            {
+                adapter.Fill(dataSet);
+            }
+
+            return dataSet;
         }
 
-        abstract public DataReaderBase ExecuteReader(DbCommand Command, bool AttachConnectionToReader);
-        abstract public DataSet ExecuteDataSet(string QuerySql);
-        abstract public DataSet ExecuteDataSet(DbCommand Command);
-        abstract public int ExecuteScript(string QuerySql);
+        public virtual int ExecuteNonQuery(string querySql)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = Factory.NewCommand(querySql, Connection, Transaction))
+            {
+                return command.ExecuteNonQuery();
+            }
+        }
+
+        public virtual object ExecuteScalar(string querySql)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var command = Factory.NewCommand(querySql, Connection, Transaction))
+            {
+                return command.ExecuteScalar();
+            }
+        }
+
+        public virtual DataReaderBase ExecuteReader(string querySql)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = Factory.NewCommand(querySql, Connection, Transaction);
+            return ExecuteReader(command, true);
+        }
+
+        public virtual DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            var command = Factory.NewCommand(querySql, Connection, Transaction);
+            return ExecuteReader(command, true, attachConnectionToReader);
+        }
+
+        public virtual DataSet ExecuteDataSet(string querySql)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+
+            using (var cmd = Factory.NewCommand(querySql, Connection, Transaction))
+            {
+                return ExecuteDataSet(cmd);
+            }
+        }
+
+        public abstract int ExecuteScript(string querySql);
 
         #endregion
 

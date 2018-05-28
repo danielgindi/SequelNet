@@ -27,7 +27,7 @@ namespace dg.Sql
         private string _AlterColumnOldName;
         private string _DropColumnName;
         private string _StoredProcedureName;
-        private List<DbParameter> _StoredProcedureParameters = null;
+        private List<DbParameterWrapper> _StoredProcedureParameters = null;
         internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();
         private QueryMode _QueryMode = QueryMode.Select;
         private bool _IsDistinct = false;

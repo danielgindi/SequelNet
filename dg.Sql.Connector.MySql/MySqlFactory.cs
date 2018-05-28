@@ -10,10 +10,11 @@ namespace dg.Sql.Connector
 {
     public class MySqlFactory : FactoryBase
     {
+        internal static MySqlFactory Instance = new MySqlFactory();
+
         public override DbParameter NewParameter(string name, object value)
         {
-            MySqlParameter p = new MySqlParameter(name, value);
-            return p;
+            return new MySqlParameter(name, value);
         }
 
         public override DbParameter NewParameter(string name, DbType type, object value)
@@ -50,50 +51,42 @@ namespace dg.Sql.Connector
 
         public override DbCommand NewCommand()
         {
-            MySqlCommand p = new MySqlCommand();
-            return p;
+            return new MySqlCommand();
         }
 
         public override DbCommand NewCommand(string commandText)
         {
-            MySqlCommand p = new MySqlCommand(commandText);
-            return p;
+            return new MySqlCommand(commandText);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            MySqlCommand p = new MySqlCommand(commandText, (MySqlConnection)connection);
-            return p;
+            return new MySqlCommand(commandText, (MySqlConnection)connection);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            MySqlCommand p = new MySqlCommand(commandText, (MySqlConnection)connection, (MySqlTransaction)transaction);
-            return p;
+            return new MySqlCommand(commandText, (MySqlConnection)connection, (MySqlTransaction)transaction);
         }
 
         public override DbDataAdapter NewDataAdapter()
         {
-            MySqlDataAdapter da = new MySqlDataAdapter();
-            return da;
+            return new MySqlDataAdapter();
         }
 
         public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter((MySqlCommand)selectCommand);
-            return da;
+            return new MySqlDataAdapter((MySqlCommand)selectCommand);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter(selectCommandText, (MySqlConnection)connection);
-            return da;
+            return new MySqlDataAdapter(selectCommandText, (MySqlConnection)connection);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            MySqlDataAdapter da = new MySqlDataAdapter(selectCommandText, selectConnString);
-            return da;
+            return new MySqlDataAdapter(selectCommandText, selectConnString);
         }
     }
 }

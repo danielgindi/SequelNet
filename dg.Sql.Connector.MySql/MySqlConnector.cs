@@ -28,138 +28,29 @@ namespace dg.Sql.Connector
         {
             Connection = CreateSqlConnection(null);
         }
+
         public MySqlConnector(string connectionStringKey)
         {
             Connection = CreateSqlConnection(connectionStringKey);
         }
+
         ~MySqlConnector()
         {
             Dispose(false);
         }
 
+        public override FactoryBase Factory
+        {
+            get
+            {
+                return MySqlFactory.Instance;
+            }
+        }
+
         #endregion
 
         #region Executing
-
-        public override int ExecuteNonQuery(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
-            {
-                return command.ExecuteNonQuery();
-            }
-        }
-
-        public override int ExecuteNonQuery(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteNonQuery();
-        }
-
-        public override object ExecuteScalar(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
-            {
-                return command.ExecuteScalar();
-            }
-        }
-
-        public override object ExecuteScalar(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteScalar();
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-
-            return new DataReaderBase(
-                command.ExecuteReader(),
-                attachCommandToReader ? command : null,
-                attachConnectionToReader ? this : null);
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return new DataReaderBase(((MySqlCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
-        }
-
-        public override DataSet ExecuteDataSet(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var cmd = new MySqlCommand(querySql, (MySqlConnection)Connection, Transaction as MySqlTransaction))
-            {
-                DataSet dataSet = new DataSet();
-                using (var adapter = new MySqlDataAdapter(cmd))
-                {
-                    adapter.Fill(dataSet);
-                }
-                return dataSet;
-            }
-        }
-
-        public override DataSet ExecuteDataSet(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            DataSet dataSet = new DataSet();
-
-            using (var adapter = new MySqlDataAdapter((MySqlCommand)command))
-            {
-                adapter.Fill(dataSet);
-            }
-
-            return dataSet;
-        }
-
+        
         public override int ExecuteScript(string querySql)
         {
             if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();

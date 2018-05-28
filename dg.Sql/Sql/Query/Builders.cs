@@ -950,7 +950,7 @@ namespace dg.Sql
         {
             if (this.QueryMode == QueryMode.ExecuteStoredProcedure)
             {
-                var cmd = FactoryBase.Factory().NewCommand(_StoredProcedureName);
+                var cmd = connection.Factory.NewCommand(_StoredProcedureName);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 if (CommandTimeout != null)
@@ -958,9 +958,9 @@ namespace dg.Sql
 
                 if (_StoredProcedureParameters != null)
                 {
-                    foreach (DbParameter param in _StoredProcedureParameters)
+                    foreach (var param in _StoredProcedureParameters)
                     {
-                        cmd.Parameters.Add(param);
+                        cmd.Parameters.Add(param.Build(connection.Factory));
                     }
                 }
 
@@ -974,7 +974,7 @@ namespace dg.Sql
             }
             else
             {
-                var cmd = FactoryBase.Factory().NewCommand(BuildCommand(connection));
+                var cmd = connection.Factory.NewCommand(BuildCommand(connection));
                 cmd.CommandType = CommandType.Text;
 
                 if (CommandTimeout != null)

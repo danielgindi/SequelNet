@@ -27,137 +27,28 @@ namespace dg.Sql.Connector
         {
             Connection = CreateSqlConnection(null);
         }
+
         public PostgreSQLConnector(string connectionStringKey)
         {
             Connection = CreateSqlConnection(connectionStringKey);
         }
+
         ~PostgreSQLConnector()
         {
             Dispose(false);
         }
-        
+
+        public override FactoryBase Factory
+        {
+            get
+            {
+                return PostgreSQLFactory.Instance;
+            }
+        }
+
         #endregion
 
         #region Executing
-
-        public override int ExecuteNonQuery(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
-            {
-                return command.ExecuteNonQuery();
-            }
-        }
-
-        public override int ExecuteNonQuery(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteNonQuery();
-        }
-
-        public override object ExecuteScalar(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
-            {
-                return command.ExecuteScalar();
-            }
-        }
-
-        public override object ExecuteScalar(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteScalar();
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-
-            return new DataReaderBase(
-                command.ExecuteReader(),
-                attachCommandToReader ? command : null,
-                attachConnectionToReader ? this : null);
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return new DataReaderBase(((NpgsqlCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
-        }
-
-        public override DataSet ExecuteDataSet(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var cmd = new NpgsqlCommand(querySql, (NpgsqlConnection)Connection, Transaction as NpgsqlTransaction))
-            {
-                DataSet dataSet = new DataSet();
-                using (var adapter = new NpgsqlDataAdapter(cmd))
-                {
-                    adapter.Fill(dataSet);
-                }
-                return dataSet;
-            }
-        }
-
-        public override DataSet ExecuteDataSet(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            DataSet dataSet = new DataSet();
-
-            using (var adapter = new NpgsqlDataAdapter((NpgsqlCommand)command))
-            {
-                adapter.Fill(dataSet);
-            }
-
-            return dataSet;
-        }
 
         public override int ExecuteScript(string querySql)
         {

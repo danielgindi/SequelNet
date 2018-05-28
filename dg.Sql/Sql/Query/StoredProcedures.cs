@@ -34,8 +34,10 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query AddStoredProcedureParameter(DbParameter dbParameter)
         {
-            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(dbParameter);
+            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameterWrapper>();
+            _StoredProcedureParameters.Add(new DbParameterWrapper {
+                Parameter = dbParameter,
+            });
             return this;
         }
 
@@ -47,8 +49,12 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query AddStoredProcedureParameter(string name, object value)
         {
-            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, value));
+            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameterWrapper>();
+            _StoredProcedureParameters.Add(new DbParameterWrapper
+            {
+                ParameterName = name,
+                Value = value,
+            });
             return this;
         }
 
@@ -61,8 +67,13 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query AddStoredProcedureParameter(string name, DbType type, object value)
         {
-            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, type, value));
+            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameterWrapper>();
+            _StoredProcedureParameters.Add(new DbParameterWrapper
+            {
+                ParameterName = name,
+                Value = value,
+                DbType = type,
+            });
             return this;
         }
 
@@ -75,8 +86,13 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query AddStoredProcedureParameter(string name, object value, ParameterDirection parameterDirection)
         {
-            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, value, parameterDirection));
+            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameterWrapper>();
+            _StoredProcedureParameters.Add(new DbParameterWrapper
+            {
+                ParameterName = name,
+                Value = value,
+                Direction = parameterDirection,
+            });
             return this;
         }
 
@@ -98,9 +114,61 @@ namespace dg.Sql
             int size, bool isNullable, byte precision, byte scale, 
             string sourceColumn, DataRowVersion sourceVersion, object value)
         {
-            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameter>();
-            _StoredProcedureParameters.Add(FactoryBase.Factory().NewParameter(name, type, parameterDirection, size, isNullable, precision, scale, sourceColumn, sourceVersion, value));
+            if (_StoredProcedureParameters == null) _StoredProcedureParameters = new List<DbParameterWrapper>();
+            _StoredProcedureParameters.Add(new DbParameterWrapper
+            {
+                ParameterName = name,
+                DbType = type,
+                Value = value,
+                Direction = parameterDirection,
+                Size = size,
+                IsNullable = isNullable,
+                Precision = precision,
+                Scale = scale,
+                SourceColumn = sourceColumn,
+                SourceVersion = sourceVersion,
+            });
             return this;
+        }
+
+        private class DbParameterWrapper
+        {
+            public DbParameter Parameter { get; set; }
+            public DbType? DbType { get; set; }
+            public ParameterDirection? Direction { get; set; }
+            public bool? IsNullable { get; set; }
+            public string ParameterName { get; set; }
+            public byte? Precision { get; set; }
+            public byte? Scale { get; set; }
+            public int? Size { get; set; }
+            public string SourceColumn { get; set; }
+            public bool? SourceColumnNullMapping { get; set; }
+            public DataRowVersion? SourceVersion { get; set; }
+            public object Value { get; set; }
+
+            public DbParameter Build(FactoryBase factory)
+            {
+                if (Parameter != null)
+                {
+                    return Parameter;
+                }
+                else
+                {
+                    var param = factory.NewParameter(ParameterName, Value);
+
+                    if (DbType != null) param.DbType = DbType.Value;
+                    if (Direction != null) param.Direction = Direction.Value;
+                    if (IsNullable != null) param.IsNullable = IsNullable.Value;
+                    if (Precision != null) param.Precision = Precision.Value;
+                    if (Scale != null) param.Scale = Scale.Value;
+                    if (Size != null) param.Size = Size.Value;
+                    if (SourceColumn != null) param.SourceColumn = SourceColumn;
+                    if (SourceColumnNullMapping != null) param.SourceColumnNullMapping = SourceColumnNullMapping.Value;
+                    if (SourceVersion != null) param.SourceVersion = SourceVersion.Value;
+
+                    return param;
+                }
+            }
         }
     }
 }

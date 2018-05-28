@@ -9,10 +9,11 @@ namespace dg.Sql.Connector
 {
     public class MsSqlFactory : FactoryBase
     {
+        internal static MsSqlFactory Instance = new MsSqlFactory();
+
         public override DbParameter NewParameter(string name, object value)
         {
-            SqlParameter p = new SqlParameter(name, value);
-            return p;
+            return new SqlParameter(name, value);
         }
 
         public override DbParameter NewParameter(string name, DbType type, object value)
@@ -49,50 +50,42 @@ namespace dg.Sql.Connector
 
         public override DbCommand NewCommand()
         {
-            SqlCommand p = new SqlCommand();
-            return p;
+            return new SqlCommand();
         }
 
         public override DbCommand NewCommand(string commandText)
         {
-            SqlCommand p = new SqlCommand(commandText);
-            return p;
+            return new SqlCommand(commandText);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            SqlCommand p = new SqlCommand(commandText, (SqlConnection)connection);
-            return p;
+            return new SqlCommand(commandText, (SqlConnection)connection);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            SqlCommand p = new SqlCommand(commandText, (SqlConnection)connection, (SqlTransaction)transaction);
-            return p;
+            return new SqlCommand(commandText, (SqlConnection)connection, (SqlTransaction)transaction);
         }
 
         public override DbDataAdapter NewDataAdapter()
         {
-            SqlDataAdapter da = new SqlDataAdapter();
-            return da;
+            return new SqlDataAdapter();
         }
 
         public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            SqlDataAdapter da = new SqlDataAdapter((SqlCommand)selectCommand);
-            return da;
+            return new SqlDataAdapter((SqlCommand)selectCommand);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            SqlDataAdapter da = new SqlDataAdapter(selectCommandText, (SqlConnection)connection);
-            return da;
+            return new SqlDataAdapter(selectCommandText, (SqlConnection)connection);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            SqlDataAdapter da = new SqlDataAdapter(selectCommandText, selectConnString);
-            return da;
+            return new SqlDataAdapter(selectCommandText, selectConnString);
         }
     }
 }

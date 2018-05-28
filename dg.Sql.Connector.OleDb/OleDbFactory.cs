@@ -9,10 +9,11 @@ namespace dg.Sql.Connector
 {
     public class OleDbFactory : FactoryBase
     {
+        internal static OleDbFactory Instance = new OleDbFactory();
+
         public override DbParameter NewParameter(string name, object value)
         {
-            OleDbParameter p = new OleDbParameter(name, value);
-            return p;
+            return new OleDbParameter(name, value);
         }
 
         public override DbParameter NewParameter(string name, DbType type, object value)
@@ -49,50 +50,42 @@ namespace dg.Sql.Connector
 
         public override DbCommand NewCommand()
         {
-            OleDbCommand p = new OleDbCommand();
-            return p;
+            return new OleDbCommand();
         }
 
         public override DbCommand NewCommand(string commandText)
         {
-            OleDbCommand p = new OleDbCommand(commandText);
-            return p;
+            return new OleDbCommand(commandText);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            OleDbCommand p = new OleDbCommand(commandText, (OleDbConnection)connection);
-            return p;
+            return new OleDbCommand(commandText, (OleDbConnection)connection);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            OleDbCommand p = new OleDbCommand(commandText, (OleDbConnection)connection, (OleDbTransaction)transaction);
-            return p;
+            return new OleDbCommand(commandText, (OleDbConnection)connection, (OleDbTransaction)transaction);
         }
 
         public override DbDataAdapter NewDataAdapter()
         {
-            OleDbDataAdapter da = new OleDbDataAdapter();
-            return da;
+            return new OleDbDataAdapter();
         }
 
         public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter((OleDbCommand)selectCommand);
-            return da;
+            return new OleDbDataAdapter((OleDbCommand)selectCommand);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter(selectCommandText, (OleDbConnection)connection);
-            return da;
+            return new OleDbDataAdapter(selectCommandText, (OleDbConnection)connection);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            OleDbDataAdapter da = new OleDbDataAdapter(selectCommandText, selectConnString);
-            return da;
+            return new OleDbDataAdapter(selectCommandText, selectConnString);
         }
     }
 }

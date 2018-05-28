@@ -44,8 +44,8 @@ namespace dg.Sql
             {
                 if (needsDispose) connection = ConnectorBase.NewInstance();
 
-                using (var cmd = BuildDbCommand(connection))
-                    return connection.ExecuteReader(cmd, needsDispose);
+                var cmd = BuildDbCommand(connection);
+                return connection.ExecuteReader(cmd, true, needsDispose);
             }
             catch
             {
@@ -213,8 +213,8 @@ namespace dg.Sql
         /// <returns>List of values. Will never return null.</returns>
         public List<T> ExecuteScalarList<T>(ConnectorBase connection = null)
         {
-            List<T> list = new List<T>();
-            using (DataReaderBase reader = ExecuteReader(connection))
+            var list = new List<T>();
+            using (var reader = ExecuteReader(connection))
             {
                 object value;
                 while (reader.Read())
@@ -237,7 +237,7 @@ namespace dg.Sql
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public List<object> ExecuteOneRowToList(ConnectorBase connection = null)
         {
-            using (DataReaderBase reader = ExecuteReader(connection))
+            using (var reader = ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -268,7 +268,7 @@ namespace dg.Sql
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public Dictionary<string, object> ExecuteOneRowToDictionary(ConnectorBase connection = null)
         {
-            using (DataReaderBase reader = ExecuteReader(connection))
+            using (var reader = ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -304,7 +304,7 @@ namespace dg.Sql
         public List<List<object>> ExecuteListOfLists(ConnectorBase connection = null)
         {
             List<List<object>> results = new List<List<object>>();
-            using (DataReaderBase reader = ExecuteReader(connection))
+            using (var reader = ExecuteReader(connection))
             {
                 List<object> row;
                 object value;
@@ -332,8 +332,8 @@ namespace dg.Sql
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         public List<Dictionary<string, object>> ExecuteListOfDictionaries(ConnectorBase connection = null)
         {
-            List<Dictionary<string, object>> results = new List<Dictionary<string, object>>();
-            using (DataReaderBase reader = ExecuteReader(connection))
+            var results = new List<Dictionary<string, object>>();
+            using (var reader = ExecuteReader(connection))
             {
                 Dictionary<string, object> row;
                 int i, c = reader.GetColumnCount();

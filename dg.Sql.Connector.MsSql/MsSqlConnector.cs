@@ -27,137 +27,28 @@ namespace dg.Sql.Connector
         {
             Connection = CreateSqlConnection(null);
         }
+
         public MsSqlConnector(string connectionStringKey)
         {
             Connection = CreateSqlConnection(connectionStringKey);
         }
+
         ~MsSqlConnector()
         {
             Dispose(false);
         }
-        
+
+        public override FactoryBase Factory
+        {
+            get
+            {
+                return MsSqlFactory.Instance;
+            }
+        }
+
         #endregion
 
         #region Executing
-
-        public override int ExecuteNonQuery(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new SqlCommand(querySql, (SqlConnection)Connection, Transaction as SqlTransaction))
-            {
-                return command.ExecuteNonQuery();
-            }
-        }
-
-        public override int ExecuteNonQuery(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteNonQuery();
-        }
-
-        public override object ExecuteScalar(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new SqlCommand(querySql, (SqlConnection)Connection, Transaction as SqlTransaction))
-            {
-                return command.ExecuteScalar();
-            }
-        }
-
-        public override object ExecuteScalar(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return command.ExecuteScalar();
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new SqlCommand(querySql, (SqlConnection)Connection, Transaction as SqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            var command = new SqlCommand(querySql, (SqlConnection)Connection, Transaction as SqlTransaction);
-            try
-            {
-                return new DataReaderBase(command.ExecuteReader(), command, attachConnectionToReader ? this : null);
-            }
-            catch (Exception ex)
-            {
-                command.Dispose();
-                throw ex;
-            }
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-
-            return new DataReaderBase(
-                command.ExecuteReader(),
-                attachCommandToReader ? command : null,
-                attachConnectionToReader ? this : null);
-        }
-
-        public override DataReaderBase ExecuteReader(DbCommand command, bool attachConnectionToReader)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            return new DataReaderBase(((SqlCommand)command).ExecuteReader(), attachConnectionToReader ? this : null);
-        }
-
-        public override DataSet ExecuteDataSet(string querySql)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-
-            using (var command = new SqlCommand(querySql, (SqlConnection)Connection, Transaction as SqlTransaction))
-            {
-                DataSet dataSet = new DataSet();
-                using (var adapter = new SqlDataAdapter(command))
-                {
-                    adapter.Fill(dataSet);
-                }
-                return dataSet;
-            }
-        }
-
-        public override DataSet ExecuteDataSet(DbCommand command)
-        {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            command.Connection = Connection;
-            command.Transaction = Transaction;
-            DataSet dataSet = new DataSet();
-
-            using (var adapter = new SqlDataAdapter((SqlCommand)command))
-            {
-                adapter.Fill(dataSet);
-            }
-
-            return dataSet;
-        }
 
         public override int ExecuteScript(string querySql)
         {

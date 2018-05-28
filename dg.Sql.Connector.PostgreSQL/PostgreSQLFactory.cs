@@ -10,10 +10,11 @@ namespace dg.Sql.Connector
 {
     public class PostgreSQLFactory : FactoryBase
     {
+        internal static PostgreSQLFactory Instance = new PostgreSQLFactory();
+
         public override DbParameter NewParameter(string name, object value)
         {
-            NpgsqlParameter p = new NpgsqlParameter(name, value);
-            return p;
+            return new NpgsqlParameter(name, value);
         }
 
         public override DbParameter NewParameter(string name, DbType type, object value)
@@ -50,50 +51,42 @@ namespace dg.Sql.Connector
 
         public override DbCommand NewCommand()
         {
-            NpgsqlCommand p = new NpgsqlCommand();
-            return p;
+            return new NpgsqlCommand();
         }
 
         public override DbCommand NewCommand(string commandText)
         {
-            NpgsqlCommand p = new NpgsqlCommand(commandText);
-            return p;
+            return new NpgsqlCommand(commandText);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection)
         {
-            NpgsqlCommand p = new NpgsqlCommand(commandText, (NpgsqlConnection)connection);
-            return p;
+            return new NpgsqlCommand(commandText, (NpgsqlConnection)connection);
         }
 
         public override DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
-            NpgsqlCommand p = new NpgsqlCommand(commandText, (NpgsqlConnection)connection, (NpgsqlTransaction)transaction);
-            return p;
+            return new NpgsqlCommand(commandText, (NpgsqlConnection)connection, (NpgsqlTransaction)transaction);
         }
 
         public override DbDataAdapter NewDataAdapter()
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter();
-            return da;
+            return new NpgsqlDataAdapter();
         }
 
         public override DbDataAdapter NewDataAdapter(DbCommand selectCommand)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter((NpgsqlCommand)selectCommand);
-            return da;
+            return new NpgsqlDataAdapter((NpgsqlCommand)selectCommand);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(selectCommandText, (NpgsqlConnection)connection);
-            return da;
+            return new NpgsqlDataAdapter(selectCommandText, (NpgsqlConnection)connection);
         }
 
         public override DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
         {
-            NpgsqlDataAdapter da = new NpgsqlDataAdapter(selectCommandText, selectConnString);
-            return da;
+            return new NpgsqlDataAdapter(selectCommandText, selectConnString);
         }
     }
 }
