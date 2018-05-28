@@ -37,6 +37,7 @@ namespace dg.Sql
         private QueryHint _QueryHint = QueryHint.None;
         private GroupByHint _GroupByHint = GroupByHint.None;
         private bool _NeedTransaction = false;
+        private int? _CommandTimeout = null;
 
         #endregion
 
@@ -555,6 +556,15 @@ namespace dg.Sql
         {
             get { return _NeedTransaction; }
             set { _NeedTransaction = value; }
+        }
+
+        /// <summary>
+        /// The command timeout. If null, default command timeout will be used.
+        /// </summary>
+        public int? CommandTimeout
+        {
+            get { return _CommandTimeout; }
+            set { _CommandTimeout = value; }
         }
 
         #endregion

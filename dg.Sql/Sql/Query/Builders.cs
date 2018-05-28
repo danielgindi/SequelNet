@@ -950,32 +950,42 @@ namespace dg.Sql
         {
             if (this.QueryMode == QueryMode.ExecuteStoredProcedure)
             {
-                using (DbCommand cmd = FactoryBase.Factory().NewCommand(_StoredProcedureName))
+                var cmd = FactoryBase.Factory().NewCommand(_StoredProcedureName);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                if (CommandTimeout != null)
+                    cmd.CommandTimeout = CommandTimeout.Value;
+
+                if (_StoredProcedureParameters != null)
                 {
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    if (_StoredProcedureParameters != null)
+                    foreach (DbParameter param in _StoredProcedureParameters)
                     {
-                        foreach (DbParameter param in _StoredProcedureParameters)
-                        {
-                            cmd.Parameters.Add(param);
-                        }
+                        cmd.Parameters.Add(param);
                     }
-                    if (connection != null)
-                    {
-                        cmd.Connection = connection.Connection;
-                        cmd.Transaction = connection.Transaction;
-                    }
-                    return cmd;
                 }
-            }
-            else
-            {
-                DbCommand cmd = FactoryBase.Factory().NewCommand(BuildCommand(connection));
+
                 if (connection != null)
                 {
                     cmd.Connection = connection.Connection;
                     cmd.Transaction = connection.Transaction;
                 }
+
+                return cmd;
+            }
+            else
+            {
+                var cmd = FactoryBase.Factory().NewCommand(BuildCommand(connection));
+                cmd.CommandType = CommandType.Text;
+
+                if (CommandTimeout != null)
+                    cmd.CommandTimeout = CommandTimeout.Value;
+
+                if (connection != null)
+                {
+                    cmd.Connection = connection.Connection;
+                    cmd.Transaction = connection.Transaction;
+                }
+
                 return cmd;
             }
         }

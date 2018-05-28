@@ -20,14 +20,8 @@ namespace dg.Sql
             try
             {
                 if (needsDispose) connection = ConnectorBase.NewInstance();
-                if (_QueryMode == QueryMode.ExecuteStoredProcedure)
-                {
-                    return connection.ExecuteDataSet(BuildDbCommand(connection));
-                }
-                else
-                {
-                    return connection.ExecuteDataSet(BuildCommand(connection));
-                }
+                using (var cmd = BuildDbCommand(connection))
+                    return connection.ExecuteDataSet(cmd);
             }
             finally
             {
@@ -49,14 +43,9 @@ namespace dg.Sql
             try
             {
                 if (needsDispose) connection = ConnectorBase.NewInstance();
-                if (_QueryMode == QueryMode.ExecuteStoredProcedure)
-                {
-                    return connection.ExecuteReader(BuildDbCommand(connection), needsDispose);
-                }
-                else
-                {
-                    return connection.ExecuteReader(BuildCommand(connection), needsDispose);
-                }
+
+                using (var cmd = BuildDbCommand(connection))
+                    return connection.ExecuteReader(cmd, needsDispose);
             }
             catch
             {
@@ -89,14 +78,8 @@ namespace dg.Sql
                 }
                 object retValue = null;
 
-                if (_QueryMode == QueryMode.ExecuteStoredProcedure)
-                {
-                    retValue = connection.ExecuteScalar(BuildDbCommand(connection));
-                }
-                else
-                {
-                    retValue = connection.ExecuteScalar(BuildCommand(connection));
-                }
+                using (var cmd = BuildDbCommand(connection))
+                    retValue = connection.ExecuteScalar(cmd);
 
                 if (retValue is DBNull) retValue = null;
                 else if (retValue is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)retValue).IsNull) retValue = null;
@@ -133,14 +116,8 @@ namespace dg.Sql
                 if (_NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
                 int retValue = 0;
 
-                if (_QueryMode == QueryMode.ExecuteStoredProcedure)
-                {
-                    retValue = connection.ExecuteNonQuery(BuildDbCommand(connection));
-                }
-                else
-                {
-                    retValue = connection.ExecuteNonQuery(BuildCommand(connection));
-                }
+                using (var cmd = BuildDbCommand(connection))
+                    retValue = connection.ExecuteNonQuery(cmd);
 
                 if (transaction) connection.CommitTransaction();
                 return retValue;
@@ -183,14 +160,8 @@ namespace dg.Sql
 
                 int retValue = 0;
 
-                if (_QueryMode == QueryMode.ExecuteStoredProcedure)
-                {
-                    retValue = connection.ExecuteNonQuery(BuildDbCommand(connection));
-                }
-                else
-                {
-                    retValue = connection.ExecuteNonQuery(BuildCommand(connection));
-                }
+                using (var cmd = BuildDbCommand(connection))
+                    retValue = connection.ExecuteNonQuery(cmd);
 
                 if (retValue > 0)
                 {
