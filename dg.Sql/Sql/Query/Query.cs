@@ -386,8 +386,11 @@ namespace dg.Sql
                     }
                     else if (columnDefinition.Type == typeof(Guid))
                     {
-                        Guid gValue = new Guid((string)value);
-                        value = gValue;
+                        Guid gValue;
+                        if (Guid.TryParse((string)value, out gValue))
+                        {
+                            value = gValue;
+                        }
                     }
                 }
                 else
