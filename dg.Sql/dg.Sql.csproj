@@ -74,12 +74,20 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sql\Base Types\JsonPathValue.cs" />
     <Compile Include="Sql\Base Types\ValueWrapper.cs" />
     <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
     <Compile Include="Sql\Phrases\DateTime\DateTimeDiff.cs" />
     <Compile Include="Sql\Phrases\FlowControl\Case.cs" />
     <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
     <Compile Include="Sql\Phrases\Hash\MD5.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonArrayInsert.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonSet.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonLength.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonInsert.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonArrayAppend.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonObject.cs" />
+    <Compile Include="Sql\Phrases\Json\JsonArray.cs" />
     <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
     <Compile Include="Sql\Phrases\Math\Abs.cs" />
     <Compile Include="Sql\Phrases\Math\Least.cs" />

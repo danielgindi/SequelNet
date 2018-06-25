@@ -313,6 +313,129 @@ namespace dg.Sql
 
         #region Json
 
+        public static JsonArray JsonArray()
+        {
+            return new JsonArray();
+        }
+
+        public static JsonArray JsonArray(params ValueWrapper[] values)
+        {
+            return new JsonArray(values);
+        }
+
+        public static JsonArray JsonArray(IEnumerable<ValueWrapper> values)
+        {
+            return new JsonArray(values);
+        }
+
+        public static JsonArray JsonArray(params object[] values)
+        {
+            return new JsonArray(values);
+        }
+
+        public static JsonArray JsonArray(params string[] values)
+        {
+            return new JsonArray(values);
+        }
+
+        public static JsonArray JsonArray(params Int64[] values)
+        {
+            return new JsonArray(values);
+        }
+
+        public static JsonArray JsonArray(params Int32[] values)
+        {
+            return new JsonArray(values);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            object doc, ValueObjectType docType,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayAppend(doc, docType, path, value, valueType);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            string docTableName, string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayAppend(docTableName, docColumnName, path, value, valueType);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayAppend(docColumnName, path, value, valueType);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            IPhrase doc,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayAppend(doc, path, value, valueType);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            IPhrase doc,
+            string path,
+            IPhrase value)
+        {
+            return new JsonArrayAppend(doc, path, value);
+        }
+
+        static public JsonArrayAppend JsonArrayAppend(
+            IPhrase doc,
+            string path,
+            params ValueWrapper[] values)
+        {
+            return new JsonArrayAppend(doc, path, values);
+        }
+
+        static public JsonArrayInsert JsonArrayInsert(
+            object doc, ValueObjectType docType,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayInsert(doc, docType, path, value, valueType);
+        }
+
+        static public JsonArrayInsert JsonArrayInsert(
+            string docTableName, string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayInsert(docTableName, docColumnName, path, value, valueType);
+        }
+
+        static public JsonArrayInsert JsonArrayInsert(
+            string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayInsert(docColumnName, path, value, valueType);
+        }
+
+        static public JsonArrayInsert JsonArrayInsert(
+            IPhrase doc,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonArrayInsert(doc, path, value, valueType);
+        }
+
+        static public JsonArrayInsert JsonArrayInsert(
+            IPhrase doc,
+            string path,
+            IPhrase value)
+        {
+            return new JsonArrayInsert(doc, path, value);
+        }
+
         public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path = "$")
         {
             return new JsonExtract(value, valueType, path);
@@ -336,6 +459,141 @@ namespace dg.Sql
         public static JsonExtract JsonExtract(Where where, string path = "$")
         {
             return new JsonExtract(where, path);
+        }
+
+        static public JsonInsert JsonInsert(
+            object doc, ValueObjectType docType,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonInsert(doc, docType, path, value, valueType);
+        }
+
+        static public JsonInsert JsonInsert(
+            string docTableName, string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonInsert(docTableName, docColumnName, path, value, valueType);
+        }
+
+        static public JsonInsert JsonInsert(
+            string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonInsert(docColumnName, path, value, valueType);
+        }
+
+        static public JsonInsert JsonInsert(
+            IPhrase doc,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonInsert(doc, path, value, valueType);
+        }
+
+        static public JsonInsert JsonInsert(
+            IPhrase doc,
+            string path,
+            IPhrase value)
+        {
+            return new JsonInsert(doc, path, value);
+        }
+
+        public static JsonLength JsonLength(object value, ValueObjectType valueType)
+        {
+            return new JsonLength(value, valueType);
+        }
+
+        public static JsonLength JsonLength(string tableName, string columnName)
+        {
+            return new JsonLength(tableName, columnName);
+        }
+
+        public static JsonLength JsonLength(string columnName)
+        {
+            return new JsonLength(columnName);
+        }
+
+        public static JsonLength JsonLength(IPhrase phrase)
+        {
+            return new JsonLength(phrase);
+        }
+
+        public static JsonLength JsonLength(Where where)
+        {
+            return new JsonLength(where);
+        }
+
+        public static JsonObject JsonObject()
+        {
+            return new JsonObject();
+        }
+
+        public static JsonObject JsonObject(Dictionary<string, ValueWrapper> values)
+        {
+            return new JsonObject(values);
+        }
+
+        public static JsonObject JsonObject(Dictionary<string, object> values)
+        {
+            return new JsonObject(values);
+        }
+
+        public static JsonObject JsonObject(Dictionary<string, string> values)
+        {
+            return new JsonObject(values);
+        }
+
+        public static JsonObject JsonObject(Dictionary<string, Int64> values)
+        {
+            return new JsonObject(values);
+        }
+
+        public static JsonObject JsonObject(Dictionary<string, Int32> values)
+        {
+            return new JsonObject(values);
+        }
+
+        static public JsonSet JsonSet(
+            object doc, ValueObjectType docType,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonSet(doc, docType, path, value, valueType);
+        }
+
+        static public JsonSet JsonSet(
+            string docTableName, string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonSet(docTableName, docColumnName, path, value, valueType);
+        }
+
+        static public JsonSet JsonSet(
+            string docColumnName,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonSet(docColumnName, path, value, valueType);
+        }
+
+        static public JsonSet JsonSet(
+            IPhrase doc,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonSet(doc, path, value, valueType);
+        }
+
+        static public JsonSet JsonSet(
+            IPhrase doc,
+            string path,
+            IPhrase value)
+        {
+            return new JsonSet(doc, path, value);
         }
 
         #endregion

@@ -55,110 +55,6 @@ namespace dg.Sql.Phrases
         {
         }
 
-        private static List<string> PathParts(string path)
-        {
-            List<string> parts = new List<string>();
-
-            bool inProp = true; // Starts with a $
-            bool isEscaped = false;
-            bool inArray = false;
-            bool isQuoted = false;
-            string part = "";
-
-            for (int i = 0, len = path.Length; i < len; i++)
-            {
-                char c = path[i];
-                
-                if (isQuoted)
-                {
-                    if (isEscaped || c != '"')
-                    {
-                        part += c; 
-                    }
-
-                    if (isEscaped)
-                    {
-                        isEscaped = false;
-                    }
-                    else
-                    {
-                        switch (c)
-                        {
-                            case '\\':
-                                isEscaped = true;
-                                break;
-
-                            case '"':
-                                parts.Add(StringUtils.UnescapeStringLiteral(part));
-                                isQuoted = false;
-                                inProp = false;
-                                break;
-                        }
-                    }
-
-                    continue;
-                }
-
-                if (inArray)
-                {
-                    if (c == ']')
-                    {
-                        parts.Add(part);
-                        inArray = false;
-                    }
-                    else
-                    {
-                        part += c;
-                    }
-
-                    continue;
-                }
-
-                if (inProp)
-                {
-                    if (c == '.' || c == '[')
-                    {
-                        parts.Add(part);
-                        inProp = false;
-                    }
-                    else
-                    {
-                        if (c == '"' && part.Length == 0)
-                        {
-                            isQuoted = true;
-                            isEscaped = false;
-                        }
-                        else
-                        {
-                            part += c;
-                        }
-
-                        continue;
-                    }
-                }
-                
-                switch (c)
-                {
-                    case '.':
-                        part = "";
-                        inProp = true;
-                        break;
-
-                    case '[':
-                        part = "";
-                        inArray = true;
-                        break;
-                }
-            }
-
-            if (inProp)
-            {
-                parts.Add(part);
-            }
-
-            return parts;
-        }
-
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
@@ -189,7 +85,7 @@ namespace dg.Sql.Phrases
 
                 case ConnectorBase.SqlServiceType.POSTGRESQL:
                     { // No support for returning "self". Postgres works with actual json Objects.
-                        var parts = PathParts(Path);
+                        var parts = JsonPathValue.PathParts(Path);
 
                         if (parts.Count > 0 && parts[0] == "$")
                         {
