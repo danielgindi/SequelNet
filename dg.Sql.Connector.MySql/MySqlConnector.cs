@@ -242,12 +242,12 @@ namespace dg.Sql.Connector
 
         public override string EscapeLike(string expression)
         {
-            return expression.Replace(@"'", @"''").Replace(@"%", @"%%");
+            return expression.Replace("%", "\x10%");
         }
 
         public override string LikeEscapingStatement
         {
-            get { return @"ESCAPE('\\')"; }
+            get { return "ESCAPE('\x10')"; }
         }
 
         #endregion

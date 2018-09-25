@@ -209,21 +209,14 @@ namespace dg.Sql.Connector
 
         public override string EscapeLike(string expression)
         {
-            return expression.Replace(@"_", @"\_").Replace(@"%", @"\%");
+            return expression.Replace(@"_", @"\x10_").Replace(@"%", @"\x10%");
         }
 
         public override string LikeEscapingStatement
         {
             get 
             {
-                if (GetPostgreSQLMode().StandardConformingStrings)
-                {
-                    return @"ESCAPE('\')";
-                }
-                else
-                {
-                    return @"ESCAPE('\\')";
-                }
+                return "ESCAPE('\x10')";
             }
         }
 
