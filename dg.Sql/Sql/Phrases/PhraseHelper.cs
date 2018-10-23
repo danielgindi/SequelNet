@@ -709,6 +709,218 @@ namespace dg.Sql
 
         #region Math
 
+        public static Add Add(
+            string tableName1, string columnName1,
+            string tableName2, string columnName2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                tableName2, columnName2);
+        }
+
+        public static Add Add(
+            string tableName1, string columnName1,
+            object value2, ValueObjectType valueType2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2, valueType2);
+        }
+
+        public static Add Add(
+            object value1, ValueObjectType valueType1,
+            string tableName2, string columnName2)
+        {
+            return new Add(
+                value1, valueType1,
+                tableName2, columnName2);
+        }
+
+        public static Add Add(
+            object value1, ValueObjectType valueType1,
+            object value2, ValueObjectType valueType2)
+        {
+            return new Add(
+                value1, valueType1,
+                value2, valueType2);
+        }
+
+        public static Add Add(string tableName1, string columnName1, Int32 value2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Add Add(string tableName1, string columnName1, Int64 value2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Add Add(string tableName1, string columnName1, decimal value2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Add Add(string tableName1, string columnName1, double value2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Add Add(string tableName1, string columnName1, float value2)
+        {
+            return new Add(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Add Add(string columnName1, Int32 value2)
+        {
+            return new Add(
+                columnName1,
+                value2);
+        }
+
+        public static Add Add(string columnName1, Int64 value2)
+        {
+            return new Add(
+                columnName1,
+                value2);
+        }
+
+        public static Add Add(string columnName1, decimal value2)
+        {
+            return new Add(
+                columnName1,
+                value2);
+        }
+
+        public static Add Add(string columnName1, double value2)
+        {
+            return new Add(
+                columnName1,
+                value2);
+        }
+
+        public static Add Add(string columnName1, float value2)
+        {
+            return new Add(
+                columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(
+            string tableName1, string columnName1,
+            string tableName2, string columnName2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                tableName2, columnName2);
+        }
+
+        public static Subtract Subtract(
+            string tableName1, string columnName1,
+            object value2, ValueObjectType valueType2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2, valueType2);
+        }
+
+        public static Subtract Subtract(
+            object value1, ValueObjectType valueType1,
+            string tableName2, string columnName2)
+        {
+            return new Subtract(
+                value1, valueType1,
+                tableName2, columnName2);
+        }
+
+        public static Subtract Subtract(
+            object value1, ValueObjectType valueType1,
+            object value2, ValueObjectType valueType2)
+        {
+            return new Subtract(
+                value1, valueType1,
+                value2, valueType2);
+        }
+
+        public static Subtract Subtract(string tableName1, string columnName1, Int32 value2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string tableName1, string columnName1, Int64 value2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string tableName1, string columnName1, decimal value2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string tableName1, string columnName1, double value2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string tableName1, string columnName1, float value2)
+        {
+            return new Subtract(
+                tableName1, columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string columnName1, Int32 value2)
+        {
+            return new Subtract(
+                columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string columnName1, Int64 value2)
+        {
+            return new Subtract(
+                columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string columnName1, decimal value2)
+        {
+            return new Subtract(
+                columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string columnName1, double value2)
+        {
+            return new Subtract(
+                columnName1,
+                value2);
+        }
+
+        public static Subtract Subtract(string columnName1, float value2)
+        {
+            return new Subtract(
+                columnName1,
+                value2);
+        }
+
         public static Abs Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
         {
             return new Abs(value, valueType, decimalPlaces);
@@ -1034,112 +1246,6 @@ namespace dg.Sql
         #endregion
 
         #region Aggregate
-
-        public static Add Add(
-            string tableName1, string columnName1,
-            string tableName2, string columnName2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                tableName2, columnName2);
-        }
-
-        public static Add Add(
-            string tableName1, string columnName1,
-            object value2, ValueObjectType valueType2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2, valueType2);
-        }
-
-        public static Add Add(
-            object value1, ValueObjectType valueType1,
-            string tableName2, string columnName2)
-        {
-            return new Add(
-                value1, valueType1,
-                tableName2, columnName2);
-        }
-
-        public static Add Add(
-            object value1, ValueObjectType valueType1,
-            object value2, ValueObjectType valueType2)
-        {
-            return new Add(
-                value1, valueType1,
-                value2, valueType2);
-        }
-
-        public static Add Add(string tableName1, string columnName1, Int32 value2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2);
-        }
-
-        public static Add Add(string tableName1, string columnName1, Int64 value2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2);
-        }
-
-        public static Add Add(string tableName1, string columnName1, decimal value2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2);
-        }
-
-        public static Add Add(string tableName1, string columnName1, double value2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2);
-        }
-
-        public static Add Add(string tableName1, string columnName1, float value2)
-        {
-            return new Add(
-                tableName1, columnName1,
-                value2);
-        }
-
-        public static Add Add(string columnName1, Int32 value2)
-        {
-            return new Add(
-                columnName1,
-                value2);
-        }
-
-        public static Add Add(string columnName1, Int64 value2)
-        {
-            return new Add(
-                columnName1,
-                value2);
-        }
-
-        public static Add Add(string columnName1, decimal value2)
-        {
-            return new Add(
-                columnName1,
-                value2);
-        }
-
-        public static Add Add(string columnName1, double value2)
-        {
-            return new Add(
-                columnName1,
-                value2);
-        }
-
-        public static Add Add(string columnName1, float value2)
-        {
-            return new Add(
-                columnName1,
-                value2);
-        }
 
         public static Avg Avg(object value, ValueObjectType valueType)
         {

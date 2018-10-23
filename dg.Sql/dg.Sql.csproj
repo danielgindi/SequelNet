@@ -90,6 +90,7 @@
     <Compile Include="Sql\Phrases\Json\JsonArray.cs" />
     <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
     <Compile Include="Sql\Phrases\Math\Abs.cs" />
+    <Compile Include="Sql\Phrases\Math\Add.cs" />
     <Compile Include="Sql\Phrases\Math\Least.cs" />
     <Compile Include="Sql\Phrases\Math\Greatest.cs" />
     <Compile Include="Sql\Phrases\PhraseHelper.cs" />
@@ -131,7 +132,7 @@
     <Compile Include="Sql\Query\Inserts.cs" />
     <Compile Include="Sql\Query\Selects.cs" />
     <Compile Include="Sql\QueryKeywords\WhereList.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Add.cs" />
+    <Compile Include="Sql\Phrases\Math\Subtract.cs" />
     <Compile Include="Sql\Phrases\Spatial\GeographyDistance.cs" />
     <Compile Include="Sql\Phrases\Spatial\GeographyContains.cs" />
     <Compile Include="Sql\QueryKeywords\QueryHint.cs" />
