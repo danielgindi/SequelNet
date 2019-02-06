@@ -1274,13 +1274,10 @@ namespace dg.Sql
                                     }
                                     else sb.Append(',');
 
-                                    if (_ListJoin.Count > 0 && upd.TableName != null)
+                                    if (_ListJoin != null && _ListJoin.Count > 0 && upd.TableName != null)
                                     {
-                                        if (upd.TableName != null)
-                                        {
-                                            sb.Append(connection.WrapFieldName(upd.TableName));
-                                            sb.Append(@".");
-                                        }
+                                        sb.Append(connection.WrapFieldName(upd.TableName));
+                                        sb.Append(@".");
                                     }
 
                                     sb.Append(connection.WrapFieldName(upd.ColumnName));
@@ -1337,7 +1334,6 @@ namespace dg.Sql
 
                                 BuildOrderBy(sb, connection, false);
                             }
-
                             break;
 
                         case QueryMode.InsertOrUpdate:
@@ -1437,6 +1433,7 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.Delete:
                             {
                                 sb.Append(@"DELETE");
@@ -1466,7 +1463,6 @@ namespace dg.Sql
                                 }
                                 BuildOrderBy(sb, connection, false);
                             }
-
                             break;
 
                         case QueryMode.CreateTable:
@@ -1520,9 +1516,11 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.CreateIndex:
                             BuildCreateIndex(sb, connection, _CreateIndexObject);
                             break;
+
                         case QueryMode.CreateIndexes:
                             {
                                 if ((Schema.Indexes.Count + Schema.ForeignKeys.Count) > 1)
@@ -1680,6 +1678,7 @@ namespace dg.Sql
                                 sb.Append(connection.WrapFieldName(_DropColumnName));
                             }
                             break;
+
                         case QueryMode.DropForeignKey:
                             {
                                 if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
@@ -1720,6 +1719,7 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.DropIndex:
                             {
                                 if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
@@ -1748,6 +1748,7 @@ namespace dg.Sql
                                 }
                             }
                             break;
+
                         case QueryMode.DropTable:
                             {
                                 sb.Append(@"DROP TABLE ");
