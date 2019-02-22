@@ -135,7 +135,7 @@ namespace dg.Sql.Migrations
 
             migrations.Sort((a, b) => a.Attribute.Version.CompareTo(b.Attribute.Version));
 
-            if (up)
+            if (!up)
                 migrations.Reverse();
 
             int counter = 0;
