@@ -161,6 +161,8 @@ namespace dg.Sql.Migrations
                     migration.Migration.Down();
 
                     ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Attribute.Description, migration.Type, false));
+
+                    _State.CurrentVersion--;
                 }
 
                 counter++;
@@ -189,14 +191,14 @@ namespace dg.Sql.Migrations
             {
                 _State.IsRollingBack = true;
                 var from = _State.CurrentVersion;
-                var to = _State.StartVersion - 1;
+                var to = _State.StartVersion;
                 _State.StartVersion = from;
                 _State.TargetVersion = to;
             }
 
             var counter = MigrateTo(_State.TargetVersion);
 
-            MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.CurrentVersion));
+            MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.TargetVersion));
 
             return counter;
         }
