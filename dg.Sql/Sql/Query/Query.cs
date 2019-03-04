@@ -215,6 +215,16 @@ namespace dg.Sql
             return this;
         }
 
+        /// <summary>
+        /// Sets the command timeout.
+        /// </summary>
+        /// <param name="timeout">Timeout in seconds</param>
+        public Query SetCommandTimeout(int timeout)
+        {
+            CommandTimeout = timeout;
+            return this;
+        }
+
         #endregion
 
         #region Object
