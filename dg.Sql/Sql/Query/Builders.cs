@@ -139,6 +139,10 @@ namespace dg.Sql
                         {
                             sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
                         }
+                        else if (join.RightTableSql is IPhrase)
+                        {
+                            sb.Append(((IPhrase)join.RightTableSql).BuildPhrase(connection));
+                        }
                         else
                         {
                             sb.Append(join.RightTableSql.ToString());
