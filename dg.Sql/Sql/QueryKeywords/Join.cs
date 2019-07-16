@@ -5,6 +5,7 @@ using System.Text;
 namespace dg.Sql
 {
     internal class JoinList : List<Join> { }
+
     public class JoinColumnPair : WhereList
     {
         public const string RIGHT_TABLE_PLACEHOLDER_ID = @"__RIGHT_TABLE_PLACEHOLDER_ID__";
@@ -43,32 +44,93 @@ namespace dg.Sql
             this.Add(w);
         }
 
+        [Obsolete("Use AND")]
         public JoinColumnPair JoinAND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
+        {
+            return AND(leftTableSchema, leftColumn, rightColumn);
+        }
+
+        [Obsolete("Use AND")]
+        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, string rightColumn)
+        {
+            return AND(leftTableNameOrAlias, leftColumn, rightColumn);
+        }
+
+        [Obsolete("Use AND")]
+        public JoinColumnPair JoinAND(object value, string rightColumn)
+        {
+            return AND(value, rightColumn);
+        }
+
+        [Obsolete("Use AND")]
+        public JoinColumnPair JoinAND(object value, bool literalValue, string rightColumn)
+        {
+            return AND(value, literalValue, rightColumn);
+        }
+
+        [Obsolete("Use AND")]
+        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
+        {
+            return AND(leftTableNameOrAlias, leftColumn, value, literalValue);
+        }
+
+        [Obsolete("Use OR")]
+        public JoinColumnPair JoinOR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
+        {
+            return OR(leftTableSchema, leftColumn, rightColumn);
+        }
+
+        [Obsolete("Use OR")]
+        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, string rightColumn)
+        {
+            return OR(leftTableNameOrAlias, leftColumn, rightColumn);
+        }
+
+        [Obsolete("Use OR")]
+        public JoinColumnPair JoinOR(object value, string rightColumn)
+        {
+            return OR(value, rightColumn);
+        }
+
+        [Obsolete("Use OR")]
+        public JoinColumnPair JoinOR(object value, bool literalValue, string rightColumn)
+        {
+            return OR(value, literalValue, rightColumn);
+        }
+
+        [Obsolete("Use OR")]
+        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
+        {
+            return OR(leftTableNameOrAlias, leftColumn, value, literalValue);
+        }
+
+        public JoinColumnPair AND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
-        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, string rightColumn)
+        public JoinColumnPair AND(string leftTableNameOrAlias, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
-        public JoinColumnPair JoinAND(object value, string rightColumn)
+        public JoinColumnPair AND(object value, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
             return this;
         }
 
-        public JoinColumnPair JoinAND(object value, bool literalValue, string rightColumn)
+        public JoinColumnPair AND(object value, bool literalValue, string rightColumn)
         {
             Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
         }
-        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
+
+        public JoinColumnPair AND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
         {
             Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
@@ -76,25 +138,73 @@ namespace dg.Sql
             return this;
         }
 
-        public JoinColumnPair JoinOR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
+        public new JoinColumnPair AND(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            base.AND(thisObject, thisObjectType, comparison, thatObject, thatObjectType);
+            return this;
+        }
+
+        public new JoinColumnPair AND(IPhrase phrase)
+        {
+            base.AND(phrase);
+            return this;
+        }
+
+        public new JoinColumnPair AND(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            base.AND(phrase, comparison, value);
+            return this;
+        }
+
+        public new JoinColumnPair AND(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            base.AND(phrase, comparison, value, valueType);
+            return this;
+        }
+
+        public new JoinColumnPair AND(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            base.AND(phrase, comparison, tableName, columnName);
+            return this;
+        }
+
+        public new JoinColumnPair AND(WhereList whereList)
+        {
+            base.AND(whereList);
+            return this;
+        }
+
+        public new JoinColumnPair AND(string tableName, string columnName, WhereComparison comparison, object columnValue)
+        {
+            base.AND(tableName, columnName, comparison, columnValue);
+            return this;
+        }
+
+        public new JoinColumnPair AND(string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
+        {
+            base.AND(tableName, columnName, comparison, otherTableName, otherColumnName);
+            return this;
+        }
+
+        public JoinColumnPair OR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.OR, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
-        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, string rightColumn)
+        public JoinColumnPair OR(string leftTableNameOrAlias, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
             return this;
         }
 
-        public JoinColumnPair JoinOR(object value, string rightColumn)
+        public JoinColumnPair OR(object value, string rightColumn)
         {
             this.Add(new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
             return this;
         }
 
-        public JoinColumnPair JoinOR(object value, bool literalValue, string rightColumn)
+        public JoinColumnPair OR(object value, bool literalValue, string rightColumn)
         {
             Where w = new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
@@ -102,14 +212,69 @@ namespace dg.Sql
             return this;
         }
 
-        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
+        public JoinColumnPair OR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
         {
             Where w = new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
             if (literalValue) w.SecondType = ValueObjectType.Literal;
             this.Add(w);
             return this;
         }
+
+        public new JoinColumnPair OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
+        {
+            base.OR(thisObject, thisObjectType, comparison, thatObject, thatObjectType);
+            return this;
+        }
+
+        public new JoinColumnPair OR(string columnName, WhereComparison comparison, object columnValue)
+        {
+            base.OR(columnName, comparison, columnValue);
+            return this;
+        }
+
+        public new JoinColumnPair OR(IPhrase phrase)
+        {
+            base.OR(phrase);
+            return this;
+        }
+
+        public new JoinColumnPair OR(IPhrase phrase, WhereComparison comparison, object value)
+        {
+            base.OR(phrase, comparison, value);
+            return this;
+        }
+
+        public new JoinColumnPair OR(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType)
+        {
+            base.OR(phrase, comparison, value, valueType);
+            return this;
+        }
+
+        public new JoinColumnPair OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
+        {
+            base.OR(phrase, comparison, tableName, columnName);
+            return this;
+        }
+
+        public new JoinColumnPair OR(WhereList whereList)
+        {
+            base.OR(whereList);
+            return this;
+        }
+
+        public new JoinColumnPair OR(string tableName, string columnName, WhereComparison comparison, object columnValue)
+        {
+            base.OR(tableName, columnName, comparison, columnValue);
+            return this;
+        }
+
+        public new JoinColumnPair OR(string tableName, string columnName, WhereComparison comparison, string otherTableName, string otherColumnName)
+        {
+            base.OR(tableName, columnName, comparison, otherTableName, otherColumnName);
+            return this;
+        }
     }
+
     internal class Join
     {
         private JoinType _JoinType;
