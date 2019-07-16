@@ -13,6 +13,7 @@
  *  @StaticColumns          Export column names as static fields (writable) instead of const
  *  @OmitCollection         Omit collection class
  *  @AtomicUpdates          Track atomic column updates
+ *  @SnakeColumnNames		Convert columns actual names to snake case
  *  @InsertAutoIncrement    Allow inserting autoincrement values
  *  @NoCreatedBy			Disable the automatic "CreatedBy" setting on Insert
  *  @NoCreatedOn			Disable the automatic "CreatedOn" setting on Insert

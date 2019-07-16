@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows.Forms;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
@@ -27,10 +27,20 @@ namespace dg.Sql.SchemaGenerator
             {
                 foreach (var column in dalIx.Columns)
                 {
-                    if (context.Columns.Find(x => x.Name.Equals(column.Name)) == null && context.Columns.Find(x => x.NameX.Equals(column.Name)) == null)
+                    if (context.Columns.Find(x => x.Name.Equals(column.Name)) == null && context.Columns.Find(x => x.PropertyName.Equals(column.Name)) == null)
                     {
                         MessageBox.Show(@"Column " + column.Name + @" not found in index " + (dalIx.IndexName ?? ""));
                     }
+                }
+            }
+
+            if (context.SnakeColumnNames)
+            {
+                foreach (var column in context.Columns)
+                {
+                    if (column.HasCustomName) continue;
+
+                    column.Name = SnakeCase(column.Name);
                 }
             }
 
@@ -248,6 +258,10 @@ namespace dg.Sql.SchemaGenerator
                 {
                     context.AtomicUpdates = true;
                 }
+                else if (currentLineTrimmed.StartsWith("@SnakeColumnNames", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.SnakeColumnNames = true;
+                }
                 else if (currentLineTrimmed.StartsWith("@InsertAutoIncrement", StringComparison.OrdinalIgnoreCase))
                 {
                     context.InsertAutoIncrement = true;
@@ -273,11 +287,13 @@ namespace dg.Sql.SchemaGenerator
                     int startPos = currentLineTrimmed.IndexOf(":");
                     DalColumn dalColumn = new DalColumn();
                     dalColumn.Name = currentLineTrimmed.Substring(0, startPos).Trim();
-                    dalColumn.NameX = StripColumnName(dalColumn.Name);
-                    if (context.ClassName == dalColumn.NameX || dalColumn.NameX == "Columns")
+                    dalColumn.PropertyName = StripColumnName(dalColumn.Name);
+
+                    if (context.ClassName == dalColumn.PropertyName || dalColumn.PropertyName == "Columns")
                     {
-                        dalColumn.NameX += "X";
+                        dalColumn.PropertyName += "X";
                     }
+
                     dalColumn.IsPrimaryKey = false;
                     dalColumn.IsNullable = false;
                     dalColumn.AutoIncrement = false;
@@ -323,7 +339,7 @@ namespace dg.Sql.SchemaGenerator
                             columnKeyword.Equals("PRIMARYKEY", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.IsPrimaryKey = true;
-                            context.SingleColumnPrimaryKeyName = (context.SingleColumnPrimaryKeyName != null ? "" : dalColumn.NameX);
+                            context.SingleColumnPrimaryKeyName = (context.SingleColumnPrimaryKeyName != null ? "" : dalColumn.PropertyName);
                         }
                         else if (columnKeyword.Equals("NULLABLE", StringComparison.OrdinalIgnoreCase))
                         {
@@ -693,11 +709,12 @@ namespace dg.Sql.SchemaGenerator
                         }
                         else if (columnKeyword.StartsWith("ColumnName ", StringComparison.OrdinalIgnoreCase))
                         {
+                            dalColumn.HasCustomName = true;
                             dalColumn.Name = columnKeyword.Substring(11);
                         }
                         else if (columnKeyword.StartsWith("PropertyName ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.NameX = columnKeyword.Substring(13);
+                            dalColumn.PropertyName = columnKeyword.Substring(13);
                         }
                         else if (columnKeyword.Equals("Unique Index", StringComparison.OrdinalIgnoreCase) ||
                             columnKeyword.Equals("Unique", StringComparison.OrdinalIgnoreCase))
@@ -790,7 +807,7 @@ namespace dg.Sql.SchemaGenerator
             foreach (DalColumn dalCol in context.Columns)
             {
                 stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";{0}", "\r\n", 
-                    context.StaticColumns ? @"static" : @"const", dalCol.NameX, dalCol.Name);
+                    context.StaticColumns ? @"static" : @"const", dalCol.PropertyName, dalCol.Name);
             }
             stringBuilder.AppendFormat("}}{0}", "\r\n");
             stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _Schema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.Name = @\"{1}\";{0}", "\r\n", context.SchemaName);
@@ -818,7 +835,7 @@ namespace dg.Sql.SchemaGenerator
                 if (dalIx.IndexMode != DalIndexIndexMode.PrimaryKey) continue;
                 foreach (DalIndexColumn indexColumn in dalIx.Columns)
                 {
-                    DalColumn column = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.NameX == indexColumn.Name);
+                    DalColumn column = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.PropertyName == indexColumn.Name);
                     if (column == null) continue;
                     primaryKeyColumns.Add(column);
                 }
@@ -959,7 +976,7 @@ namespace dg.Sql.SchemaGenerator
                     continue;
                 }
                 stringBuilder.Append(dalColumn.ActualType);
-                stringBuilder.AppendFormat(" _{0}", dalColumn.NameX);
+                stringBuilder.AppendFormat(" _{0}", dalColumn.PropertyName);
                 if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue.Length > 0 & (dalColumn.ActualDefaultValue == "null")) && dalColumn.IsNullable)
                 {
                     stringBuilder.AppendFormat(" = {1};{0}", "\r\n",
@@ -988,7 +1005,7 @@ namespace dg.Sql.SchemaGenerator
                 {
                     continue;
                 }
-                object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.NameX, null };
+                object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.PropertyName, null };
                 formatArgs[3] = (dalCol.VirtualProp ? "virtual " : "");
 
                 if (!string.IsNullOrEmpty(dalCol.Comment))
@@ -1028,7 +1045,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (!context.NoCreatedBy)
             {
-                if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedBy") != null)
+                if (context.Columns.Find((DalColumn c) => c.PropertyName == "CreatedBy") != null)
                 {
                     stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
                     printExtraNewLine = true;
@@ -1037,7 +1054,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (!context.NoCreatedOn)
             {
-                if (context.Columns.Find((DalColumn c) => c.NameX == "CreatedOn") != null)
+                if (context.Columns.Find((DalColumn c) => c.PropertyName == "CreatedOn") != null)
                 {
                     stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
                     printExtraNewLine = true;
@@ -1073,19 +1090,19 @@ namespace dg.Sql.SchemaGenerator
                         dalCol.Type == DalColumnType.TUInt32 ||
                         dalCol.Type == DalColumnType.TUInt64)
                     {
-                        stringBuilder.AppendFormat("if ({1} > 0){0}{{{0}", "\r\n", dalCol.NameX);
+                        stringBuilder.AppendFormat("if ({1} > 0){0}{{{0}", "\r\n", dalCol.PropertyName);
                     }
                     else if (dalCol.Type == DalColumnType.TGuid)
                     {
-                        stringBuilder.AppendFormat("if ({1}.Equals(Guid.Empty)){0}{{{0}", "\r\n", dalCol.NameX);
+                        stringBuilder.AppendFormat("if ({1}.Equals(Guid.Empty)){0}{{{0}", "\r\n", dalCol.PropertyName);
                     }
                     else
                     {
-                        stringBuilder.AppendFormat("if ({1} != null){0}{{{0}", "\r\n", dalCol.NameX);
+                        stringBuilder.AppendFormat("if ({1} != null){0}{{{0}", "\r\n", dalCol.PropertyName);
                     }
                 }
                 
-                stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.NameX, ValueToDb(dalCol.NameX, dalCol));
+                stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol));
 
                 if (dalCol.AutoIncrement)
                 {
@@ -1100,7 +1117,7 @@ namespace dg.Sql.SchemaGenerator
 
                 DalColumn dalCol = context.Columns.Find(
                     (DalColumn c) => c.Name == context.SingleColumnPrimaryKeyName 
-                    || c.NameX == context.SingleColumnPrimaryKeyName
+                    || c.PropertyName == context.SingleColumnPrimaryKeyName
                 );
                 if (dalCol.Type == DalColumnType.TBool)
                 {
@@ -1229,8 +1246,8 @@ namespace dg.Sql.SchemaGenerator
             // Update() method
             stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
 
-            bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.NameX == "ModifiedBy") != null;
-            bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.NameX == "ModifiedOn") != null;
+            bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null;
+            bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null;
 
             if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
             {
@@ -1239,7 +1256,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (!context.NoModifiedBy)
             {
-                if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedBy") != null)
+                if (context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null)
                 {
                     stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
                 }
@@ -1247,7 +1264,7 @@ namespace dg.Sql.SchemaGenerator
 
             if (!context.NoModifiedOn)
             {
-                if (context.Columns.Find((DalColumn c) => c.NameX == "ModifiedOn") != null)
+                if (context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null)
                 {
                     stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
                 }
@@ -1277,21 +1294,21 @@ namespace dg.Sql.SchemaGenerator
 
                 if (context.AtomicUpdates)
                 {
-                    stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.NameX);
+                    stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.PropertyName);
                 }
 
-                stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.NameX, ValueToDb(dalCol.NameX, dalCol));
+                stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol));
 
                 if (context.AtomicUpdates)
                 {
-                    stringBuilder.AppendFormat(@"}}{0}{0}", "\r\n", dalCol.NameX);
+                    stringBuilder.AppendFormat(@"}}{0}{0}", "\r\n", dalCol.PropertyName);
                 }
             }
 
             bool flag1 = true;
             foreach (DalColumn dalCol in primaryKeyColumns)
             {
-                stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n", dalCol.NameX, ValueToDb(dalCol.NameX, dalCol), (flag1 ? "Where" : "AND"));
+                stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol), (flag1 ? "Where" : "AND"));
                 flag1 = false;
             }
 
@@ -1567,7 +1584,7 @@ namespace dg.Sql.SchemaGenerator
                     fromDb = dalCol.FromDb;
                 }
 
-                stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.NameX, string.Format(fromDb, string.Format(fromReader, dalCol.NameX), dalCol.DefaultValue, dalCol.NameX));
+                stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.PropertyName, string.Format(fromDb, string.Format(fromReader, dalCol.PropertyName), dalCol.DefaultValue, dalCol.PropertyName));
             }
             if (!string.IsNullOrEmpty(context.CustomAfterRead))
             {
@@ -1599,7 +1616,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("base.MarkColumnMutated(column);{0}{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
-                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = true;{0}", "\r\n", dalCol.NameX, dalCol.NameX, dalCol.IsMutatedProperty);
+                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = true;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
@@ -1608,7 +1625,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("base.MarkColumnNotMutated(column);{0}{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
-                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = false;{0}", "\r\n", dalCol.NameX, dalCol.NameX, dalCol.IsMutatedProperty);
+                    stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = false;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
@@ -1617,7 +1634,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("base.MarkAllColumnsNotMutated();{0}{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
-                    stringBuilder.AppendFormat("if ({1} != null) {1}.{2} = false;{0}", "\r\n", dalCol.NameX, dalCol.IsMutatedProperty);
+                    stringBuilder.AppendFormat("if ({1} != null) {1}.{2} = false;{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
@@ -1627,7 +1644,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("switch (column){0}{{{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
-                    stringBuilder.AppendFormat("case Columns.{1}:{0}if ({2} != null && {2}.{3}) return true;{0}break;{0}", "\r\n", dalCol.NameX, dalCol.NameX, dalCol.IsMutatedProperty);
+                    stringBuilder.AppendFormat("case Columns.{1}:{0}if ({2} != null && {2}.{3}) return true;{0}break;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
                 stringBuilder.AppendFormat("return false;{0}", "\r\n");
@@ -1638,7 +1655,7 @@ namespace dg.Sql.SchemaGenerator
                 stringBuilder.AppendFormat("if (base.HasMutatedColumns()) return true;{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
-                    stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) return true;{0}", "\r\n", dalCol.NameX, dalCol.IsMutatedProperty);
+                    stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) return true;{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("return false;{0}", "\r\n");
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
@@ -1668,7 +1685,7 @@ namespace dg.Sql.SchemaGenerator
                     {
                         first = false;
                     }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.NameX));
+                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
                 }
                 stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
@@ -1678,11 +1695,11 @@ namespace dg.Sql.SchemaGenerator
                 {
                     if (!first)
                     {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
                     }
                     else
                     {
-                        stringBuilder.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                        stringBuilder.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
                         first = false;
                     }
                 }
@@ -1703,7 +1720,7 @@ namespace dg.Sql.SchemaGenerator
                         {
                             first = false;
                         }
-                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.NameX));
+                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
                     }
                     stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
@@ -1714,11 +1731,11 @@ namespace dg.Sql.SchemaGenerator
 
                     if (colIsDeleted != null)
                     {
-                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colIsDeleted.NameX);
+                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colIsDeleted.PropertyName);
                     }
                     else if (colDeleted != null)
                     {
-                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colDeleted.NameX);
+                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colDeleted.PropertyName);
                     }
                     else
                     {
@@ -1730,11 +1747,11 @@ namespace dg.Sql.SchemaGenerator
                     {
                         if (!first)
                         {
-                            stringBuilder.AppendFormat("{0}    .AND(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                            stringBuilder.AppendFormat("{0}    .AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
                         }
                         else
                         {
-                            stringBuilder.AppendFormat("{0}    .Where(Columns.{1}, {2})", "\r\n", dalCol.NameX, ValueToDb(FirstLetterLowerCase(dalCol.NameX), dalCol));
+                            stringBuilder.AppendFormat("{0}    .Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
                             first = false;
                         }
                     }
@@ -1952,7 +1969,7 @@ namespace dg.Sql.SchemaGenerator
 
             stringBuilder.AppendFormat("{0}Name = Columns.{1},",
                 "\r\n",
-                dalCol.NameX);
+                dalCol.PropertyName);
 
             stringBuilder.AppendFormat("{0}Type = typeof({1}),",
                 "\r\n",
@@ -2239,8 +2256,8 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("{0}, TableSchema.ClusterMode.{1}, TableSchema.IndexMode.{2}, TableSchema.IndexType.{3}", formatArgs);
             foreach (DalIndexColumn indexColumn in dalIx.Columns)
             {
-                DalColumn dalCol = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.NameX == indexColumn.Name);
-                string col = (dalCol == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalCol.NameX));
+                DalColumn dalCol = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.PropertyName == indexColumn.Name);
+                string col = (dalCol == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalCol.PropertyName));
                 stringBuilder.AppendFormat(", {0}", col);
                 if (string.IsNullOrEmpty(indexColumn.SortDirection))
                 {
@@ -2339,6 +2356,16 @@ namespace dg.Sql.SchemaGenerator
                 return string.Format(dalCol.ToDb, varName);
             }
         }
+
+        public static string SnakeCase(string value)
+        {
+            var values = new List<string>();
+            var matches = Regex.Matches(value, @"[^A-Z._-]+|[A-Z\d]+(?![^._-])|[A-Z\d]+(?=[A-Z])|[A-Z][^A-Z._-]*", RegexOptions.ECMAScript);
+            foreach (Match match in matches)
+                values.Add(match.Value);
+
+            return string.Join("_", values.Select(x => x.ToLowerInvariant()));
+        }
 	}
 
     public class ScriptContext
@@ -2358,6 +2385,7 @@ namespace dg.Sql.SchemaGenerator
         public bool ExportRecord = true;
         public bool ExportCollection = true;
         public bool AtomicUpdates = false;
+        public bool SnakeColumnNames = false;
         public bool InsertAutoIncrement = false;
         public bool NoCreatedBy = false;
         public bool NoCreatedOn = false;

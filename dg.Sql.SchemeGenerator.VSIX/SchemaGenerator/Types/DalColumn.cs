@@ -12,8 +12,9 @@ namespace dg.Sql.SchemaGenerator
 		public DalColumnType Type;
 		public string LiteralType;
 		public string EnumTypeName;
+		public bool HasCustomName;
 		public string Name;
-		public string NameX;
+        public string PropertyName;
 		public int MaxLength;
 		public int Precision;
 		public int Scale;
