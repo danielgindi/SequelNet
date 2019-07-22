@@ -56,7 +56,7 @@ namespace dg.Sql
                 throw;
             }
         }
-        
+
         /// <summary>
         /// Will execute the query returning the first value of the first row.
         /// </summary>
@@ -99,7 +99,42 @@ namespace dg.Sql
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="connection">An existing connection to use.</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public Nullable<T> ExecuteScalarOrNull<T>(ConnectorBase connection = null) where T : struct, IConvertible
+        {
+            var scalar = ExecuteScalar(connection);
+
+            if (scalar == null || !(scalar is IConvertible)) return null;
+
+            var converted = Convert.ChangeType(scalar, typeof(T));
+            if (converted == null) return null;
+
+            return (T)converted;
+        }
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="connection">An existing connection to use.</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public T ExecuteScalar<T>(ConnectorBase connection = null) where T : class, IConvertible
+        {
+            var scalar = ExecuteScalar(connection);
+
+            if (scalar == null || !(scalar is IConvertible)) return null;
+
+            return Convert.ChangeType(scalar, typeof(T)) as T;
+        }
+
         /// <summary>
         /// Will execute the query without reading any results.
         /// </summary>
