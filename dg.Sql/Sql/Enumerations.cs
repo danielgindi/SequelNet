@@ -58,7 +58,9 @@ namespace dg.Sql
         Like = 9,
         Between = 10,
         In = 11,
-        NotIn = 12
+        NotIn = 12,
+        NullSafeEqualsTo = 13,
+        NullSafeNotEqualsTo = 14,
     }
 
     public enum JoinType

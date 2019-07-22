@@ -341,6 +341,29 @@ namespace dg.Sql.Connector
             return func_ST_GeomFromText(text, srid);
         }
 
+        public override void oper_NullSafeEqualsTo(
+            Where where,
+            bool negate,
+            StringBuilder outputBuilder,
+            ConnectorBase conn,
+            Query relatedQuery,
+            TableSchema rightTableSchema,
+            string rightTableName)
+        {
+            if (negate)
+                outputBuilder.Append(@" NOT ");
+
+            where.BuildSingleValueFirst(
+                outputBuilder, conn,
+                relatedQuery, rightTableSchema, rightTableName);
+
+            outputBuilder.Append(@" <=> ");
+
+            where.BuildSingleValueSecond(
+                outputBuilder, conn,
+                relatedQuery, rightTableSchema, rightTableName);
+        }
+
         public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }
         public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTO_INCREMENT"; } }
 

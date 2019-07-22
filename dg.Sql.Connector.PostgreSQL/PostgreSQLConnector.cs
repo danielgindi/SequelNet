@@ -323,6 +323,28 @@ namespace dg.Sql.Connector
             return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
+        public override void oper_NullSafeEqualsTo(
+            Where where,
+            bool negate,
+            StringBuilder outputBuilder,
+            ConnectorBase conn,
+            Query relatedQuery,
+            TableSchema rightTableSchema,
+            string rightTableName)
+        {
+            where.BuildSingleValueFirst(
+                outputBuilder, conn,
+                relatedQuery, rightTableSchema, rightTableName);
+
+            if (negate)
+                outputBuilder.Append(@" IS DISTINCT FROM ");
+            else outputBuilder.Append(@" IS NOT DISTINCT FROM ");
+
+            where.BuildSingleValueSecond(
+                outputBuilder, conn,
+                relatedQuery, rightTableSchema, rightTableName);
+        }
+
         public override string type_AUTOINCREMENT { get { return @"SERIAL"; } } 
         public override string type_AUTOINCREMENT_BIGINT { get { return @"BIGSERIAL"; } }
 

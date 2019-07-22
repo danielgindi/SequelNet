@@ -354,87 +354,120 @@ namespace dg.Sql
             }
             else
             {
-                BuildSingleValue(
-                    outputBuilder, conn, 
-                    FirstTableName, First, FirstType,
-                    SecondTableName, Second, SecondType,
-                    relatedQuery, rightTableSchema, rightTableName);
-                
-                if (Comparison != WhereComparison.None)
+                if (Comparison == WhereComparison.NullSafeEqualsTo ||
+                    Comparison == WhereComparison.NullSafeNotEqualsTo)
                 {
-                    switch (Comparison)
-                    {
-                        case WhereComparison.EqualsTo:
-                            if (First == null || Second == null) outputBuilder.Append(@" IS ");
-                            else outputBuilder.Append(@" = ");
-                            break;
-                        case WhereComparison.NotEqualsTo:
-                            if (First == null || Second == null) outputBuilder.Append(@" IS NOT ");
-                            else outputBuilder.Append(@" <> ");
-                            break;
-                        case WhereComparison.GreaterThan:
-                            outputBuilder.Append(@" > ");
-                            break;
-                        case WhereComparison.GreaterThanOrEqual:
-                            outputBuilder.Append(@" >= ");
-                            break;
-                        case WhereComparison.LessThan:
-                            outputBuilder.Append(@" < ");
-                            break;
-                        case WhereComparison.LessThanOrEqual:
-                            outputBuilder.Append(@" <= ");
-                            break;
-                        case WhereComparison.Is:
-                            outputBuilder.Append(@" IS ");
-                            break;
-                        case WhereComparison.IsNot:
-                            outputBuilder.Append(@" IS NOT ");
-                            break;
-                        case WhereComparison.Like:
-                            outputBuilder.Append(@" LIKE ");
-                            break;
-                        case WhereComparison.Between:
-                            outputBuilder.Append(@" BETWEEN ");
-                            break;
-                        case WhereComparison.In:
-                            outputBuilder.Append(@" IN ");
-                            break;
-                        case WhereComparison.NotIn:
-                            outputBuilder.Append(@" NOT IN ");
-                            break;
-                    }
-
+                    conn.oper_NullSafeEqualsTo(
+                        this,
+                        Comparison == WhereComparison.NullSafeNotEqualsTo,
+                        outputBuilder, conn, relatedQuery, rightTableSchema, rightTableName);
+                }
+                else
+                {
                     BuildSingleValue(
                         outputBuilder, conn,
-                        SecondTableName, Second, SecondType,
                         FirstTableName, First, FirstType,
+                        SecondTableName, Second, SecondType,
                         relatedQuery, rightTableSchema, rightTableName);
-                    
-                    if (Comparison == WhereComparison.Between)
+
+                    if (Comparison != WhereComparison.None)
                     {
-                        outputBuilder.Append(@" AND ");
+                        switch (Comparison)
+                        {
+                            case WhereComparison.EqualsTo:
+                                if (First == null || Second == null) outputBuilder.Append(@" IS ");
+                                else outputBuilder.Append(@" = ");
+                                break;
+                            case WhereComparison.NotEqualsTo:
+                                if (First == null || Second == null) outputBuilder.Append(@" IS NOT ");
+                                else outputBuilder.Append(@" <> ");
+                                break;
+                            case WhereComparison.GreaterThan:
+                                outputBuilder.Append(@" > ");
+                                break;
+                            case WhereComparison.GreaterThanOrEqual:
+                                outputBuilder.Append(@" >= ");
+                                break;
+                            case WhereComparison.LessThan:
+                                outputBuilder.Append(@" < ");
+                                break;
+                            case WhereComparison.LessThanOrEqual:
+                                outputBuilder.Append(@" <= ");
+                                break;
+                            case WhereComparison.Is:
+                                outputBuilder.Append(@" IS ");
+                                break;
+                            case WhereComparison.IsNot:
+                                outputBuilder.Append(@" IS NOT ");
+                                break;
+                            case WhereComparison.Like:
+                                outputBuilder.Append(@" LIKE ");
+                                break;
+                            case WhereComparison.Between:
+                                outputBuilder.Append(@" BETWEEN ");
+                                break;
+                            case WhereComparison.In:
+                                outputBuilder.Append(@" IN ");
+                                break;
+                            case WhereComparison.NotIn:
+                                outputBuilder.Append(@" NOT IN ");
+                                break;
+                        }
 
                         BuildSingleValue(
                             outputBuilder, conn,
-                            ThirdTableName, Third, ThirdType,
+                            SecondTableName, Second, SecondType,
                             FirstTableName, First, FirstType,
                             relatedQuery, rightTableSchema, rightTableName);
-                    }
-                    else if (Comparison == WhereComparison.Like)
-                    {
-                        outputBuilder.Append(' ');
-                        outputBuilder.Append(conn.LikeEscapingStatement);
-                        outputBuilder.Append(' ');
+
+                        if (Comparison == WhereComparison.Between)
+                        {
+                            outputBuilder.Append(@" AND ");
+
+                            BuildSingleValue(
+                                outputBuilder, conn,
+                                ThirdTableName, Third, ThirdType,
+                                FirstTableName, First, FirstType,
+                                relatedQuery, rightTableSchema, rightTableName);
+                        }
+                        else if (Comparison == WhereComparison.Like)
+                        {
+                            outputBuilder.Append(' ');
+                            outputBuilder.Append(conn.LikeEscapingStatement);
+                            outputBuilder.Append(' ');
+                        }
                     }
                 }
             }
         }
 
+        public void BuildSingleValueFirst(
+            StringBuilder outputBuilder, ConnectorBase conn,
+            Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+        {
+            BuildSingleValue(
+                outputBuilder, conn,
+                FirstTableName, First, FirstType,
+                SecondTableName, Second, SecondType,
+                relatedQuery, rightTableSchema, rightTableName);
+        }
+
+        public void BuildSingleValueSecond(
+            StringBuilder outputBuilder, ConnectorBase conn,
+            Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+        {
+            BuildSingleValue(
+                outputBuilder, conn,
+                ThirdTableName, Third, ThirdType,
+                FirstTableName, First, FirstType,
+                relatedQuery, rightTableSchema, rightTableName);
+        }
+
         private static void BuildSingleValue(
-            StringBuilder outputBuilder, ConnectorBase conn, 
+            StringBuilder outputBuilder, ConnectorBase conn,
             string firstTableName, object value, ValueObjectType valueType,
             string otherTableName, object otherValue, ValueObjectType otherType,
-            Query relatedQuery, 
+            Query relatedQuery,
             TableSchema rightTableSchema, string rightTableName)
         {
             if (valueType == ValueObjectType.Value)

@@ -605,6 +605,56 @@ namespace dg.Sql.Connector
             return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
+        public virtual void oper_NullSafeEqualsTo(
+            Where where,
+            bool negate,
+            StringBuilder outputBuilder, 
+            ConnectorBase conn,
+            Query relatedQuery, 
+            TableSchema rightTableSchema,
+            string rightTableName)
+        {
+            var wl = new WhereList();
+
+            wl.Add(new Where
+            {
+                Condition = WhereCondition.OR,
+                FirstTableName = where.FirstTableName,
+                First = where.First,
+                FirstType = where.FirstType,
+                Comparison = negate ? WhereComparison.NotEqualsTo : WhereComparison.EqualsTo,
+                SecondTableName = where.SecondTableName,
+                Second = where.Second,
+                SecondType = where.SecondType,
+            });
+
+            wl.Add(new Where(WhereCondition.OR,
+                    new Where
+                    {
+                        FirstTableName = where.FirstTableName,
+                        First = where.First,
+                        FirstType = where.FirstType,
+                        Comparison = WhereComparison.Is,
+                        Second = null,
+                        SecondType = ValueObjectType.Value,
+                    },
+                    ValueObjectType.Value,
+                    negate ? WhereComparison.NotEqualsTo : WhereComparison.EqualsTo,
+                    new Where
+                    {
+                        FirstTableName = where.SecondTableName,
+                        First = where.Second,
+                        FirstType = where.SecondType,
+                        Comparison = WhereComparison.Is,
+                        Second = null,
+                        SecondType = ValueObjectType.Value,
+                    },
+                    ValueObjectType.Value
+                ));
+
+            wl.BuildCommand(outputBuilder, conn, relatedQuery);
+        }
+
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
         public virtual string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
 
