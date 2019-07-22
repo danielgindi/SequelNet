@@ -91,7 +91,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">The index passed was outside the range of 0 through System.Data.IDataRecord.FieldCount.</exception>
+        /// <exception cref="IndexOutOfRangeException">The index passed was outside the range of 0 through System.Data.IDataRecord.FieldCount.</exception>
         public object this[int ordinal]
         {
             get
@@ -99,13 +99,13 @@ namespace dg.Sql.Connector
                 return UnderlyingReader[ordinal];
             }
         }
-        
+
         /// <summary>
         /// Gets the value of the specified column as an instance of System.Object.
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found.</exception>
+        /// <exception cref="IndexOutOfRangeException">No column with the specified name was found.</exception>
         public object this[string name]
         {
             get
@@ -118,7 +118,7 @@ namespace dg.Sql.Connector
         /// Gets the number of columns in the current row.
         /// </summary>
         /// <returns>The number of columns in the current row.</returns>
-        /// <exception cref="System.NotSupportedException">There is no current connection to an instance of SQL Server.</exception>
+        /// <exception cref="NotSupportedException">There is no current connection to an instance of SQL Server.</exception>
         public int FieldCount
         {
             get
@@ -126,13 +126,13 @@ namespace dg.Sql.Connector
                 return UnderlyingReader.FieldCount;
             }
         }
-        
+
         /// <summary>
         /// Gets the value of the specified column as a Boolean.
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public bool GetBoolean(int ordinal)
         {
             return UnderlyingReader.GetBoolean(ordinal);
@@ -143,7 +143,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public byte GetByte(int ordinal)
         {
             return UnderlyingReader.GetByte(ordinal);
@@ -159,7 +159,7 @@ namespace dg.Sql.Connector
         /// <param name="bufferOffset">The index with the buffer to which the data will be copied.</param>
         /// <param name="length">The maximum number of characters to read.</param>
         /// <returns>The actual number of bytes read.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public long GetBytes(int ordinal, long dataOffset, byte[] buffer, int bufferOffset, int length)
         {
             return UnderlyingReader.GetBytes(ordinal, dataOffset, buffer, bufferOffset, length);
@@ -170,7 +170,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public char GetChar(int ordinal)
         {
             return UnderlyingReader.GetChar(ordinal);
@@ -208,7 +208,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>A string representing the name of the data type.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public string GetDataTypeName(int ordinal)
         {
             return UnderlyingReader.GetDataTypeName(ordinal);
@@ -219,7 +219,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public DateTime GetDateTime(int ordinal)
         {
             return UnderlyingReader.GetDateTime(ordinal);
@@ -230,7 +230,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public decimal GetDecimal(int ordinal)
         {
             return UnderlyingReader.GetDecimal(ordinal);
@@ -241,7 +241,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public double GetDouble(int ordinal)
         {
             return UnderlyingReader.GetDouble(ordinal);
@@ -252,7 +252,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The data type of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public Type GetFieldType(int ordinal)
         {
             return UnderlyingReader.GetFieldType(ordinal);
@@ -263,7 +263,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public float GetFloat(int ordinal)
         {
             return UnderlyingReader.GetFloat(ordinal);
@@ -274,7 +274,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public Guid GetGuid(int ordinal)
         {
             return UnderlyingReader.GetGuid(ordinal);
@@ -285,7 +285,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public short GetInt16(int ordinal)
         {
             return UnderlyingReader.GetInt16(ordinal);
@@ -296,7 +296,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public int GetInt32(int ordinal)
         {
             return UnderlyingReader.GetInt32(ordinal);
@@ -307,7 +307,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public long GetInt64(int ordinal)
         {
             return UnderlyingReader.GetInt64(ordinal);
@@ -328,7 +328,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="name">The name of the column.</param>
         /// <returns>The zero-based column ordinal.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">The name specified is not a valid column name.</exception>
+        /// <exception cref="IndexOutOfRangeException">The name specified is not a valid column name.</exception>
         public int GetOrdinal(string name)
         {
             return UnderlyingReader.GetOrdinal(name);
@@ -339,7 +339,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column.</returns>
-        /// <exception cref="System.InvalidCastException">The specified cast is not valid.</exception>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
         public string GetString(int ordinal)
         {
             return UnderlyingReader.GetString(ordinal);
@@ -434,7 +434,7 @@ namespace dg.Sql.Connector
         /// Returns a System.Data.DataTable that describes the column metadata of the System.Data.Common.DbDataReader.
         /// </summary>
         /// <returns>A System.Data.DataTable that describes the column metadata.</returns>
-        /// <exception cref="System.InvalidOperationException">The System.Data.SqlClient.SqlDataReader is closed.</exception>
+        /// <exception cref="InvalidOperationException">The System.Data.SqlClient.SqlDataReader is closed.</exception>
         public DataTable GetSchemaTable()
         {
             return UnderlyingReader.GetSchemaTable();
@@ -487,7 +487,7 @@ namespace dg.Sql.Connector
         /// Gets a value indicating whether the System.Data.Common.DbDataReader is closed.
         /// </summary>
         /// <returns>true if the System.Data.Common.DbDataReader is closed; otherwise false.</returns>
-        /// <exception cref="System.InvalidOperationException">The System.Data.SqlClient.SqlDataReader is closed.</exception>
+        /// <exception cref="InvalidOperationException">The System.Data.SqlClient.SqlDataReader is closed.</exception>
         public bool IsClosed
         {
             get
@@ -1007,7 +1007,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="i">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column in Geometry type.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">The index passed was outside the range of 0 through System.Data.IDataRecord.FieldCount</exception>
+        /// <exception cref="IndexOutOfRangeException">The index passed was outside the range of 0 through System.Data.IDataRecord.FieldCount</exception>
         public Geometry GetGeometry(int columnIndex)
         {
             byte[] geometryData = UnderlyingReader[columnIndex] as byte[];
@@ -1023,7 +1023,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="i">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column in Geometry type.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found</exception>
+        /// <exception cref="IndexOutOfRangeException">No column with the specified name was found</exception>
         public Geometry GetGeometry(string columnName)
         {
             byte[] geometryData = UnderlyingReader[columnName] as byte[];

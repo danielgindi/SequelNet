@@ -733,91 +733,91 @@ namespace dg.Sql
 
         protected static string StringOrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return (string)value;
         }
 
         protected static string StringOrEmptyFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return string.Empty;
+            if (value is DBNull || value == null) return string.Empty;
             else return (string)value;
         }
 
         protected static Int32? Int32OrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return Convert.ToInt32(value);
         }
 
         protected static Int32 Int32OrZero(object value)
         {
-            if (value is System.DBNull || value == null) return 0;
+            if (value is DBNull || value == null) return 0;
             else return Convert.ToInt32(value);
         }
 
         protected static Int64? Int64OrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return Convert.ToInt64(value);
         }
 
         protected static Int64 Int64OrZero(object value)
         {
-            if (value is System.DBNull || value == null) return 0;
+            if (value is DBNull || value == null) return 0;
             else return Convert.ToInt64(value);
         }
 
         protected static decimal? DecimalOrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return Convert.ToDecimal(value);
         }
 
         protected static decimal DecimalOrZeroFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return 0m;
+            if (value is DBNull || value == null) return 0m;
             else return Convert.ToDecimal(value);
         }
 
         protected static float? FloatOrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return Convert.ToSingle(value);
         }
 
         protected static float FloatOrZeroFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return 0f;
+            if (value is DBNull || value == null) return 0f;
             else return Convert.ToSingle(value);
         }
 
         protected static double? DoubleOrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return Convert.ToDouble(value);
         }
 
         protected static double DoubleOrZeroFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return 0.0;
+            if (value is DBNull || value == null) return 0.0;
             else return Convert.ToDouble(value);
         }
 
         protected static DateTime? DateTimeOrNullFromDb(object value)
         {
-            if (value is System.DBNull || value == null) return null;
+            if (value is DBNull || value == null) return null;
             else return (DateTime)value;
         }
 
         protected static DateTime DateTimeOrNow(object value)
         {
-            if (value is System.DBNull || value == null) return DateTime.UtcNow;
+            if (value is DBNull || value == null) return DateTime.UtcNow;
             else return (DateTime)value;
         }
 
         protected static DateTime DateTimeOrMinValue(object value)
         {
-            if (value is System.DBNull || value == null) return DateTime.MinValue;
+            if (value is DBNull || value == null) return DateTime.MinValue;
             else return (DateTime)value;
         }
 

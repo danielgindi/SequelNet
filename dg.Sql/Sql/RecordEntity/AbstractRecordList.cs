@@ -42,7 +42,7 @@ namespace dg.Sql
                     ownsTransaction = false;
                 }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }

@@ -95,7 +95,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type,
+            string name, Type type,
             int maxLength, 
             int numberPrecision, int numberScale, 
             bool autoIncrement, bool isPrimaryKey, 
@@ -115,7 +115,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type, 
+            string name, Type type, 
             int maxLength, string literalType, 
             int numberPrecision, int numberScale, 
             bool autoIncrement, bool isPrimaryKey,
@@ -137,7 +137,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type, DataType dataType, 
+            string name, Type type, DataType dataType, 
             int maxLength,
             int numberPrecision, int numberScale,
             bool autoIncrement, bool isPrimaryKey, 
@@ -159,7 +159,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type, DataType dataType,
+            string name, Type type, DataType dataType,
             int maxLength, string literalType,
             int numberPrecision, int numberScale,
             bool autoIncrement, bool isPrimaryKey, 
@@ -182,7 +182,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type,
+            string name, Type type,
             int maxLength,
             int numberPrecision, int numberScale,
             bool autoIncrement, bool isPrimaryKey,
@@ -206,7 +206,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type,
+            string name, Type type,
             int maxLength, string literalType, 
             int numberPrecision, int numberScale, 
             bool autoIncrement, bool isPrimaryKey,
@@ -231,7 +231,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type, DataType dataType, 
+            string name, Type type, DataType dataType, 
             int maxLength,
             int numberPrecision, int numberScale, 
             bool autoIncrement, bool isPrimaryKey,
@@ -256,7 +256,7 @@ namespace dg.Sql
         }
 
         public void AddColumn(
-            string name, System.Type type, DataType dataType, 
+            string name, Type type, DataType dataType, 
             int maxLength, string literalType, 
             int numberPrecision, int numberScale,
             bool autoIncrement, bool isPrimaryKey, 

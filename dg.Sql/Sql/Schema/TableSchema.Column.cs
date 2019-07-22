@@ -23,7 +23,7 @@ namespace dg.Sql
         {
             public string Comment;
             public string Name;
-            private System.Type _Type;
+            private Type _Type;
             private DataType _DataType;
             private DataType _ActualDataType;
             public string LiteralType;
@@ -41,7 +41,7 @@ namespace dg.Sql
 
             public Column() { }
             
-            public System.Type Type
+            public Type Type
             {
                 get { return this._Type; }
                 set

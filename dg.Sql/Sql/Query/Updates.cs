@@ -50,7 +50,7 @@ namespace dg.Sql
             return this;
         }
 
-        [ObsoleteAttribute("This method is deprecated. Use UpdateFromColumn() instead.")]
+        [Obsolete("This method is deprecated. Use UpdateFromColumn() instead.")]
         public Query UpdateFromOtherColumn(string tableName, string columnName, string fromTableName, string fromTableColumn)
         {
             return UpdateFromColumn(tableName, columnName, fromTableName, fromTableColumn);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using dg.Sql.Connector;
+using System.Runtime.CompilerServices;
 
 namespace dg.Sql
 {
@@ -316,13 +317,8 @@ namespace dg.Sql
         }
 
         #region Builders
-
-        public void BuildCommand(StringBuilder outputBuilder, bool isFirst, ConnectorBase conn, Query relatedQuery)
-        {
-            BuildCommand(outputBuilder, isFirst, conn, relatedQuery, null, null);
-        }
-
-        public void BuildCommand(StringBuilder outputBuilder, bool isFirst, ConnectorBase conn, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+        
+        public void BuildCommand(StringBuilder outputBuilder, bool isFirst, BuildContext context)
         {
             if (!isFirst)
             {
@@ -349,7 +345,7 @@ namespace dg.Sql
             if (First is WhereList)
             {
                 outputBuilder.Append('(');
-                ((WhereList)First).BuildCommand(outputBuilder, conn, relatedQuery, rightTableSchema, rightTableName);
+                ((WhereList)First).BuildCommand(outputBuilder, context);
                 outputBuilder.Append(')');
             }
             else
@@ -357,18 +353,14 @@ namespace dg.Sql
                 if (Comparison == WhereComparison.NullSafeEqualsTo ||
                     Comparison == WhereComparison.NullSafeNotEqualsTo)
                 {
-                    conn.oper_NullSafeEqualsTo(
+                    context.Conn.BuildNullSafeEqualsTo(
                         this,
                         Comparison == WhereComparison.NullSafeNotEqualsTo,
-                        outputBuilder, conn, relatedQuery, rightTableSchema, rightTableName);
+                        outputBuilder, context);
                 }
                 else
                 {
-                    BuildSingleValue(
-                        outputBuilder, conn,
-                        FirstTableName, First, FirstType,
-                        SecondTableName, Second, SecondType,
-                        relatedQuery, rightTableSchema, rightTableName);
+                    BuildSingleValueFirst(outputBuilder, context);
 
                     if (Comparison != WhereComparison.None)
                     {
@@ -414,26 +406,22 @@ namespace dg.Sql
                                 break;
                         }
 
-                        BuildSingleValue(
-                            outputBuilder, conn,
-                            SecondTableName, Second, SecondType,
-                            FirstTableName, First, FirstType,
-                            relatedQuery, rightTableSchema, rightTableName);
+                        BuildSingleValueSecond(outputBuilder, context);
 
                         if (Comparison == WhereComparison.Between)
                         {
                             outputBuilder.Append(@" AND ");
 
                             BuildSingleValue(
-                                outputBuilder, conn,
+                                outputBuilder,
                                 ThirdTableName, Third, ThirdType,
                                 FirstTableName, First, FirstType,
-                                relatedQuery, rightTableSchema, rightTableName);
+                                context);
                         }
                         else if (Comparison == WhereComparison.Like)
                         {
                             outputBuilder.Append(' ');
-                            outputBuilder.Append(conn.LikeEscapingStatement);
+                            outputBuilder.Append(context.Conn.LikeEscapingStatement);
                             outputBuilder.Append(' ');
                         }
                     }
@@ -441,47 +429,46 @@ namespace dg.Sql
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BuildSingleValueFirst(
-            StringBuilder outputBuilder, ConnectorBase conn,
-            Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+            StringBuilder outputBuilder, BuildContext context)
         {
             BuildSingleValue(
-                outputBuilder, conn,
+                outputBuilder,
                 FirstTableName, First, FirstType,
                 SecondTableName, Second, SecondType,
-                relatedQuery, rightTableSchema, rightTableName);
+                context);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BuildSingleValueSecond(
-            StringBuilder outputBuilder, ConnectorBase conn,
-            Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
+            StringBuilder outputBuilder, BuildContext context)
         {
             BuildSingleValue(
-                outputBuilder, conn,
-                ThirdTableName, Third, ThirdType,
+                outputBuilder,
+                SecondTableName, Second, SecondType,
                 FirstTableName, First, FirstType,
-                relatedQuery, rightTableSchema, rightTableName);
+                context);
         }
 
         private static void BuildSingleValue(
-            StringBuilder outputBuilder, ConnectorBase conn,
+            StringBuilder outputBuilder,
             string firstTableName, object value, ValueObjectType valueType,
             string otherTableName, object otherValue, ValueObjectType otherType,
-            Query relatedQuery,
-            TableSchema rightTableSchema, string rightTableName)
+            BuildContext context)
         {
             if (valueType == ValueObjectType.Value)
             {
                 if (value is Query)
                 {
                     outputBuilder.Append('(');
-                    outputBuilder.Append(((Query)value).BuildCommand(conn));
+                    outputBuilder.Append(((Query)value).BuildCommand(context.Conn));
                     outputBuilder.Append(')');
                 }
                 else if (value is WhereList)
                 {
                     outputBuilder.Append('(');
-                    ((WhereList)value).BuildCommand(outputBuilder, conn, relatedQuery, rightTableSchema, rightTableName);
+                    ((WhereList)value).BuildCommand(outputBuilder, context);
                     outputBuilder.Append(')');
                 }
                 else if (value is ICollection)
@@ -494,15 +481,15 @@ namespace dg.Sql
                     TableSchema schema = null;
                     if (object.ReferenceEquals(otherTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                     {
-                        schema = rightTableSchema;
+                        schema = context.RightTableSchema;
                     }
                     else
                     {
-                        if (relatedQuery != null)
+                        if (context.RelatedQuery != null)
                         {
-                            if (otherTableName == null || !relatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
+                            if (otherTableName == null || !context.RelatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
                             {
-                                schema = relatedQuery.Schema;
+                                schema = context.RelatedQuery.Schema;
                             }
                         }
                     }
@@ -514,11 +501,11 @@ namespace dg.Sql
 
                         if (schema != null && otherValue is string)
                         {
-                            sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), objIn, conn, relatedQuery));
+                            sbIn.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), objIn, context.Conn, context.RelatedQuery));
                         }
                         else
                         {
-                            sbIn.Append(conn.PrepareValue(objIn, relatedQuery));
+                            sbIn.Append(context.Conn.PrepareValue(objIn, context.RelatedQuery));
                         }
                     }
 
@@ -535,15 +522,15 @@ namespace dg.Sql
                     TableSchema schema = null;
                     if (object.ReferenceEquals(otherTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                     {
-                        schema = rightTableSchema;
+                        schema = context.RightTableSchema;
                     }
                     else
                     {
-                        if (relatedQuery != null)
+                        if (context.RelatedQuery != null)
                         {
-                            if (otherTableName == null || !relatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
+                            if (otherTableName == null || !context.RelatedQuery.TableAliasMap.TryGetValue(otherTableName, out schema))
                             {
-                                schema = relatedQuery.Schema;
+                                schema = context.RelatedQuery.Schema;
                             }
                         }
                     }
@@ -551,17 +538,17 @@ namespace dg.Sql
                     if (schema != null && otherValue is string)
                     {
                         // Try to match value type to the other value type
-                        outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), value, conn, relatedQuery));
+                        outputBuilder.Append(Query.PrepareColumnValue(schema.Columns.Find((string)otherValue), value, context.Conn, context.RelatedQuery));
                     }
                     else
                     {
                         // Format it according to generic rules
-                        outputBuilder.Append(conn.PrepareValue(value, relatedQuery));
+                        outputBuilder.Append(context.Conn.PrepareValue(value, context.RelatedQuery));
                     }
                 }
                 else
                 {
-                    outputBuilder.Append(conn.PrepareValue(value, relatedQuery));
+                    outputBuilder.Append(context.Conn.PrepareValue(value, context.RelatedQuery));
                 }
             }
             else if (valueType == ValueObjectType.ColumnName)
@@ -570,15 +557,15 @@ namespace dg.Sql
                 {
                     if (object.ReferenceEquals(firstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                     {
-                        outputBuilder.Append(conn.WrapFieldName(rightTableName));
+                        outputBuilder.Append(context.Conn.WrapFieldName(context.RightTableName));
                     }
                     else
                     {
-                        outputBuilder.Append(conn.WrapFieldName(firstTableName));
+                        outputBuilder.Append(context.Conn.WrapFieldName(firstTableName));
                     }
                     outputBuilder.Append('.');
                 }
-                outputBuilder.Append(conn.WrapFieldName((string)value));
+                outputBuilder.Append(context.Conn.WrapFieldName((string)value));
             }
             else
             {
@@ -774,5 +761,12 @@ namespace dg.Sql
 
         #endregion
 
+        public class BuildContext
+        {
+            public ConnectorBase Conn;
+            internal Query RelatedQuery;
+            internal TableSchema RightTableSchema;
+            internal string RightTableName;
+        }
     }
 }

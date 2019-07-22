@@ -444,26 +444,34 @@ namespace dg.Sql.Connector
             { // Must be formatted specifically, to avoid decimal separator confusion
                 return PrepareValue((double)value);
             }
-            else if (value is dg.Sql.IPhrase)
+            else if (value is IPhrase)
             {
-                return ((dg.Sql.IPhrase)value).BuildPhrase(this, relatedQuery);
+                return ((IPhrase)value).BuildPhrase(this, relatedQuery);
             }
-            else if (value is dg.Sql.Geometry)
+            else if (value is Geometry)
             {
                 StringBuilder sb = new StringBuilder();
-                ((dg.Sql.Geometry)value).BuildValue(sb, this);
+                ((Geometry)value).BuildValue(sb, this);
                 return sb.ToString();
             }
-            else if (value is dg.Sql.Where)
+            else if (value is Where)
             {
                 StringBuilder sb = new StringBuilder();
-                ((dg.Sql.Where)value).BuildCommand(sb, true, this, relatedQuery);
+                ((Where)value).BuildCommand(sb, true, new Where.BuildContext
+                {
+                    Conn = this,
+                    RelatedQuery = relatedQuery
+                });
                 return sb.ToString();
             }
-            else if (value is dg.Sql.WhereList)
+            else if (value is WhereList)
             {
                 StringBuilder sb = new StringBuilder();
-                ((dg.Sql.WhereList)value).BuildCommand(sb, this, relatedQuery);
+                ((WhereList)value).BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = this,
+                    RelatedQuery = relatedQuery
+                });
                 return sb.ToString();
             }
             else return value.ToString();
@@ -490,7 +498,7 @@ namespace dg.Sql.Connector
         /// </summary>
         /// <param name="i">The zero-based column ordinal.</param>
         /// <returns>The value of the specified column in Geometry type.</returns>
-        /// <exception cref="System.IndexOutOfRangeException">No column with the specified name was found</exception>
+        /// <exception cref="IndexOutOfRangeException">No column with the specified name was found</exception>
         public virtual Geometry ReadGeometry(object value)
         {
             throw new NotImplementedException(@"ReadGeometry not implemented for this connector");
@@ -605,14 +613,11 @@ namespace dg.Sql.Connector
             return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
-        public virtual void oper_NullSafeEqualsTo(
+        public virtual void BuildNullSafeEqualsTo(
             Where where,
             bool negate,
-            StringBuilder outputBuilder, 
-            ConnectorBase conn,
-            Query relatedQuery, 
-            TableSchema rightTableSchema,
-            string rightTableName)
+            StringBuilder outputBuilder,
+            Where.BuildContext context)
         {
             var wl = new WhereList();
 
@@ -652,7 +657,7 @@ namespace dg.Sql.Connector
                     ValueObjectType.Value
                 ));
 
-            wl.BuildCommand(outputBuilder, conn, relatedQuery);
+            wl.BuildCommand(outputBuilder, context);
         }
 
         public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }

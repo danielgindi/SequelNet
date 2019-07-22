@@ -341,27 +341,20 @@ namespace dg.Sql.Connector
             return func_ST_GeomFromText(text, srid);
         }
 
-        public override void oper_NullSafeEqualsTo(
+        public override void BuildNullSafeEqualsTo(
             Where where,
             bool negate,
             StringBuilder outputBuilder,
-            ConnectorBase conn,
-            Query relatedQuery,
-            TableSchema rightTableSchema,
-            string rightTableName)
+            Where.BuildContext context)
         {
             if (negate)
                 outputBuilder.Append(@" NOT ");
 
-            where.BuildSingleValueFirst(
-                outputBuilder, conn,
-                relatedQuery, rightTableSchema, rightTableName);
+            where.BuildSingleValueFirst(outputBuilder, context);
 
             outputBuilder.Append(@" <=> ");
 
-            where.BuildSingleValueSecond(
-                outputBuilder, conn,
-                relatedQuery, rightTableSchema, rightTableName);
+            where.BuildSingleValueSecond(outputBuilder, context);
         }
 
         public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }

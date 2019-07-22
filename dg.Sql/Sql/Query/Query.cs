@@ -281,20 +281,20 @@ namespace dg.Sql
                 return;
             }
 
-            if (value is dg.Sql.IPhrase)
+            if (value is IPhrase)
             {
                 // Output the complete phrase
 
-                outputBuilder.Append(((dg.Sql.IPhrase)value).BuildPhrase(connection, relatedQuery));
+                outputBuilder.Append(((IPhrase)value).BuildPhrase(connection, relatedQuery));
 
                 return;
             }
 
-            if (value is dg.Sql.Query)
+            if (value is Query)
             {
                 // Output a properly wrapped query
 
-                outputBuilder.Append("(" + ((dg.Sql.Query)value).BuildCommand(connection) + ")");
+                outputBuilder.Append("(" + ((Query)value).BuildCommand(connection) + ")");
 
                 return;
             }

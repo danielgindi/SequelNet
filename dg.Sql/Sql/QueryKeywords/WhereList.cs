@@ -8,22 +8,14 @@ namespace dg.Sql
 {
     public class WhereList : List<Where>
     {
-        public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery)
+        public void BuildCommand(StringBuilder outputBuilder, Where.BuildContext context)
         {
-            BuildCommand(outputBuilder, conn, relatedQuery, null, null);
-        }
+            context = context ?? new Where.BuildContext();
 
-        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery)
-        {
-            BuildCommand(outputBuilder, null, relatedQuery, null, null);
-        }
-
-        public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
-        {
-            bool ownsConn = conn == null;
+            bool ownsConn = context.Conn == null;
             if (ownsConn)
             {
-                conn = ConnectorBase.NewInstance();
+                context.Conn = ConnectorBase.NewInstance();
             }
 
             try
@@ -32,7 +24,7 @@ namespace dg.Sql
                 bool isForJoinList = this is JoinColumnPair;
                 foreach (Where where in this)
                 {
-                    where.BuildCommand(outputBuilder, isFirst, conn, relatedQuery, rightTableSchema, rightTableName);
+                    where.BuildCommand(outputBuilder, isFirst, context);
                     if (isFirst) isFirst = false;
                 }
             }
@@ -40,14 +32,9 @@ namespace dg.Sql
             {
                 if (ownsConn)
                 {
-                    conn.Dispose();
+                    context.Conn.Dispose();
                 }
             }
-        }
-
-        public void BuildCommand(StringBuilder outputBuilder, Query relatedQuery, TableSchema rightTableSchema, string rightTableName)
-        {
-            BuildCommand(outputBuilder, null, relatedQuery, rightTableSchema, rightTableName);
         }
 
         public WhereList ClearWhere()

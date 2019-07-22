@@ -138,10 +138,10 @@ namespace dg.Sql
             }
             else if (Type == ValueObjectType.Value)
             {
-                if (Value is dg.Sql.Where)
+                if (Value is Where)
                 {
                     outputBuilder.Append("(");
-                    ((dg.Sql.Where)Value).BuildCommand(outputBuilder, true, conn, relatedQuery);
+                    ((Where)Value).BuildCommand(outputBuilder, true, new Where.BuildContext { Conn = conn, RelatedQuery = relatedQuery });
                     outputBuilder.Append(")");
                 }
                 else

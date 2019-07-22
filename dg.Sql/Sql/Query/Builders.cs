@@ -164,17 +164,32 @@ namespace dg.Sql
                     if (join.Pairs.Count > 1)
                     {
                         sb.Append(@" ON ");
-                        WhereList wl = new WhereList();
-                        foreach (WhereList joins in join.Pairs)
-                        {
+
+                        var wl = new WhereList();
+
+                        foreach (var joins in join.Pairs)
                             wl.AddRange(joins);
-                        }
-                        wl.BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias);
+
+                        wl.BuildCommand(
+                            sb,
+                            new Where.BuildContext {
+                                Conn = connection,
+                                RelatedQuery = this,
+                                RightTableSchema = join.RightTableSchema, 
+                                RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias });
                     }
                     else if (join.Pairs.Count == 1)
                     {
                         sb.Append(@" ON ");
-                        join.Pairs[0].BuildCommand(sb, connection, this, join.RightTableSchema, join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias);
+                        join.Pairs[0].BuildCommand(
+                            sb,
+                            new Where.BuildContext
+                            {
+                                Conn = connection,
+                                RelatedQuery = this,
+                                RightTableSchema = join.RightTableSchema,
+                                RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
+                            });
                     }
                 }
             }
@@ -199,13 +214,17 @@ namespace dg.Sql
                     if (bFirst) bFirst = false;
                     else sb.Append(',');
 
-                    if (groupBy.ColumnName is dg.Sql.IPhrase)
+                    if (groupBy.ColumnName is IPhrase)
                     {
-                        sb.Append(((dg.Sql.IPhrase)groupBy.ColumnName).BuildPhrase(connection, this));
+                        sb.Append(((IPhrase)groupBy.ColumnName).BuildPhrase(connection, this));
                     }
-                    else if (groupBy.ColumnName is dg.Sql.Where)
+                    else if (groupBy.ColumnName is Where)
                     {
-                        ((dg.Sql.Where)groupBy.ColumnName).BuildCommand(sb, true, connection, this);
+                        ((Where)groupBy.ColumnName).BuildCommand(sb, true, new Where.BuildContext
+                        {
+                            Conn = connection,
+                            RelatedQuery = this
+                        });
                     }
                     else if (groupBy.IsLiteral)
                     {
@@ -247,7 +266,11 @@ namespace dg.Sql
             if (_ListHaving != null && _ListHaving.Count > 0)
             {
                 sb.Append(@" HAVING ");
-                _ListHaving.BuildCommand(sb, connection, this, null, null);
+                _ListHaving.BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = connection,
+                    RelatedQuery = this
+                });
             }
         }
 
@@ -1065,9 +1088,9 @@ namespace dg.Sql
                                     else
                                     {
                                         sb.Append(@"(");
-                                        if (_FromExpression is dg.Sql.IPhrase)
+                                        if (_FromExpression is IPhrase)
                                         {
-                                            sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
+                                            sb.Append(((IPhrase)_FromExpression).BuildPhrase(connection, this));
                                         }
                                         else sb.Append(_FromExpression);
                                         sb.Append(@") ");
@@ -1079,7 +1102,11 @@ namespace dg.Sql
                                     if (_ListWhere != null && _ListWhere.Count > 0)
                                     {
                                         sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
+                                        _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                        {
+                                            Conn = connection,
+                                            RelatedQuery = this
+                                        });
                                     }
 
                                     BuildGroupBy(sb, connection, false);
@@ -1224,7 +1251,11 @@ namespace dg.Sql
                                     if (_ListWhere != null && _ListWhere.Count > 0)
                                     {
                                         sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, connection, this, null, null);
+                                        _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                        {
+                                            Conn = connection,
+                                            RelatedQuery = this,
+                                        });
                                     }
                                 }
                             }
@@ -1333,7 +1364,11 @@ namespace dg.Sql
                                 if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, connection, this, null, null);
+                                    _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                    {
+                                        Conn = connection,
+                                        RelatedQuery = this
+                                    });
                                 }
 
                                 BuildOrderBy(sb, connection, false);
@@ -1406,7 +1441,11 @@ namespace dg.Sql
                                         if (_ListWhere != null && _ListWhere.Count > 0)
                                         {
                                             sb.Append(@" WHERE ");
-                                            _ListWhere.BuildCommand(sb, connection, this, null, null);
+                                            _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                            {
+                                                Conn = connection,
+                                                RelatedQuery = this
+                                            });
                                         }
                                     }
                                 }
@@ -1463,7 +1502,11 @@ namespace dg.Sql
                                 if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, connection, this, null, null);
+                                    _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                    {
+                                        Conn = connection,
+                                        RelatedQuery = this
+                                    });
                                 }
                                 BuildOrderBy(sb, connection, false);
                             }
@@ -1819,9 +1862,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.IPhrase)
+                if (_FromExpression is IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
+                    sb.Append(((IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1833,7 +1876,11 @@ namespace dg.Sql
             if (_ListWhere != null && _ListWhere.Count > 0)
             {
                 sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, connection, this, null, null);
+                _ListWhere.BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = connection,
+                    RelatedQuery = this
+                });
             }
 
             sb.Append(@") SELECT * FROM [Ordered Table]");
@@ -1868,7 +1915,11 @@ namespace dg.Sql
             if (_ListWhere != null && _ListWhere.Count > 0)
             {
                 sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, connection, this, null, null);
+                _ListWhere.BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = connection,
+                    RelatedQuery = this
+                });
             }
             sb.AppendFormat(@") - {0} ", Offset);
 
@@ -1889,9 +1940,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.IPhrase)
+                if (_FromExpression is IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
+                    sb.Append(((IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1903,7 +1954,11 @@ namespace dg.Sql
             if (_ListWhere != null && _ListWhere.Count > 0)
             {
                 sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, connection, this, null, null);
+                _ListWhere.BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = connection,
+                    RelatedQuery = this
+                });
             }
 
             BuildGroupBy(sb, connection, true);
@@ -1946,9 +2001,9 @@ namespace dg.Sql
             else
             {
                 sb.Append(@"(");
-                if (_FromExpression is dg.Sql.IPhrase)
+                if (_FromExpression is IPhrase)
                 {
-                    sb.Append(((dg.Sql.IPhrase)_FromExpression).BuildPhrase(connection, this));
+                    sb.Append(((IPhrase)_FromExpression).BuildPhrase(connection, this));
                 }
                 else sb.Append(_FromExpression);
                 sb.Append(@") ");
@@ -1960,7 +2015,11 @@ namespace dg.Sql
             if (_ListWhere != null && _ListWhere.Count > 0)
             {
                 sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, connection, this, null, null);
+                _ListWhere.BuildCommand(sb, new Where.BuildContext
+                {
+                    Conn = connection,
+                    RelatedQuery = this
+                });
             }
 
             StringBuilder sbOrderBy = new StringBuilder();

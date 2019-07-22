@@ -85,8 +85,8 @@ namespace dg.Sql
                 get
                 {
                     if (IsEmpty) return false;
-                    Geometry.Point FirstPoint = _Points[0];
-                    Geometry.Point LastPoint = _Points[_Points.Count - 1];
+                    Point FirstPoint = _Points[0];
+                    Point LastPoint = _Points[_Points.Count - 1];
                     return FirstPoint.X == LastPoint.X && FirstPoint.Y == LastPoint.Y;
                 }
             }
@@ -96,8 +96,8 @@ namespace dg.Sql
                 get
                 {
                     if (IsEmpty) return true;
-                    Geometry.Point FirstPoint = _Points[0];
-                    Geometry.Point LastPoint = _Points[_Points.Count - 1];
+                    Point FirstPoint = _Points[0];
+                    Point LastPoint = _Points[_Points.Count - 1];
                     return FirstPoint.X == LastPoint.X && FirstPoint.Y == LastPoint.Y;
                 }
             }
@@ -110,8 +110,8 @@ namespace dg.Sql
                 get
                 {
                     if (_Points.Count == 0) return Double.NaN;
-                    Geometry.Point FirstPoint = _Points[0];
-                    Geometry.Point LastPoint = _Points[_Points.Count - 1];
+                    Point FirstPoint = _Points[0];
+                    Point LastPoint = _Points[_Points.Count - 1];
                     double deltaX = LastPoint.X - FirstPoint.X;
                     double deltaY = LastPoint.Y - FirstPoint.Y;
                     double length = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
