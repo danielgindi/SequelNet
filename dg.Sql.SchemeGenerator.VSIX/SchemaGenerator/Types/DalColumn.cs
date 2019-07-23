@@ -8,6 +8,7 @@ namespace dg.Sql.SchemaGenerator
 		public bool IsNullable;
 		public bool AutoIncrement;
         public bool NoProperty;
+        public bool NoRead;
         public bool NoSave;
 		public DalColumnType Type;
 		public string LiteralType;

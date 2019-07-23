@@ -355,6 +355,10 @@ namespace dg.Sql.SchemaGenerator
                         {
                             dalColumn.NoProperty = true;
                         }
+                        else if (columnKeyword.Equals("NoRead", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.NoRead = true;
+                        }
                         else if (columnKeyword.Equals("NoSave", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.NoSave = true;
@@ -1332,6 +1336,8 @@ namespace dg.Sql.SchemaGenerator
             stringBuilder.AppendFormat("public override void Read(DataReaderBase reader){0}{{{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
+                if (dalCol.NoRead) continue;
+
                 string fromDb = "{0}";
                 string fromReader = "reader[Columns.{0}]";
                 if (dalCol.Type == DalColumnType.TBool)
