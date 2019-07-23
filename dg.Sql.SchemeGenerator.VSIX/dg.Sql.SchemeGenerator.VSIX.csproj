@@ -119,6 +119,17 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PkgCmdID.cs" />
     <Compile Include="SchemaGenerator\ClipboardHelper.cs" />
+    <Compile Include="SchemaGenerator\Parse.cs" />
+    <Compile Include="SchemaGenerator\ScriptContext.cs" />
+    <Compile Include="SchemaGenerator\Utils.cs" />
+    <Compile Include="SchemaGenerator\Schema.cs" />
+    <Compile Include="SchemaGenerator\FetchMethods.cs" />
+    <Compile Include="SchemaGenerator\MutationMethods.cs" />
+    <Compile Include="SchemaGenerator\ValueStoredVariables.cs" />
+    <Compile Include="SchemaGenerator\ValueProperties.cs" />
+    <Compile Include="SchemaGenerator\InsertMethod.cs" />
+    <Compile Include="SchemaGenerator\UpdateMethod.cs" />
+    <Compile Include="SchemaGenerator\ReadMethod.cs" />
     <Compile Include="SchemaGenerator\SchemaGenerator.cs" />
     <Compile Include="SchemaGenerator\Types\DalColumn.cs" />
     <Compile Include="SchemaGenerator\Types\DalColumnType.cs" />
