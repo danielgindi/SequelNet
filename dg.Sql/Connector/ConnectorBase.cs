@@ -474,6 +474,16 @@ namespace dg.Sql.Connector
                 });
                 return sb.ToString();
             }
+            else if (value.GetType().BaseType.Name == @"Enum")
+            {
+                var underlyingValue = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
+                if (underlyingValue is string || underlyingValue is char)
+                {
+                    return PrepareValue(underlyingValue.ToString());
+                }
+
+                return underlyingValue.ToString();
+            }
             else return value.ToString();
         }
 

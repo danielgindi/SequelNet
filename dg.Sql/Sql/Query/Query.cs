@@ -442,14 +442,6 @@ namespace dg.Sql
                 ((Geometry)value).BuildValue(outputBuilder, connection);
                 return;
             }
-            else if (value.GetType().BaseType.Name == @"Enum")
-            {
-                try
-                {
-                    value = (int)value;
-                }
-                catch { }
-            }
 
             outputBuilder.Append(connection.PrepareValue(value, relatedQuery));
         }
