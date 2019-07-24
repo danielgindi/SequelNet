@@ -56,13 +56,13 @@ namespace dg.Sql
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query SelectAllTableColumns()
         {
-            if (_Schema != null)
+            if (_SchemaAlias != null)
             {
-                return SelectAll(_SchemaName);
+                return SelectAll(this._SchemaAlias);
             }
             else
             {
-                return SelectAll(this._FromExpressionTableAlias);
+                return SelectAll(_SchemaName);
             }
         }
 

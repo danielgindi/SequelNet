@@ -14,7 +14,7 @@ namespace dg.Sql
         private TableSchema _Schema;
         private string _SchemaName = null;
         private object _FromExpression = null;
-        private string _FromExpressionTableAlias = null;
+        private string _SchemaAlias = null;
         private OrderByList _ListOrderBy;
         private GroupByList _ListGroupBy;
         private WhereList _ListHaving;
@@ -43,42 +43,38 @@ namespace dg.Sql
 
         #region Instantitaion
 
-        public Query(TableSchema schema)
-            : this(schema, null)
-        {
-        }
-
-        public Query(TableSchema schema, string schemaName)
+        public Query(TableSchema schema, string alias = null)
         {
             this.Schema = schema;
-            this.SchemaName = schemaName;
+            this._SchemaAlias = alias;
+
             TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.Name] = this.Schema;
+
             if (schema == null)
             {
                 throw new Exception("The Schema you passed in is null.");
             }
-            if (schema.Columns == null || schema.Columns.Count == 0)
-            {
-                throw new Exception("The Schema Table you passed in has no columns");
-            }
         }
 
-        public Query(string schemaName)
+        public Query(string schemaName, string alias = null)
+            : this(new TableSchema(schemaName, null), alias)
         {
-            this.Schema = new TableSchema(schemaName, null);
-            TableAliasMap[this.Schema.DatabaseOwner + @"/" + this.Schema.Name] = this.Schema;
         }
 
-        public Query(object fromExpression, string fromExpressionTableAlias)
+        public Query(object fromExpression, string alias)
         {
             this.Schema = null;
+
             _FromExpression = fromExpression;
-            _SchemaName = _FromExpressionTableAlias = fromExpressionTableAlias;
+            _SchemaAlias = alias;
+            _SchemaName = _SchemaAlias;
+
             if (fromExpression == null)
             {
                 throw new Exception("The expression you passed in is null.");
             } 
-            if (fromExpressionTableAlias == null)
+
+            if (alias == null)
             {
                 throw new Exception("The Alias you passed in is null.");
             }
@@ -99,19 +95,14 @@ namespace dg.Sql
             return new Query(schema);
         }
 
-        public static Query New(TableSchema schema, string SchemaName)
-        {
-            return new Query(schema, SchemaName);
-        }
-
         public static Query New(string schemaName)
         {
             return new Query(schemaName);
         }
 
-        public static Query New(object FromExpression, string FromExpressionTableAlias)
+        public static Query New(object fromExpression, string fromExpressionTableAlias)
         {
-            return new Query(FromExpression, FromExpressionTableAlias);
+            return new Query(fromExpression, fromExpressionTableAlias);
         }
 
         #endregion
@@ -223,6 +214,26 @@ namespace dg.Sql
         {
             CommandTimeout = timeout;
             return this;
+        }
+
+        /// <summary>
+        /// Setting a schema name.
+        /// This does not set an alias, but the actual schema name.
+        /// When using an actual TableSchema class, this will allow to reuse it as different table names.
+        /// </summary>
+        /// <param name="schemaName">A name, or null to default to current schema or alias.</param>
+        public void SetSchemaName(string schemaName)
+        {
+            this.SchemaName = schemaName;
+        }
+
+        /// <summary>
+        /// Setting a schema alias.
+        /// </summary>
+        /// <param name="alias"></param>
+        public void SetSchemaAlias(string alias)
+        {
+            this.SchemaAlias = alias;
         }
 
         #endregion
@@ -479,7 +490,36 @@ namespace dg.Sql
             {
                 _SchemaName = value != null ?
                     value :
-                    (_Schema != null ? _Schema.Name : _FromExpressionTableAlias);
+                    (_Schema != null ? _Schema.Name : _SchemaAlias);
+            }
+        }
+
+        /// <summary>
+        /// Setting a schema name.
+        /// This does not set an alias, but the actual schema name.
+        /// When using an actual TableSchema class, this will allow to reuse it as different table names.
+        /// </summary>
+        /// <param name="schemaName">A name, or null to default to current schema or alias.</param>
+        public string SchemaAlias
+        {
+            get { return _SchemaAlias; }
+            set
+            {
+                bool modifySchemaName = _SchemaName == _SchemaAlias;
+
+                _SchemaAlias = value;
+
+                if (modifySchemaName)
+                {
+                    if (_SchemaAlias == null)
+                    {
+                        SchemaName = null;
+                    }
+                    else
+                    {
+                        SchemaName = _SchemaAlias;
+                    }
+                }
             }
         }
 

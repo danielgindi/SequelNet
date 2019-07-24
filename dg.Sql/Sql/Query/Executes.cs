@@ -454,9 +454,9 @@ namespace dg.Sql
                 }
                 else
                 {
-                    if (Schema == null)
+                    if (_SchemaAlias != null)
                     {
-                        schemaName = connection.WrapFieldName(_FromExpressionTableAlias);
+                        schemaName = connection.WrapFieldName(_SchemaAlias);
                     }
                     else
                     {
