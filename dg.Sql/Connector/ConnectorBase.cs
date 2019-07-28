@@ -277,9 +277,9 @@ namespace dg.Sql.Connector
 
         abstract public object GetLastInsertID();
 
-        virtual public void SetIdentityInsert(string TableName, bool Enabled) { }
+        virtual public void SetIdentityInsert(string tableName, bool enabled) { }
 
-        abstract public bool CheckIfTableExists(string TableName);
+        abstract public bool CheckIfTableExists(string tableName);
 
         #endregion
 

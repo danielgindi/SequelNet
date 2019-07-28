@@ -8,7 +8,7 @@ namespace dg.Sql.SchemaGenerator
 	{
         private static void WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null, string userName = null){0}{{{0}", "\r\n");
 
             bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null;
             bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null;
@@ -22,7 +22,7 @@ namespace dg.Sql.SchemaGenerator
             {
                 if (context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null)
                 {
-                    stringBuilder.AppendFormat("ModifiedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                    stringBuilder.AppendFormat("ModifiedBy = userName;{0}", "\r\n");
                 }
             }
 

@@ -1,8 +1,6 @@
-﻿using dg.Sql.Connector;
-using dg.Sql.Phrases;
+﻿using dg.Sql.Phrases;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace dg.Sql
 {

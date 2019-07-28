@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using dg.Sql.Connector;
+﻿using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {

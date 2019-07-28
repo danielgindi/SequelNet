@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Text;
 using dg.Sql.Connector;
-using System.IO;
 
 namespace dg.Sql
 {

@@ -8,7 +8,7 @@ namespace dg.Sql.SchemaGenerator
 	{
         private static void WriteInsertMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn = null, string userName = null){0}{{{0}", "\r\n");
 
             bool printExtraNewLine = false;
 
@@ -16,7 +16,7 @@ namespace dg.Sql.SchemaGenerator
             {
                 if (context.Columns.Find((DalColumn c) => c.PropertyName == "CreatedBy") != null)
                 {
-                    stringBuilder.AppendFormat("CreatedBy = base.CurrentSessionUserName;{0}", "\r\n");
+                    stringBuilder.AppendFormat("CreatedBy = userName;{0}", "\r\n");
                     printExtraNewLine = true;
                 }
             }

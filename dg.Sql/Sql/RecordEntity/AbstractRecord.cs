@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Xml.Serialization;
 using dg.Sql.Connector;
 using System.Collections;
@@ -258,10 +257,7 @@ namespace dg.Sql
 
         #region Virtual Read/Write Actions
 
-        public virtual void Insert() { Insert(null); }
-        public virtual void Update() { Update(null); }
-
-        public virtual void Insert(ConnectorBase connection)
+        public virtual void Insert(ConnectorBase connection = null, string userName = null)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -272,40 +268,22 @@ namespace dg.Sql
                 __CLASS_TYPE = this.GetType();
             }
 
-            Query qry = new Query(TableSchema);
+            var qry = new Query(TableSchema);
 
-            PropertyInfo propInfo;
-            foreach (TableSchema.Column Column in TableSchema.Columns)
+            foreach (var column in TableSchema.Columns)
             {
-                propInfo = __CLASS_TYPE.GetProperty(Column.Name);
-                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
+                var propInfo = __CLASS_TYPE.GetProperty(column.Name);
+
+                if (propInfo == null) 
+                    propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
+
                 if (propInfo != null)
-                {
-                    qry.Insert(Column.Name, propInfo.GetValue(this, null));
-                }
+                    qry.Insert(column.Name, propInfo.GetValue(this, null));
             }
 
-            if (__HAS_CREATED_BY)
+            if (__HAS_CREATED_BY && userName != null)
             {
-                string userName = null;
-                if (System.Web.HttpContext.Current != null)
-                {
-                    userName = System.Web.HttpContext.Current.User.Identity.Name;
-                }
-                else
-                {
-                    userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
-                }
-
-                if (userName == null || userName.Length == 0)
-                {
-                    propInfo = __CLASS_TYPE.GetProperty(@"CreatedBy");
-                    if (propInfo != null) userName = propInfo.GetValue(this, null) as string;
-                }
-                if (userName != null)
-                {
-                    qry.Insert(@"CreatedBy", userName);
-                }
+                qry.Insert(@"CreatedBy", userName);
             }
 
             if (__HAS_CREATED_ON)
@@ -319,7 +297,7 @@ namespace dg.Sql
             MarkAllColumnsNotMutated();
         }
 
-        public virtual void Update(ConnectorBase connection)
+        public virtual void Update(ConnectorBase connection = null, string userName = null)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -333,15 +311,14 @@ namespace dg.Sql
             object primaryKey = SchemaPrimaryKeyName;
             bool isPrimaryKeyNullOrString = primaryKey == null || primaryKey is string;
 
-            Query qry = new Query(TableSchema);
+            var qry = new Query(TableSchema);
 
-            PropertyInfo propInfo;
-            foreach (TableSchema.Column Column in TableSchema.Columns)
+            foreach (var Column in TableSchema.Columns)
             {
                 if ((isPrimaryKeyNullOrString && Column.Name == (string)primaryKey) ||
                     (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, Column.Name))) continue;
 
-                propInfo = __CLASS_TYPE.GetProperty(Column.Name);
+                var propInfo = __CLASS_TYPE.GetProperty(Column.Name);
                 if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
                 if (propInfo != null)
                 {
@@ -353,27 +330,9 @@ namespace dg.Sql
 
             if (!_AtomicUpdates || qry.HasInsertsOrUpdates)
             {
-                if (__HAS_MODIFIED_BY)
+                if (__HAS_MODIFIED_BY && userName != null)
                 {
-                    string userName = null;
-                    if (System.Web.HttpContext.Current != null)
-                    {
-                        userName = System.Web.HttpContext.Current.User.Identity.Name;
-                    }
-                    else
-                    {
-                        userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
-                    }
-
-                    if (userName == null || userName.Length == 0)
-                    {
-                        propInfo = __CLASS_TYPE.GetProperty(@"ModifiedBy");
-                        if (propInfo != null) userName = propInfo.GetValue(this, null) as string;
-                    }
-                    if (userName != null)
-                    {
-                        qry.Update(@"ModifiedBy", userName);
-                    }
+                    qry.Update(@"ModifiedBy", userName);
                 }
 
                 if (__HAS_MODIFIED_ON)
@@ -412,27 +371,27 @@ namespace dg.Sql
             MarkAllColumnsNotMutated();
         }
 
-        public virtual void Save()
+        public virtual void Save(string userName = null)
         {
             if (_NewRecord)
             {
-                Insert(null);
+                Insert(null, userName);
             }
             else
             {
-                Update(null);
+                Update(null, userName);
             }
         }
 
-        public virtual void Save(ConnectorBase connection)
+        public virtual void Save(ConnectorBase connection, string userName = null)
         {
             if (_NewRecord)
             {
-                Insert(connection);
+                Insert(connection, userName);
             }
             else
             {
-                Update(connection);
+                Update(connection, userName);
             }
         }
 
@@ -504,16 +463,8 @@ namespace dg.Sql
                 RetrieveFlags();
             }
 
-            string strUpdate = string.Empty;
             if (__HAS_DELETED || __HAS_IS_DELETED)
             {
-                if (userName == null || userName.Length == 0)
-                {
-                    if (System.Web.HttpContext.Current != null)
-                        userName = System.Web.HttpContext.Current.User.Identity.Name;
-                    else userName = System.Threading.Thread.CurrentPrincipal.Identity.Name;
-                }
-
                 Query qry = new Query(TableSchema);
 
                 if (__HAS_DELETED) qry.Update(@"Deleted", true);
@@ -854,21 +805,6 @@ namespace dg.Sql
                 if (item == containsItem) return true;
             }
             return false;
-        }
-
-        protected string CurrentSessionUserName
-        {
-            get
-            {
-                if (System.Web.HttpContext.Current != null && System.Web.HttpContext.Current.User != null)
-                {
-                    return System.Web.HttpContext.Current.User.Identity.Name;
-                }
-                else
-               {
-                    return System.Threading.Thread.CurrentPrincipal.Identity.Name;
-                }
-            }
         }
 
         #endregion
