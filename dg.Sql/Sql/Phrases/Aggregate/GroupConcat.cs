@@ -141,7 +141,7 @@ namespace dg.Sql.Phrases
 
                 if (Separator != null)
                 {
-                    sb.Append("," + conn.PrepareValue(Separator));
+                    sb.Append("," + conn.Language.PrepareValue(Separator));
                 }
                 else
                 {
@@ -173,7 +173,7 @@ namespace dg.Sql.Phrases
 
                 if (Separator != null)
                 {
-                    sb.Append(" SEPARATOR " + conn.PrepareValue(Separator));
+                    sb.Append(" SEPARATOR " + conn.Language.PrepareValue(Separator));
                 }
 
                 sb.Append(")");

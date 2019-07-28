@@ -98,7 +98,7 @@ namespace dg.Sql.Phrases
                         for (int i = 0, len = Values.Count; i < len; i++)
                         {
                             ret += ", ";
-                            ret += conn.PrepareValue(Path);
+                            ret += conn.Language.PrepareValue(Path);
                             ret += ", ";
                             ret += Values[i].Build(conn, relatedQuery);
                         }

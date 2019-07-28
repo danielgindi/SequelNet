@@ -1,20 +1,37 @@
 ﻿namespace dg.Sql.Connector
 {
-    public class PostgreSQLMode
+    public struct PostgreSQLMode
     {
-        private bool _StandardConformingStrings = false; // Which is the default in earlier versions, for backwards compatibility
-        private bool _BackslashQuote = false; // Relevant only for non-standard-conforming string literals
+        public string Version;
+        public bool StandardConformingStrings; // Which is the default in earlier versions, for backwards compatibility
+        public bool BackslashQuote; // Relevant only for non-standard-conforming string literals
 
-        public bool StandardConformingStrings
+        public override bool Equals(object obj)
         {
-            get { return _StandardConformingStrings == true; }
-            set { _StandardConformingStrings = value; }
+            if (obj is PostgreSQLMode)
+            {
+                var m = (PostgreSQLMode)obj;
+                return StandardConformingStrings == m.StandardConformingStrings &&
+                    BackslashQuote == m.BackslashQuote &&
+                    Version == m.Version;
+            }
+
+            return false;
         }
 
-        public bool BackslashQuote
+        public override int GetHashCode()
         {
-            get { return _BackslashQuote == true; }
-            set { _BackslashQuote = value; }
+            return base.GetHashCode();
+        }
+
+        public static bool operator ==(PostgreSQLMode m1, PostgreSQLMode m2)
+        {
+            return m1.Equals(m2);
+        }
+
+        public static bool operator !=(PostgreSQLMode m1, PostgreSQLMode m2)
+        {
+            return !m1.Equals(m2);
         }
     }
 }

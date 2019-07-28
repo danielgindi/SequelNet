@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
@@ -107,10 +106,10 @@ namespace dg.Sql.Phrases
             {
                 if (OuterTableName != null && OuterTableName.Length > 0)
                 {
-                    sb1.Append(conn.WrapFieldName(OuterTableName));
+                    sb1.Append(conn.Language.WrapFieldName(OuterTableName));
                     sb1.Append(".");
                 }
-                sb1.Append(conn.WrapFieldName(OuterValue.ToString()));
+                sb1.Append(conn.Language.WrapFieldName(OuterValue.ToString()));
             }
             else if (OuterValueType == ValueObjectType.Value)
             {
@@ -120,7 +119,7 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb1.Append(conn.PrepareValue(OuterValue, relatedQuery));
+                    sb1.Append(conn.Language.PrepareValue(conn, OuterValue, relatedQuery));
                 }
             }
             else sb1.Append(OuterValue);
@@ -129,10 +128,10 @@ namespace dg.Sql.Phrases
             {
                 if (InnerTableName != null && InnerTableName.Length > 0)
                 {
-                    sb2.Append(conn.WrapFieldName(InnerTableName));
+                    sb2.Append(conn.Language.WrapFieldName(InnerTableName));
                     sb2.Append(".");
                 }
-                sb2.Append(conn.WrapFieldName(InnerValue.ToString()));
+                sb2.Append(conn.Language.WrapFieldName(InnerValue.ToString()));
             }
             else if (InnerValueType == ValueObjectType.Value)
             {
@@ -142,12 +141,12 @@ namespace dg.Sql.Phrases
                 }
                 else
                 {
-                    sb2.Append(conn.PrepareValue(InnerValue, relatedQuery));
+                    sb2.Append(conn.Language.PrepareValue(conn, InnerValue, relatedQuery));
                 }
             }
             else sb2.Append(InnerValue);
 
-            return conn.func_ST_Contains(sb1.ToString(), sb2.ToString());
+            return conn.Language.func_ST_Contains(sb1.ToString(), sb2.ToString());
         }
     }
 }

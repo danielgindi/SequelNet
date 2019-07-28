@@ -1,5 +1,4 @@
-﻿using System;
-using dg.Sql.Connector;
+﻿using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {

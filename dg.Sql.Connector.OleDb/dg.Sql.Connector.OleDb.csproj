@@ -67,6 +67,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OleDbLanguageFactory.cs" />
     <Compile Include="OleDbConnector.cs" />
     <Compile Include="OleDbFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

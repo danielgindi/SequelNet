@@ -33,13 +33,13 @@ namespace dg.Sql
                         }
                         else
                         {
-                            sb.Append(connection.PrepareValue(sel.Value, this));
+                            sb.Append(connection.Language.PrepareValue(connection, sel.Value, this));
                         }
 
                         if (!string.IsNullOrEmpty(sel.Alias))
                         {
                             sb.Append(@" AS ");
-                            sb.Append(connection.WrapFieldName(sel.Alias));
+                            sb.Append(connection.Language.WrapFieldName(sel.Alias));
                         }
                     }
                     else if (sel.ObjectType == ValueObjectType.Literal)
@@ -52,7 +52,7 @@ namespace dg.Sql
                         {
                             sb.Append(sel.Value.ToString());
                             sb.Append(@" AS ");
-                            sb.Append(connection.WrapFieldName(sel.Alias));
+                            sb.Append(connection.Language.WrapFieldName(sel.Alias));
                         }
                     }
                     else
@@ -61,38 +61,38 @@ namespace dg.Sql
                         {
                             if (_SchemaAlias != null)
                             {
-                                sb.Append(connection.WrapFieldName(_SchemaAlias));
+                                sb.Append(connection.Language.WrapFieldName(_SchemaAlias));
                             }
                             else
                             {
                                 if (Schema.DatabaseOwner.Length > 0)
                                 {
-                                    sb.Append(connection.WrapFieldName(Schema.DatabaseOwner));
+                                    sb.Append(connection.Language.WrapFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.WrapFieldName(_SchemaName));
+                                sb.Append(connection.Language.WrapFieldName(_SchemaName));
                             }
 
                             sb.Append('.');
-                            sb.Append(sel.Value == null ? "*" : connection.WrapFieldName(sel.Value.ToString()));
+                            sb.Append(sel.Value == null ? "*" : connection.Language.WrapFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
-                                sb.Append(connection.WrapFieldName(sel.Alias));
+                                sb.Append(connection.Language.WrapFieldName(sel.Alias));
                             }
                         }
                         else
                         {
                             if (!string.IsNullOrEmpty(sel.TableName))
                             {
-                                sb.Append(connection.WrapFieldName(sel.TableName));
+                                sb.Append(connection.Language.WrapFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(sel.Value == null ? "*" : connection.WrapFieldName(sel.Value.ToString()));
+                            sb.Append(sel.Value == null ? "*" : connection.Language.WrapFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
-                                sb.Append(connection.WrapFieldName(sel.Alias));
+                                sb.Append(connection.Language.WrapFieldName(sel.Alias));
                             }
                         }
                     }
@@ -132,10 +132,10 @@ namespace dg.Sql
                     {
                         if (join.RightTableSchema.DatabaseOwner.Length > 0)
                         {
-                            sb.Append(connection.WrapFieldName(join.RightTableSchema.DatabaseOwner));
+                            sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
                             sb.Append('.');
                         }
-                        sb.Append(connection.WrapFieldName(join.RightTableSchema.Name));
+                        sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.Name));
                     }
                     else
                     {
@@ -239,11 +239,11 @@ namespace dg.Sql
                     {
                         if (groupBy.TableName != null)
                         {
-                            sb.Append(connection.WrapFieldName(groupBy.TableName) + @"." + connection.WrapFieldName(groupBy.ColumnName.ToString()));
+                            sb.Append(connection.Language.WrapFieldName(groupBy.TableName) + @"." + connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
                         }
                         else
                         {
-                            sb.Append(connection.WrapFieldName(groupBy.ColumnName.ToString()));
+                            sb.Append(connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
                         }
                     }
 
@@ -294,7 +294,7 @@ namespace dg.Sql
 
                     if (index.Mode == dg.Sql.TableSchema.IndexMode.PrimaryKey)
                     {
-                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.WrapFieldName(index.Name));
+                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.Language.WrapFieldName(index.Name));
                     }
                     else
                     {
@@ -311,7 +311,7 @@ namespace dg.Sql
                                 break;
                         }
                         sb.Append(@"INDEX ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
                         sb.Append(@" ");
                     }
                     if (index.Mode != TableSchema.IndexMode.Spatial)
@@ -333,7 +333,7 @@ namespace dg.Sql
                     for (int i = 0; i < index.ColumnNames.Length; i++)
                     {
                         if (i > 0) sb.Append(",");
-                        sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                        sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                         if (index.ColumnLength[i] > 0) sb.AppendFormat("({0})", index.ColumnLength[i]);
                         sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                     }
@@ -348,14 +348,14 @@ namespace dg.Sql
                         BuildTableName(connection, sb, false);
 
                         sb.Append(@" ADD CONSTRAINT ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
                         sb.Append(@" PRIMARY KEY ");
 
                         sb.Append(@"(");
                         for (int i = 0; i < index.ColumnNames.Length; i++)
                         {
                             if (i > 0) sb.Append(",");
-                            sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                             sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                         }
                         sb.Append(@")");
@@ -367,7 +367,7 @@ namespace dg.Sql
                         if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
 
                         sb.Append(@"INDEX ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
 
                         sb.Append(@"ON ");
 
@@ -382,7 +382,7 @@ namespace dg.Sql
                         for (int i = 0; i < index.ColumnNames.Length; i++)
                         {
                             if (i > 0) sb.Append(",");
-                            sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                             sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                         }
                         sb.Append(@")");
@@ -398,20 +398,20 @@ namespace dg.Sql
 
                     if (index.Mode == dg.Sql.TableSchema.IndexMode.PrimaryKey)
                     {
-                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.WrapFieldName(index.Name));
+                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.Language.WrapFieldName(index.Name));
                     }
                     else
                     {
                         if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
                         sb.Append(@"INDEX ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
                         sb.Append(@" ");
                     }
                     sb.Append(@"(");
                     for (int i = 0; i < index.ColumnNames.Length; i++)
                     {
                         if (i > 0) sb.Append(",");
-                        sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                        sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                         sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                     }
                     sb.Append(@")");
@@ -425,7 +425,7 @@ namespace dg.Sql
                         BuildTableName(connection, sb, false);
 
                         sb.Append(@" ADD CONSTRAINT ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
                         sb.Append(@" PRIMARY KEY ");
 
                         if (index.Cluster == TableSchema.ClusterMode.Clustered) sb.Append(@"CLUSTERED ");
@@ -435,7 +435,7 @@ namespace dg.Sql
                         for (int i = 0; i < index.ColumnNames.Length; i++)
                         {
                             if (i > 0) sb.Append(",");
-                            sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                             sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                         }
                         sb.Append(@")");
@@ -449,7 +449,7 @@ namespace dg.Sql
                         else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");
 
                         sb.Append(@"INDEX ");
-                        sb.Append(connection.WrapFieldName(index.Name));
+                        sb.Append(connection.Language.WrapFieldName(index.Name));
 
                         sb.Append(@"ON ");
 
@@ -459,7 +459,7 @@ namespace dg.Sql
                         for (int i = 0; i < index.ColumnNames.Length; i++)
                         {
                             if (i > 0) sb.Append(",");
-                            sb.Append(connection.WrapFieldName(index.ColumnNames[i]));
+                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
                             sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                         }
                         sb.Append(@")");
@@ -475,19 +475,19 @@ namespace dg.Sql
                 BuildTableName(connection, sb, false);
 
                 sb.Append(@" ADD CONSTRAINT ");
-                sb.Append(connection.WrapFieldName(foreignKey.Name));
+                sb.Append(connection.Language.WrapFieldName(foreignKey.Name));
                 sb.Append(@" FOREIGN KEY (");
 
                 for (int i = 0; i < foreignKey.Columns.Length; i++)
                 {
                     if (i > 0) sb.Append(",");
-                    sb.Append(connection.WrapFieldName(foreignKey.Columns[i]));
+                    sb.Append(connection.Language.WrapFieldName(foreignKey.Columns[i]));
                 }
                 sb.AppendFormat(@") REFERENCES {0} (", foreignKey.ForeignTable);
                 for (int i = 0; i < foreignKey.ForeignColumns.Length; i++)
                 {
                     if (i > 0) sb.Append(",");
-                    sb.Append(connection.WrapFieldName(foreignKey.ForeignColumns[i]));
+                    sb.Append(connection.Language.WrapFieldName(foreignKey.ForeignColumns[i]));
                 }
                 sb.Append(@")");
                 if (foreignKey.OnDelete != TableSchema.ForeignKeyReference.None)
@@ -529,9 +529,9 @@ namespace dg.Sql
             }
         }
 
-        public void BuildColumnProperties(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, bool NoDefault)
+        public void BuildColumnProperties(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, bool noDefault)
         {
-            sb.Append(connection.WrapFieldName(column.Name));
+            sb.Append(connection.Language.WrapFieldName(column.Name));
             sb.Append(' ');
 
             bool isTextField;
@@ -540,7 +540,7 @@ namespace dg.Sql
             if (!string.IsNullOrEmpty(column.Comment) && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
             {
                 sb.AppendFormat(@" COMMENT {0}",
-                    connection.PrepareValue(column.Comment));
+                    connection.Language.PrepareValue(column.Comment));
             }
 
             if (!column.Nullable)
@@ -550,7 +550,7 @@ namespace dg.Sql
 
             if (column.ComputedColumn == null)
             {
-                if (!NoDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
+                if (!noDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
                 {
                     sb.Append(@" DEFAULT ");
                     Query.PrepareColumnValue(column, column.Default, sb, connection, this);
@@ -583,40 +583,40 @@ namespace dg.Sql
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.varchar_MAX != null)
+                        if (connection.Language.varchar_MAX != null)
                         {
-                            sb.Append(connection.type_VARCHAR);
-                            sb.AppendFormat(@"({0})", connection.varchar_MAX);
+                            sb.Append(connection.Language.type_VARCHAR);
+                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX);
                         }
                         else
                         {
-                            sb.Append(connection.type_VARCHAR);
-                            sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
+                            sb.Append(connection.Language.type_VARCHAR);
+                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
                         }
                     }
                     else if (column.MaxLength == 0)
                     {
-                        sb.Append(connection.type_TEXT);
+                        sb.Append(connection.Language.type_TEXT);
                         isTextField = true;
                     }
-                    else if (column.MaxLength <= connection.varchar_MAX_VALUE)
+                    else if (column.MaxLength <= connection.Language.varchar_MAX_VALUE)
                     {
-                        sb.Append(connection.type_VARCHAR);
+                        sb.Append(connection.Language.type_VARCHAR);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                     else if (column.MaxLength < 65536)
                     {
-                        sb.Append(connection.type_TEXT);
+                        sb.Append(connection.Language.type_TEXT);
                         isTextField = true;
                     }
                     else if (column.MaxLength < 16777215)
                     {
-                        sb.Append(connection.type_MEDIUMTEXT);
+                        sb.Append(connection.Language.type_MEDIUMTEXT);
                         isTextField = true;
                     }
                     else
                     {
-                        sb.Append(connection.type_LONGTEXT);
+                        sb.Append(connection.Language.type_LONGTEXT);
                         isTextField = true;
                     }
                 }
@@ -625,104 +625,104 @@ namespace dg.Sql
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.varchar_MAX != null)
+                        if (connection.Language.varchar_MAX != null)
                         {
-                            sb.Append(connection.type_CHAR);
-                            sb.AppendFormat(@"({0})", connection.varchar_MAX);
+                            sb.Append(connection.Language.type_CHAR);
+                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX);
                         }
                         else
                         {
-                            sb.Append(connection.type_CHAR);
-                            sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
+                            sb.Append(connection.Language.type_CHAR);
+                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
                         }
                     }
-                    else if (column.MaxLength == 0 || column.MaxLength >= connection.varchar_MAX_VALUE)
+                    else if (column.MaxLength == 0 || column.MaxLength >= connection.Language.varchar_MAX_VALUE)
                     {
-                        sb.Append(connection.type_CHAR);
-                        sb.AppendFormat(@"({0})", connection.varchar_MAX_VALUE);
+                        sb.Append(connection.Language.type_CHAR);
+                        sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
                     }
                     else
                     {
-                        sb.Append(connection.type_CHAR);
+                        sb.Append(connection.Language.type_CHAR);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                 }
                 else if (dataType == DataType.Text)
                 {
-                    sb.Append(connection.type_TEXT);
+                    sb.Append(connection.Language.type_TEXT);
                     isTextField = true;
                 }
                 else if (dataType == DataType.MediumText)
                 {
-                    sb.Append(connection.type_MEDIUMTEXT);
+                    sb.Append(connection.Language.type_MEDIUMTEXT);
                     isTextField = true;
                 }
                 else if (dataType == DataType.LongText)
                 {
-                    sb.Append(connection.type_LONGTEXT);
+                    sb.Append(connection.Language.type_LONGTEXT);
                     isTextField = true;
                 }
                 else if (dataType == DataType.Boolean)
                 {
-                    sb.Append(connection.type_BOOLEAN);
+                    sb.Append(connection.Language.type_BOOLEAN);
                 }
                 else if (dataType == DataType.DateTime)
                 {
-                    sb.Append(connection.type_DATETIME);
+                    sb.Append(connection.Language.type_DATETIME);
                 }
                 else if (dataType == DataType.Numeric)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.type_NUMERIC);
+                        sb.Append(connection.Language.type_NUMERIC);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.type_NUMERIC);
+                        sb.Append(connection.Language.type_NUMERIC);
                     }
                 }
                 else if (dataType == DataType.Float)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.type_FLOAT);
+                        sb.Append(connection.Language.type_FLOAT);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.type_FLOAT);
+                        sb.Append(connection.Language.type_FLOAT);
                     }
                 }
                 else if (dataType == DataType.Double)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.type_DOUBLE);
+                        sb.Append(connection.Language.type_DOUBLE);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.type_DOUBLE);
+                        sb.Append(connection.Language.type_DOUBLE);
                     }
                 }
                 else if (dataType == DataType.Decimal)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.type_DECIMAL);
+                        sb.Append(connection.Language.type_DECIMAL);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.type_DECIMAL);
+                        sb.Append(connection.Language.type_DECIMAL);
                     }
                 }
                 else if (dataType == DataType.Money)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.type_MONEY);
+                        sb.Append(connection.Language.type_MONEY);
                         if (connection.TYPE != ConnectorBase.SqlServiceType.MSSQL)
                         {
                             sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
@@ -730,168 +730,168 @@ namespace dg.Sql
                     }
                     else
                     {
-                        sb.Append(connection.type_MONEY);
+                        sb.Append(connection.Language.type_MONEY);
                     }
                 }
                 else if (dataType == DataType.TinyInt)
                 {
-                    sb.Append(connection.type_TINYINT);
+                    sb.Append(connection.Language.type_TINYINT);
                 }
                 else if (dataType == DataType.UnsignedTinyInt)
                 {
-                    sb.Append(connection.type_UNSIGNEDTINYINT);
+                    sb.Append(connection.Language.type_UNSIGNEDTINYINT);
                 }
                 else if (dataType == DataType.SmallInt)
                 {
-                    sb.Append(connection.type_SMALLINT);
+                    sb.Append(connection.Language.type_SMALLINT);
                 }
                 else if (dataType == DataType.UnsignedSmallInt)
                 {
-                    sb.Append(connection.type_UNSIGNEDSMALLINT);
+                    sb.Append(connection.Language.type_UNSIGNEDSMALLINT);
                 }
                 else if (dataType == DataType.Int)
                 {
-                    sb.Append(connection.type_INT);
+                    sb.Append(connection.Language.type_INT);
                 }
                 else if (dataType == DataType.UnsignedInt)
                 {
-                    sb.Append(connection.type_UNSIGNEDINT);
+                    sb.Append(connection.Language.type_UNSIGNEDINT);
                 }
                 else if (dataType == DataType.BigInt)
                 {
-                    sb.Append(connection.type_BIGINT);
+                    sb.Append(connection.Language.type_BIGINT);
                 }
                 else if (dataType == DataType.UnsignedBigInt)
                 {
-                    sb.Append(connection.type_UNSIGNEDBIGINT);
+                    sb.Append(connection.Language.type_UNSIGNEDBIGINT);
                 }
                 else if (dataType == DataType.Json)
                 {
-                    sb.Append(connection.type_JSON);
+                    sb.Append(connection.Language.type_JSON);
                 }
                 else if (dataType == DataType.JsonBinary)
                 {
-                    sb.Append(connection.type_JSON_BINARY);
+                    sb.Append(connection.Language.type_JSON_BINARY);
                 }
                 else if (dataType == DataType.Blob)
                 {
-                    sb.Append(connection.type_BLOB);
+                    sb.Append(connection.Language.type_BLOB);
                 }
                 else if (dataType == DataType.Guid)
                 {
-                    sb.Append(connection.type_GUID);
+                    sb.Append(connection.Language.type_GUID);
                 }
                 else if (dataType == DataType.Geometry)
                 {
-                    sb.Append(connection.type_GEOMETRY);
+                    sb.Append(connection.Language.type_GEOMETRY);
                 }
                 else if (dataType == DataType.GeometryCollection)
                 {
-                    sb.Append(connection.type_GEOMETRYCOLLECTION);
+                    sb.Append(connection.Language.type_GEOMETRYCOLLECTION);
                 }
                 else if (dataType == DataType.Point)
                 {
-                    sb.Append(connection.type_POINT);
+                    sb.Append(connection.Language.type_POINT);
                 }
                 else if (dataType == DataType.LineString)
                 {
-                    sb.Append(connection.type_LINESTRING);
+                    sb.Append(connection.Language.type_LINESTRING);
                 }
                 else if (dataType == DataType.Polygon)
                 {
-                    sb.Append(connection.type_POLYGON);
+                    sb.Append(connection.Language.type_POLYGON);
                 }
                 else if (dataType == DataType.Line)
                 {
-                    sb.Append(connection.type_LINE);
+                    sb.Append(connection.Language.type_LINE);
                 }
                 else if (dataType == DataType.Curve)
                 {
-                    sb.Append(connection.type_CURVE);
+                    sb.Append(connection.Language.type_CURVE);
                 }
                 else if (dataType == DataType.Surface)
                 {
-                    sb.Append(connection.type_SURFACE);
+                    sb.Append(connection.Language.type_SURFACE);
                 }
                 else if (dataType == DataType.LinearRing)
                 {
-                    sb.Append(connection.type_LINEARRING);
+                    sb.Append(connection.Language.type_LINEARRING);
                 }
                 else if (dataType == DataType.MultiPoint)
                 {
-                    sb.Append(connection.type_MULTIPOINT);
+                    sb.Append(connection.Language.type_MULTIPOINT);
                 }
                 else if (dataType == DataType.MultiLineString)
                 {
-                    sb.Append(connection.type_MULTILINESTRING);
+                    sb.Append(connection.Language.type_MULTILINESTRING);
                 }
                 else if (dataType == DataType.MultiPolygon)
                 {
-                    sb.Append(connection.type_MULTIPOLYGON);
+                    sb.Append(connection.Language.type_MULTIPOLYGON);
                 }
                 else if (dataType == DataType.MultiCurve)
                 {
-                    sb.Append(connection.type_MULTICURVE);
+                    sb.Append(connection.Language.type_MULTICURVE);
                 }
                 else if (dataType == DataType.MultiSurface)
                 {
-                    sb.Append(connection.type_MULTISURFACE);
+                    sb.Append(connection.Language.type_MULTISURFACE);
                 }
                 else if (dataType == DataType.Geographic)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC);
+                    sb.Append(connection.Language.type_GEOGRAPHIC);
                 }
                 else if (dataType == DataType.GeographicCollection)
                 {
-                    sb.Append(connection.type_GEOGRAPHICCOLLECTION);
+                    sb.Append(connection.Language.type_GEOGRAPHICCOLLECTION);
                 }
                 else if (dataType == DataType.GeographicPoint)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_POINT);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_POINT);
                 }
                 else if (dataType == DataType.GeographicLineString)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_LINESTRING);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_LINESTRING);
                 }
                 else if (dataType == DataType.GeographicPolygon)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_POLYGON);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_POLYGON);
                 }
                 else if (dataType == DataType.GeographicLine)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_LINE);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_LINE);
                 }
                 else if (dataType == DataType.GeographicCurve)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_CURVE);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_CURVE);
                 }
                 else if (dataType == DataType.GeographicSurface)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_SURFACE);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_SURFACE);
                 }
                 else if (dataType == DataType.GeographicLinearRing)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_LINEARRING);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_LINEARRING);
                 }
                 else if (dataType == DataType.GeographicMultiPoint)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_MULTIPOINT);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTIPOINT);
                 }
                 else if (dataType == DataType.GeographicMultiLineString)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_MULTILINESTRING);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTILINESTRING);
                 }
                 else if (dataType == DataType.GeographicMultiPolygon)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_MULTIPOLYGON);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTIPOLYGON);
                 }
                 else if (dataType == DataType.GeographicMultiCurve)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_MULTICURVE);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTICURVE);
                 }
                 else if (dataType == DataType.GeographicMultiSurface)
                 {
-                    sb.Append(connection.type_GEOGRAPHIC_MULTISURFACE);
+                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTISURFACE);
                 }
             }
 
@@ -900,11 +900,11 @@ namespace dg.Sql
                 sb.Append(' ');
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
                 { // Specifically for PostgreSQL
-                    sb.Append(connection.type_AUTOINCREMENT_BIGINT);
+                    sb.Append(connection.Language.type_AUTOINCREMENT_BIGINT);
                 }
                 else
                 {
-                    sb.Append(connection.type_AUTOINCREMENT);
+                    sb.Append(connection.Language.type_AUTOINCREMENT);
                 }
             }
 
@@ -995,10 +995,10 @@ namespace dg.Sql
             {
                 if (Schema.DatabaseOwner.Length > 0)
                 {
-                    sb.Append(connection.WrapFieldName(Schema.DatabaseOwner));
+                    sb.Append(connection.Language.WrapFieldName(Schema.DatabaseOwner));
                     sb.Append('.');
                 }
-                sb.Append(connection.WrapFieldName(_SchemaName));
+                sb.Append(connection.Language.WrapFieldName(_SchemaName));
             }
             else
             {
@@ -1013,7 +1013,7 @@ namespace dg.Sql
 
             if (considerAlias && !string.IsNullOrEmpty(_SchemaAlias))
             {
-                sb.Append(" " + connection.WrapFieldName(_SchemaAlias));
+                sb.Append(" " + connection.Language.WrapFieldName(_SchemaAlias));
             }
         }
 
@@ -1181,7 +1181,7 @@ namespace dg.Sql
                                 {
                                     if (bFirst) bFirst = false;
                                     else sb.Append(',');
-                                    sb.Append(connection.WrapFieldName(ins.ColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(ins.ColumnName));
                                 }
                                 if (InsertExpression != null)
                                 {
@@ -1217,10 +1217,10 @@ namespace dg.Sql
                                         {
                                             if (ins.SecondTableName != null)
                                             {
-                                                sb.Append(connection.WrapFieldName(ins.SecondTableName));
+                                                sb.Append(connection.Language.WrapFieldName(ins.SecondTableName));
                                                 sb.Append(@".");
                                             }
-                                            sb.Append(connection.WrapFieldName(ins.Second.ToString()));
+                                            sb.Append(connection.Language.WrapFieldName(ins.Second.ToString()));
                                         }
                                     }
                                     sb.Append(@")");
@@ -1250,7 +1250,7 @@ namespace dg.Sql
                                     connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS) &&
                                     !string.IsNullOrEmpty(_SchemaAlias))
                                 {
-                                    sb.Append(connection.WrapFieldName(_SchemaAlias));
+                                    sb.Append(connection.Language.WrapFieldName(_SchemaAlias));
                                 }
                                 else
                                 {
@@ -1277,11 +1277,11 @@ namespace dg.Sql
 
                                     if (_ListJoin != null && _ListJoin.Count > 0 && upd.TableName != null)
                                     {
-                                        sb.Append(connection.WrapFieldName(upd.TableName));
+                                        sb.Append(connection.Language.WrapFieldName(upd.TableName));
                                         sb.Append(@".");
                                     }
 
-                                    sb.Append(connection.WrapFieldName(upd.ColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(upd.ColumnName));
 
                                     sb.Append('=');
 
@@ -1297,10 +1297,10 @@ namespace dg.Sql
                                     {
                                         if (upd.SecondTableName != null)
                                         {
-                                            sb.Append(connection.WrapFieldName(upd.SecondTableName));
+                                            sb.Append(connection.Language.WrapFieldName(upd.SecondTableName));
                                             sb.Append(@".");
                                         }
-                                        sb.Append(connection.WrapFieldName(upd.Second.ToString()));
+                                        sb.Append(connection.Language.WrapFieldName(upd.Second.ToString()));
                                     }
                                 }
 
@@ -1343,7 +1343,7 @@ namespace dg.Sql
                                     {
                                         if (bFirst) bFirst = false;
                                         else sb.Append(',');
-                                        sb.Append(connection.WrapFieldName(ins.ColumnName));
+                                        sb.Append(connection.Language.WrapFieldName(ins.ColumnName));
                                     }
                                     if (InsertExpression != null)
                                     {
@@ -1379,10 +1379,10 @@ namespace dg.Sql
                                             {
                                                 if (ins.SecondTableName != null)
                                                 {
-                                                    sb.Append(connection.WrapFieldName(ins.SecondTableName));
+                                                    sb.Append(connection.Language.WrapFieldName(ins.SecondTableName));
                                                     sb.Append(@".");
                                                 }
-                                                sb.Append(connection.WrapFieldName(ins.Second.ToString()));
+                                                sb.Append(connection.Language.WrapFieldName(ins.Second.ToString()));
                                             }
                                         }
                                         sb.Append(@")");
@@ -1471,13 +1471,13 @@ namespace dg.Sql
                                 {
                                     if (bSep) sb.Append(@", ");
 
-                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", connection.WrapFieldName(@"PK_" + _SchemaName));
+                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", connection.Language.WrapFieldName(@"PK_" + _SchemaName));
                                     bSep = false;
                                     foreach (TableSchema.Column col in Schema.Columns)
                                     {
                                         if (!col.IsPrimaryKey) continue;
                                         if (bSep) sb.Append(@", "); else bSep = true;
-                                        if (col.IsPrimaryKey) sb.Append(connection.WrapFieldName(col.Name));
+                                        if (col.IsPrimaryKey) sb.Append(connection.Language.WrapFieldName(col.Name));
                                     }
                                     bSep = true;
                                     sb.Append(')');
@@ -1540,7 +1540,7 @@ namespace dg.Sql
                                 {
                                     int idx = Schema.Columns.IndexOf(_AlterColumn);
                                     if (idx == 0) sb.Append(@"FIRST ");
-                                    else sb.AppendFormat(@"AFTER {0} ", connection.WrapFieldName(Schema.Columns[idx - 1].Name));
+                                    else sb.AppendFormat(@"AFTER {0} ", connection.Language.WrapFieldName(Schema.Columns[idx - 1].Name));
                                 }
                             }
                             break;
@@ -1558,9 +1558,9 @@ namespace dg.Sql
                                         BuildTableName(connection, sb, false);
 
                                         sb.Append('.');
-                                        sb.Append(connection.WrapFieldName(_AlterColumnOldName));
+                                        sb.Append(connection.Language.WrapFieldName(_AlterColumnOldName));
                                         sb.Append(',');
-                                        sb.Append(connection.WrapFieldName(_AlterColumn.Name));
+                                        sb.Append(connection.Language.WrapFieldName(_AlterColumn.Name));
                                         sb.Append(@",'COLUMN';");
                                     }
                                     else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
@@ -1570,9 +1570,9 @@ namespace dg.Sql
                                         BuildTableName(connection, sb, false);
 
                                         sb.Append(@" RENAME COLUMN ");
-                                        sb.Append(connection.WrapFieldName(_AlterColumnOldName));
+                                        sb.Append(connection.Language.WrapFieldName(_AlterColumnOldName));
                                         sb.Append(@" TO ");
-                                        sb.Append(connection.WrapFieldName(_AlterColumn.Name));
+                                        sb.Append(connection.Language.WrapFieldName(_AlterColumn.Name));
                                         sb.Append(';');
                                     }
                                 }
@@ -1586,7 +1586,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     string alterColumnStatement = @" ALTER COLUMN ";
-                                    alterColumnStatement += connection.WrapFieldName(_AlterColumn.Name);
+                                    alterColumnStatement += connection.Language.WrapFieldName(_AlterColumn.Name);
 
                                     sb.Append(alterColumnStatement);
                                     sb.Append(@" TYPE ");
@@ -1611,7 +1611,7 @@ namespace dg.Sql
                                     sb.Append(' ');
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                     {
-                                        sb.AppendFormat(@"CHANGE {0} ", connection.WrapFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
+                                        sb.AppendFormat(@"CHANGE {0} ", connection.Language.WrapFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
                                     }
                                     else
                                     {
@@ -1622,7 +1622,7 @@ namespace dg.Sql
                                     {
                                         int idx = Schema.Columns.IndexOf(_AlterColumn);
                                         if (idx == 0) sb.Append(@"FIRST ");
-                                        else sb.AppendFormat(@"AFTER {0} ", connection.WrapFieldName(Schema.Columns[idx - 1].Name));
+                                        else sb.AppendFormat(@"AFTER {0} ", connection.Language.WrapFieldName(Schema.Columns[idx - 1].Name));
                                     }
                                 }
                             }
@@ -1635,7 +1635,7 @@ namespace dg.Sql
                                 BuildTableName(connection, sb, false);
 
                                 sb.Append(@" DROP COLUMN ");
-                                sb.Append(connection.WrapFieldName(_DropColumnName));
+                                sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                             }
                             break;
 
@@ -1648,7 +1648,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     sb.Append(@" DROP FOREIGN KEY ");
-                                    sb.Append(connection.WrapFieldName(_DropColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                                 }
                                 else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                 {
@@ -1657,7 +1657,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.WrapFieldName(_DropColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                                 }
                                 else
                                 {
@@ -1666,7 +1666,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.WrapFieldName(_DropColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                                 }
                             }
                             break;
@@ -1680,7 +1680,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     sb.Append(@" DROP INDEX ");
-                                    sb.Append(connection.WrapFieldName(_DropColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                                 }
                                 else
                                 {
@@ -1689,7 +1689,7 @@ namespace dg.Sql
                                     BuildTableName(connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.WrapFieldName(_DropColumnName));
+                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
                                 }
                             }
                             break;

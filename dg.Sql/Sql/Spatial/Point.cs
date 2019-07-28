@@ -66,8 +66,8 @@ namespace dg.Sql
                 var geom = "POINT(" + X.ToString(formatProvider) + " " + Y.ToString(formatProvider) + ")";
 
                 sb.Append(IsGeographyType
-                    ? conn.func_ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString()) 
-                    : conn.func_ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString()));
+                    ? conn.Language.func_ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString()) 
+                    : conn.Language.func_ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)

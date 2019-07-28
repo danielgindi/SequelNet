@@ -147,7 +147,7 @@ namespace dg.Sql.Connector
 
         static public bool IsView(MySqlConnector conn, string tableName)
         {
-            string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.PrepareValue(tableName));
+            string sql = string.Format(@"SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = {0}", conn.Language.PrepareValue(tableName));
             return !IsNull(conn.ExecuteScalar(sql));
         }
 
@@ -215,7 +215,7 @@ namespace dg.Sql.Connector
 
                 Query query = options.GetTableDataQuery(table);
 
-                using (DataReaderBase reader = (query == null ? conn.ExecuteReader(string.Format(@"SELECT * FROM {0}", table)) : query.ExecuteReader(conn)))
+                using (var reader = (query == null ? conn.ExecuteReader(string.Format(@"SELECT * FROM {0}", table)) : query.ExecuteReader(conn)))
                 {
                     while (reader.Read())
                     {
@@ -223,13 +223,13 @@ namespace dg.Sql.Connector
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
                         {
                             if (idx > 0) writer.Write(@",");
-                            writer.Write(conn.WrapFieldName(reader.GetColumnName(idx)));
+                            writer.Write(conn.Language.WrapFieldName(reader.GetColumnName(idx)));
                         }
                         writer.Write(@") VALUES(");
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
                         {
                             if (idx > 0) writer.Write(@",");
-                            writer.Write(conn.PrepareValue(reader[idx]));
+                            writer.Write(conn.Language.PrepareValue(conn, reader[idx]));
                         }
                         writer.Write(string.Format(@") {0}{1}", DELIMITER, NEW_LINE));
                     }
@@ -239,7 +239,7 @@ namespace dg.Sql.Connector
 
         static private void ExportTriggers(MySqlConnector conn, StreamWriter writer)
         {
-            using (DataReaderBase reader = conn.ExecuteReader(@"SHOW TRIGGERS"))
+            using (var reader = conn.ExecuteReader(@"SHOW TRIGGERS"))
             {
                 while (reader.Read())
                 {

@@ -104,15 +104,15 @@ namespace dg.Sql
             {
                 if (TableName != null && TableName.Length > 0)
                 {
-                    ret += conn.WrapFieldName(TableName);
+                    ret += conn.Language.WrapFieldName(TableName);
                     ret += ".";
                 }
 
-                ret += conn.WrapFieldName(Value.ToString());
+                ret += conn.Language.WrapFieldName(Value.ToString());
             }
             else if (Type == ValueObjectType.Value)
             {
-                ret += "(" + conn.PrepareValue(Value, relatedQuery) + ")";
+                ret += "(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")";
             }
             else
             {
@@ -128,11 +128,11 @@ namespace dg.Sql
             {
                 if (TableName != null && TableName.Length > 0)
                 {
-                    outputBuilder.Append(conn.WrapFieldName(TableName));
+                    outputBuilder.Append(conn.Language.WrapFieldName(TableName));
                     outputBuilder.Append(".");
                 }
 
-                outputBuilder.Append(conn.WrapFieldName(Value.ToString()));
+                outputBuilder.Append(conn.Language.WrapFieldName(Value.ToString()));
             }
             else if (Type == ValueObjectType.Value)
             {
@@ -144,7 +144,7 @@ namespace dg.Sql
                 }
                 else
                 {
-                    outputBuilder.Append("(" + conn.PrepareValue(Value, relatedQuery) + ")");
+                    outputBuilder.Append("(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")");
                 }
             }
             else

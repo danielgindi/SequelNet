@@ -60,22 +60,22 @@ namespace dg.Sql.Phrases
 
                 if (point.LatitudeTableName != null)
                 {
-                    pt = conn.WrapFieldName(point.LatitudeTableName) + @"." + conn.WrapFieldName(point.PointColumnName);
+                    pt = conn.Language.WrapFieldName(point.LatitudeTableName) + @"." + conn.Language.WrapFieldName(point.PointColumnName);
                 }
                 else
                 {
-                    pt = conn.WrapFieldName(point.PointColumnName);
+                    pt = conn.Language.WrapFieldName(point.PointColumnName);
                 }
 
-                x = conn.func_ST_X(pt);
-                y = conn.func_ST_Y(pt);
+                x = conn.Language.func_ST_X(pt);
+                y = conn.Language.func_ST_Y(pt);
             }
             else
             {
                 if (point.LatitudeColumnName != null)
                 {
-                    x = (point.LatitudeTableName != null ? conn.WrapFieldName(point.LatitudeTableName) + "." : "")
-                        + conn.WrapFieldName(point.LatitudeColumnName);
+                    x = (point.LatitudeTableName != null ? conn.Language.WrapFieldName(point.LatitudeTableName) + "." : "")
+                        + conn.Language.WrapFieldName(point.LatitudeColumnName);
                 }
                 else
                 {
@@ -84,8 +84,8 @@ namespace dg.Sql.Phrases
 
                 if (point.LongitudeColumnName != null)
                 {
-                    y = (point.LongitudeTableName != null ? conn.WrapFieldName(point.LongitudeTableName) + "." : "")
-                        + conn.WrapFieldName(point.LongitudeColumnName);
+                    y = (point.LongitudeTableName != null ? conn.Language.WrapFieldName(point.LongitudeTableName) + "." : "")
+                        + conn.Language.WrapFieldName(point.LongitudeColumnName);
                 }
                 else
                 {

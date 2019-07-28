@@ -1,5 +1,4 @@
-﻿using System;
-using dg.Sql.Connector;
+﻿using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
@@ -42,7 +41,7 @@ namespace dg.Sql.Phrases
 
             ret += Value.Build(conn, relatedQuery);
 
-            return conn.func_LENGTH(ret);
+            return conn.Language.func_LENGTH(ret);
         }
     }
 }

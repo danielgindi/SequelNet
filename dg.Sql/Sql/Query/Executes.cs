@@ -443,27 +443,27 @@ namespace dg.Sql
                 {
                     if (databaseOwner != null && databaseOwner.Length > 0)
                     {
-                        schemaName = connection.WrapFieldName(databaseOwner) + @"." + connection.WrapFieldName(schemaName);
+                        schemaName = connection.Language.WrapFieldName(databaseOwner) + @"." + connection.Language.WrapFieldName(schemaName);
                     }
                     else
                     {
-                        schemaName = connection.WrapFieldName(schemaName);
+                        schemaName = connection.Language.WrapFieldName(schemaName);
                     }
                 }
                 else
                 {
                     if (_SchemaAlias != null)
                     {
-                        schemaName = connection.WrapFieldName(_SchemaAlias);
+                        schemaName = connection.Language.WrapFieldName(_SchemaAlias);
                     }
                     else
                     {
                         schemaName = @"";
                         if (Schema.DatabaseOwner.Length > 0)
                         {
-                            schemaName = connection.WrapFieldName(Schema.DatabaseOwner) + @".";
+                            schemaName = connection.Language.WrapFieldName(Schema.DatabaseOwner) + @".";
                         }
-                        schemaName += connection.WrapFieldName(_SchemaName);
+                        schemaName += connection.Language.WrapFieldName(_SchemaName);
                     }
                 }
 
@@ -471,7 +471,7 @@ namespace dg.Sql
                     aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
                     (columnName == "*" 
                     ? columnName 
-                    : (schemaName + "." + connection.WrapFieldName(columnName)))
+                    : (schemaName + "." + connection.Language.WrapFieldName(columnName)))
                     + @")", true);
 
                 _ListSelect.Add(select);

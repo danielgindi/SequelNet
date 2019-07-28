@@ -1,13 +1,11 @@
 ﻿namespace dg.Sql.Connector
 {
-    public class MsSqlVersion
+    public struct MsSqlVersion
     {
-        private bool? _SupportsOffset = null;
-
-        private int _MajorVersion = 0;
-        private string _Version = null;
-        private string _Level = null;
-        private string _Edition = null;
+        public int MajorVersion;
+        private string _Version;
+        public string Level;
+        public string Edition;
 
         public string Version
         {
@@ -17,42 +15,45 @@
                 _Version = value;
 
                 int periodIndex = _Version.IndexOf('.');
-                int.TryParse(periodIndex == -1 ? _Version : _Version.Substring(0, periodIndex), out _MajorVersion);
+                int.TryParse(periodIndex == -1 ? _Version : _Version.Substring(0, periodIndex), out var major);
+                MajorVersion = major;
             }
-        }
-
-        public int MajorVersion
-        {
-            get { return _MajorVersion; }
-            set { _MajorVersion = value; }
-        }
-
-        public string Level
-        {
-            get { return _Level; }
-            set { _Level = value; }
-        }
-
-        public string Edition
-        {
-            get { return _Edition; }
-            set { _Edition = value; }
         }
 
         public bool SupportsOffset
         {
-            get 
+            get
             {
-                if (_SupportsOffset == null)
-                {
-                    _SupportsOffset = MajorVersion >= 11; // Since Sql Server 2012
-                }
-                return _SupportsOffset.Value;
+                return MajorVersion >= 11; // Since Sql Server 2012
             }
-            set 
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MsSqlVersion)
             {
-                _SupportsOffset = value;
+                var m = (MsSqlVersion)obj;
+                return _Version == m._Version &&
+                    Level == m.Level &&
+                    Edition == m.Edition;
             }
+
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public static bool operator ==(MsSqlVersion m1, MsSqlVersion m2)
+        {
+            return m1.Equals(m2);
+        }
+
+        public static bool operator !=(MsSqlVersion m1, MsSqlVersion m2)
+        {
+            return !m1.Equals(m2);
         }
     }
 }

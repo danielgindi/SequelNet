@@ -91,7 +91,7 @@ namespace dg.Sql.Phrases
                             if (first) first = false;
                             else sb.Append(",");
 
-                            sb.Append(conn.PrepareValue(val.Key));
+                            sb.Append(conn.Language.PrepareValue(val.Key));
                             sb.Append(",");
                             sb.Append(val.Value.Build(conn, relatedQuery));
                         }
@@ -112,7 +112,7 @@ namespace dg.Sql.Phrases
                             if (first) first = false;
                             else sb.Append(",");
 
-                            sb.Append(conn.PrepareValue(val.Key));
+                            sb.Append(conn.Language.PrepareValue(val.Key));
                             sb.Append(",");
                             sb.Append(val.Value.Build(conn, relatedQuery));
                         }

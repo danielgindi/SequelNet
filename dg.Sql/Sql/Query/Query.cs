@@ -313,7 +313,7 @@ namespace dg.Sql
                 // No definition to match against,
                 // so just prepare the value as it is, output it and return
 
-                outputBuilder.Append(connection.PrepareValue(value, relatedQuery));
+                outputBuilder.Append(connection.Language.PrepareValue(connection, value, relatedQuery));
 
                 return;
             }
@@ -430,7 +430,7 @@ namespace dg.Sql
                 {
                     if (((string)value).Length > columnDefinition.MaxLength)
                     {
-                        outputBuilder.Append(connection.PrepareValue(((string)value).Remove(columnDefinition.MaxLength)));
+                        outputBuilder.Append(connection.Language.PrepareValue(((string)value).Remove(columnDefinition.MaxLength)));
                         return;
                     }
                 }
@@ -441,7 +441,7 @@ namespace dg.Sql
                 return;
             }
 
-            outputBuilder.Append(connection.PrepareValue(value, relatedQuery));
+            outputBuilder.Append(connection.Language.PrepareValue(connection, value, relatedQuery));
         }
 
         /// <summary>

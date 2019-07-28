@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace dg.Sql
+﻿namespace dg.Sql
 {
     public partial class Query
     {

@@ -351,7 +351,7 @@ namespace dg.Sql
                 if (Comparison == WhereComparison.NullSafeEqualsTo ||
                     Comparison == WhereComparison.NullSafeNotEqualsTo)
                 {
-                    context.Conn.BuildNullSafeEqualsTo(
+                    context.Conn.Language.BuildNullSafeEqualsTo(
                         this,
                         Comparison == WhereComparison.NullSafeNotEqualsTo,
                         outputBuilder, context);
@@ -419,7 +419,7 @@ namespace dg.Sql
                         else if (Comparison == WhereComparison.Like)
                         {
                             outputBuilder.Append(' ');
-                            outputBuilder.Append(context.Conn.LikeEscapingStatement);
+                            outputBuilder.Append(context.Conn.Language.LikeEscapingStatement);
                             outputBuilder.Append(' ');
                         }
                     }
@@ -503,7 +503,7 @@ namespace dg.Sql
                         }
                         else
                         {
-                            sbIn.Append(context.Conn.PrepareValue(objIn, context.RelatedQuery));
+                            sbIn.Append(context.Conn.Language.PrepareValue(context.Conn, objIn, context.RelatedQuery));
                         }
                     }
 
@@ -541,12 +541,12 @@ namespace dg.Sql
                     else
                     {
                         // Format it according to generic rules
-                        outputBuilder.Append(context.Conn.PrepareValue(value, context.RelatedQuery));
+                        outputBuilder.Append(context.Conn.Language.PrepareValue(context.Conn, value, context.RelatedQuery));
                     }
                 }
                 else
                 {
-                    outputBuilder.Append(context.Conn.PrepareValue(value, context.RelatedQuery));
+                    outputBuilder.Append(context.Conn.Language.PrepareValue(context.Conn, value, context.RelatedQuery));
                 }
             }
             else if (valueType == ValueObjectType.ColumnName)
@@ -555,15 +555,15 @@ namespace dg.Sql
                 {
                     if (object.ReferenceEquals(firstTableName, JoinColumnPair.RIGHT_TABLE_PLACEHOLDER_ID))
                     {
-                        outputBuilder.Append(context.Conn.WrapFieldName(context.RightTableName));
+                        outputBuilder.Append(context.Conn.Language.WrapFieldName(context.RightTableName));
                     }
                     else
                     {
-                        outputBuilder.Append(context.Conn.WrapFieldName(firstTableName));
+                        outputBuilder.Append(context.Conn.Language.WrapFieldName(firstTableName));
                     }
                     outputBuilder.Append('.');
                 }
-                outputBuilder.Append(context.Conn.WrapFieldName((string)value));
+                outputBuilder.Append(context.Conn.Language.WrapFieldName((string)value));
             }
             else
             {

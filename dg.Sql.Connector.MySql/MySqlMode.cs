@@ -1,15 +1,23 @@
 ﻿namespace dg.Sql.Connector
 {
-    public class MySqlMode
+    public struct MySqlMode
     {
-        private string _SqlMode = null;
-        private bool? _NoBackSlashes = null;
-        private bool? _AnsiQuotes = null;
+        private string _SqlMode;
+        private string _Version;
+
+        private bool? _NoBackSlashes;
+        private bool? _AnsiQuotes;
 
         public string SqlMode
         {
             get { return _SqlMode; }
             set { _SqlMode = value; }
+        }
+
+        public string Version
+        {
+            get { return _Version; }
+            set { _Version = value; }
         }
 
         public bool NoBackSlashes
@@ -38,6 +46,32 @@
                 return _AnsiQuotes == true;
             }
             set { _AnsiQuotes = value; }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is MySqlMode)
+            {
+                var m = (MySqlMode)obj;
+                return _SqlMode == m._SqlMode && _Version == m._Version;
+            }
+
+            return false;
+        }
+        
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public static bool operator ==(MySqlMode m1, MySqlMode m2)
+        {
+            return m1.Equals(m2);
+        }
+
+        public static bool operator !=(MySqlMode m1, MySqlMode m2)
+        {
+            return !m1.Equals(m2);
         }
     }
 }

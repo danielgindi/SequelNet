@@ -10,7 +10,7 @@ namespace dg.Sql.Phrases
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            return conn.func_UTC_NOW();
+            return conn.Language.func_UTC_NOW();
         }
     }
 }

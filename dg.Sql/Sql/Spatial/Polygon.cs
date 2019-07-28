@@ -83,8 +83,8 @@ namespace dg.Sql
                 BuildValueForCollection(sbGeom, conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.func_ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()) 
-                    : conn.func_ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
+                    ? conn.Language.func_ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()) 
+                    : conn.Language.func_ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
             }
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)

@@ -66,7 +66,7 @@ namespace dg.Sql.Phrases
                         ret += "JSON_UNQUOTE(JSON_EXTRACT(";
                         ret += Value.Build(conn, relatedQuery);
                         ret += ", ";
-                        ret += conn.PrepareValue(Path);
+                        ret += conn.Language.PrepareValue(Path);
                         ret += "))";
                     }
                     break;
@@ -76,7 +76,7 @@ namespace dg.Sql.Phrases
                         ret += "JSON_VALUE(";
                         ret += Value.Build(conn, relatedQuery);
                         ret += ", ";
-                        ret += conn.PrepareValue(Path);
+                        ret += conn.Language.PrepareValue(Path);
                         ret += ")";
                     }
                     break;
@@ -94,7 +94,7 @@ namespace dg.Sql.Phrases
                         ret += Value.Build(conn, relatedQuery);
                         foreach (var part in parts)
                         {
-                            ret += ", " + conn.PrepareValue(part);
+                            ret += ", " + conn.Language.PrepareValue(part);
                         }
                         ret += ")";
                     }

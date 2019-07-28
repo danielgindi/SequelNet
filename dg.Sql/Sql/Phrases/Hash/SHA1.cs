@@ -1,5 +1,4 @@
-﻿using System;
-using dg.Sql.Connector;
+﻿using dg.Sql.Connector;
 
 namespace dg.Sql.Phrases
 {
@@ -45,7 +44,7 @@ namespace dg.Sql.Phrases
 
             ret += Value.Build(conn, relatedQuery);
 
-            return Binary ? conn.func_SHA1_Binary(ret) : conn.func_SHA1_Hex(ret);
+            return Binary ? conn.Language.func_SHA1_Binary(ret) : conn.Language.func_SHA1_Hex(ret);
         }
     }
 }

@@ -82,7 +82,7 @@ namespace dg.Sql.Phrases
                         foreach (var pair in Values)
                         {
                             ret += ", ";
-                            ret += conn.PrepareValue(pair.Path);
+                            ret += conn.Language.PrepareValue(pair.Path);
                             ret += ", ";
                             ret += pair.Value.Build(conn, relatedQuery);
                         }

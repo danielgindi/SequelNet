@@ -27,7 +27,7 @@ namespace dg.Sql.Phrases
         {
             if (Values.Count == 0)
             {
-                return conn.PrepareValue("");
+                return conn.Language.PrepareValue("");
             }
             else
             {
