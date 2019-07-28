@@ -15,7 +15,7 @@ namespace dg.Sql.SchemaGenerator
                     context.StaticColumns ? @"static" : @"const", dalCol.PropertyName, dalCol.Name);
             }
             stringBuilder.AppendFormat("}}{0}", "\r\n");
-            stringBuilder.AppendFormat("public override TableSchema GetTableSchema(){0}{{{0}if (null == _Schema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.Name = @\"{1}\";{0}", "\r\n", context.SchemaName);
+            stringBuilder.AppendFormat("public override TableSchema GenerateTableSchema(){0}{{{0}if (null == _Schema){0}{{{0}TableSchema schema = new TableSchema();{0}schema.Name = @\"{1}\";{0}", "\r\n", context.SchemaName);
             if (context.DatabaseOwner != null && context.DatabaseOwner.Length > 0)
             {
                 stringBuilder.AppendFormat("schema.DatabaseOwner = @\"{1}\";{0}", "\r\n", context.DatabaseOwner);

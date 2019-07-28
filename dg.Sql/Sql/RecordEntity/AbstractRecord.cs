@@ -8,7 +8,8 @@ using System.Reflection;
 namespace dg.Sql
 {
     [Serializable]
-    public abstract class AbstractRecord<T> where T : AbstractRecord<T>, new()
+    public abstract class AbstractRecord<T> : IRecord
+        where T : AbstractRecord<T>, new()
     {
         #region Static private variables, caches
 
@@ -103,14 +104,14 @@ namespace dg.Sql
 
         public abstract object GetPrimaryKeyValue();
 
-        public abstract TableSchema GetTableSchema();
+        public abstract TableSchema GenerateTableSchema();
 
         [XmlIgnore]
         public static TableSchema Schema
         {
             get
             {
-                if (__TABLE_SCHEMA == null) __TABLE_SCHEMA = (new T()).GetTableSchema();
+                if (__TABLE_SCHEMA == null) __TABLE_SCHEMA = (new T()).GenerateTableSchema();
                 return __TABLE_SCHEMA;
             }
             set
@@ -172,13 +173,6 @@ namespace dg.Sql
         #region Mutated
 
         public bool IsNewRecord
-        {
-            get { return _NewRecord; }
-            set { _NewRecord = value; }
-        }
-
-        // Deprecate this
-        public bool IsThisANewRecord
         {
             get { return _NewRecord; }
             set { _NewRecord = value; }
