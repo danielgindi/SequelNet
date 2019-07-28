@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Web;
 using System.Data.OleDb;
-using System.Data;
-using System.Data.Common;
 using dg.Sql.Sql.Spatial;
 
 namespace dg.Sql.Connector

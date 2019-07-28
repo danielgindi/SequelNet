@@ -1,8 +1,6 @@
-using System;
-
 namespace dg.Sql.SchemaGenerator
 {
-	public enum DalIndexClusterMode
+    public enum DalIndexClusterMode
 	{
 		None,
 		NonClustered,

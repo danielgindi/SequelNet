@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>dg.Sql</RootNamespace>
     <AssemblyName>dg.Sql</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+  <TargetFramework>netstandard2.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strongKey.pfx</AssemblyOriginatorKeyFile>
@@ -18,7 +18,6 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
-    <OldToolsVersion>3.5</OldToolsVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -34,7 +33,13 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
+    <Version>1.4.8</Version>
+    <Company />
+    <Product>dg.Sql Data Layer</Product>
+    <Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2009</Copyright>
+    <PackageId>dg.Sql</PackageId>
+    <Authors>Daniel Cohen Gindi</Authors>
+    <RepositoryUrl>https://github.com/danielgindi/dg.Sql</RepositoryUrl>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -61,155 +66,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.configuration" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Runtime.Serialization">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.XML" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Migrations\DecoratedMigration.cs" />
-    <Compile Include="Migrations\MigrationState.cs" />
-    <Compile Include="Migrations\MigrationController.cs" />
-    <Compile Include="Migrations\Migration.cs" />
-    <Compile Include="Migrations\MigrationAttribute.cs" />
-    <Compile Include="Migrations\MigrationItemEventArgs.cs" />
-    <Compile Include="Migrations\MigrationVersionEventArgs.cs" />
-    <Compile Include="Sql\Base Types\JsonPathValue.cs" />
-    <Compile Include="Sql\Base Types\ValueWrapper.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\GroupConcat.cs" />
-    <Compile Include="Sql\Phrases\DateTime\DateTimeDiff.cs" />
-    <Compile Include="Sql\Phrases\FlowControl\Case.cs" />
-    <Compile Include="Sql\Phrases\Hash\SHA1.cs" />
-    <Compile Include="Sql\Phrases\Hash\MD5.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonArrayInsert.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonSet.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonLength.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonInsert.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonArrayAppend.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonObject.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonArray.cs" />
-    <Compile Include="Sql\Phrases\Json\JsonExtract.cs" />
-    <Compile Include="Sql\Phrases\Math\Abs.cs" />
-    <Compile Include="Sql\Phrases\Math\Add.cs" />
-    <Compile Include="Sql\Phrases\Math\Least.cs" />
-    <Compile Include="Sql\Phrases\Math\Greatest.cs" />
-    <Compile Include="Sql\Phrases\PhraseHelper.cs" />
-    <Compile Include="Sql\Phrases\IPhrase.cs" />
-    <Compile Include="Connector\ConnectorBase.cs" />
-    <Compile Include="Connector\DataReaderBase.cs" />
-    <Compile Include="Connector\FactoryBase.cs" />
-    <Compile Include="Sql\Phrases\DateTime\DateTimeUnit.cs" />
-    <Compile Include="Sql\Phrases\DateTime\DateTimeAdd.cs" />
-    <Compile Include="Sql\Phrases\Math\Divide.cs" />
-    <Compile Include="Sql\Phrases\Math\Multiply.cs" />
-    <Compile Include="Sql\Phrases\Math\Round.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Avg.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\PassThroughAggregate.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\CountDistinct.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\StandardDeviationOfPopulation.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\StandardDeviationOfSample.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfSample.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\StandardVarianceOfPopulation.cs" />
-    <Compile Include="Sql\Phrases\Spatial\ST_Y.cs" />
-    <Compile Include="Sql\Phrases\Spatial\ST_X.cs" />
-    <Compile Include="Sql\Phrases\Strings\Length.cs" />
-    <Compile Include="Sql\Phrases\Strings\Concat.cs" />
-    <Compile Include="Sql\Phrases\Strings\Substring.cs" />
-    <Compile Include="Sql\QueryKeywords\GroupByHint.cs" />
-    <Compile Include="Sql\Query\Builders.cs" />
-    <Compile Include="Sql\Query\Having.cs" />
-    <Compile Include="Sql\Query\ShortAggregates.cs" />
-    <Compile Include="Sql\Query\Executes.cs" />
-    <Compile Include="Sql\Query\Joins.cs" />
-    <Compile Include="Sql\Query\StoredProcedures.cs" />
-    <Compile Include="Sql\Query\SchemaChanges.cs" />
-    <Compile Include="Sql\Query\Wheres.cs" />
-    <Compile Include="Sql\Query\GroupBys.cs" />
-    <Compile Include="Sql\Query\OrderBys.cs" />
-    <Compile Include="Sql\Query\Deletes.cs" />
-    <Compile Include="Sql\Query\InsertOrUpdates.cs" />
-    <Compile Include="Sql\Query\Updates.cs" />
-    <Compile Include="Sql\Query\Inserts.cs" />
-    <Compile Include="Sql\Query\Selects.cs" />
-    <Compile Include="Sql\QueryKeywords\WhereList.cs" />
-    <Compile Include="Sql\Phrases\Math\Subtract.cs" />
-    <Compile Include="Sql\Phrases\Spatial\GeographyDistance.cs" />
-    <Compile Include="Sql\Phrases\Spatial\GeographyContains.cs" />
-    <Compile Include="Sql\QueryKeywords\QueryHint.cs" />
-    <Compile Include="Sql\Spatial\MultiPoint.cs" />
-    <Compile Include="Sql\Spatial\MultiPolygon.cs" />
-    <Compile Include="Sql\Spatial\MultiLineString.cs" />
-    <Compile Include="Sql\Spatial\GeometryCollection.cs" />
-    <Compile Include="Sql\Spatial\Polygon.cs" />
-    <Compile Include="Sql\Spatial\LineString.cs" />
-    <Compile Include="Sql\Spatial\Point.cs" />
-    <Compile Include="Sql\Spatial\Geometry.cs" />
-    <Compile Include="Sql\Spatial\WkbReader.cs" />
-    <Compile Include="Sql\Schema\TableSchema.TableOption.cs" />
-    <Compile Include="Sql\Phrases\Strings\Upper.cs" />
-    <Compile Include="Sql\Phrases\Strings\Lower.cs" />
-    <Compile Include="Sql\Phrases\Strings\Replace.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Second.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Minute.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Hour.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Day.cs" />
-    <Compile Include="Sql\Phrases\General\Union.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Sum.cs" />
-    <Compile Include="Sql\Phrases\General\UnionAll.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Month.cs" />
-    <Compile Include="Sql\Phrases\DateTime\UTC_TIMESTAMP.cs" />
-    <Compile Include="Sql\Phrases\DateTime\Year.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Max.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Min.cs" />
-    <Compile Include="Sql\Phrases\Aggregate\Count.cs" />
-    <Compile Include="Sql\Phrases\General\RandWeight.cs" />
-    <Compile Include="Sql\QueryKeywords\GroupBy.cs" />
-    <Compile Include="Sql\Phrases\FlowControl\IfNull.cs" />
-    <Compile Include="Sql\Schema\TableSchema.ForeignKey.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Sql\RecordEntity\AbstractRecord.cs" />
-    <Compile Include="Sql\RecordEntity\AbstractRecordList.cs" />
-    <Compile Include="Sql\QueryKeywords\AssignmentColumn.cs" />
-    <Compile Include="Sql\Schema\TableSchema.Index.cs" />
-    <Compile Include="Sql\QueryKeywords\Join.cs" />
-    <Compile Include="Sql\QueryKeywords\OrderBy.cs" />
-    <Compile Include="Sql\Query\Query.cs" />
-    <Compile Include="Sql\QueryKeywords\SelectColumn.cs" />
-    <Compile Include="Sql\Schema\TableSchema.Column.cs" />
-    <Compile Include="Sql\Schema\TableSchema.cs" />
-    <Compile Include="Sql\Enumerations.cs" />
-    <Compile Include="Sql\QueryKeywords\Where.cs" />
-    <Compile Include="Utilities\StringUtils.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
-      <Visible>False</Visible>
-      <ProductName>Windows Installer 3.1</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="strongKey.pfx" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.5.0" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

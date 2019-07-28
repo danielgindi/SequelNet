@@ -1,5 +1,3 @@
-using System;
-
 namespace dg.Sql.SchemaGenerator
 {
     public class DalColumn

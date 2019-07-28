@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 
 namespace dg.Sql.SchemaGenerator
 {
-	public class DalIndex
+    public class DalIndex
     {
         public DalIndex()
         {

@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using System.Linq;
 
@@ -9,7 +6,7 @@ using System.Linq;
 
 namespace dg.Sql.SchemaGenerator
 {
-	public partial class GeneratorCore
+    public partial class GeneratorCore
     {
         private static string CsharpString(string value)
         {

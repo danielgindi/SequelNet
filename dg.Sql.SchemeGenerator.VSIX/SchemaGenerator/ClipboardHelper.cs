@@ -1,10 +1,9 @@
-using System;
 using System.Threading;
 using System.Windows.Forms;
 
 namespace dg.Sql.SchemaGenerator
 {
-	public static class ClipboardHelper
+    public static class ClipboardHelper
 	{
 		private static string clipboardData;
 

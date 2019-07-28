@@ -1,8 +1,6 @@
-using System;
-
 namespace dg.Sql.SchemaGenerator
 {
-	public enum DalIndexIndexType
+    public enum DalIndexIndexType
 	{
 		None,
 		BTREE,

@@ -34,7 +34,7 @@ namespace dg.Sql.Connector
             {
                 s_ConnectorType = FindConnectorType();
             }
-            return (ConnectorBase)System.Activator.CreateInstance(s_ConnectorType);
+            return (ConnectorBase)Activator.CreateInstance(s_ConnectorType);
         }
 
         static public ConnectorBase NewInstance(string connectionStringKey)
@@ -43,7 +43,7 @@ namespace dg.Sql.Connector
             {
                 s_ConnectorType = FindConnectorType();
             }
-            return (ConnectorBase)System.Activator.CreateInstance(s_ConnectorType, new string[] { connectionStringKey });
+            return (ConnectorBase)Activator.CreateInstance(s_ConnectorType, new string[] { connectionStringKey });
         }
 
         virtual public SqlServiceType TYPE
@@ -54,6 +54,7 @@ namespace dg.Sql.Connector
         static private Type FindConnectorType()
         {
             Type type = null;
+
             try
             {
                 string connector = ConfigurationManager.AppSettings[@"dg.Sql.Connector"];
@@ -67,31 +68,31 @@ namespace dg.Sql.Connector
             {
                 Debug.WriteLine(string.Format(@"dg.ConnectorBase.FindConnectorType error: {0}", ex));
             }
-            if (type == null) System.Web.Compilation.BuildManager.GetType(@"dg.Sql.Connector.MySqlConnector", false);
+
             return type;
         }
 
-        public static string FindConnectionString(string ConnectionStringKey)
+        public static string FindConnectionString(string connectionStringKey)
         {
             ConnectionStringSettings connString = null;
 
-            if (ConnectionStringKey != null)
+            if (connectionStringKey != null)
             {
-                connString = System.Configuration.ConfigurationManager.ConnectionStrings[ConnectionStringKey];
+                connString = ConfigurationManager.ConnectionStrings[connectionStringKey];
                 if (connString != null) return connString.ConnectionString;
             }
 
             string appConnString = ConfigurationManager.AppSettings[@"dg.Sql::ConnectionStringKey"];
-            if (appConnString != null && appConnString.Length > 0) connString = System.Configuration.ConfigurationManager.ConnectionStrings[appConnString];
+            if (appConnString != null && appConnString.Length > 0) connString = ConfigurationManager.ConnectionStrings[appConnString];
             if (connString != null) return connString.ConnectionString;
 
             appConnString = ConfigurationManager.AppSettings[@"dg.Sql::ConnectionString"];
             if (appConnString != null && appConnString.Length > 0) return appConnString;
 
-            connString = System.Configuration.ConfigurationManager.ConnectionStrings[@"dg.Sql"];
+            connString = ConfigurationManager.ConnectionStrings[@"dg.Sql"];
             if (connString != null) return connString.ConnectionString;
 
-            return System.Configuration.ConfigurationManager.ConnectionStrings[0].ConnectionString;
+            return ConfigurationManager.ConnectionStrings[0].ConnectionString;
         }
 
         public static string FindConnectionString()
@@ -156,7 +157,7 @@ namespace dg.Sql.Connector
         
         public virtual int ExecuteNonQuery(DbCommand command)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
             command.Connection = Connection;
             command.Transaction = Transaction;
             return command.ExecuteNonQuery();
@@ -164,7 +165,7 @@ namespace dg.Sql.Connector
         
         public virtual object ExecuteScalar(DbCommand command)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
             command.Connection = Connection;
             command.Transaction = Transaction;
             return command.ExecuteScalar();
@@ -174,7 +175,7 @@ namespace dg.Sql.Connector
         {
             try
             {
-                if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+                if (Connection.State != ConnectionState.Open) Connection.Open();
 
                 command.Connection = Connection;
                 command.Transaction = Transaction;
@@ -198,7 +199,7 @@ namespace dg.Sql.Connector
         
         public virtual DataSet ExecuteDataSet(DbCommand command)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
             command.Connection = Connection;
             command.Transaction = Transaction;
 
@@ -214,7 +215,7 @@ namespace dg.Sql.Connector
 
         public virtual int ExecuteNonQuery(string querySql)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -224,7 +225,7 @@ namespace dg.Sql.Connector
 
         public virtual object ExecuteScalar(string querySql)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -234,7 +235,7 @@ namespace dg.Sql.Connector
 
         public virtual DataReaderBase ExecuteReader(string querySql)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
             return ExecuteReader(command, true);
@@ -242,7 +243,7 @@ namespace dg.Sql.Connector
 
         public virtual DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
             return ExecuteReader(command, true, attachConnectionToReader);
@@ -250,7 +251,7 @@ namespace dg.Sql.Connector
 
         public virtual DataSet ExecuteDataSet(string querySql)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             using (var cmd = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -291,7 +292,7 @@ namespace dg.Sql.Connector
         {
             try
             {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                if (_Connection.State != ConnectionState.Open) _Connection.Open();
                 _Transaction = _Connection.BeginTransaction();
                 if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
                 _Transactions.Push(_Transaction);
@@ -305,7 +306,7 @@ namespace dg.Sql.Connector
         {
             try
             {
-                if (_Connection.State != System.Data.ConnectionState.Open) _Connection.Open();
+                if (_Connection.State != ConnectionState.Open) _Connection.Open();
                 _Transaction = _Connection.BeginTransaction(IsolationLevel);
                 if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
                 _Transactions.Push(_Transaction);

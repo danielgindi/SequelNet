@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
-using System.Linq;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
 namespace dg.Sql.SchemaGenerator
 {
-	public partial class GeneratorCore
+    public partial class GeneratorCore
 	{
         private static void WriteMutationMethods(StringBuilder stringBuilder, ScriptContext context)
         {

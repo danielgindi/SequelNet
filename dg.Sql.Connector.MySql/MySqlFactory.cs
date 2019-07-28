@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web;
-using MySql.Data.MySqlClient;
+﻿using MySql.Data.MySqlClient;
 using System.Data;
 using System.Data.Common;
-using System.Text;
 
 namespace dg.Sql.Connector
 {

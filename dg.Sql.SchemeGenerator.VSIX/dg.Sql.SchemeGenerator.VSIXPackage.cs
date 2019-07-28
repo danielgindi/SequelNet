@@ -3,14 +3,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
-using Microsoft.Win32;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using EnvDTE;
 using EnvDTE80;
 using dg.Sql.SchemaGenerator;
+using System.Threading;
+using Task = System.Threading.Tasks.Task;
 
 namespace dg_Sql_SchemeGenerator_VSIX
 {
@@ -24,17 +23,21 @@ namespace dg_Sql_SchemeGenerator_VSIX
     /// IVsPackage interface and uses the registration attributes defined in the framework to 
     /// register itself and its components with the shell.
     /// </summary>
+    /// 
     // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
     // a package.
-    [PackageRegistration(UseManagedResourcesOnly = true)]
-    [ProvideAutoLoad(UIContextGuids80.CodeWindow)]
+    [PackageRegistration(AllowsBackgroundLoading = true, UseManagedResourcesOnly = true)]
+    [ProvideAutoLoad(UIContextGuids80.CodeWindow, PackageAutoLoadFlags.BackgroundLoad)]
+
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
+
     [Guid(GuidList.guiddg_Sql_SchemeGenerator_VSIXPkgString)]
-    public sealed class dg_Sql_SchemeGenerator_VSIXPackage : Package
+    public sealed class dg_Sql_SchemeGenerator_VSIXPackage : AsyncPackage
     {
         /// <summary>
         /// Default constructor of the package.
@@ -48,8 +51,6 @@ namespace dg_Sql_SchemeGenerator_VSIX
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
         }
 
-
-
         /////////////////////////////////////////////////////////////////////////////
         // Overriden Package Implementation
         #region Package Members
@@ -58,21 +59,21 @@ namespace dg_Sql_SchemeGenerator_VSIX
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
         /// where you can put all the initilaization code that rely on services provided by VisualStudio.
         /// </summary>
-        protected override void Initialize()
+        protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
-            base.Initialize();
+            await base.InitializeAsync(cancellationToken, progress);
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
-            OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
+            var mcs = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
                 // Create the command for the menu item.
-                CommandID menuCommandID = new CommandID(GuidList.guiddg_Sql_SchemeGenerator_VSIXCmdSet, (int)PkgCmdIDList.cmdidGenerateDalFromSelection);
-                MenuCommand menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
+                var menuCommandID = new CommandID(GuidList.guiddg_Sql_SchemeGenerator_VSIXCmdSet, (int)PkgCmdIDList.cmdidGenerateDalFromSelection);
+                var menuItem = new MenuCommand(MenuItemCallback, menuCommandID );
                 mcs.AddCommand( menuItem );
             }
         }
+
         #endregion
 
         /// <summary>
@@ -82,7 +83,9 @@ namespace dg_Sql_SchemeGenerator_VSIX
         /// </summary>
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            IVsUIShell uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
+            var uiShell = (IVsUIShell)GetService(typeof(SVsUIShell));
+            if (uiShell == null) return;
+
             DTE2 dte = (DTE2)Package.GetGlobalService(typeof(DTE));
 
             try

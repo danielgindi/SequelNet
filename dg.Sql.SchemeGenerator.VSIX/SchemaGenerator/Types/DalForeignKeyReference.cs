@@ -1,8 +1,6 @@
-using System;
-
 namespace dg.Sql.SchemaGenerator
 {
-	public enum DalForeignKeyReference
+    public enum DalForeignKeyReference
 	{
 		None,
 		Restrict,

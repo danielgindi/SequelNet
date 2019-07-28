@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
 using System.Data;
 using System.Data.SqlClient;
-using System.Data.Common;
 using dg.Sql.Sql.Spatial;
-using System.Globalization;
 
 namespace dg.Sql.Connector
 {

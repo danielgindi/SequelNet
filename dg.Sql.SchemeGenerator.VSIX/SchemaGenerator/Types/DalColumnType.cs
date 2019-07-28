@@ -1,8 +1,6 @@
-using System;
-
 namespace dg.Sql.SchemaGenerator
 {
-	public enum DalColumnType
+    public enum DalColumnType
 	{
 		TLiteral,
 

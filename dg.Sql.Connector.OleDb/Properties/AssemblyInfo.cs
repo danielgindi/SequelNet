@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -10,7 +9,7 @@ using System.Security;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("dg.Sql.Connector OleDb Library")]
+[assembly: AssemblyProduct("OleDb connector for dg.Sql.Connector")]
 [assembly: AssemblyCopyright("Copyright Daniel Cohen Gindi (danielgindi@gmail.com) ©  2009")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

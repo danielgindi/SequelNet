@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
 using MySql.Data.MySqlClient;
-using System.Data;
-using System.Data.Common;
 using System.Text;
 using dg.Sql.Sql.Spatial;
 using System.Globalization;

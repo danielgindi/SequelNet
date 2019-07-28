@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
-using System.Configuration;
 
 namespace dg.Sql.Sql.Spatial
 {
@@ -578,7 +577,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt16(byteArray, 0);
             }
 
-            [CLSCompliant(false)]
             public override UInt16 ReadUInt16()
             {
                 byte[] byteArray = new byte[2];
@@ -599,7 +597,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt32(byteArray, 0);
             }
 
-            [CLSCompliant(false)] // To avoid the annoying CLS warning
             public override UInt32 ReadUInt32()
             {
                 byte[] byteArray = new byte[4];
@@ -620,7 +617,6 @@ namespace dg.Sql.Sql.Spatial
                 return BitConverter.ToInt64(byteArray, 0);
             }
 
-            [CLSCompliant(false)]
             public override UInt64 ReadUInt64()
             {
                 byte[] byteArray = new byte[8];
