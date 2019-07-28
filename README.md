@@ -1,27 +1,42 @@
-dg.Sql
-======
+SequelNet
+=========
 
-SQL abstraction/generalization/protection layer. Anyone is welcome to use and improve :-)
+SQL abstraction/generalization/protection layer.
 
-It currently supports MySql, MsSql, Postgres and MsAccess (OleDb).
+Current connectors available:
+* MySql
+* MsSql
+* Postgre (not tested too much)
+* OleDb (requires .NET Framework).
+
+This library allows you fluent SQL building, even for very complex queries.  
+It has a built-in capability of reading/writing records from classes - in a very different way than in Entity Framework.  
+It it less automated, which means you have to have your record class inherit from `AbstractRecord` and supply the definition of the schema.  
+But - that very definition of the schema allows to manage the whole database lifecycle from the code, including creating from scratch, migrations etc.  
+It also allows matching value types according to the schema when applicable.
+
+The magic happens in the little `SchemaGenerator` addon for Visual Studio.  
+This little guys takes a "pseudo-script" and converts it to a full code of an `AbstractRecord` record.  
+You can override/extend almost anything in there, either in the script itself, or by defining a `partial class` and adding stuff.  
 
 A little bit of history
 -----------------------
-In the far past, I developed a framework for use in many of my projects, and then not so long ago I have decided to separate the Sql stuff to a library.
-Now this is an awesome library which allows you to *very easily* prototype db schemas.
-No so long ago I have decided to also make this public on GitHub.
 
-The fact that this library allows great flexibility *and* is open source, means we have full control over our queries - while having the ease of OOP and the protection of a query builder.
-If we required, we can also build our schemas entirely in runtime, not depending on any prebuilt schema files.
-And if a feature is missing, well, it's open source...
+This used to be `dg.Sql` library, renamed to `SequelNet`.  
+Migration notes - in the *Releases* section, for `2.0.0`.  
+
+Usage
+-----
 
 The use is pretty straight-forward.
-To supply a default connector, add a dg.Sql.Connector key in the appSettings of web.config. Like this:
-    <add key="dg.Sql.Connector" value="MySql" />
-The default is MySql.
-Available connectors right now are MySql, MsSql, OleDb. Postgre is not tested yet - I welcome anyone who wants to do this.
+To supply a default connector, add a SequelNet.Connector key in the appSettings of web.config. Like this:
+```xml
+    <add key="SequelNet.Connector" value="MySql" />
+```
 
-To supply a default connection string, add a dg.Sql connection string in web.config, or dg.Sql::ConnectionString key in appSettings. Another option is to add a dg.Sql::ConnectionStringKey key in the appSettings, which specifies the connectionString's name to be used.
+To supply a default connection string, add a `SequelNet` connection string in `web.config`,
+or `SequelNet::ConnectionString` key in app config.  
+Another option is to add a `SequelNet::ConnectionStringKey` key in the app config, which specifies the connectionString's name to be used.
 
 Structure of this library
 -------------------------
@@ -29,7 +44,6 @@ Structure of this library
 * `Query`: Build the query, and executes in a number of different ways, and different way to retrieve the results
 * `ConnectorBase` is the base class for the connector layer. Each connector has a subclass of this class, which supplies the basic functionalities, similar to the `SqlConnection` class. (*I am considering a change this class's name in the future...*)
 * `DataReaderBase` is the same story as with `ConnectorBase`, providing the same functionality as `SqlDataReader`
-* `FactoryBase` is a special base class which is responsible for creating special objects like `DbCommand`s and `DbDataAdapter`s. Each connector has a subclass of this class.
 * `AbstractRecord` is a DAL class that represents your data, and contains a `TableSchema`, data accessors, and helper functions. Using `AbstractRecord` is completely optional!
 * `TableSchema` is a class representing the an actual db schema. This assists the `Query` in converting values where necessary, bulding queries or even building `CREATE TABLE`, `ALTER TABLE` and `CREATE INDEX` queries...
 * There's a namespace `Phrases` which includes many objects that wrap native sql functions. You can add your own, based on the `IPhrase` class.
@@ -39,13 +53,12 @@ Bonus
 
 If you're using MySql, then there's a `MySqlBackup` class, which can create a full backup of a Database, including shcema and data. Yes, I know, it's cool.
 
-SchemaGeneratorAddIn
+SchemaGenerator
 --------------------
 
-There's a Visual Studio AddIn, called the "SchemaGeneratorAddIn", which assists in creating the `TableSchema` and a matching `AbstractRecord` based on a simple language which resides in a comment.
+There's a Visual Studio AddIn, called the "SchemaGenerator", which assists in creating the `TableSchema` and a matching `AbstractRecord` based on a simple language which resides in a comment.
 
-This little tool makes rapid db prototyping easy, and gets you much further in development in significantly less time than when using any other tool known to humanity.
+This little tool makes rapid db prototyping easy, and gets you much further in development in significantly less time than when using any other tool I've used.
 
-I will soon post here some examples on how to use it. 
-(Although there is a full documentation of the syntax in the [Macro Structure.MD](https://github.com/danielgindi/dg.Sql/blob/master/Macro%20Structure.MD) file)
+Full documentation of the syntax in [Macro Structure.MD](https://github.com/danielgindi/SequelNet/blob/master/Macro%20Structure.MD).
 
