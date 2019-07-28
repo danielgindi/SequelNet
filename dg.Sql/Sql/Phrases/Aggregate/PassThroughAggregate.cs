@@ -10,13 +10,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public PassThroughAggregate(string aggregateType, string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-            this.AggregateType = aggregateType;
-        }
-
         public PassThroughAggregate(string aggregateType, string tableName, string columnName)
         {
             this.Value = new ValueWrapper(tableName, columnName);

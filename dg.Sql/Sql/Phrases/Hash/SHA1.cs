@@ -10,12 +10,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public SHA1(string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public SHA1(object value, ValueObjectType valueType, bool binary = false)
         {
             this.Value = new ValueWrapper(value, valueType);

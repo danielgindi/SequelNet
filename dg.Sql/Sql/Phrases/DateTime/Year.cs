@@ -9,12 +9,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public Year(string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public Year(object value, ValueObjectType valueType)
         {
             this.Value = new ValueWrapper(value, valueType);

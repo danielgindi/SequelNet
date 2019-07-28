@@ -10,16 +10,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public Multiply(
-            string tableName1, object value1, ValueObjectType valueType1,
-            string tableName2, object value2, ValueObjectType valueType2
-            )
-        {
-            this.Value1 = new ValueWrapper(tableName1, value1, valueType1);
-            this.Value2 = new ValueWrapper(tableName2, value2, valueType2);
-        }
-
         public Multiply(
             object value1, ValueObjectType valueType1,
             object value2, ValueObjectType valueType2

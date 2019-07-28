@@ -9,12 +9,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public Avg(string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public Avg()
         {
             this.Value = new ValueWrapper("*", ValueObjectType.Literal);

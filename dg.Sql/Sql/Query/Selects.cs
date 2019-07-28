@@ -106,23 +106,6 @@ namespace dg.Sql
             return this;
         }
 
-        [Obsolete]
-        public Query Select(string tableName, string columnName, string alias, bool clearSelectList)
-        {
-            this.QueryMode = QueryMode.Select;
-            if (_ListSelect == null)
-            {
-                _ListSelect = new SelectColumnList();
-            }
-            else if (clearSelectList)
-            {
-                _ListSelect.Clear();
-            }
-            _ListSelect.Add(new SelectColumn(tableName, columnName, alias));
-
-            return this;
-        }
-
         public Query SelectLiteral(string literalExpression)
         {
             this.QueryMode = QueryMode.Select;

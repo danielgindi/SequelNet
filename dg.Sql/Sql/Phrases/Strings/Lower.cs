@@ -9,12 +9,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public Lower(string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public Lower(object value, ValueObjectType valueType)
         {
             this.Value = new ValueWrapper(value, valueType);

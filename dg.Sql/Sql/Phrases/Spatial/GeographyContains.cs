@@ -15,19 +15,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public GeographyContains(
-            string outerTableName, object outerValue, ValueObjectType outerValueType,
-            string innerTableName, object innerValue, ValueObjectType innerValueType)
-        {
-            this.OuterTableName = outerTableName;
-            this.OuterValue = outerValue;
-            this.OuterValueType = outerValueType;
-            this.InnerTableName = innerTableName;
-            this.InnerValue = innerValue;
-            this.InnerValueType = innerValueType;
-        }
-
         public GeographyContains(
             object outerValue, ValueObjectType outerValueType,
             object innerValue, ValueObjectType innerValueType)

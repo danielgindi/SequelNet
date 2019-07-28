@@ -12,14 +12,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public DateTimeAdd(string tableName, object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
-        {
-            this.Value1 = new ValueWrapper(tableName, value, valueType);
-            this.Unit = unit;
-            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
-        }
-
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
             this.Value1 = new ValueWrapper(value, valueType);

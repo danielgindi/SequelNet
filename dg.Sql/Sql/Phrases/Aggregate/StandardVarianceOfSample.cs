@@ -9,12 +9,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public StandardVarianceOfSample(string tableName, object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public StandardVarianceOfSample()
         {
             this.Value = new ValueWrapper("*", ValueObjectType.Literal);

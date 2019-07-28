@@ -9,12 +9,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public RandWeight(string tableName, string value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-        }
-
         public RandWeight(object value, ValueObjectType valueType)
         {
             this.Value = new ValueWrapper(value, valueType);

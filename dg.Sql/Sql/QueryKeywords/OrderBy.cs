@@ -47,20 +47,6 @@ namespace dg.Sql
     {
         public ValueWrapper Value = new ValueWrapper();
 
-        [Obsolete]
-        public string TableName
-        {
-            get { return Value.TableName; }
-            set { Value.TableName = value; }
-        }
-
-        [Obsolete]
-        public object ColumnName
-        {
-            get { return Value.Value; }
-            set { Value.Value = value; }
-        }
-
         public SortDirection SortDirection;
         internal bool Randomize = false;
 

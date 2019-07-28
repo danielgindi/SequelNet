@@ -11,17 +11,6 @@ namespace dg.Sql.Phrases
 
         #region Constructors
 
-        [Obsolete]
-        public Replace(
-            string sourceTableName, string source, ValueObjectType sourceType,
-            string searchTableName, string search, ValueObjectType searchType,
-            string replaceWithTableName, string replaceWith, ValueObjectType replaceWithType)
-        {
-            this.SourceValue = new ValueWrapper(sourceTableName, source, sourceType);
-            this.SearchValue = new ValueWrapper(searchTableName, search, searchType);
-            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWith, replaceWithType);
-        }
-
         public Replace(
             string sourceTableName, string sourceColumn,
             string searchTableName, string searchColumn,

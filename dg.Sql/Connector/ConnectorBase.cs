@@ -374,12 +374,6 @@ namespace dg.Sql.Connector
 
         abstract public string WrapFieldName(string fieldName);
 
-        [Obsolete]
-        public string EncloseFieldName(string fieldName)
-        {
-            return WrapFieldName(fieldName);
-        }
-
         public virtual string EscapeString(string value)
         {
             return value.Replace(@"'", @"''");

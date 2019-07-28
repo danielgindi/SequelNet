@@ -9,13 +9,6 @@ namespace dg.Sql.Phrases
         public int DecimalPlaces;
 
         #region Constructors
-        
-        [Obsolete]
-        public Round(string tableName, object value, ValueObjectType valueType, int decimalPlaces = 0)
-        {
-            this.Value = new ValueWrapper(tableName, value, valueType);
-            this.DecimalPlaces = decimalPlaces;
-        }
 
         public Round(object value, ValueObjectType valueType, int decimalPlaces = 0)
         {

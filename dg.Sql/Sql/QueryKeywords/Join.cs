@@ -43,66 +43,6 @@ namespace dg.Sql
             this.Add(w);
         }
 
-        [Obsolete("Use AND")]
-        public JoinColumnPair JoinAND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
-        {
-            return AND(leftTableSchema, leftColumn, rightColumn);
-        }
-
-        [Obsolete("Use AND")]
-        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, string rightColumn)
-        {
-            return AND(leftTableNameOrAlias, leftColumn, rightColumn);
-        }
-
-        [Obsolete("Use AND")]
-        public JoinColumnPair JoinAND(object value, string rightColumn)
-        {
-            return AND(value, rightColumn);
-        }
-
-        [Obsolete("Use AND")]
-        public JoinColumnPair JoinAND(object value, bool literalValue, string rightColumn)
-        {
-            return AND(value, literalValue, rightColumn);
-        }
-
-        [Obsolete("Use AND")]
-        public JoinColumnPair JoinAND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
-        {
-            return AND(leftTableNameOrAlias, leftColumn, value, literalValue);
-        }
-
-        [Obsolete("Use OR")]
-        public JoinColumnPair JoinOR(TableSchema leftTableSchema, string leftColumn, string rightColumn)
-        {
-            return OR(leftTableSchema, leftColumn, rightColumn);
-        }
-
-        [Obsolete("Use OR")]
-        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, string rightColumn)
-        {
-            return OR(leftTableNameOrAlias, leftColumn, rightColumn);
-        }
-
-        [Obsolete("Use OR")]
-        public JoinColumnPair JoinOR(object value, string rightColumn)
-        {
-            return OR(value, rightColumn);
-        }
-
-        [Obsolete("Use OR")]
-        public JoinColumnPair JoinOR(object value, bool literalValue, string rightColumn)
-        {
-            return OR(value, literalValue, rightColumn);
-        }
-
-        [Obsolete("Use OR")]
-        public JoinColumnPair JoinOR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
-        {
-            return OR(leftTableNameOrAlias, leftColumn, value, literalValue);
-        }
-
         public JoinColumnPair AND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
