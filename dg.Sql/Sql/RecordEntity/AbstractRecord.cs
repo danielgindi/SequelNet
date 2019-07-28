@@ -44,13 +44,15 @@ namespace dg.Sql
         #region Constructors
 
         public AbstractRecord() { }
-        public AbstractRecord(object KeyValue)
+
+        public AbstractRecord(object keyValue)
         {
-            LoadByKey(KeyValue);
+            LoadByKey(keyValue);
         }
-        public AbstractRecord(string ColumnName, object ColumnValue)
+
+        public AbstractRecord(string columnName, object columnValue)
         {
-            LoadByParam(ColumnName, ColumnValue);
+            LoadByParam(columnName, columnValue);
         }
 
         #endregion
@@ -63,9 +65,9 @@ namespace dg.Sql
         /// </summary>
         public static void CachePrimaryKeyName()
         {
-            List<string> keyNames = new List<string>();
+            var keyNames = new List<string>();
 
-            foreach (TableSchema.Column col in TableSchema.Columns)
+            foreach (var col in Schema.Columns)
             {
                 if (col.IsPrimaryKey)
                 {
@@ -75,7 +77,7 @@ namespace dg.Sql
 
             if (keyNames.Count == 0)
             {
-                foreach (TableSchema.Index idx in TableSchema.Indexes)
+                foreach (var idx in Schema.Indexes)
                 {
                     if (idx.Mode == TableSchema.IndexMode.PrimaryKey)
                     {
@@ -117,30 +119,8 @@ namespace dg.Sql
             }
         }
 
-        /// <summary>
-        /// Synonym for <see cref="Schema"/>
-        /// </summary>
         [XmlIgnore]
-        public static TableSchema TableSchema
-        {
-            get
-            {
-                return Schema;
-            }
-            set
-            {
-                Schema = value;
-            }
-        }
-
-        [XmlIgnore]
-        public static string SchemaName
-        {
-            get
-            {
-                return TableSchema.Name;
-            }
-        }
+        public static string SchemaName => Schema.Name;
 
         /// <summary>
         /// The primary key name for this record's schema.
@@ -178,12 +158,12 @@ namespace dg.Sql
 
         private static void RetrieveFlags()
         {
-            __HAS_DELETED = TableSchema.Columns.Find(@"Deleted") != null;
-            __HAS_IS_DELETED = TableSchema.Columns.Find(@"IsDeleted") != null;
-            __HAS_CREATED_BY = TableSchema.Columns.Find(@"CreatedBy") != null;
-            __HAS_CREATED_ON = TableSchema.Columns.Find(@"CreatedOn") != null;
-            __HAS_MODIFIED_BY = TableSchema.Columns.Find(@"ModifiedBy") != null;
-            __HAS_MODIFIED_ON = TableSchema.Columns.Find(@"ModifiedOn") != null;
+            __HAS_DELETED = Schema.Columns.Find(@"Deleted") != null;
+            __HAS_IS_DELETED = Schema.Columns.Find(@"IsDeleted") != null;
+            __HAS_CREATED_BY = Schema.Columns.Find(@"CreatedBy") != null;
+            __HAS_CREATED_ON = Schema.Columns.Find(@"CreatedOn") != null;
+            __HAS_MODIFIED_BY = Schema.Columns.Find(@"ModifiedBy") != null;
+            __HAS_MODIFIED_ON = Schema.Columns.Find(@"ModifiedOn") != null;
             __FLAGS_RETRIEVED = true;
         }
 
@@ -248,6 +228,7 @@ namespace dg.Sql
         {
             IsNewRecord = false;
         }
+
         public void MarkNew()
         {
             IsNewRecord = true;
@@ -268,9 +249,9 @@ namespace dg.Sql
                 __CLASS_TYPE = this.GetType();
             }
 
-            var qry = new Query(TableSchema);
+            var qry = new Query(Schema);
 
-            foreach (var column in TableSchema.Columns)
+            foreach (var column in Schema.Columns)
             {
                 var propInfo = __CLASS_TYPE.GetProperty(column.Name);
 
@@ -311,9 +292,9 @@ namespace dg.Sql
             object primaryKey = SchemaPrimaryKeyName;
             bool isPrimaryKeyNullOrString = primaryKey == null || primaryKey is string;
 
-            var qry = new Query(TableSchema);
+            var qry = new Query(Schema);
 
-            foreach (var Column in TableSchema.Columns)
+            foreach (var Column in Schema.Columns)
             {
                 if ((isPrimaryKeyNullOrString && Column.Name == (string)primaryKey) ||
                     (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, Column.Name))) continue;
@@ -357,7 +338,7 @@ namespace dg.Sql
             }
 
             PropertyInfo propInfo;
-            foreach (TableSchema.Column Column in TableSchema.Columns)
+            foreach (var Column in Schema.Columns)
             {
                 propInfo = __CLASS_TYPE.GetProperty(Column.Name);
                 if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
@@ -465,7 +446,7 @@ namespace dg.Sql
 
             if (__HAS_DELETED || __HAS_IS_DELETED)
             {
-                Query qry = new Query(TableSchema);
+                Query qry = new Query(Schema);
 
                 if (__HAS_DELETED) qry.Update(@"Deleted", true);
                 if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
@@ -527,7 +508,7 @@ namespace dg.Sql
         /// <returns>Number of affected rows.</returns>
         private static int DestroyByParameter(object columnName, object value, ConnectorBase connection)
         {
-            Query qry = new Query(TableSchema).Delete();
+            Query qry = new Query(Schema).Delete();
 
             if (columnName is ICollection)
             {
@@ -555,7 +536,7 @@ namespace dg.Sql
 
         private Type FindColumnType(string columnName)
         {
-            foreach (TableSchema.Column col in TableSchema.Columns)
+            foreach (var col in Schema.Columns)
             {
                 if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -567,7 +548,7 @@ namespace dg.Sql
 
         private DataType FindColumnDataType(string columnName)
         {
-            foreach (TableSchema.Column col in TableSchema.Columns)
+            foreach (var col in Schema.Columns)
             {
                 if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -589,7 +570,7 @@ namespace dg.Sql
         /// <returns>A record (marked as "old") or null.</returns>
         public static T FetchByID(object primaryKeyValue, ConnectorBase connection = null)
         {
-            Query qry = new Query(TableSchema);
+            Query qry = new Query(Schema);
 
             object primaryKey = SchemaPrimaryKeyName;
             if (__PRIMARY_KEY_MULTI)
@@ -636,7 +617,7 @@ namespace dg.Sql
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         public void LoadByParam(object columnName, object value, ConnectorBase connection = null)
         {
-            Query qry = new Query(TableSchema);
+            Query qry = new Query(Schema);
 
             if (columnName is ICollection)
             {
@@ -676,122 +657,6 @@ namespace dg.Sql
             T item = new T();
             item.Read(reader);
             return item;
-        }
-
-        #endregion
-
-        #region Utilities for loading from db
-
-        protected static string StringOrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return (string)value;
-        }
-
-        protected static string StringOrEmptyFromDb(object value)
-        {
-            if (value is DBNull || value == null) return string.Empty;
-            else return (string)value;
-        }
-
-        protected static Int32? Int32OrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return Convert.ToInt32(value);
-        }
-
-        protected static Int32 Int32OrZero(object value)
-        {
-            if (value is DBNull || value == null) return 0;
-            else return Convert.ToInt32(value);
-        }
-
-        protected static Int64? Int64OrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return Convert.ToInt64(value);
-        }
-
-        protected static Int64 Int64OrZero(object value)
-        {
-            if (value is DBNull || value == null) return 0;
-            else return Convert.ToInt64(value);
-        }
-
-        protected static decimal? DecimalOrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return Convert.ToDecimal(value);
-        }
-
-        protected static decimal DecimalOrZeroFromDb(object value)
-        {
-            if (value is DBNull || value == null) return 0m;
-            else return Convert.ToDecimal(value);
-        }
-
-        protected static float? FloatOrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return Convert.ToSingle(value);
-        }
-
-        protected static float FloatOrZeroFromDb(object value)
-        {
-            if (value is DBNull || value == null) return 0f;
-            else return Convert.ToSingle(value);
-        }
-
-        protected static double? DoubleOrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return Convert.ToDouble(value);
-        }
-
-        protected static double DoubleOrZeroFromDb(object value)
-        {
-            if (value is DBNull || value == null) return 0.0;
-            else return Convert.ToDouble(value);
-        }
-
-        protected static DateTime? DateTimeOrNullFromDb(object value)
-        {
-            if (value is DBNull || value == null) return null;
-            else return (DateTime)value;
-        }
-
-        protected static DateTime DateTimeOrNow(object value)
-        {
-            if (value is DBNull || value == null) return DateTime.UtcNow;
-            else return (DateTime)value;
-        }
-
-        protected static DateTime DateTimeOrMinValue(object value)
-        {
-            if (value is DBNull || value == null) return DateTime.MinValue;
-            else return (DateTime)value;
-        }
-
-        protected static Guid GuidFromDb(object value)
-        {
-            Guid? ret = value as Guid?;
-            if (ret == null) ret = new Guid((string)value);
-            return ret.Value;
-        }
-
-        protected static Guid? GuidOrNullFromDb(object value)
-        {
-            Guid? ret = value as Guid?;
-            if (ret == null && !IsNull(value)) ret = new Guid((string)value);
-            return ret.Value;
-        }
-
-        protected static bool IsNull(object value)
-        {
-            if (value == null) return true;
-            if (value is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)value).IsNull) return true;
-            if (value == DBNull.Value) return true;
-            else return false;
         }
 
         #endregion

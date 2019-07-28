@@ -6,8 +6,6 @@ using System.Configuration;
 using System.Reflection;
 using System.Diagnostics;
 
-// This class needs a little cleanup. But it's gonna break dependent code, so I'm gonna postpone it. In the meanwhile we will still use this pretty ugly code.
-
 namespace dg.Sql.Connector
 {
     public abstract class ConnectorBase : IDisposable
