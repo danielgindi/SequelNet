@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Npgsql;
-using dg.Sql.Sql.Spatial;
 
 namespace dg.Sql.Connector
 {
@@ -142,20 +141,6 @@ namespace dg.Sql.Connector
         {
             if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar($"select * from information_schema.tables where table_name= {Language.PrepareValue(TableName)}") != null;
-        }
-
-        #endregion
-
-        #region Reading values from SQL
-
-        public override Geometry ReadGeometry(object value)
-        {
-            byte[] geometryData = value as byte[];
-            if (geometryData != null)
-            {
-                return WkbReader.GeometryFromWkb(geometryData, false);
-            }
-            return null;
         }
 
         #endregion

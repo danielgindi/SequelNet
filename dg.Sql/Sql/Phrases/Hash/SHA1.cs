@@ -44,7 +44,7 @@ namespace dg.Sql.Phrases
 
             ret += Value.Build(conn, relatedQuery);
 
-            return Binary ? conn.Language.func_SHA1_Binary(ret) : conn.Language.func_SHA1_Hex(ret);
+            return Binary ? conn.Language.Sha1Binary(ret) : conn.Language.Sha1Hex(ret);
         }
     }
 }

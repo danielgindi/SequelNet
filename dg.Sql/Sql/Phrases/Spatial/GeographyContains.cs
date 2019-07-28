@@ -146,7 +146,7 @@ namespace dg.Sql.Phrases
             }
             else sb2.Append(InnerValue);
 
-            return conn.Language.func_ST_Contains(sb1.ToString(), sb2.ToString());
+            return conn.Language.ST_Contains(sb1.ToString(), sb2.ToString());
         }
     }
 }

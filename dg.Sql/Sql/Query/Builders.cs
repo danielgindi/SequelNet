@@ -583,40 +583,40 @@ namespace dg.Sql
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.Language.varchar_MAX != null)
+                        if (connection.Language.VarCharMaxKeyword != null)
                         {
-                            sb.Append(connection.Language.type_VARCHAR);
-                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX);
+                            sb.Append(connection.Language.VarCharType);
+                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxKeyword);
                         }
                         else
                         {
-                            sb.Append(connection.Language.type_VARCHAR);
-                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
+                            sb.Append(connection.Language.VarCharType);
+                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
                         }
                     }
                     else if (column.MaxLength == 0)
                     {
-                        sb.Append(connection.Language.type_TEXT);
+                        sb.Append(connection.Language.TextType);
                         isTextField = true;
                     }
-                    else if (column.MaxLength <= connection.Language.varchar_MAX_VALUE)
+                    else if (column.MaxLength <= connection.Language.VarCharMaxLength)
                     {
-                        sb.Append(connection.Language.type_VARCHAR);
+                        sb.Append(connection.Language.VarCharType);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                     else if (column.MaxLength < 65536)
                     {
-                        sb.Append(connection.Language.type_TEXT);
+                        sb.Append(connection.Language.TextType);
                         isTextField = true;
                     }
                     else if (column.MaxLength < 16777215)
                     {
-                        sb.Append(connection.Language.type_MEDIUMTEXT);
+                        sb.Append(connection.Language.MediumTextType);
                         isTextField = true;
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_LONGTEXT);
+                        sb.Append(connection.Language.LongTextType);
                         isTextField = true;
                     }
                 }
@@ -625,104 +625,104 @@ namespace dg.Sql
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.Language.varchar_MAX != null)
+                        if (connection.Language.VarCharMaxKeyword != null)
                         {
-                            sb.Append(connection.Language.type_CHAR);
-                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX);
+                            sb.Append(connection.Language.CharType);
+                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxKeyword);
                         }
                         else
                         {
-                            sb.Append(connection.Language.type_CHAR);
-                            sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
+                            sb.Append(connection.Language.CharType);
+                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
                         }
                     }
-                    else if (column.MaxLength == 0 || column.MaxLength >= connection.Language.varchar_MAX_VALUE)
+                    else if (column.MaxLength == 0 || column.MaxLength >= connection.Language.VarCharMaxLength)
                     {
-                        sb.Append(connection.Language.type_CHAR);
-                        sb.AppendFormat(@"({0})", connection.Language.varchar_MAX_VALUE);
+                        sb.Append(connection.Language.CharType);
+                        sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_CHAR);
+                        sb.Append(connection.Language.CharType);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                 }
                 else if (dataType == DataType.Text)
                 {
-                    sb.Append(connection.Language.type_TEXT);
+                    sb.Append(connection.Language.TextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.MediumText)
                 {
-                    sb.Append(connection.Language.type_MEDIUMTEXT);
+                    sb.Append(connection.Language.MediumTextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.LongText)
                 {
-                    sb.Append(connection.Language.type_LONGTEXT);
+                    sb.Append(connection.Language.LongTextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.Boolean)
                 {
-                    sb.Append(connection.Language.type_BOOLEAN);
+                    sb.Append(connection.Language.BooleanType);
                 }
                 else if (dataType == DataType.DateTime)
                 {
-                    sb.Append(connection.Language.type_DATETIME);
+                    sb.Append(connection.Language.DateTimeType);
                 }
                 else if (dataType == DataType.Numeric)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.type_NUMERIC);
+                        sb.Append(connection.Language.NumericType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_NUMERIC);
+                        sb.Append(connection.Language.NumericType);
                     }
                 }
                 else if (dataType == DataType.Float)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.Language.type_FLOAT);
+                        sb.Append(connection.Language.FloatType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_FLOAT);
+                        sb.Append(connection.Language.FloatType);
                     }
                 }
                 else if (dataType == DataType.Double)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.Language.type_DOUBLE);
+                        sb.Append(connection.Language.DoubleType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_DOUBLE);
+                        sb.Append(connection.Language.DoubleType);
                     }
                 }
                 else if (dataType == DataType.Decimal)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.type_DECIMAL);
+                        sb.Append(connection.Language.DecimalType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_DECIMAL);
+                        sb.Append(connection.Language.DecimalType);
                     }
                 }
                 else if (dataType == DataType.Money)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.type_MONEY);
+                        sb.Append(connection.Language.MoneyType);
                         if (connection.TYPE != ConnectorBase.SqlServiceType.MSSQL)
                         {
                             sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
@@ -730,168 +730,168 @@ namespace dg.Sql
                     }
                     else
                     {
-                        sb.Append(connection.Language.type_MONEY);
+                        sb.Append(connection.Language.MoneyType);
                     }
                 }
                 else if (dataType == DataType.TinyInt)
                 {
-                    sb.Append(connection.Language.type_TINYINT);
+                    sb.Append(connection.Language.TinyIntType);
                 }
                 else if (dataType == DataType.UnsignedTinyInt)
                 {
-                    sb.Append(connection.Language.type_UNSIGNEDTINYINT);
+                    sb.Append(connection.Language.UnsignedTinyIntType);
                 }
                 else if (dataType == DataType.SmallInt)
                 {
-                    sb.Append(connection.Language.type_SMALLINT);
+                    sb.Append(connection.Language.SmallIntType);
                 }
                 else if (dataType == DataType.UnsignedSmallInt)
                 {
-                    sb.Append(connection.Language.type_UNSIGNEDSMALLINT);
+                    sb.Append(connection.Language.UnsignedSmallIntType);
                 }
                 else if (dataType == DataType.Int)
                 {
-                    sb.Append(connection.Language.type_INT);
+                    sb.Append(connection.Language.IntType);
                 }
                 else if (dataType == DataType.UnsignedInt)
                 {
-                    sb.Append(connection.Language.type_UNSIGNEDINT);
+                    sb.Append(connection.Language.UnsignedIntType);
                 }
                 else if (dataType == DataType.BigInt)
                 {
-                    sb.Append(connection.Language.type_BIGINT);
+                    sb.Append(connection.Language.BigIntType);
                 }
                 else if (dataType == DataType.UnsignedBigInt)
                 {
-                    sb.Append(connection.Language.type_UNSIGNEDBIGINT);
+                    sb.Append(connection.Language.UnsignedBigIntType);
                 }
                 else if (dataType == DataType.Json)
                 {
-                    sb.Append(connection.Language.type_JSON);
+                    sb.Append(connection.Language.JsonType);
                 }
                 else if (dataType == DataType.JsonBinary)
                 {
-                    sb.Append(connection.Language.type_JSON_BINARY);
+                    sb.Append(connection.Language.JsonBinaryType);
                 }
                 else if (dataType == DataType.Blob)
                 {
-                    sb.Append(connection.Language.type_BLOB);
+                    sb.Append(connection.Language.BlobType);
                 }
                 else if (dataType == DataType.Guid)
                 {
-                    sb.Append(connection.Language.type_GUID);
+                    sb.Append(connection.Language.GuidType);
                 }
                 else if (dataType == DataType.Geometry)
                 {
-                    sb.Append(connection.Language.type_GEOMETRY);
+                    sb.Append(connection.Language.TypeGeometry);
                 }
                 else if (dataType == DataType.GeometryCollection)
                 {
-                    sb.Append(connection.Language.type_GEOMETRYCOLLECTION);
+                    sb.Append(connection.Language.GeometryCollectionType);
                 }
                 else if (dataType == DataType.Point)
                 {
-                    sb.Append(connection.Language.type_POINT);
+                    sb.Append(connection.Language.PointType);
                 }
                 else if (dataType == DataType.LineString)
                 {
-                    sb.Append(connection.Language.type_LINESTRING);
+                    sb.Append(connection.Language.LineStringType);
                 }
                 else if (dataType == DataType.Polygon)
                 {
-                    sb.Append(connection.Language.type_POLYGON);
+                    sb.Append(connection.Language.PolygonType);
                 }
                 else if (dataType == DataType.Line)
                 {
-                    sb.Append(connection.Language.type_LINE);
+                    sb.Append(connection.Language.LineType);
                 }
                 else if (dataType == DataType.Curve)
                 {
-                    sb.Append(connection.Language.type_CURVE);
+                    sb.Append(connection.Language.CurveType);
                 }
                 else if (dataType == DataType.Surface)
                 {
-                    sb.Append(connection.Language.type_SURFACE);
+                    sb.Append(connection.Language.SurfaceType);
                 }
                 else if (dataType == DataType.LinearRing)
                 {
-                    sb.Append(connection.Language.type_LINEARRING);
+                    sb.Append(connection.Language.LinearRingType);
                 }
                 else if (dataType == DataType.MultiPoint)
                 {
-                    sb.Append(connection.Language.type_MULTIPOINT);
+                    sb.Append(connection.Language.MultiPointType);
                 }
                 else if (dataType == DataType.MultiLineString)
                 {
-                    sb.Append(connection.Language.type_MULTILINESTRING);
+                    sb.Append(connection.Language.MultiLineStringType);
                 }
                 else if (dataType == DataType.MultiPolygon)
                 {
-                    sb.Append(connection.Language.type_MULTIPOLYGON);
+                    sb.Append(connection.Language.MultiPolygonType);
                 }
                 else if (dataType == DataType.MultiCurve)
                 {
-                    sb.Append(connection.Language.type_MULTICURVE);
+                    sb.Append(connection.Language.MultiCurveType);
                 }
                 else if (dataType == DataType.MultiSurface)
                 {
-                    sb.Append(connection.Language.type_MULTISURFACE);
+                    sb.Append(connection.Language.MultiSurfaceType);
                 }
                 else if (dataType == DataType.Geographic)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC);
+                    sb.Append(connection.Language.GeographicType);
                 }
                 else if (dataType == DataType.GeographicCollection)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHICCOLLECTION);
+                    sb.Append(connection.Language.GeographicCollectionType);
                 }
                 else if (dataType == DataType.GeographicPoint)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_POINT);
+                    sb.Append(connection.Language.GeographicPointType);
                 }
                 else if (dataType == DataType.GeographicLineString)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_LINESTRING);
+                    sb.Append(connection.Language.GeographicLinestringType);
                 }
                 else if (dataType == DataType.GeographicPolygon)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_POLYGON);
+                    sb.Append(connection.Language.GeographicPolygonType);
                 }
                 else if (dataType == DataType.GeographicLine)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_LINE);
+                    sb.Append(connection.Language.GeographicLineType);
                 }
                 else if (dataType == DataType.GeographicCurve)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_CURVE);
+                    sb.Append(connection.Language.GeographicCurveType);
                 }
                 else if (dataType == DataType.GeographicSurface)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_SURFACE);
+                    sb.Append(connection.Language.GeographicSurfaceType);
                 }
                 else if (dataType == DataType.GeographicLinearRing)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_LINEARRING);
+                    sb.Append(connection.Language.GeographicLinearringType);
                 }
                 else if (dataType == DataType.GeographicMultiPoint)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTIPOINT);
+                    sb.Append(connection.Language.GeographicMultipointType);
                 }
                 else if (dataType == DataType.GeographicMultiLineString)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTILINESTRING);
+                    sb.Append(connection.Language.GeographicMultilinestringType);
                 }
                 else if (dataType == DataType.GeographicMultiPolygon)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTIPOLYGON);
+                    sb.Append(connection.Language.GeographicMultipolygonType);
                 }
                 else if (dataType == DataType.GeographicMultiCurve)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTICURVE);
+                    sb.Append(connection.Language.GeographicMulticurveType);
                 }
                 else if (dataType == DataType.GeographicMultiSurface)
                 {
-                    sb.Append(connection.Language.type_GEOGRAPHIC_MULTISURFACE);
+                    sb.Append(connection.Language.GeographicMultisurfaceType);
                 }
             }
 
@@ -900,11 +900,11 @@ namespace dg.Sql
                 sb.Append(' ');
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
                 { // Specifically for PostgreSQL
-                    sb.Append(connection.Language.type_AUTOINCREMENT_BIGINT);
+                    sb.Append(connection.Language.AutoIncrementBigIntType);
                 }
                 else
                 {
-                    sb.Append(connection.Language.type_AUTOINCREMENT);
+                    sb.Append(connection.Language.AutoIncrementType);
                 }
             }
 

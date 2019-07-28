@@ -44,7 +44,7 @@ namespace dg.Sql.Phrases
 
             ret += Value.Build(conn, relatedQuery);
 
-            return Binary ? conn.Language.func_MD5_Binary(ret) : conn.Language.func_MD5_Hex(ret);
+            return Binary ? conn.Language.Md5Binary(ret) : conn.Language.Md5Hex(ret);
         }
     }
 }

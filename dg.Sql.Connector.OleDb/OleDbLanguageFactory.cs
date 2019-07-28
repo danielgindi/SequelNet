@@ -1,4 +1,5 @@
-﻿using System;
+﻿using dg.Sql.Sql.Spatial;
+using System;
 
 namespace dg.Sql.Connector
 {
@@ -6,67 +7,86 @@ namespace dg.Sql.Connector
     {
         #region Syntax
 
-        public override string func_UTC_NOW()
+        public override string UtcNow()
         {
             return @"now()"; // NOT UTC
         }
 
-        public override string func_LOWER(string value)
+        public override string StringToLower(string value)
         {
             return @"LCASE(" + value + ")";
         }
 
-        public override string func_UPPER(string value)
+        public override string StringToUpper(string value)
         {
             return @"UCASE(" + value + ")";
         }
 
-        public override string func_LENGTH(string value)
+        public override string LengthOfString(string value)
         {
             return @"LEN(" + value + ")";
         }
 
-        public override string func_HOUR(string date)
+        public override string HourPartOfDate(string date)
         {
             return @"DATEPART(hour, " + date + ")";
         }
 
-        public override string func_MINUTE(string date)
+        public override string MinutePartOfDate(string date)
         {
             return @"DATEPART(minute, " + date + ")";
         }
 
-        public override string func_SECOND(string date)
+        public override string SecondPartOfDate(string date)
         {
             return @"DATEPART(second, " + date + ")";
         }
 
-        public override string type_TINYINT { get { return @"BYTE"; } }
-        public override string type_UNSIGNEDTINYINT { get { return @"TINYINT"; } }
-        public override string type_SMALLINT { get { return @"SHORT"; } }
-        public override string type_UNSIGNEDSMALLINT { get { return @"SHORT"; } }
-        public override string type_INT { get { return @"INT"; } }
-        public override string type_UNSIGNEDINT { get { return @"INT"; } }
-        public override string type_BIGINT { get { return @"INT"; } }
-        public override string type_UNSIGNEDBIGINT { get { return @"INT"; } }
-        public override string type_NUMERIC { get { return @"NUMERIC"; } }
-        public override string type_DECIMAL { get { return @"DECIMAL"; } }
-        public override string type_MONEY { get { return @"DECIMAL"; } }
-        public override string type_FLOAT { get { return @"SINGLE"; } }
-        public override string type_DOUBLE { get { return @"DOUBLE"; } }
-        public override string type_VARCHAR { get { return @"VARCHAR"; } }
-        public override string type_CHAR { get { return @"CHAR"; } }
-        public override string type_TEXT { get { return @"TEXT"; } }
-        public override string type_MEDIUMTEXT { get { return @"TEXT"; } }
-        public override string type_LONGTEXT { get { return @"TEXT"; } }
-        public override string type_BOOLEAN { get { return @"BIT"; } }
-        public override string type_DATETIME { get { return @"DATETIME"; } }
-        public override string type_GUID { get { return @"UNIQUEIDENTIFIER"; } }
-        public override string type_BLOB { get { return @"IMAGE"; } }
-        public override string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
-        public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
-        public override string type_JSON { get { return @"TEXT"; } }
-        public override string type_JSON_BINARY { get { return @"TEXT"; } }
+        #endregion
+
+        #region Types
+
+        public override string AutoIncrementType => @"AUTOINCREMENT";
+        public override string AutoIncrementBigIntType => @"AUTOINCREMENT";
+
+        public override string TinyIntType => @"BYTE";
+        public override string UnsignedTinyIntType => @"TINYINT";
+        public override string SmallIntType => @"SHORT";
+        public override string UnsignedSmallIntType => @"SHORT";
+        public override string IntType => @"INT";
+        public override string UnsignedIntType => @"INT";
+        public override string BigIntType => @"INT";
+        public override string UnsignedBigIntType => @"INT";
+        public override string NumericType => @"NUMERIC";
+        public override string DecimalType => @"DECIMAL";
+        public override string MoneyType => @"DECIMAL";
+        public override string FloatType => @"SINGLE";
+        public override string DoubleType => @"DOUBLE";
+        public override string VarCharType => @"VARCHAR";
+        public override string CharType => @"CHAR";
+        public override string TextType => @"TEXT";
+        public override string MediumTextType => @"TEXT";
+        public override string LongTextType => @"TEXT";
+        public override string BooleanType => @"BIT";
+        public override string DateTimeType => @"DATETIME";
+        public override string GuidType => @"UNIQUEIDENTIFIER";
+        public override string BlobType => @"IMAGE";
+        public override string JsonType => @"TEXT";
+        public override string JsonBinaryType => @"TEXT";
+
+        #endregion
+
+        #region Reading values from SQL
+
+        public override Geometry ReadGeometry(object value)
+        {
+            byte[] geometryData = value as byte[];
+            if (geometryData != null)
+            {
+                return WkbReader.GeometryFromWkb(geometryData, false);
+            }
+            return null;
+        }
 
         #endregion
 

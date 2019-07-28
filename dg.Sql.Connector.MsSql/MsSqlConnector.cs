@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using dg.Sql.Sql.Spatial;
 
 namespace dg.Sql.Connector
 {
@@ -145,20 +144,6 @@ namespace dg.Sql.Connector
         {
             if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SELECT name FROM sysObjects WHERE name like " + Language.PrepareValue(TableName)) != null;
-        }
-
-        #endregion
-
-        #region Reading values from SQL
-
-        public override Geometry ReadGeometry(object value)
-        {
-            byte[] geometryData = value as byte[];
-            if (geometryData != null)
-            {
-                return WkbReader.GeometryFromWkb(geometryData, false);
-            }
-            return null;
         }
 
         #endregion

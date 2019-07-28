@@ -1,4 +1,5 @@
-﻿using System;
+﻿using dg.Sql.Sql.Spatial;
+using System;
 using System.Text;
 
 namespace dg.Sql.Connector
@@ -48,7 +49,7 @@ namespace dg.Sql.Connector
 
         #region Syntax
 
-        public override int varchar_MAX_VALUE
+        public override int VarCharMaxLength
         {
             get
             {
@@ -63,12 +64,12 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_UTC_NOW()
+        public override string UtcNow()
         {
             return @"UTC_TIMESTAMP()";
         }
 
-        public override string func_ST_X(string pt)
+        public override string ST_X(string pt)
         {
             if (Is5_7OrLater())
             {
@@ -80,7 +81,7 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_ST_Y(string pt)
+        public override string ST_Y(string pt)
         {
             if (Is5_7OrLater())
             {
@@ -92,7 +93,7 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_ST_Contains(string g1, string g2)
+        public override string ST_Contains(string g1, string g2)
         {
             if (Is5_7OrLater())
             {
@@ -104,7 +105,7 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_ST_GeomFromText(string text, string srid = null)
+        public override string ST_GeomFromText(string text, string srid = null)
         {
             if (Is5_7OrLater())
             {
@@ -116,9 +117,9 @@ namespace dg.Sql.Connector
             }
         }
 
-        public override string func_ST_GeogFromText(string text, string srid = null)
+        public override string ST_GeogFromText(string text, string srid = null)
         {
-            return func_ST_GeomFromText(text, srid);
+            return ST_GeomFromText(text, srid);
         }
 
         public override void BuildNullSafeEqualsTo(
@@ -137,63 +138,81 @@ namespace dg.Sql.Connector
             where.BuildSingleValueSecond(outputBuilder, context);
         }
 
-        public override string type_AUTOINCREMENT { get { return @"AUTO_INCREMENT"; } }
-        public override string type_AUTOINCREMENT_BIGINT { get { return @"AUTO_INCREMENT"; } }
+        #endregion
 
-        public override string type_TINYINT { get { return @"TINYINT"; } }
-        public override string type_UNSIGNEDTINYINT { get { return @"TINYINT UNSIGNED"; } }
-        public override string type_SMALLINT { get { return @"SMALLINT"; } }
-        public override string type_UNSIGNEDSMALLINT { get { return @"SMALLINT UNSIGNED"; } }
-        public override string type_INT { get { return @"INT"; } }
-        public override string type_UNSIGNEDINT { get { return @"INT UNSIGNED"; } }
-        public override string type_BIGINT { get { return @"BIGINT"; } }
-        public override string type_UNSIGNEDBIGINT { get { return @"BIGINT UNSIGNED"; } }
-        public override string type_NUMERIC { get { return @"NUMERIC"; } }
-        public override string type_DECIMAL { get { return @"DECIMAL"; } }
-        public override string type_MONEY { get { return @"DECIMAL"; } }
-        public override string type_FLOAT { get { return @"FLOAT"; } }
-        public override string type_DOUBLE { get { return @"DOUBLE"; } }
-        public override string type_VARCHAR { get { return @"NATIONAL VARCHAR"; } }
-        public override string type_CHAR { get { return @"NATIONAL CHAR"; } }
-        public override string type_TEXT { get { return @"TEXT"; } }
-        public override string type_MEDIUMTEXT { get { return @"MEDIUMTEXT"; } }
-        public override string type_LONGTEXT { get { return @"LONGTEXT"; } }
-        public override string type_BOOLEAN { get { return @"BOOLEAN"; } }
-        public override string type_DATETIME { get { return @"DATETIME"; } }
-        public override string type_BLOB { get { return @"BLOB"; } }
-        public override string type_GUID { get { return @"NATIONAL CHAR(36)"; } }
-        public override string type_JSON { get { return @"JSON"; } }
-        public override string type_JSON_BINARY { get { return @"JSON"; } }
+        #region Types
 
-        public override string type_GEOMETRY { get { return @"GEOMETRY"; } }
-        public override string type_GEOMETRYCOLLECTION { get { return @"GEOMETRYCOLLECTION"; } }
-        public override string type_POINT { get { return @"POINT"; } }
-        public override string type_LINESTRING { get { return @"LINESTRING"; } }
-        public override string type_POLYGON { get { return @"POLYGON"; } }
-        public override string type_LINE { get { return @"LINE"; } }
-        public override string type_CURVE { get { return @"CURVE"; } }
-        public override string type_SURFACE { get { return @"SURFACE"; } }
-        public override string type_LINEARRING { get { return @"LINEARRING"; } }
-        public override string type_MULTIPOINT { get { return @"MULTIPOINT"; } }
-        public override string type_MULTILINESTRING { get { return @"MULTILINESTRING"; } }
-        public override string type_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
-        public override string type_MULTICURVE { get { return @"MULTICURVE"; } }
-        public override string type_MULTISURFACE { get { return @"MULTISURFACE"; } }
+        public override string AutoIncrementType => @"AUTO_INCREMENT";
+        public override string AutoIncrementBigIntType => @"AUTO_INCREMENT";
 
-        public override string type_GEOGRAPHIC { get { return @"GEOMETRY"; } }
-        public override string type_GEOGRAPHICCOLLECTION { get { return @"GEOMETRYCOLLECTION"; } }
-        public override string type_GEOGRAPHIC_POINT { get { return @"POINT"; } }
-        public override string type_GEOGRAPHIC_LINESTRING { get { return @"LINESTRING"; } }
-        public override string type_GEOGRAPHIC_POLYGON { get { return @"POLYGON"; } }
-        public override string type_GEOGRAPHIC_LINE { get { return @"LINE"; } }
-        public override string type_GEOGRAPHIC_CURVE { get { return @"CURVE"; } }
-        public override string type_GEOGRAPHIC_SURFACE { get { return @"SURFACE"; } }
-        public override string type_GEOGRAPHIC_LINEARRING { get { return @"LINEARRING"; } }
-        public override string type_GEOGRAPHIC_MULTIPOINT { get { return @"MULTIPOINT"; } }
-        public override string type_GEOGRAPHIC_MULTILINESTRING { get { return @"MULTILINESTRING"; } }
-        public override string type_GEOGRAPHIC_MULTIPOLYGON { get { return @"MULTIPOLYGON"; } }
-        public override string type_GEOGRAPHIC_MULTICURVE { get { return @"MULTICURVE"; } }
-        public override string type_GEOGRAPHIC_MULTISURFACE { get { return @"MULTISURFACE"; } }
+        public override string TinyIntType => @"TINYINT";
+        public override string UnsignedTinyIntType => @"TINYINT UNSIGNED";
+        public override string SmallIntType => @"SMALLINT";
+        public override string UnsignedSmallIntType => @"SMALLINT UNSIGNED";
+        public override string IntType => @"INT";
+        public override string UnsignedIntType => @"INT UNSIGNED";
+        public override string BigIntType => @"BIGINT";
+        public override string UnsignedBigIntType => @"BIGINT UNSIGNED";
+        public override string NumericType => @"NUMERIC";
+        public override string DecimalType => @"DECIMAL";
+        public override string MoneyType => @"DECIMAL";
+        public override string FloatType => @"FLOAT";
+        public override string DoubleType => @"DOUBLE";
+        public override string VarCharType => @"NATIONAL VARCHAR";
+        public override string CharType => @"NATIONAL CHAR";
+        public override string TextType => @"TEXT";
+        public override string MediumTextType => @"MEDIUMTEXT";
+        public override string LongTextType => @"LONGTEXT";
+        public override string BooleanType => @"BOOLEAN";
+        public override string DateTimeType => @"DATETIME";
+        public override string BlobType => @"BLOB";
+        public override string GuidType => @"NATIONAL CHAR(36)";
+        public override string JsonType => @"JSON";
+        public override string JsonBinaryType => @"JSON";
+
+        public override string TypeGeometry => @"GEOMETRY";
+        public override string GeometryCollectionType => @"GEOMETRYCOLLECTION";
+        public override string PointType => @"POINT";
+        public override string LineStringType => @"LINESTRING";
+        public override string PolygonType => @"POLYGON";
+        public override string LineType => @"LINE";
+        public override string CurveType => @"CURVE";
+        public override string SurfaceType => @"SURFACE";
+        public override string LinearRingType => @"LINEARRING";
+        public override string MultiPointType => @"MULTIPOINT";
+        public override string MultiLineStringType => @"MULTILINESTRING";
+        public override string MultiPolygonType => @"MULTIPOLYGON";
+        public override string MultiCurveType => @"MULTICURVE";
+        public override string MultiSurfaceType => @"MULTISURFACE";
+
+        public override string GeographicType => @"GEOMETRY";
+        public override string GeographicCollectionType => @"GEOMETRYCOLLECTION";
+        public override string GeographicPointType => @"POINT";
+        public override string GeographicLinestringType => @"LINESTRING";
+        public override string GeographicPolygonType => @"POLYGON";
+        public override string GeographicLineType => @"LINE";
+        public override string GeographicCurveType => @"CURVE";
+        public override string GeographicSurfaceType => @"SURFACE";
+        public override string GeographicLinearringType => @"LINEARRING";
+        public override string GeographicMultipointType => @"MULTIPOINT";
+        public override string GeographicMultilinestringType => @"MULTILINESTRING";
+        public override string GeographicMultipolygonType => @"MULTIPOLYGON";
+        public override string GeographicMulticurveType => @"MULTICURVE";
+        public override string GeographicMultisurfaceType => @"MULTISURFACE";
+
+        #endregion
+
+        #region Reading values from SQL
+
+        public override Geometry ReadGeometry(object value)
+        {
+            byte[] geometryData = value as byte[];
+            if (geometryData != null)
+            {
+                return WkbReader.GeometryFromWkb(geometryData, true);
+            }
+            return null;
+        }
 
         #endregion
 
@@ -268,10 +287,7 @@ namespace dg.Sql.Connector
             return expression.Replace("%", "\x10%");
         }
 
-        public override string LikeEscapingStatement
-        {
-            get { return "ESCAPE('\x10')"; }
-        }
+        public override string LikeEscapingStatement => "ESCAPE('\x10')";
 
         #endregion
     }

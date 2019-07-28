@@ -67,8 +67,8 @@ namespace dg.Sql.Phrases
                     pt = conn.Language.WrapFieldName(point.PointColumnName);
                 }
 
-                x = conn.Language.func_ST_X(pt);
-                y = conn.Language.func_ST_Y(pt);
+                x = conn.Language.ST_X(pt);
+                y = conn.Language.ST_Y(pt);
             }
             else
             {

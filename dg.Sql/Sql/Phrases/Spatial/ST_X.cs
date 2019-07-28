@@ -27,7 +27,7 @@ namespace dg.Sql.Phrases
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            return conn.Language.func_ST_X(Value.Build(conn, relatedQuery));
+            return conn.Language.ST_X(Value.Build(conn, relatedQuery));
         }
     }
 }

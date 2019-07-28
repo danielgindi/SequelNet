@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using dg.Sql.Sql.Spatial;
 using System.Globalization;
 
 namespace dg.Sql.Connector
@@ -139,20 +138,6 @@ namespace dg.Sql.Connector
         {
             if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SHOW TABLES LIKE " + Language.PrepareValue(tableName)) != null;
-        }
-
-        #endregion
-
-        #region Reading values from SQL
-
-        public override Geometry ReadGeometry(object value)
-        {
-            byte[] geometryData = value as byte[];
-            if (geometryData != null)
-            {
-                return WkbReader.GeometryFromWkb(geometryData, true);
-            }
-            return null;
         }
 
         #endregion

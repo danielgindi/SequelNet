@@ -41,7 +41,7 @@ namespace dg.Sql.Phrases
 
             ret += Value.Build(conn, relatedQuery);
 
-            return conn.Language.func_SECOND(ret);
+            return conn.Language.SecondPartOfDate(ret);
         }
     }
 }

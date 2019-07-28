@@ -8,107 +8,101 @@ namespace dg.Sql.Connector
     {
         #region Syntax
 
-        public virtual int varchar_MAX_VALUE
-        {
-            get { return 255; }
-        }
+        public virtual int VarCharMaxLength => 255;
 
-        public virtual string varchar_MAX
-        {
-            get { return null; } // Not supported
-        }
+        public virtual string VarCharMaxKeyword => null;
 
-        public virtual string func_UTC_NOW()
+        public virtual string UtcNow()
         {
             return @"NOW()";
         }
 
-        public virtual string func_LOWER(string value)
+        public virtual string StringToLower(string value)
         {
             return @"LOWER(" + value + ")";
         }
 
-        public virtual string func_UPPER(string value)
+        public virtual string StringToUpper(string value)
         {
             return @"UPPER(" + value + ")";
         }
 
-        public virtual string func_LENGTH(string value)
+        public virtual string LengthOfString(string value)
         {
             return @"LENGTH(" + value + ")";
         }
 
-        public virtual string func_YEAR(string date)
+        public virtual string YearPartOfDate(string date)
         {
             return @"YEAR(" + date + ")";
         }
 
-        public virtual string func_MONTH(string date)
+        public virtual string MonthPartOfDate(string date)
         {
             return @"MONTH(" + date + ")";
         }
 
-        public virtual string func_DAY(string date)
+        public virtual string DayPartOfDate(string date)
         {
             return @"DAY(" + date + ")";
         }
 
-        public virtual string func_HOUR(string date)
+        public virtual string HourPartOfDate(string date)
         {
             return @"HOUR(" + date + ")";
         }
 
-        public virtual string func_MINUTE(string date)
+        public virtual string MinutePartOfDate(string date)
         {
             return @"MINUTE(" + date + ")";
         }
 
-        public virtual string func_SECOND(string date)
+        public virtual string SecondPartOfDate(string date)
         {
             return @"SECONDS(" + date + ")";
         }
 
-        public virtual string func_MD5_Hex(string value)
+        public virtual string Md5Hex(string value)
         {
             return @"MD5(" + value + ")";
         }
 
-        public virtual string func_SHA1_Hex(string value)
+        public virtual string Sha1Hex(string value)
         {
             return @"SHA1(" + value + ")";
         }
 
-        public virtual string func_MD5_Binary(string value)
+        public virtual string Md5Binary(string value)
         {
             return @"UNHEX(MD5(" + value + "))";
         }
 
-        public virtual string func_SHA1_Binary(string value)
+        public virtual string Sha1Binary(string value)
         {
             return @"UNHEX(SHA1(" + value + "))";
         }
 
-        public virtual string func_ST_X(string pt)
+        public virtual string ST_X(string pt)
         {
             return "ST_X(" + pt + ")";
         }
 
-        public virtual string func_ST_Y(string pt)
+        public virtual string ST_Y(string pt)
         {
             return "ST_Y(" + pt + ")";
         }
 
-        public virtual string func_ST_Contains(string g1, string g2)
+        public virtual string ST_Contains(string g1, string g2)
         {
             return "ST_Contains(" + g1 + ", " + g2 + ")";
         }
 
-        public virtual string func_ST_GeomFromText(string text, string srid = null)
+        public virtual string ST_GeomFromText(string text, string srid = null)
         {
             return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
-        public virtual string func_ST_GeogFromText(string text, string srid = null)
+        public virtual string ST_GeogFromText(string text, string srid = null)
         {
             return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
@@ -160,63 +154,82 @@ namespace dg.Sql.Connector
             wl.BuildCommand(outputBuilder, context);
         }
 
-        public virtual string type_AUTOINCREMENT { get { return @"AUTOINCREMENT"; } }
-        public virtual string type_AUTOINCREMENT_BIGINT { get { return @"AUTOINCREMENT"; } }
+        #endregion
 
-        public virtual string type_TINYINT { get { return @"INT"; } }
-        public virtual string type_UNSIGNEDTINYINT { get { return @"INT"; } }
-        public virtual string type_SMALLINT { get { return @"INT"; } }
-        public virtual string type_UNSIGNEDSMALLINT { get { return @"INT"; } }
-        public virtual string type_INT { get { return @"INT"; } }
-        public virtual string type_UNSIGNEDINT { get { return @"INT"; } }
-        public virtual string type_BIGINT { get { return @"INT"; } }
-        public virtual string type_UNSIGNEDBIGINT { get { return @"INT"; } }
-        public virtual string type_NUMERIC { get { return @"NUMERIC"; } }
-        public virtual string type_DECIMAL { get { return @"DECIMAL"; } }
-        public virtual string type_MONEY { get { return @"DECIMAL"; } }
-        public virtual string type_FLOAT { get { return @"FLOAT"; } }
-        public virtual string type_DOUBLE { get { return @"DOUBLE"; } }
-        public virtual string type_VARCHAR { get { return @"NVARCHAR"; } }
-        public virtual string type_CHAR { get { return @"NCHAR"; } }
-        public virtual string type_TEXT { get { return @"NTEXT"; } }
-        public virtual string type_MEDIUMTEXT { get { return @"NTEXT"; } }
-        public virtual string type_LONGTEXT { get { return @"NTEXT"; } }
-        public virtual string type_BOOLEAN { get { return @"BOOLEAN"; } }
-        public virtual string type_DATETIME { get { return @"DATETIME"; } }
-        public virtual string type_BLOB { get { return @"BLOB"; } }
-        public virtual string type_GUID { get { return @"GUID"; } }
-        public virtual string type_JSON { get { return @"TEXT"; } }
-        public virtual string type_JSON_BINARY { get { return @"TEXT"; } }
+        #region Types
 
-        public virtual string type_GEOMETRY { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOMETRYCOLLECTION { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_POINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_LINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_POLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_LINE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_CURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_SURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_LINEARRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_MULTIPOINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_MULTILINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_MULTIPOLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_MULTICURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_MULTISURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string AutoIncrementType => @"AUTOINCREMENT";
+        public virtual string AutoIncrementBigIntType => @"AUTOINCREMENT";
 
-        public virtual string type_GEOGRAPHIC { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHICCOLLECTION { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_POINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_LINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_POLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_LINE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_CURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_SURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_LINEARRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_MULTIPOINT { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_MULTILINESTRING { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_MULTIPOLYGON { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_MULTICURVE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
-        public virtual string type_GEOGRAPHIC_MULTISURFACE { get { throw new NotImplementedException(@"Geospatial data types not supported in this database"); } }
+        public virtual string TinyIntType => @"INT";
+        public virtual string UnsignedTinyIntType => @"INT";
+        public virtual string SmallIntType => @"INT";
+        public virtual string UnsignedSmallIntType => @"INT";
+        public virtual string IntType => @"INT";
+        public virtual string UnsignedIntType => @"INT";
+        public virtual string BigIntType => @"INT";
+        public virtual string UnsignedBigIntType => @"INT";
+        public virtual string NumericType => @"NUMERIC";
+        public virtual string DecimalType => @"DECIMAL";
+        public virtual string MoneyType => @"DECIMAL";
+        public virtual string FloatType => @"FLOAT";
+        public virtual string DoubleType => @"DOUBLE";
+        public virtual string VarCharType => @"NVARCHAR";
+        public virtual string CharType => @"NCHAR";
+        public virtual string TextType => @"NTEXT";
+        public virtual string MediumTextType => @"NTEXT";
+        public virtual string LongTextType => @"NTEXT";
+        public virtual string BooleanType => @"BOOLEAN";
+        public virtual string DateTimeType => @"DATETIME";
+        public virtual string BlobType => @"BLOB";
+        public virtual string GuidType => @"GUID";
+        public virtual string JsonType => @"TEXT";
+        public virtual string JsonBinaryType => @"TEXT";
+
+        public virtual string TypeGeometry => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeometryCollectionType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string PointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string LineStringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string PolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string LineType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string CurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string SurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string LinearRingType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string MultiPointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string MultiLineStringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string MultiPolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string MultiCurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string MultiSurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+
+        public virtual string GeographicType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicCollectionType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicPointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicLinestringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicPolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicLineType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicCurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicSurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicLinearringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicMultipointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicMultilinestringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicMultipolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicMulticurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+        public virtual string GeographicMultisurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
+
+        #endregion
+
+        #region Reading values from SQL
+
+        /// <summary>
+        /// Gets the value of the specified column in Geometry type given the column name.
+        /// </summary>
+        /// <param name="i">The zero-based column ordinal.</param>
+        /// <returns>The value of the specified column in Geometry type.</returns>
+        /// <exception cref="IndexOutOfRangeException">No column with the specified name was found</exception>
+        public virtual Geometry ReadGeometry(object value)
+        {
+            throw new NotImplementedException(@"ReadGeometry not implemented for this connector");
+        }
 
         #endregion
 
@@ -350,10 +363,7 @@ namespace dg.Sql.Connector
             return expression.Replace(@"\", @"\\").Replace(@"%", @"\%");
         }
 
-        public virtual string LikeEscapingStatement
-        {
-            get { return @"ESCAPE('\')"; }
-        }
+        public virtual string LikeEscapingStatement => @"ESCAPE('\')";
 
         #endregion
     }
