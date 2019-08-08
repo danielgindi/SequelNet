@@ -1039,110 +1039,37 @@ namespace SequelNet
                     {
                         case QueryMode.Select:
                             {
-                                if (Offset > 0 && 
-                                    connection.TYPE == ConnectorBase.SqlServiceType.MSSQL &&
-                                    !connection.SupportsSelectPaging())
+                                sb.Append(@" SELECT ");
+
+                                connection.Language.BuildLimitOffset(this, true, sb);
+
+                                if (IsDistinct) sb.Append(@"DISTINCT ");
+
+                                BuildSelectList(sb, connection);
+
+                                sb.Append(@" FROM ");
+
+                                BuildTableName(connection, sb, true);
+
+                                BuildJoin(sb, connection);
+
+                                if (_ListWhere != null && _ListWhere.Count > 0)
                                 {
-                                    // Special case for Sql Server where in versions prior to 2012 there was no paging support
-                                    BuildSelectForMsSqlPaging(sb, connection);
+                                    sb.Append(@" WHERE ");
+                                    _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                    {
+                                        Conn = connection,
+                                        RelatedQuery = this
+                                    });
                                 }
-                                else if (Offset > 0 && Limit > 0 &&
-                                    connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
-                                {
-                                    // Special case for Ms Access where paging is not supported so we do a complex emulation of LIMIT+OFFSET
-                                    BuildSelectForMsAccessLimitOffset(sb, connection);
-                                }
-                                else if (Offset > 0 &&
-                                    connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
-                                {
-                                    // Special case for Ms Access where paging is not supported so we do a complex emulation of OFFSET
-                                    BuildSelectForMsAccessOffset(sb, connection);
-                                }
-                                else
-                                {
-                                    sb.Append(@" SELECT ");
 
-                                    if (IsDistinct) sb.Append(@"DISTINCT ");
+                                BuildGroupBy(sb, connection, false);
+                                BuildHaving(sb, connection);
+                                BuildOrderBy(sb, connection, false);
 
-                                    if (Limit > 0 && 
-                                        (connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS ||
-                                        (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL && !(connection.SupportsSelectPaging() && Offset > 0))
-                                        ))
-                                    {
-                                        sb.Append(@"TOP " + Limit);
-                                        sb.Append(' ');
-                                    }
+                                connection.Language.BuildLimitOffset(this, false, sb);
 
-                                    BuildSelectList(sb, connection);
-
-                                    sb.Append(@" FROM ");
-
-                                    BuildTableName(connection, sb, true);
-
-                                    BuildJoin(sb, connection);
-
-                                    if (_ListWhere != null && _ListWhere.Count > 0)
-                                    {
-                                        sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, new Where.BuildContext
-                                        {
-                                            Conn = connection,
-                                            RelatedQuery = this
-                                        });
-                                    }
-
-                                    BuildGroupBy(sb, connection, false);
-                                    BuildHaving(sb, connection);
-                                    BuildOrderBy(sb, connection, false);
-
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                    {
-                                        if (Limit > 0)
-                                        {
-                                            sb.Append(@" LIMIT ");
-                                            sb.Append(Limit);
-
-                                            // OFFSET is not supported without LIMIT
-                                            if (Offset > 0)
-                                            {
-                                                sb.Append(@" OFFSET ");
-                                                sb.Append(Offset);
-                                            }
-                                        }
-                                    }
-                                    else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                    {
-                                        if (Limit > 0)
-                                        {
-                                            sb.Append(@" LIMIT ");
-                                            sb.Append(Limit);
-                                        }
-                                        if (Offset > 0)
-                                        {
-                                            sb.Append(@" OFFSET ");
-                                            sb.Append(Offset);
-                                        }
-                                    }
-                                    else if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                                    {
-                                        if (connection.SupportsSelectPaging() && Offset > 0)
-                                        {
-                                            // If we are in MsSql OFFSET/FETCH mode...
-
-                                            sb.Append(@" OFFSET ");
-                                            sb.Append(Offset);
-                                            sb.Append(@" ROWS");
-                                            if (Limit > 0) 
-                                            {
-                                                sb.Append(@" FETCH NEXT ");
-                                                sb.Append(Limit);
-                                                sb.Append(@" ROWS ONLY");
-                                            }
-                                        }
-                                    }
-
-                                    // Done with select query
-                                }
+                                // Done with select query
                                 
                                 // Write out supported hints
                                 switch (_QueryHint)
@@ -1429,10 +1356,14 @@ namespace SequelNet
                         case QueryMode.Delete:
                             {
                                 sb.Append(@"DELETE");
+
+                                connection.Language.BuildLimitOffset(this, true, sb);
+
                                 if (_ListJoin != null && _ListJoin.Count > 0)
                                 {
                                     BuildTableName(connection, sb, false);
                                 }
+
                                 sb.Append(@" FROM ");
 
                                 BuildTableName(connection, sb, false);
@@ -1447,7 +1378,10 @@ namespace SequelNet
                                         RelatedQuery = this
                                     });
                                 }
+
                                 BuildOrderBy(sb, connection, false);
+
+                                connection.Language.BuildLimitOffset(this, false, sb);
                             }
                             break;
 
@@ -1719,154 +1653,6 @@ namespace SequelNet
             }
 
             return sb.ToString();
-        }
-
-        private void BuildSelectForMsSqlPaging(StringBuilder sb, ConnectorBase connection)
-        {
-            // MSSQL: 
-            //   WITH [table] AS 
-            //   (
-            //     SELECT [selects],ROW_NUMBER() OVER([orders]) AS __ROWID__ 
-            //     FROM [tables, joins] WHERE [wheres]
-            //   ) 
-            //   SELECT * FROM [table] 
-            //   WHERE __ROWID__ BETWEEN [offset+1] AND [offset+1+limit]
-            // --WHERE __ROWID__ > offset
-
-            sb.Append(@"WITH [Ordered Table] AS ( SELECT ");
-
-            if (IsDistinct) sb.Append(@"DISTINCT ");
-
-            BuildSelectList(sb, connection);
-
-            sb.Append(@",ROW_NUMBER() OVER(");
-            BuildOrderBy(sb, connection, false);
-            sb.Append(@") AS __ROWID__");
-
-            sb.Append(@" FROM ");
-
-            BuildTableName(connection, sb, true);
-
-            BuildJoin(sb, connection);
-
-            if (_ListWhere != null && _ListWhere.Count > 0)
-            {
-                sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, new Where.BuildContext
-                {
-                    Conn = connection,
-                    RelatedQuery = this
-                });
-            }
-
-            sb.Append(@") SELECT * FROM [Ordered Table]");
-            if (Limit > 0) sb.AppendFormat(@" WHERE __ROWID__ BETWEEN {0} AND {1}", Offset + 1, Offset + 1 + Limit);
-            else sb.AppendFormat(@" WHERE __ROWID__ > {0}", Offset);
-        }
-
-        private void BuildSelectForMsAccessOffset(StringBuilder sb, ConnectorBase connection)
-        {
-            // MSACCESS - OFFSET:
-            // SELECT * FROM
-            //  (
-            //    SELECT TOP 
-            //     (SELECT COUNT(*) FROM [tables, joins] WHERE [wheres]) - [offset]
-            //     [selects] FROM [tables, joins] 
-            //     WHERE [wheres] 
-            //     ORDER BY [inverted orders]
-            //  ) p ORDER BY [orders]
-
-            sb.Append(@"SELECT * FROM ( SELECT TOP ( SELECT COUNT(*) FROM ");
-
-            BuildTableName(connection, sb, true);
-
-            BuildJoin(sb, connection);
-            if (_ListWhere != null && _ListWhere.Count > 0)
-            {
-                sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, new Where.BuildContext
-                {
-                    Conn = connection,
-                    RelatedQuery = this
-                });
-            }
-            sb.AppendFormat(@") - {0} ", Offset);
-
-            if (IsDistinct) sb.Append(@"DISTINCT ");
-
-            BuildSelectList(sb, connection);
-
-            sb.Append(@" FROM ");
-
-            BuildTableName(connection, sb, true);
-
-            BuildJoin(sb, connection);
-
-            if (_ListWhere != null && _ListWhere.Count > 0)
-            {
-                sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, new Where.BuildContext
-                {
-                    Conn = connection,
-                    RelatedQuery = this
-                });
-            }
-
-            BuildGroupBy(sb, connection, true);
-            BuildOrderBy(sb, connection, true);
-            sb.Append(@") p ");
-            BuildGroupBy(sb, connection, false);
-            BuildOrderBy(sb, connection, false);
-        }
-
-        private void BuildSelectForMsAccessLimitOffset(StringBuilder sb, ConnectorBase connection)
-        {
-            // MSACCESS - LIMIT,OFFSET:
-            // SELECT * FROM
-            //  (
-            //    SELECT TOP [limit] * FROM 
-            //     (
-            //       SELECT TOP [offset+limit] 
-            //       [selects] FROM [tables, joins] 
-            //       WHERE [wheres] 
-            //       ORDER BY [orders]
-            //     ) pp ORDER BY [inverted orders]
-            //  ) p ORDER BY [orders]
-
-            sb.AppendFormat(@"SELECT * FROM ( SELECT TOP {0} * FROM ( SELECT TOP {1} ", Limit, Offset + Limit);
-
-            if (IsDistinct) sb.Append(@"DISTINCT ");
-
-            BuildSelectList(sb, connection);
-
-            sb.Append(@" FROM ");
-
-            BuildTableName(connection, sb, true);
-
-            BuildJoin(sb, connection);
-
-            if (_ListWhere != null && _ListWhere.Count > 0)
-            {
-                sb.Append(@" WHERE ");
-                _ListWhere.BuildCommand(sb, new Where.BuildContext
-                {
-                    Conn = connection,
-                    RelatedQuery = this
-                });
-            }
-
-            StringBuilder sbOrderBy = new StringBuilder();
-            StringBuilder sbGroupBy = new StringBuilder();
-            BuildGroupBy(sbGroupBy, connection, false);
-            BuildOrderBy(sbOrderBy, connection, false);
-            sb.Append(sbOrderBy.ToString());
-            sb.Append(sbGroupBy.ToString());
-            sb.Append(@") pp ");
-            BuildGroupBy(sb, connection, true);
-            BuildOrderBy(sb, connection, true);
-            sb.Append(@") p ");
-            sb.Append(sbOrderBy.ToString());
-            sb.Append(sbGroupBy.ToString());
         }
     }
 }

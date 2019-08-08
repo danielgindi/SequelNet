@@ -1,5 +1,6 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
+using System.Text;
 
 namespace SequelNet.Connector
 {
@@ -104,6 +105,40 @@ namespace SequelNet.Connector
         public override string ST_GeogFromText(string text, string srid = null)
         {
             return "geography::STGeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
+        public override void BuildLimitOffset(
+            Query query,
+            bool top,
+            StringBuilder outputBuilder)
+        {
+            var withOffset = query.Offset > 0 && query.QueryMode == QueryMode.Select && _MsSqlVersion.SupportsOffset;
+
+            if (top)
+            {
+                if (!withOffset && query.Limit > 0)
+                {
+                    outputBuilder.Append(" TOP ");
+                    outputBuilder.Append(query.Limit);
+                    outputBuilder.Append(' ');
+                }
+            }
+            else
+            {
+                if (withOffset && query.Limit > 0)
+                {
+                    outputBuilder.Append(" OFFSET ");
+                    outputBuilder.Append(query.Offset);
+                    outputBuilder.Append(" ROWS ");
+
+                    if (query.Limit > 0)
+                    {
+                        outputBuilder.Append("FETCH NEXT ");
+                        outputBuilder.Append(query.Limit);
+                        outputBuilder.Append(" ROWS ONLY ");
+                    }
+                }
+            }
         }
 
         #endregion

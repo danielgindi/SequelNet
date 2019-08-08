@@ -138,6 +138,32 @@ namespace SequelNet.Connector
             where.BuildSingleValueSecond(outputBuilder, context);
         }
 
+        public override void BuildLimitOffset(
+            Query query,
+            bool top,
+            StringBuilder outputBuilder)
+        {
+            if (top)
+                return;
+
+            var withOffset = query.Offset > 0 && query.QueryMode == QueryMode.Select;
+
+            // OFFSET is not supported without LIMIT
+            if (query.Limit > 0 || withOffset)
+            {
+                outputBuilder.Append(" LIMIT ");
+                outputBuilder.Append(query.Limit);
+                outputBuilder.Append(' ');
+
+                if (withOffset)
+                {
+                    outputBuilder.Append("OFFSET ");
+                    outputBuilder.Append(query.Offset);
+                    outputBuilder.Append(' ');
+                }
+            }
+        }
+
         #endregion
 
         #region Types

@@ -1,5 +1,6 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
+using System.Text;
 
 namespace SequelNet.Connector
 {
@@ -40,6 +41,22 @@ namespace SequelNet.Connector
         public override string SecondPartOfDate(string date)
         {
             return @"DATEPART(second, " + date + ")";
+        }
+
+        public override void BuildLimitOffset(
+            Query query,
+            bool top,
+            StringBuilder outputBuilder)
+        {
+            if (!top)
+                return;
+
+            if (query.Limit > 0)
+            {
+                outputBuilder.Append(" TOP ");
+                outputBuilder.Append(query.Limit);
+                outputBuilder.Append(' ');
+            }
         }
 
         #endregion
