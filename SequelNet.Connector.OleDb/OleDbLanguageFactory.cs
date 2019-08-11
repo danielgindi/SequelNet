@@ -59,6 +59,39 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildCreateIndex(
+            Query qry,
+            ConnectorBase conn,
+            TableSchema.Index index,
+            StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"ALTER TABLE ");
+
+            BuildTableName(qry, conn, outputBuilder, false);
+
+            outputBuilder.Append(@" ADD ");
+
+            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            {
+                outputBuilder.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", WrapFieldName(index.Name));
+            }
+            else
+            {
+                if (index.Mode == TableSchema.IndexMode.Unique) outputBuilder.Append(@"UNIQUE ");
+                outputBuilder.Append(@"INDEX ");
+                outputBuilder.Append(WrapFieldName(index.Name));
+                outputBuilder.Append(@" ");
+            }
+            outputBuilder.Append(@"(");
+            for (int i = 0; i < index.ColumnNames.Length; i++)
+            {
+                if (i > 0) outputBuilder.Append(",");
+                outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
+                outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+            }
+            outputBuilder.Append(@")");
+        }
+
         #endregion
 
         #region Types

@@ -154,29 +154,51 @@ namespace SequelNet.Connector
             wl.BuildCommand(outputBuilder, context);
         }
 
+        public virtual void BuildTableName(Query qry, ConnectorBase conn, StringBuilder sb, bool considerAlias = true)
+        {
+            if (qry.Schema != null)
+            {
+                if (qry.Schema.DatabaseOwner.Length > 0)
+                {
+                    sb.Append(WrapFieldName(qry.Schema.DatabaseOwner));
+                    sb.Append('.');
+                }
+                sb.Append(WrapFieldName(qry.SchemaName));
+            }
+            else
+            {
+                sb.Append(@"(");
+
+                if (qry.FromExpression is IPhrase)
+                {
+                    sb.Append(((IPhrase)qry.FromExpression).BuildPhrase(conn, qry));
+                }
+                else sb.Append(qry.FromExpression);
+
+                sb.Append(@")");
+            }
+
+            if (considerAlias && !string.IsNullOrEmpty(qry.SchemaAlias))
+            {
+                sb.Append(" " + WrapFieldName(qry.SchemaAlias));
+            }
+        }
+
         public virtual void BuildLimitOffset(
             Query query,
             bool top,
             StringBuilder outputBuilder)
         {
-            if (top)
-                return;
+            throw new NotImplementedException("Paging syntax has not been implemented for this connector");
+        }
 
-            var withOffset = query.Offset > 0 && query.QueryMode == QueryMode.Select;
-
-            if (query.Limit > 0)
-            {
-                outputBuilder.Append(" LIMIT ");
-                outputBuilder.Append(query.Limit);
-                outputBuilder.Append(' ');
-            }
-
-            if (withOffset && query.Offset > 0)
-            {
-                outputBuilder.Append(" OFFSET ");
-                outputBuilder.Append(query.Offset);
-                outputBuilder.Append(' ');
-            }
+        public virtual void BuildCreateIndex(
+            Query qry,
+            ConnectorBase conn,
+            TableSchema.Index index,
+            StringBuilder outputBuilder)
+        {
+            throw new NotImplementedException("Index syntax has not been implemented for this connector");
         }
 
         #endregion

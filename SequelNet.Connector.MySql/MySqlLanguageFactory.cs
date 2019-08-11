@@ -164,6 +164,68 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildCreateIndex(
+            Query qry,
+            ConnectorBase conn,
+            TableSchema.Index index,
+            StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"ALTER TABLE ");
+
+            BuildTableName(qry, conn, outputBuilder, false);
+
+            outputBuilder.Append(@" ADD ");
+
+            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            {
+                outputBuilder.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", WrapFieldName(index.Name));
+            }
+            else
+            {
+                switch (index.Mode)
+                {
+                    case TableSchema.IndexMode.Unique:
+                        outputBuilder.Append(@"UNIQUE ");
+                        break;
+                    case TableSchema.IndexMode.FullText:
+                        outputBuilder.Append(@"FULLTEXT ");
+                        break;
+                    case TableSchema.IndexMode.Spatial:
+                        outputBuilder.Append(@"SPATIAL ");
+                        break;
+                }
+                outputBuilder.Append(@"INDEX ");
+                outputBuilder.Append(WrapFieldName(index.Name));
+                outputBuilder.Append(@" ");
+            }
+
+            if (index.Mode != TableSchema.IndexMode.Spatial)
+            {
+                switch (index.Type)
+                {
+                    case TableSchema.IndexType.BTREE:
+                        outputBuilder.Append(@"USING BTREE ");
+                        break;
+                    case TableSchema.IndexType.RTREE:
+                        outputBuilder.Append(@"USING RTREE ");
+                        break;
+                    case TableSchema.IndexType.HASH:
+                        outputBuilder.Append(@"USING HASH ");
+                        break;
+                }
+            }
+
+            outputBuilder.Append(@"(");
+            for (int i = 0; i < index.ColumnNames.Length; i++)
+            {
+                if (i > 0) outputBuilder.Append(",");
+                outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
+                if (index.ColumnLength[i] > 0) outputBuilder.AppendFormat("({0})", index.ColumnLength[i]);
+                outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+            }
+            outputBuilder.Append(@")");
+        }
+
         #endregion
 
         #region Types

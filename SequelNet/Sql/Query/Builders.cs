@@ -17,6 +17,8 @@ namespace SequelNet
             }
             else
             {
+                var language = connection.Language;
+
                 bool bFirst = true;
                 foreach (SelectColumn sel in _ListSelect)
                 {
@@ -33,13 +35,13 @@ namespace SequelNet
                         }
                         else
                         {
-                            sb.Append(connection.Language.PrepareValue(connection, sel.Value, this));
+                            sb.Append(language.PrepareValue(connection, sel.Value, this));
                         }
 
                         if (!string.IsNullOrEmpty(sel.Alias))
                         {
                             sb.Append(@" AS ");
-                            sb.Append(connection.Language.WrapFieldName(sel.Alias));
+                            sb.Append(language.WrapFieldName(sel.Alias));
                         }
                     }
                     else if (sel.ObjectType == ValueObjectType.Literal)
@@ -52,7 +54,7 @@ namespace SequelNet
                         {
                             sb.Append(sel.Value.ToString());
                             sb.Append(@" AS ");
-                            sb.Append(connection.Language.WrapFieldName(sel.Alias));
+                            sb.Append(language.WrapFieldName(sel.Alias));
                         }
                     }
                     else
@@ -61,38 +63,38 @@ namespace SequelNet
                         {
                             if (_SchemaAlias != null)
                             {
-                                sb.Append(connection.Language.WrapFieldName(_SchemaAlias));
+                                sb.Append(language.WrapFieldName(_SchemaAlias));
                             }
                             else
                             {
                                 if (Schema.DatabaseOwner.Length > 0)
                                 {
-                                    sb.Append(connection.Language.WrapFieldName(Schema.DatabaseOwner));
+                                    sb.Append(language.WrapFieldName(Schema.DatabaseOwner));
                                     sb.Append('.');
                                 }
-                                sb.Append(connection.Language.WrapFieldName(_SchemaName));
+                                sb.Append(language.WrapFieldName(_SchemaName));
                             }
 
                             sb.Append('.');
-                            sb.Append(sel.Value == null ? "*" : connection.Language.WrapFieldName(sel.Value.ToString()));
+                            sb.Append(sel.Value == null ? "*" : language.WrapFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
-                                sb.Append(connection.Language.WrapFieldName(sel.Alias));
+                                sb.Append(language.WrapFieldName(sel.Alias));
                             }
                         }
                         else
                         {
                             if (!string.IsNullOrEmpty(sel.TableName))
                             {
-                                sb.Append(connection.Language.WrapFieldName(sel.TableName));
+                                sb.Append(language.WrapFieldName(sel.TableName));
                                 sb.Append('.');
                             }
-                            sb.Append(sel.Value == null ? "*" : connection.Language.WrapFieldName(sel.Value.ToString()));
+                            sb.Append(sel.Value == null ? "*" : language.WrapFieldName(sel.Value.ToString()));
                             if (!string.IsNullOrEmpty(sel.Alias))
                             {
                                 sb.Append(@" AS ");
-                                sb.Append(connection.Language.WrapFieldName(sel.Alias));
+                                sb.Append(language.WrapFieldName(sel.Alias));
                             }
                         }
                     }
@@ -281,190 +283,11 @@ namespace SequelNet
 
         private void BuildCreateIndex(StringBuilder sb, ConnectorBase connection, object indexObj)
         {
-            if (indexObj is TableSchema.Index)
+            var language = connection.Language;
+
+            if (indexObj is TableSchema.Index index)
             {
-                TableSchema.Index index = indexObj as TableSchema.Index;
-                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                {
-                    sb.Append(@"ALTER TABLE ");
-
-                    BuildTableName(connection, sb, false);
-
-                    sb.Append(@" ADD ");
-
-                    if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
-                    {
-                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.Language.WrapFieldName(index.Name));
-                    }
-                    else
-                    {
-                        switch (index.Mode)
-                        {
-                            case TableSchema.IndexMode.Unique:
-                                sb.Append(@"UNIQUE ");
-                                break;
-                            case TableSchema.IndexMode.FullText:
-                                sb.Append(@"FULLTEXT ");
-                                break;
-                            case TableSchema.IndexMode.Spatial:
-                                sb.Append(@"SPATIAL ");
-                                break;
-                        }
-                        sb.Append(@"INDEX ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-                        sb.Append(@" ");
-                    }
-                    if (index.Mode != TableSchema.IndexMode.Spatial)
-                    {
-                        switch (index.Type)
-                        {
-                            case TableSchema.IndexType.BTREE:
-                                sb.Append(@"USING BTREE ");
-                                break;
-                            case TableSchema.IndexType.RTREE:
-                                sb.Append(@"USING RTREE ");
-                                break;
-                            case TableSchema.IndexType.HASH:
-                                sb.Append(@"USING HASH ");
-                                break;
-                        }
-                    }
-                    sb.Append(@"(");
-                    for (int i = 0; i < index.ColumnNames.Length; i++)
-                    {
-                        if (i > 0) sb.Append(",");
-                        sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                        if (index.ColumnLength[i] > 0) sb.AppendFormat("({0})", index.ColumnLength[i]);
-                        sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                    }
-                    sb.Append(@")");
-                }
-                else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                {
-                    if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
-                    {
-                        sb.Append(@"ALTER TABLE ");
-
-                        BuildTableName(connection, sb, false);
-
-                        sb.Append(@" ADD CONSTRAINT ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-                        sb.Append(@" PRIMARY KEY ");
-
-                        sb.Append(@"(");
-                        for (int i = 0; i < index.ColumnNames.Length; i++)
-                        {
-                            if (i > 0) sb.Append(",");
-                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                        }
-                        sb.Append(@")");
-                    }
-                    else
-                    {
-                        sb.Append(@"CREATE ");
-
-                        if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
-
-                        sb.Append(@"INDEX ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-
-                        sb.Append(@"ON ");
-
-                        BuildTableName(connection, sb, false);
-
-                        if (index.Mode == TableSchema.IndexMode.Spatial)
-                        {
-                            sb.Append(@"USING GIST");
-                        }
-
-                        sb.Append(@"(");
-                        for (int i = 0; i < index.ColumnNames.Length; i++)
-                        {
-                            if (i > 0) sb.Append(",");
-                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                        }
-                        sb.Append(@")");
-                    }
-                }
-                else if (connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
-                {
-                    sb.Append(@"ALTER TABLE ");
-
-                    BuildTableName(connection, sb, false);
-
-                    sb.Append(@" ADD ");
-
-                    if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
-                    {
-                        sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", connection.Language.WrapFieldName(index.Name));
-                    }
-                    else
-                    {
-                        if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
-                        sb.Append(@"INDEX ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-                        sb.Append(@" ");
-                    }
-                    sb.Append(@"(");
-                    for (int i = 0; i < index.ColumnNames.Length; i++)
-                    {
-                        if (i > 0) sb.Append(",");
-                        sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                        sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                    }
-                    sb.Append(@")");
-                }
-                else if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                {
-                    if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
-                    {
-                        sb.Append(@"ALTER TABLE ");
-
-                        BuildTableName(connection, sb, false);
-
-                        sb.Append(@" ADD CONSTRAINT ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-                        sb.Append(@" PRIMARY KEY ");
-
-                        if (index.Cluster == TableSchema.ClusterMode.Clustered) sb.Append(@"CLUSTERED ");
-                        else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");
-
-                        sb.Append(@"(");
-                        for (int i = 0; i < index.ColumnNames.Length; i++)
-                        {
-                            if (i > 0) sb.Append(",");
-                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                        }
-                        sb.Append(@")");
-                    }
-                    else
-                    {
-                        sb.Append(@"CREATE ");
-
-                        if (index.Mode == TableSchema.IndexMode.Unique) sb.Append(@"UNIQUE ");
-                        if (index.Cluster == TableSchema.ClusterMode.Clustered) sb.Append(@"CLUSTERED ");
-                        else if (index.Cluster == TableSchema.ClusterMode.NonClustered) sb.Append(@"NONCLUSTERED ");
-
-                        sb.Append(@"INDEX ");
-                        sb.Append(connection.Language.WrapFieldName(index.Name));
-
-                        sb.Append(@"ON ");
-
-                        BuildTableName(connection, sb, false);
-
-                        sb.Append(@"(");
-                        for (int i = 0; i < index.ColumnNames.Length; i++)
-                        {
-                            if (i > 0) sb.Append(",");
-                            sb.Append(connection.Language.WrapFieldName(index.ColumnNames[i]));
-                            sb.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
-                        }
-                        sb.Append(@")");
-                    }
-                }
+                language.BuildCreateIndex(this, connection, index, sb);
             }
             else if (indexObj is TableSchema.ForeignKey)
             {
@@ -472,22 +295,22 @@ namespace SequelNet
 
                 sb.Append(@"ALTER TABLE ");
 
-                BuildTableName(connection, sb, false);
+                language.BuildTableName(this, connection, sb, false);
 
                 sb.Append(@" ADD CONSTRAINT ");
-                sb.Append(connection.Language.WrapFieldName(foreignKey.Name));
+                sb.Append(language.WrapFieldName(foreignKey.Name));
                 sb.Append(@" FOREIGN KEY (");
 
                 for (int i = 0; i < foreignKey.Columns.Length; i++)
                 {
                     if (i > 0) sb.Append(",");
-                    sb.Append(connection.Language.WrapFieldName(foreignKey.Columns[i]));
+                    sb.Append(language.WrapFieldName(foreignKey.Columns[i]));
                 }
                 sb.AppendFormat(@") REFERENCES {0} (", foreignKey.ForeignTable);
                 for (int i = 0; i < foreignKey.ForeignColumns.Length; i++)
                 {
                     if (i > 0) sb.Append(",");
-                    sb.Append(connection.Language.WrapFieldName(foreignKey.ForeignColumns[i]));
+                    sb.Append(language.WrapFieldName(foreignKey.ForeignColumns[i]));
                 }
                 sb.Append(@")");
                 if (foreignKey.OnDelete != TableSchema.ForeignKeyReference.None)
@@ -575,6 +398,8 @@ namespace SequelNet
                 return;
             }
 
+            var language = connection.Language;
+
             isTextField = false;
             DataType dataType = column.ActualDataType;
             if (!column.AutoIncrement || (connection.TYPE != ConnectorBase.SqlServiceType.MSACCESS && connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL))
@@ -583,40 +408,40 @@ namespace SequelNet
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.Language.VarCharMaxKeyword != null)
+                        if (language.VarCharMaxKeyword != null)
                         {
-                            sb.Append(connection.Language.VarCharType);
-                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxKeyword);
+                            sb.Append(language.VarCharType);
+                            sb.AppendFormat(@"({0})", language.VarCharMaxKeyword);
                         }
                         else
                         {
-                            sb.Append(connection.Language.VarCharType);
-                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
+                            sb.Append(language.VarCharType);
+                            sb.AppendFormat(@"({0})", language.VarCharMaxLength);
                         }
                     }
                     else if (column.MaxLength == 0)
                     {
-                        sb.Append(connection.Language.TextType);
+                        sb.Append(language.TextType);
                         isTextField = true;
                     }
-                    else if (column.MaxLength <= connection.Language.VarCharMaxLength)
+                    else if (column.MaxLength <= language.VarCharMaxLength)
                     {
-                        sb.Append(connection.Language.VarCharType);
+                        sb.Append(language.VarCharType);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                     else if (column.MaxLength < 65536)
                     {
-                        sb.Append(connection.Language.TextType);
+                        sb.Append(language.TextType);
                         isTextField = true;
                     }
                     else if (column.MaxLength < 16777215)
                     {
-                        sb.Append(connection.Language.MediumTextType);
+                        sb.Append(language.MediumTextType);
                         isTextField = true;
                     }
                     else
                     {
-                        sb.Append(connection.Language.LongTextType);
+                        sb.Append(language.LongTextType);
                         isTextField = true;
                     }
                 }
@@ -625,104 +450,104 @@ namespace SequelNet
                 {
                     if (column.MaxLength < 0)
                     {
-                        if (connection.Language.VarCharMaxKeyword != null)
+                        if (language.VarCharMaxKeyword != null)
                         {
-                            sb.Append(connection.Language.CharType);
-                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxKeyword);
+                            sb.Append(language.CharType);
+                            sb.AppendFormat(@"({0})", language.VarCharMaxKeyword);
                         }
                         else
                         {
-                            sb.Append(connection.Language.CharType);
-                            sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
+                            sb.Append(language.CharType);
+                            sb.AppendFormat(@"({0})", language.VarCharMaxLength);
                         }
                     }
-                    else if (column.MaxLength == 0 || column.MaxLength >= connection.Language.VarCharMaxLength)
+                    else if (column.MaxLength == 0 || column.MaxLength >= language.VarCharMaxLength)
                     {
-                        sb.Append(connection.Language.CharType);
-                        sb.AppendFormat(@"({0})", connection.Language.VarCharMaxLength);
+                        sb.Append(language.CharType);
+                        sb.AppendFormat(@"({0})", language.VarCharMaxLength);
                     }
                     else
                     {
-                        sb.Append(connection.Language.CharType);
+                        sb.Append(language.CharType);
                         sb.AppendFormat(@"({0})", column.MaxLength);
                     }
                 }
                 else if (dataType == DataType.Text)
                 {
-                    sb.Append(connection.Language.TextType);
+                    sb.Append(language.TextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.MediumText)
                 {
-                    sb.Append(connection.Language.MediumTextType);
+                    sb.Append(language.MediumTextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.LongText)
                 {
-                    sb.Append(connection.Language.LongTextType);
+                    sb.Append(language.LongTextType);
                     isTextField = true;
                 }
                 else if (dataType == DataType.Boolean)
                 {
-                    sb.Append(connection.Language.BooleanType);
+                    sb.Append(language.BooleanType);
                 }
                 else if (dataType == DataType.DateTime)
                 {
-                    sb.Append(connection.Language.DateTimeType);
+                    sb.Append(language.DateTimeType);
                 }
                 else if (dataType == DataType.Numeric)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.NumericType);
+                        sb.Append(language.NumericType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.NumericType);
+                        sb.Append(language.NumericType);
                     }
                 }
                 else if (dataType == DataType.Float)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.Language.FloatType);
+                        sb.Append(language.FloatType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.FloatType);
+                        sb.Append(language.FloatType);
                     }
                 }
                 else if (dataType == DataType.Double)
                 {
                     if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                     {
-                        sb.Append(connection.Language.DoubleType);
+                        sb.Append(language.DoubleType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.DoubleType);
+                        sb.Append(language.DoubleType);
                     }
                 }
                 else if (dataType == DataType.Decimal)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.DecimalType);
+                        sb.Append(language.DecimalType);
                         sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
                     }
                     else
                     {
-                        sb.Append(connection.Language.DecimalType);
+                        sb.Append(language.DecimalType);
                     }
                 }
                 else if (dataType == DataType.Money)
                 {
                     if (column.NumberPrecision > 0)
                     {
-                        sb.Append(connection.Language.MoneyType);
+                        sb.Append(language.MoneyType);
                         if (connection.TYPE != ConnectorBase.SqlServiceType.MSSQL)
                         {
                             sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
@@ -730,168 +555,168 @@ namespace SequelNet
                     }
                     else
                     {
-                        sb.Append(connection.Language.MoneyType);
+                        sb.Append(language.MoneyType);
                     }
                 }
                 else if (dataType == DataType.TinyInt)
                 {
-                    sb.Append(connection.Language.TinyIntType);
+                    sb.Append(language.TinyIntType);
                 }
                 else if (dataType == DataType.UnsignedTinyInt)
                 {
-                    sb.Append(connection.Language.UnsignedTinyIntType);
+                    sb.Append(language.UnsignedTinyIntType);
                 }
                 else if (dataType == DataType.SmallInt)
                 {
-                    sb.Append(connection.Language.SmallIntType);
+                    sb.Append(language.SmallIntType);
                 }
                 else if (dataType == DataType.UnsignedSmallInt)
                 {
-                    sb.Append(connection.Language.UnsignedSmallIntType);
+                    sb.Append(language.UnsignedSmallIntType);
                 }
                 else if (dataType == DataType.Int)
                 {
-                    sb.Append(connection.Language.IntType);
+                    sb.Append(language.IntType);
                 }
                 else if (dataType == DataType.UnsignedInt)
                 {
-                    sb.Append(connection.Language.UnsignedIntType);
+                    sb.Append(language.UnsignedIntType);
                 }
                 else if (dataType == DataType.BigInt)
                 {
-                    sb.Append(connection.Language.BigIntType);
+                    sb.Append(language.BigIntType);
                 }
                 else if (dataType == DataType.UnsignedBigInt)
                 {
-                    sb.Append(connection.Language.UnsignedBigIntType);
+                    sb.Append(language.UnsignedBigIntType);
                 }
                 else if (dataType == DataType.Json)
                 {
-                    sb.Append(connection.Language.JsonType);
+                    sb.Append(language.JsonType);
                 }
                 else if (dataType == DataType.JsonBinary)
                 {
-                    sb.Append(connection.Language.JsonBinaryType);
+                    sb.Append(language.JsonBinaryType);
                 }
                 else if (dataType == DataType.Blob)
                 {
-                    sb.Append(connection.Language.BlobType);
+                    sb.Append(language.BlobType);
                 }
                 else if (dataType == DataType.Guid)
                 {
-                    sb.Append(connection.Language.GuidType);
+                    sb.Append(language.GuidType);
                 }
                 else if (dataType == DataType.Geometry)
                 {
-                    sb.Append(connection.Language.TypeGeometry);
+                    sb.Append(language.TypeGeometry);
                 }
                 else if (dataType == DataType.GeometryCollection)
                 {
-                    sb.Append(connection.Language.GeometryCollectionType);
+                    sb.Append(language.GeometryCollectionType);
                 }
                 else if (dataType == DataType.Point)
                 {
-                    sb.Append(connection.Language.PointType);
+                    sb.Append(language.PointType);
                 }
                 else if (dataType == DataType.LineString)
                 {
-                    sb.Append(connection.Language.LineStringType);
+                    sb.Append(language.LineStringType);
                 }
                 else if (dataType == DataType.Polygon)
                 {
-                    sb.Append(connection.Language.PolygonType);
+                    sb.Append(language.PolygonType);
                 }
                 else if (dataType == DataType.Line)
                 {
-                    sb.Append(connection.Language.LineType);
+                    sb.Append(language.LineType);
                 }
                 else if (dataType == DataType.Curve)
                 {
-                    sb.Append(connection.Language.CurveType);
+                    sb.Append(language.CurveType);
                 }
                 else if (dataType == DataType.Surface)
                 {
-                    sb.Append(connection.Language.SurfaceType);
+                    sb.Append(language.SurfaceType);
                 }
                 else if (dataType == DataType.LinearRing)
                 {
-                    sb.Append(connection.Language.LinearRingType);
+                    sb.Append(language.LinearRingType);
                 }
                 else if (dataType == DataType.MultiPoint)
                 {
-                    sb.Append(connection.Language.MultiPointType);
+                    sb.Append(language.MultiPointType);
                 }
                 else if (dataType == DataType.MultiLineString)
                 {
-                    sb.Append(connection.Language.MultiLineStringType);
+                    sb.Append(language.MultiLineStringType);
                 }
                 else if (dataType == DataType.MultiPolygon)
                 {
-                    sb.Append(connection.Language.MultiPolygonType);
+                    sb.Append(language.MultiPolygonType);
                 }
                 else if (dataType == DataType.MultiCurve)
                 {
-                    sb.Append(connection.Language.MultiCurveType);
+                    sb.Append(language.MultiCurveType);
                 }
                 else if (dataType == DataType.MultiSurface)
                 {
-                    sb.Append(connection.Language.MultiSurfaceType);
+                    sb.Append(language.MultiSurfaceType);
                 }
                 else if (dataType == DataType.Geographic)
                 {
-                    sb.Append(connection.Language.GeographicType);
+                    sb.Append(language.GeographicType);
                 }
                 else if (dataType == DataType.GeographicCollection)
                 {
-                    sb.Append(connection.Language.GeographicCollectionType);
+                    sb.Append(language.GeographicCollectionType);
                 }
                 else if (dataType == DataType.GeographicPoint)
                 {
-                    sb.Append(connection.Language.GeographicPointType);
+                    sb.Append(language.GeographicPointType);
                 }
                 else if (dataType == DataType.GeographicLineString)
                 {
-                    sb.Append(connection.Language.GeographicLinestringType);
+                    sb.Append(language.GeographicLinestringType);
                 }
                 else if (dataType == DataType.GeographicPolygon)
                 {
-                    sb.Append(connection.Language.GeographicPolygonType);
+                    sb.Append(language.GeographicPolygonType);
                 }
                 else if (dataType == DataType.GeographicLine)
                 {
-                    sb.Append(connection.Language.GeographicLineType);
+                    sb.Append(language.GeographicLineType);
                 }
                 else if (dataType == DataType.GeographicCurve)
                 {
-                    sb.Append(connection.Language.GeographicCurveType);
+                    sb.Append(language.GeographicCurveType);
                 }
                 else if (dataType == DataType.GeographicSurface)
                 {
-                    sb.Append(connection.Language.GeographicSurfaceType);
+                    sb.Append(language.GeographicSurfaceType);
                 }
                 else if (dataType == DataType.GeographicLinearRing)
                 {
-                    sb.Append(connection.Language.GeographicLinearringType);
+                    sb.Append(language.GeographicLinearringType);
                 }
                 else if (dataType == DataType.GeographicMultiPoint)
                 {
-                    sb.Append(connection.Language.GeographicMultipointType);
+                    sb.Append(language.GeographicMultipointType);
                 }
                 else if (dataType == DataType.GeographicMultiLineString)
                 {
-                    sb.Append(connection.Language.GeographicMultilinestringType);
+                    sb.Append(language.GeographicMultilinestringType);
                 }
                 else if (dataType == DataType.GeographicMultiPolygon)
                 {
-                    sb.Append(connection.Language.GeographicMultipolygonType);
+                    sb.Append(language.GeographicMultipolygonType);
                 }
                 else if (dataType == DataType.GeographicMultiCurve)
                 {
-                    sb.Append(connection.Language.GeographicMulticurveType);
+                    sb.Append(language.GeographicMulticurveType);
                 }
                 else if (dataType == DataType.GeographicMultiSurface)
                 {
-                    sb.Append(connection.Language.GeographicMultisurfaceType);
+                    sb.Append(language.GeographicMultisurfaceType);
                 }
             }
 
@@ -900,11 +725,11 @@ namespace SequelNet
                 sb.Append(' ');
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
                 { // Specifically for PostgreSQL
-                    sb.Append(connection.Language.AutoIncrementBigIntType);
+                    sb.Append(language.AutoIncrementBigIntType);
                 }
                 else
                 {
-                    sb.Append(connection.Language.AutoIncrementType);
+                    sb.Append(language.AutoIncrementType);
                 }
             }
 
@@ -989,34 +814,6 @@ namespace SequelNet
             }
         }
 
-        private void BuildTableName(ConnectorBase connection, StringBuilder sb, bool considerAlias = true)
-        {
-            if (Schema != null)
-            {
-                if (Schema.DatabaseOwner.Length > 0)
-                {
-                    sb.Append(connection.Language.WrapFieldName(Schema.DatabaseOwner));
-                    sb.Append('.');
-                }
-                sb.Append(connection.Language.WrapFieldName(_SchemaName));
-            }
-            else
-            {
-                sb.Append(@"(");
-                if (_FromExpression is IPhrase)
-                {
-                    sb.Append(((IPhrase)_FromExpression).BuildPhrase(connection, this));
-                }
-                else sb.Append(_FromExpression);
-                sb.Append(@")");
-            }
-
-            if (considerAlias && !string.IsNullOrEmpty(_SchemaAlias))
-            {
-                sb.Append(" " + connection.Language.WrapFieldName(_SchemaAlias));
-            }
-        }
-
         public string BuildCommand(ConnectorBase connection)
         {
             if (this.QueryMode == QueryMode.ExecuteStoredProcedure || this.QueryMode == QueryMode.None) return string.Empty;
@@ -1031,6 +828,8 @@ namespace SequelNet
             }
             try
             {
+                var language = connection.Language;
+
                 bool bFirst;
 
                 if (this.QueryMode != QueryMode.None)
@@ -1041,7 +840,7 @@ namespace SequelNet
                             {
                                 sb.Append(@" SELECT ");
 
-                                connection.Language.BuildLimitOffset(this, true, sb);
+                                language.BuildLimitOffset(this, true, sb);
 
                                 if (IsDistinct) sb.Append(@"DISTINCT ");
 
@@ -1049,7 +848,7 @@ namespace SequelNet
 
                                 sb.Append(@" FROM ");
 
-                                BuildTableName(connection, sb, true);
+                                language.BuildTableName(this, connection, sb, true);
 
                                 BuildJoin(sb, connection);
 
@@ -1067,7 +866,7 @@ namespace SequelNet
                                 BuildHaving(sb, connection);
                                 BuildOrderBy(sb, connection, false);
 
-                                connection.Language.BuildLimitOffset(this, false, sb);
+                                language.BuildLimitOffset(this, false, sb);
 
                                 // Done with select query
                                 
@@ -1100,7 +899,7 @@ namespace SequelNet
                             {
                                 sb.Append(@"INSERT INTO ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
 
                                 sb.Append(@" (");
                                 bFirst = true;
@@ -1108,7 +907,7 @@ namespace SequelNet
                                 {
                                     if (bFirst) bFirst = false;
                                     else sb.Append(',');
-                                    sb.Append(connection.Language.WrapFieldName(ins.ColumnName));
+                                    sb.Append(language.WrapFieldName(ins.ColumnName));
                                 }
                                 if (InsertExpression != null)
                                 {
@@ -1144,10 +943,10 @@ namespace SequelNet
                                         {
                                             if (ins.SecondTableName != null)
                                             {
-                                                sb.Append(connection.Language.WrapFieldName(ins.SecondTableName));
+                                                sb.Append(language.WrapFieldName(ins.SecondTableName));
                                                 sb.Append(@".");
                                             }
-                                            sb.Append(connection.Language.WrapFieldName(ins.Second.ToString()));
+                                            sb.Append(language.WrapFieldName(ins.Second.ToString()));
                                         }
                                     }
                                     sb.Append(@")");
@@ -1177,11 +976,11 @@ namespace SequelNet
                                     connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS) &&
                                     !string.IsNullOrEmpty(_SchemaAlias))
                                 {
-                                    sb.Append(connection.Language.WrapFieldName(_SchemaAlias));
+                                    sb.Append(language.WrapFieldName(_SchemaAlias));
                                 }
                                 else
                                 {
-                                    BuildTableName(connection, sb, true);
+                                    language.BuildTableName(this, connection, sb, true);
                                 }
 
                                 if (hasJoins)
@@ -1204,11 +1003,11 @@ namespace SequelNet
 
                                     if (_ListJoin != null && _ListJoin.Count > 0 && upd.TableName != null)
                                     {
-                                        sb.Append(connection.Language.WrapFieldName(upd.TableName));
+                                        sb.Append(language.WrapFieldName(upd.TableName));
                                         sb.Append(@".");
                                     }
 
-                                    sb.Append(connection.Language.WrapFieldName(upd.ColumnName));
+                                    sb.Append(language.WrapFieldName(upd.ColumnName));
 
                                     sb.Append('=');
 
@@ -1224,10 +1023,10 @@ namespace SequelNet
                                     {
                                         if (upd.SecondTableName != null)
                                         {
-                                            sb.Append(connection.Language.WrapFieldName(upd.SecondTableName));
+                                            sb.Append(language.WrapFieldName(upd.SecondTableName));
                                             sb.Append(@".");
                                         }
-                                        sb.Append(connection.Language.WrapFieldName(upd.Second.ToString()));
+                                        sb.Append(language.WrapFieldName(upd.Second.ToString()));
                                     }
                                 }
 
@@ -1236,7 +1035,7 @@ namespace SequelNet
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL || 
                                         connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
                                     {
-                                        BuildTableName(connection, sb, true);
+                                        language.BuildTableName(this, connection, sb, true);
 
                                         BuildJoin(sb, connection);
                                     }
@@ -1262,7 +1061,7 @@ namespace SequelNet
                                 {
                                     sb.Append(@"REPLACE INTO ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" (");
                                     bFirst = true;
@@ -1270,7 +1069,7 @@ namespace SequelNet
                                     {
                                         if (bFirst) bFirst = false;
                                         else sb.Append(',');
-                                        sb.Append(connection.Language.WrapFieldName(ins.ColumnName));
+                                        sb.Append(language.WrapFieldName(ins.ColumnName));
                                     }
                                     if (InsertExpression != null)
                                     {
@@ -1306,10 +1105,10 @@ namespace SequelNet
                                             {
                                                 if (ins.SecondTableName != null)
                                                 {
-                                                    sb.Append(connection.Language.WrapFieldName(ins.SecondTableName));
+                                                    sb.Append(language.WrapFieldName(ins.SecondTableName));
                                                     sb.Append(@".");
                                                 }
-                                                sb.Append(connection.Language.WrapFieldName(ins.Second.ToString()));
+                                                sb.Append(language.WrapFieldName(ins.Second.ToString()));
                                             }
                                         }
                                         sb.Append(@")");
@@ -1357,16 +1156,16 @@ namespace SequelNet
                             {
                                 sb.Append(@"DELETE");
 
-                                connection.Language.BuildLimitOffset(this, true, sb);
+                                language.BuildLimitOffset(this, true, sb);
 
                                 if (_ListJoin != null && _ListJoin.Count > 0)
                                 {
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
                                 }
 
                                 sb.Append(@" FROM ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
 
                                 BuildJoin(sb, connection);
                                 if (_ListWhere != null && _ListWhere.Count > 0)
@@ -1381,7 +1180,7 @@ namespace SequelNet
 
                                 BuildOrderBy(sb, connection, false);
 
-                                connection.Language.BuildLimitOffset(this, false, sb);
+                                language.BuildLimitOffset(this, false, sb);
                             }
                             break;
 
@@ -1389,7 +1188,7 @@ namespace SequelNet
                             {
                                 sb.Append(@"CREATE TABLE ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
 
                                 sb.Append('(');
                                 int iPrimaryKeys = 0;
@@ -1405,13 +1204,13 @@ namespace SequelNet
                                 {
                                     if (bSep) sb.Append(@", ");
 
-                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", connection.Language.WrapFieldName(@"PK_" + _SchemaName));
+                                    sb.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY(", language.WrapFieldName(@"PK_" + _SchemaName));
                                     bSep = false;
                                     foreach (TableSchema.Column col in Schema.Columns)
                                     {
                                         if (!col.IsPrimaryKey) continue;
                                         if (bSep) sb.Append(@", "); else bSep = true;
-                                        if (col.IsPrimaryKey) sb.Append(connection.Language.WrapFieldName(col.Name));
+                                        if (col.IsPrimaryKey) sb.Append(language.WrapFieldName(col.Name));
                                     }
                                     bSep = true;
                                     sb.Append(')');
@@ -1459,7 +1258,7 @@ namespace SequelNet
                             {
                                 sb.Append(@"ALTER TABLE ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
 
                                 sb.Append(@" ADD ");
 
@@ -1474,7 +1273,7 @@ namespace SequelNet
                                 {
                                     int idx = Schema.Columns.IndexOf(_AlterColumn);
                                     if (idx == 0) sb.Append(@"FIRST ");
-                                    else sb.AppendFormat(@"AFTER {0} ", connection.Language.WrapFieldName(Schema.Columns[idx - 1].Name));
+                                    else sb.AppendFormat(@"AFTER {0} ", language.WrapFieldName(Schema.Columns[idx - 1].Name));
                                 }
                             }
                             break;
@@ -1489,24 +1288,24 @@ namespace SequelNet
                                     {
                                         sb.Append(@"EXEC sp_rename ");
 
-                                        BuildTableName(connection, sb, false);
+                                        language.BuildTableName(this, connection, sb, false);
 
                                         sb.Append('.');
-                                        sb.Append(connection.Language.WrapFieldName(_AlterColumnOldName));
+                                        sb.Append(language.WrapFieldName(_AlterColumnOldName));
                                         sb.Append(',');
-                                        sb.Append(connection.Language.WrapFieldName(_AlterColumn.Name));
+                                        sb.Append(language.WrapFieldName(_AlterColumn.Name));
                                         sb.Append(@",'COLUMN';");
                                     }
                                     else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                     {
                                         sb.Append(@"ALTER TABLE ");
 
-                                        BuildTableName(connection, sb, false);
+                                        language.BuildTableName(this, connection, sb, false);
 
                                         sb.Append(@" RENAME COLUMN ");
-                                        sb.Append(connection.Language.WrapFieldName(_AlterColumnOldName));
+                                        sb.Append(language.WrapFieldName(_AlterColumnOldName));
                                         sb.Append(@" TO ");
-                                        sb.Append(connection.Language.WrapFieldName(_AlterColumn.Name));
+                                        sb.Append(language.WrapFieldName(_AlterColumn.Name));
                                         sb.Append(';');
                                     }
                                 }
@@ -1517,10 +1316,10 @@ namespace SequelNet
 
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     string alterColumnStatement = @" ALTER COLUMN ";
-                                    alterColumnStatement += connection.Language.WrapFieldName(_AlterColumn.Name);
+                                    alterColumnStatement += language.WrapFieldName(_AlterColumn.Name);
 
                                     sb.Append(alterColumnStatement);
                                     sb.Append(@" TYPE ");
@@ -1540,12 +1339,12 @@ namespace SequelNet
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(' ');
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                     {
-                                        sb.AppendFormat(@"CHANGE {0} ", connection.Language.WrapFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
+                                        sb.AppendFormat(@"CHANGE {0} ", language.WrapFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
                                     }
                                     else
                                     {
@@ -1556,7 +1355,7 @@ namespace SequelNet
                                     {
                                         int idx = Schema.Columns.IndexOf(_AlterColumn);
                                         if (idx == 0) sb.Append(@"FIRST ");
-                                        else sb.AppendFormat(@"AFTER {0} ", connection.Language.WrapFieldName(Schema.Columns[idx - 1].Name));
+                                        else sb.AppendFormat(@"AFTER {0} ", language.WrapFieldName(Schema.Columns[idx - 1].Name));
                                     }
                                 }
                             }
@@ -1566,10 +1365,10 @@ namespace SequelNet
                             {
                                 sb.Append(@"ALTER TABLE ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
 
                                 sb.Append(@" DROP COLUMN ");
-                                sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                sb.Append(language.WrapFieldName(_DropColumnName));
                             }
                             break;
 
@@ -1579,28 +1378,28 @@ namespace SequelNet
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" DROP FOREIGN KEY ");
-                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                    sb.Append(language.WrapFieldName(_DropColumnName));
                                 }
                                 else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                    sb.Append(language.WrapFieldName(_DropColumnName));
                                 }
                                 else
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                    sb.Append(language.WrapFieldName(_DropColumnName));
                                 }
                             }
                             break;
@@ -1611,19 +1410,19 @@ namespace SequelNet
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" DROP INDEX ");
-                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                    sb.Append(language.WrapFieldName(_DropColumnName));
                                 }
                                 else
                                 {
                                     sb.Append(@"ALTER TABLE ");
 
-                                    BuildTableName(connection, sb, false);
+                                    language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(connection.Language.WrapFieldName(_DropColumnName));
+                                    sb.Append(language.WrapFieldName(_DropColumnName));
                                 }
                             }
                             break;
@@ -1632,7 +1431,7 @@ namespace SequelNet
                             {
                                 sb.Append(@"DROP TABLE ");
 
-                                BuildTableName(connection, sb, false);
+                                language.BuildTableName(this, connection, sb, false);
                             }
                             break;
                     }

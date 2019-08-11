@@ -485,6 +485,15 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Expression that replaces a table to select from.
+        /// </summary>
+        public object FromExpression
+        {
+            get { return _FromExpression; }
+            set { _FromExpression = value; }
+        }
+
+        /// <summary>
         /// Setting a schema name.
         /// This does not set an alias, but the actual schema name.
         /// When using an actual TableSchema class, this will allow to reuse it as different table names.
