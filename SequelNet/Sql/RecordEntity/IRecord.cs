@@ -19,7 +19,7 @@ namespace SequelNet
 
         void Insert(ConnectorBase connection = null, string userName = null);
         void Update(ConnectorBase connection = null, string userName = null);
-        void Read(DataReaderBase reader);
+        void Read(DataReader reader);
         void Save(string userName = null);
         void Save(ConnectorBase connection, string userName = null);
 

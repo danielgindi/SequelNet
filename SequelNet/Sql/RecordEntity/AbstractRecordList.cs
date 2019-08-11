@@ -59,7 +59,7 @@ namespace SequelNet
             SaveAll(null, withTransaction);
         }
 
-        public static TListType FromReader(DataReaderBase reader)
+        public static TListType FromReader(DataReader reader)
         {
             TListType coll = new TListType();
             while (reader.Read()) coll.Add(AbstractRecord<TItemType>.FromReader(reader));
@@ -68,7 +68,7 @@ namespace SequelNet
 
         public static TListType FetchAll()
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
+            using (DataReader reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
             {
                 return FromReader(reader);
             }
@@ -76,7 +76,7 @@ namespace SequelNet
 
         public static TListType FetchAll(ConnectorBase conn)
         {
-            using (DataReaderBase reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
+            using (DataReader reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
             {
                 return FromReader(reader);
             }
@@ -91,7 +91,7 @@ namespace SequelNet
 
         public static TListType FetchByQuery(Query qry)
         {
-            using (DataReaderBase reader = qry.ExecuteReader())
+            using (DataReader reader = qry.ExecuteReader())
             {
                 return FromReader(reader);
             }
@@ -99,7 +99,7 @@ namespace SequelNet
 
         public static TListType FetchByQuery(Query qry, ConnectorBase conn)
         {
-            using (DataReaderBase reader = qry.ExecuteReader(conn))
+            using (DataReader reader = qry.ExecuteReader(conn))
             {
                 return FromReader(reader);
             }

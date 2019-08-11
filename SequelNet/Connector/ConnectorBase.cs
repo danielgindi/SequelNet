@@ -173,7 +173,7 @@ namespace SequelNet.Connector
             return command.ExecuteScalar();
         }
 
-        public virtual DataReaderBase ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
+        public virtual DataReader ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
         {
             try
             {
@@ -182,7 +182,7 @@ namespace SequelNet.Connector
                 command.Connection = Connection;
                 command.Transaction = Transaction;
 
-                return new DataReaderBase(
+                return new DataReader(
                     command.ExecuteReader(),
                     attachCommandToReader ? command : null,
                     attachConnectionToReader ? this : null);
@@ -235,7 +235,7 @@ namespace SequelNet.Connector
             }
         }
 
-        public virtual DataReaderBase ExecuteReader(string querySql)
+        public virtual DataReader ExecuteReader(string querySql)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -243,7 +243,7 @@ namespace SequelNet.Connector
             return ExecuteReader(command, true);
         }
 
-        public virtual DataReaderBase ExecuteReader(string querySql, bool attachConnectionToReader)
+        public virtual DataReader ExecuteReader(string querySql, bool attachConnectionToReader)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 

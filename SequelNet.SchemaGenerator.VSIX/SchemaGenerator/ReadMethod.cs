@@ -9,7 +9,7 @@ namespace SequelNet.SchemaGenerator
         private static void WriteReadMethod(StringBuilder stringBuilder, ScriptContext context)
         {
             // Read() method
-            stringBuilder.AppendFormat("public override void Read(DataReaderBase reader){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override void Read(DataReader reader){0}{{{0}", "\r\n");
             foreach (DalColumn dalCol in context.Columns)
             {
                 if (dalCol.NoRead) continue;

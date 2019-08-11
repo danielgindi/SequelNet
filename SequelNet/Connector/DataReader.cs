@@ -7,7 +7,7 @@ using SequelNet.Sql.Spatial;
 
 namespace SequelNet.Connector
 {
-    public class DataReaderBase : IDisposable, IDataRecord, IEnumerable
+    public class DataReader : IDisposable, IDataRecord, IEnumerable
     {
         #region Instancing
 
@@ -15,14 +15,14 @@ namespace SequelNet.Connector
         protected ConnectorBase AttachedConnection = null;
         protected DbCommand AttachedDbCommand = null;
 
-        public DataReaderBase(DbDataReader reader, DbCommand attachedDbCommand = null, ConnectorBase attachedConnection = null)
+        public DataReader(DbDataReader reader, DbCommand attachedDbCommand = null, ConnectorBase attachedConnection = null)
         {
             UnderlyingReader = reader;
             AttachedDbCommand = attachedDbCommand;
             AttachedConnection = attachedConnection;
         }
 
-        public DataReaderBase(DbDataReader reader, ConnectorBase connectionToClose)
+        public DataReader(DbDataReader reader, ConnectorBase connectionToClose)
         {
             UnderlyingReader = reader;
             AttachedConnection = connectionToClose;
@@ -61,7 +61,7 @@ namespace SequelNet.Connector
             // Now clean up Native Resources (Pointers)
         }
 
-        ~DataReaderBase()
+        ~DataReader()
         {
             Dispose(false);
         }
@@ -193,14 +193,14 @@ namespace SequelNet.Connector
         }
 
         /// <summary>
-        /// Returns a <see cref="DataReaderBase"/> object for the requested column ordinal.
+        /// Returns a <see cref="DataReader"/> object for the requested column ordinal.
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
         /// <returns>A System.Data.Common.DbDataReader object.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public DataReaderBase GetData(int ordinal)
+        public DataReader GetData(int ordinal)
         {
-            return new DataReaderBase(UnderlyingReader.GetData(ordinal));
+            return new DataReader(UnderlyingReader.GetData(ordinal));
         }
 
         /// <summary>
@@ -558,10 +558,10 @@ namespace SequelNet.Connector
         }
         
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public DataReaderBase GetData(string columnName)
+        public DataReader GetData(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
-            return new DataReaderBase(UnderlyingReader.GetData(ordinal));
+            return new DataReader(UnderlyingReader.GetData(ordinal));
         }
         
         public string GetDataTypeName(string columnName)

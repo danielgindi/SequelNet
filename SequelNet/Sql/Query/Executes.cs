@@ -29,13 +29,13 @@ namespace SequelNet
                 }
             }
         }
-        
+
         /// <summary>
-        /// Will execute the query returning a <typeparamref name="DataReaderBase"/> object.
+        /// Will execute the query returning a <typeparamref name="DataReader"/> object.
         /// </summary>
         /// <param name="connection">An existing connection to use.</param>
-        /// <returns><typeparamref name="DataReaderBase"/> object</returns>
-        public DataReaderBase ExecuteReader(ConnectorBase connection = null)
+        /// <returns><typeparamref name="DataReader"/> object</returns>
+        public DataReader ExecuteReader(ConnectorBase connection = null)
         {
             bool needsDispose = connection == null;
             try

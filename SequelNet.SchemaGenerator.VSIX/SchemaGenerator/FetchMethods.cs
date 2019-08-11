@@ -46,7 +46,7 @@ namespace SequelNet.SchemaGenerator
                         first = false;
                     }
                 }
-                stringBuilder.AppendFormat(";{0}using (DataReaderBase reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat(";{0}using (DataReader reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
 
                 if (primaryKeyColumns.Count > 1)
                 {

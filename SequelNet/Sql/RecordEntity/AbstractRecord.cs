@@ -324,7 +324,7 @@ namespace SequelNet
             MarkAllColumnsNotMutated();
         }
 
-        public virtual void Read(DataReaderBase reader)
+        public virtual void Read(DataReader reader)
         {
             if (__CLASS_TYPE == null)
             {
@@ -584,7 +584,7 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            using (DataReaderBase reader = qry.ExecuteReader(connection))
+            using (DataReader reader = qry.ExecuteReader(connection))
             {
                 if (reader.Read()) return FromReader(reader);
             }
@@ -630,7 +630,7 @@ namespace SequelNet
                 qry.Where((string)columnName, value);
             }
 
-            using (DataReaderBase reader = qry.ExecuteReader(connection))
+            using (DataReader reader = qry.ExecuteReader(connection))
             {
                 if (reader.Read())
                 {
@@ -646,7 +646,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="reader">The reader to use for loading the new record</param>
         /// <returns>The new <typeparamref name="T"/>.</returns>
-        public static T FromReader(DataReaderBase reader)
+        public static T FromReader(DataReader reader)
         {
             T item = new T();
             item.Read(reader);
