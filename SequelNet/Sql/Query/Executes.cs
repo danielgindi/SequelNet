@@ -105,7 +105,9 @@ namespace SequelNet
         /// <param name="connection">An existing connection to use.</param>
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
         public Nullable<T> ExecuteScalarOrNull<T>(ConnectorBase connection = null) where T : struct, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
             var scalar = ExecuteScalar(connection);
 
@@ -124,7 +126,9 @@ namespace SequelNet
         /// <param name="connection">An existing connection to use.</param>
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
         public T ExecuteScalar<T>(ConnectorBase connection = null) where T : class, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
             var scalar = ExecuteScalar(connection);
 

@@ -6,6 +6,8 @@ using System.Configuration;
 using System.Reflection;
 using System.Diagnostics;
 
+[assembly: CLSCompliant(true)]
+
 namespace SequelNet.Connector
 {
     public abstract class ConnectorBase : IDisposable

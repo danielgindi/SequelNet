@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
+[assembly: CLSCompliant(true)]
+
 namespace SequelNet.Connector
 {
     public class MsSqlConnector : ConnectorBase

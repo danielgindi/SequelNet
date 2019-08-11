@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Npgsql;
 
+[assembly: CLSCompliant(true)]
+
 namespace SequelNet.Connector
 {
     public class PostgreSQLConnector : ConnectorBase
@@ -13,7 +15,9 @@ namespace SequelNet.Connector
             get { return SqlServiceType.POSTGRESQL; }
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
         public static NpgsqlConnection CreateSqlConnection(string connectionStringKey)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
         {
             return new NpgsqlConnection(FindConnectionString(connectionStringKey));
         }
@@ -122,7 +126,9 @@ namespace SequelNet.Connector
             return true;
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
         public NpgsqlConnection GetUnderlyingConnection()
+#pragma warning restore CS3002 // Return type is not CLS-compliant
         {
             return (NpgsqlConnection)Connection;
         }

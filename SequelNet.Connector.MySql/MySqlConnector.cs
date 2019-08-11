@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Globalization;
 
+[assembly: CLSCompliant(true)]
+
 namespace SequelNet.Connector
 {
     public class MySqlConnector : ConnectorBase
@@ -14,7 +16,9 @@ namespace SequelNet.Connector
             get { return SqlServiceType.MYSQL; }
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
         public static MySqlConnection CreateSqlConnection(string connectionStringKey)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
         {
             return new MySqlConnection(FindConnectionString(connectionStringKey));
         }
@@ -119,7 +123,9 @@ namespace SequelNet.Connector
             return true;
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
         public MySqlConnection GetUnderlyingConnection()
+#pragma warning restore CS3002 // Return type is not CLS-compliant
         {
             return (MySqlConnection)Connection;
         }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data.OleDb;
 
+[assembly: CLSCompliant(true)]
+
 namespace SequelNet.Connector
 {
     public class OleDbConnector : ConnectorBase

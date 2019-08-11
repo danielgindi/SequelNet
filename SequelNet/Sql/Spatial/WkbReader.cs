@@ -577,7 +577,9 @@ namespace SequelNet.Sql.Spatial
                 return BitConverter.ToInt16(byteArray, 0);
             }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
             public override UInt16 ReadUInt16()
+#pragma warning restore CS3002 // Return type is not CLS-compliant
             {
                 byte[] byteArray = new byte[2];
                 int iBytesRead = Read(byteArray, 0, 2);
@@ -597,7 +599,9 @@ namespace SequelNet.Sql.Spatial
                 return BitConverter.ToInt32(byteArray, 0);
             }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
             public override UInt32 ReadUInt32()
+#pragma warning restore CS3002 // Return type is not CLS-compliant
             {
                 byte[] byteArray = new byte[4];
                 int iBytesRead = Read(byteArray, 0, 4);
@@ -617,7 +621,9 @@ namespace SequelNet.Sql.Spatial
                 return BitConverter.ToInt64(byteArray, 0);
             }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
             public override UInt64 ReadUInt64()
+#pragma warning restore CS3002 // Return type is not CLS-compliant
             {
                 byte[] byteArray = new byte[8];
                 int iBytesRead = Read(byteArray, 0, 8);
