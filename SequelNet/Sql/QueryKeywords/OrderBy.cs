@@ -137,38 +137,15 @@ namespace SequelNet
         {
             if (this.Randomize)
             {
-                switch (conn.TYPE)
-                {
-                    case ConnectorBase.SqlServiceType.MSSQL:
-                        outputBuilder.Append(@"NEWID()");
-                        break;
-
-                    case ConnectorBase.SqlServiceType.POSTGRESQL:
-                        outputBuilder.Append(@"RANDOM()");
-                        break;
-
-                    default:
-                    case ConnectorBase.SqlServiceType.MYSQL:
-                        outputBuilder.Append(@"RAND()");
-                        break;
-
-                    case ConnectorBase.SqlServiceType.MSACCESS:
-                        if (Value != null)
-                        {
-                            outputBuilder.Append(@"RND(" + Value.Build(conn) + @")");
-                        }
-                        else
-                        {
-                            outputBuilder.Append(@"RND(NULL)");
-                        }
-                        break;
-                }
+                conn.Language.BuildOrderByRandom(Value, conn, outputBuilder);
             }
             else
             {
-                if (conn.TYPE == ConnectorBase.SqlServiceType.MSACCESS && relatedQuery != null && relatedQuery.Schema != null && Value.Type != ValueObjectType.Literal)
+                if (!conn.Language.IsBooleanFalseOrderedFirst && 
+                    relatedQuery?.Schema != null && 
+                    Value.Type != ValueObjectType.Literal)
                 {
-                    TableSchema.Column col = relatedQuery.Schema.Columns.Find(Value.Value.ToString());
+                    var col = relatedQuery.Schema.Columns.Find(Value.Value.ToString());
                     if (col != null && col.ActualDataType == DataType.Boolean) outputBuilder.Append(@" NOT ");
                 }
 

@@ -195,6 +195,11 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"RANDOM()");
+        }
+
         #endregion
 
         #region Types

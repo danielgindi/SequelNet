@@ -8,6 +8,8 @@ namespace SequelNet.Connector
     {
         #region Syntax
 
+        public override bool IsBooleanFalseOrderedFirst => false;
+
         public override string UtcNow()
         {
             return @"now()"; // NOT UTC
@@ -90,6 +92,18 @@ namespace SequelNet.Connector
                 outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
             }
             outputBuilder.Append(@")");
+        }
+
+        public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        {
+            if (seedValue != null)
+            {
+                outputBuilder.Append(@"RND(" + seedValue.Build(conn) + @")");
+            }
+            else
+            {
+                outputBuilder.Append(@"RND(NULL)");
+            }
         }
 
         #endregion

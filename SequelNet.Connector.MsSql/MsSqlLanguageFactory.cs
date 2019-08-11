@@ -194,6 +194,11 @@ namespace SequelNet.Connector
                 outputBuilder.Append(@")");
             }
         }
+        
+        public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"NEWID()");
+        }
 
         #endregion
 

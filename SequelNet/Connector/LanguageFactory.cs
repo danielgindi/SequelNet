@@ -8,6 +8,8 @@ namespace SequelNet.Connector
     {
         #region Syntax
 
+        public virtual bool IsBooleanFalseOrderedFirst => true;
+
         public virtual int VarCharMaxLength => 255;
 
         public virtual string VarCharMaxKeyword => null;
@@ -199,6 +201,11 @@ namespace SequelNet.Connector
             StringBuilder outputBuilder)
         {
             throw new NotImplementedException("Index syntax has not been implemented for this connector");
+        }
+
+        public virtual void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"RAND()");
         }
 
         #endregion
