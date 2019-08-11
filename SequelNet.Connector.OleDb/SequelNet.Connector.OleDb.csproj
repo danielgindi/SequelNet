@@ -38,7 +38,7 @@
     <TargetFrameworkProfile />
     <PackageId>SequelNet.Connector.OleDb</PackageId>
     <Authors>Daniel Cohen Gindi</Authors>
-    <Version>2.0.0</Version>
+    <Version>2.0.1</Version>
     <Product>Oracle MySql connector for SequelNet</Product>
     <Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2009</Copyright>
     <RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
