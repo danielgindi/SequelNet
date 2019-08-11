@@ -49,6 +49,11 @@ namespace SequelNet.Connector
 
         #region Syntax
 
+        public override bool UpdateFromInsteadOfJoin => false;
+        public override bool UpdateJoinRequiresFromLeftTable => false;
+
+        public override bool GroupBySupportsOrdering => true;
+
         public override int VarCharMaxLength
         {
             get

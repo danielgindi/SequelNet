@@ -249,7 +249,7 @@ namespace SequelNet
                         }
                     }
 
-                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                    if (connection.Language.GroupBySupportsOrdering)
                     {
                         switch (groupBy.SortDirection)
                         {
@@ -402,7 +402,7 @@ namespace SequelNet
 
             isTextField = false;
             DataType dataType = column.ActualDataType;
-            if (!column.AutoIncrement || (connection.TYPE != ConnectorBase.SqlServiceType.MSACCESS && connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL))
+            if (!column.AutoIncrement || language.ShouldPrefixAutoIncrementWithType)
             {
                 if (dataType == DataType.VarChar)
                 {
@@ -723,8 +723,9 @@ namespace SequelNet
             if (column.AutoIncrement)
             {
                 sb.Append(' ');
+
                 if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
-                { // Specifically for PostgreSQL
+                {
                     sb.Append(language.AutoIncrementBigIntType);
                 }
                 else
@@ -971,10 +972,7 @@ namespace SequelNet
 
                                 sb.Append(@"UPDATE ");
 
-                                if (hasJoins && 
-                                    (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL || 
-                                    connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS) &&
-                                    !string.IsNullOrEmpty(_SchemaAlias))
+                                if (hasJoins && language.UpdateJoinRequiresFromLeftTable && !string.IsNullOrEmpty(_SchemaAlias))
                                 {
                                     sb.Append(language.WrapFieldName(_SchemaAlias));
                                 }
@@ -983,12 +981,9 @@ namespace SequelNet
                                     language.BuildTableName(this, connection, sb, true);
                                 }
 
-                                if (hasJoins)
+                                if (hasJoins && !language.UpdateJoinRequiresFromLeftTable && !language.UpdateFromInsteadOfJoin)
                                 {
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                    {
-                                        BuildJoin(sb, connection);
-                                    }
+                                    BuildJoin(sb, connection);
                                 }
 
                                 bFirst = true;
@@ -1032,23 +1027,116 @@ namespace SequelNet
 
                                 if (hasJoins)
                                 {
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL || 
-                                        connection.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
+                                    if (language.UpdateJoinRequiresFromLeftTable)
                                     {
+                                        sb.Append(" FROM ");
+
                                         language.BuildTableName(this, connection, sb, true);
 
                                         BuildJoin(sb, connection);
                                     }
+                                    else if (language.UpdateFromInsteadOfJoin)
+                                    {
+                                        sb.Append(" FROM ");
+                                        language.BuildTableName(this, connection, sb, true);
+
+                                        foreach (var join in _ListJoin)
+                                        {
+                                            sb.Append(", ");
+
+                                            if (join.RightTableSchema != null)
+                                            {
+                                                if (join.RightTableSchema.DatabaseOwner.Length > 0)
+                                                {
+                                                    sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
+                                                    sb.Append('.');
+                                                }
+                                                sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.Name));
+                                            }
+                                            else
+                                            {
+                                                sb.Append('(');
+                                                if (join.RightTableSql is Query)
+                                                {
+                                                    sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
+                                                }
+                                                else if (join.RightTableSql is IPhrase)
+                                                {
+                                                    sb.Append(((IPhrase)join.RightTableSql).BuildPhrase(connection));
+                                                }
+                                                else
+                                                {
+                                                    sb.Append(join.RightTableSql.ToString());
+                                                }
+                                                sb.Append(')');
+                                            }
+
+                                            sb.Append(' ');
+
+                                            if (join.RightTableAlias != null)
+                                            {
+                                                sb.Append(join.RightTableAlias);
+                                            }
+                                            else
+                                            {
+                                                sb.Append(join.RightTableSchema != null ? join.RightTableSchema.Name : @"");
+                                            }
+                                        }
+                                    }
                                 }
 
-                                if (_ListWhere != null && _ListWhere.Count > 0)
+                                if ((_ListWhere != null && _ListWhere.Count > 0) || (hasJoins && language.UpdateFromInsteadOfJoin))
                                 {
                                     sb.Append(@" WHERE ");
-                                    _ListWhere.BuildCommand(sb, new Where.BuildContext
+
+                                    if (_ListWhere != null)
                                     {
-                                        Conn = connection,
-                                        RelatedQuery = this
-                                    });
+                                        _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                        {
+                                            Conn = connection,
+                                            RelatedQuery = this
+                                        });
+                                    }
+
+                                    if (hasJoins && language.UpdateFromInsteadOfJoin)
+                                    {
+                                        foreach (var join in _ListJoin)
+                                        {
+                                            if (join.Pairs.Count > 1)
+                                            {
+                                                sb.Append(@" AND ");
+
+                                                var wl = new WhereList();
+
+                                                foreach (var joins in join.Pairs)
+                                                    wl.AddRange(joins);
+
+                                                wl.BuildCommand(
+                                                    sb,
+                                                    new Where.BuildContext
+                                                    {
+                                                        Conn = connection,
+                                                        RelatedQuery = this,
+                                                        RightTableSchema = join.RightTableSchema,
+                                                        RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
+                                                    });
+                                            }
+                                            else if (join.Pairs.Count == 1)
+                                            {
+                                                sb.Append(@" AND ");
+
+                                                join.Pairs[0].BuildCommand(
+                                                    sb,
+                                                    new Where.BuildContext
+                                                    {
+                                                        Conn = connection,
+                                                        RelatedQuery = this,
+                                                        RightTableSchema = join.RightTableSchema,
+                                                        RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
+                                                    });
+                                            }
+                                        }
+                                    }
                                 }
 
                                 BuildOrderBy(sb, connection, false);

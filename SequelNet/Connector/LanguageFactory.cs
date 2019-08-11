@@ -9,6 +9,12 @@ namespace SequelNet.Connector
         #region Syntax
 
         public virtual bool IsBooleanFalseOrderedFirst => true;
+        public virtual bool ShouldPrefixAutoIncrementWithType => true;
+
+        public virtual bool UpdateFromInsteadOfJoin => false;
+        public virtual bool UpdateJoinRequiresFromLeftTable => false;
+
+        public virtual bool GroupBySupportsOrdering => false;
 
         public virtual int VarCharMaxLength => 255;
 

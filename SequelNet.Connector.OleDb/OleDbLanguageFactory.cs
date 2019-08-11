@@ -9,6 +9,10 @@ namespace SequelNet.Connector
         #region Syntax
 
         public override bool IsBooleanFalseOrderedFirst => false;
+        public override bool ShouldPrefixAutoIncrementWithType => false;
+
+        public override bool UpdateFromInsteadOfJoin => false;
+        public override bool UpdateJoinRequiresFromLeftTable => true;
 
         public override string UtcNow()
         {

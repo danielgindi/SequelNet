@@ -19,6 +19,9 @@ namespace SequelNet.Connector
 
         #region Syntax
 
+        public override bool UpdateFromInsteadOfJoin => false;
+        public override bool UpdateJoinRequiresFromLeftTable => true;
+
         public override int VarCharMaxLength => 4000;
 
         public override string VarCharMaxKeyword => "MAX";

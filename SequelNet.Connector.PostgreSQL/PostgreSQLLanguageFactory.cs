@@ -19,6 +19,11 @@ namespace SequelNet.Connector
 
         #region Syntax
 
+        public override bool ShouldPrefixAutoIncrementWithType => false;
+
+        public override bool UpdateFromInsteadOfJoin => true;
+        public override bool UpdateJoinRequiresFromLeftTable => false;
+
         public override int VarCharMaxLength => 357913937;
 
         public override string UtcNow()
