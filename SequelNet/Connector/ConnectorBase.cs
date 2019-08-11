@@ -283,6 +283,16 @@ namespace SequelNet.Connector
 
         abstract public bool CheckIfTableExists(string tableName);
 
+        /// <summary>
+        /// Synonym for Language.EscapeLike(expression)
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns>Safe expression to use inside a "LIKE" express</returns>
+        public string EscapeLike(string expression)
+        {
+            return Language.EscapeLike(expression);
+        }
+
         #endregion
 
         #region Transactions
