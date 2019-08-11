@@ -911,6 +911,17 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetFloat(ordinal);
         }
 
+        public Guid? GetGuidOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (Guid?)null : UnderlyingReader.GetGuid(ordinal);
+        }
+
+        public Guid? GetGuidOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (Guid?)null : UnderlyingReader.GetGuid(ordinal);
+        }
+
         public double? GetDoubleOrNull(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? (double?)null : UnderlyingReader.GetDouble(ordinal);
