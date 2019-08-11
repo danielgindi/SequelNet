@@ -42,7 +42,7 @@ namespace SequelNet.Phrases
                 ret = @"RAND(CAST(NEWID() AS VARBINARY)) * ";
             else if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                 ret = @"RAND() * ";
-            else // if (conn.TYPE == SequelConnector.SqlServiceType.POSTGRESQL)
+            else // if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                 ret = @"RANDOM() * ";
 
             ret += Value.Build(conn, relatedQuery);

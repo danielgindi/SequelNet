@@ -64,7 +64,7 @@ namespace SequelNet.Connector
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format(@"dg.SequelConnector.FindConnectorType error: {0}", ex));
+                Debug.WriteLine(string.Format(@"SequelNet.ConnectorBase.FindConnectorType error: {0}", ex));
             }
 
             return type;

@@ -187,7 +187,7 @@ namespace SequelNet.Phrases
 
                 sb.Append('\'');
             }
-            else // if (conn.TYPE == SequelConnector.SqlServiceType.MSSQL || conn.TYPE == SequelConnector.SqlServiceType.MSACCESS)
+            else // if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL || conn.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
             {
                 sb.Append(@"DATEADD(");
                 switch (Unit)
