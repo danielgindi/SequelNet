@@ -15,7 +15,7 @@ namespace SequelNet.SchemaGenerator
             {
                 bool first;
 
-                // FetchByID(..., SequelConnector conn = null) function
+                // FetchByID(..., ConnectorBase conn = null) function
                 stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", context.ClassName);
                 first = true;
                 foreach (var dalCol in primaryKeyColumns)
@@ -30,7 +30,7 @@ namespace SequelNet.SchemaGenerator
                     }
                     stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
                 }
-                stringBuilder.AppendFormat(", SequelConnector conn = null){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
                 stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
                 first = true;
@@ -50,7 +50,7 @@ namespace SequelNet.SchemaGenerator
 
                 if (primaryKeyColumns.Count > 1)
                 {
-                    // Delete(..., SequelConnector conn = null) function
+                    // Delete(..., ConnectorBase conn = null) function
                     stringBuilder.AppendFormat("public static int Delete(", "\r\n");
                     first = true;
                     foreach (var dalCol in primaryKeyColumns)
@@ -65,7 +65,7 @@ namespace SequelNet.SchemaGenerator
                         }
                         stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
                     }
-                    stringBuilder.AppendFormat(", SequelConnector conn = null){0}{{{0}", "\r\n");
+                    stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
 
                     stringBuilder.AppendFormat("Query qry = new Query(Schema)", "\r\n");
 

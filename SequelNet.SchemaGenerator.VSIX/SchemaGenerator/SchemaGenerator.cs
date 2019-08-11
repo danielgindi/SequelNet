@@ -79,51 +79,53 @@ namespace SequelNet.SchemaGenerator
 
             if (context.AtomicUpdates)
             {
-                stringBuilder.AppendFormat("#region Static Constructor{0}", "\r\n");
+                stringBuilder.AppendFormat("#region Static Constructor{0}{0}", "\r\n");
                 stringBuilder.AppendFormat("static {1}(){0}", "\r\n", context.ClassName);
                 stringBuilder.AppendFormat("{{{0}", "\r\n", context.ClassName);
                 stringBuilder.AppendFormat("AtomicUpdates = true;{0}", "\r\n");
                 stringBuilder.AppendFormat("}}{0}", "\r\n");
-                stringBuilder.AppendFormat("#endregion{0}{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
             }
 
             #region Table Schema
 
-            stringBuilder.AppendFormat("#region Table Schema{0}", "\r\n");
+            stringBuilder.AppendFormat("#region Table Schema{0}{0}", "\r\n");
             WriteSchema(stringBuilder, context);
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
 
             #endregion
 
             #region Private Members
 
-            stringBuilder.AppendFormat("{0}#region Private Members{0}", "\r\n");
+            stringBuilder.AppendFormat("#region Private Members{0}{0}", "\r\n");
             WriteValueStoredVariables(stringBuilder, context);
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}", "\r\n");
 
             #endregion
 
             #region Properties
 
-            stringBuilder.AppendFormat("{0}#region Properties{0}", "\r\n");
+            stringBuilder.AppendFormat("#region Properties{0}{0}", "\r\n");
             WriteValueProperties(stringBuilder, context);
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
 
             #endregion
 
             #region AbstractRecord members
 
-            stringBuilder.AppendFormat("{0}#region AbstractRecord members{0}", "\r\n");
+            stringBuilder.AppendFormat("#region AbstractRecord members{0}{0}", "\r\n");
 
             // GetPrimaryKeyValue() function
             stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
                 string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName);
 
             WriteInsertMethod(stringBuilder, context);
+            stringBuilder.Append("\r\n");
             WriteUpdateMethod(stringBuilder, context);
+            stringBuilder.Append("\r\n");
             WriteReadMethod(stringBuilder, context);
 
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
 
             #endregion
 
@@ -135,9 +137,9 @@ namespace SequelNet.SchemaGenerator
 
             #region Helpers
 
-            stringBuilder.AppendFormat("{0}#region Helpers{0}", "\r\n");
+            stringBuilder.AppendFormat("#region Helpers{0}{0}", "\r\n");
             WriteFetchMethods(stringBuilder, context);
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}", "\r\n");
 
             #endregion
 

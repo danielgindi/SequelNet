@@ -454,6 +454,7 @@ namespace SequelNet.SchemaGenerator
             if (!string.IsNullOrEmpty(customActualType))
             {
                 dalCol.ActualType = customActualType;
+                dalCol.IsCustomType = true;
             }
             else if (dalCol.IsNullable && dalCol.ActualType != "string")
             {

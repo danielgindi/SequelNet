@@ -21,7 +21,8 @@ namespace SequelNet.SchemaGenerator
 		public string ActualDefaultValue;
 		public string Comment;
 		public string ActualType;
-		public string ToDb;
+		public bool IsCustomType;
+        public string ToDb;
         public string FromDb;
         public string IsMutatedProperty;
         public string Charset;

@@ -8,7 +8,7 @@ namespace SequelNet.SchemaGenerator
 	{
         private static void WriteInsertMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Insert(SequelConnector conn = null, string userName = null){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn = null, string userName = null){0}{{{0}", "\r\n");
 
             bool printExtraNewLine = false;
 

@@ -16,169 +16,31 @@ namespace SequelNet.SchemaGenerator
 
                 string fromDb = "{0}";
                 string fromReader = "reader[Columns.{0}]";
-                if (dalCol.Type == DalColumnType.TBool)
+
+                if (dalCol.Type == DalColumnType.TBool ||
+                    dalCol.Type == DalColumnType.TGuid ||
+                    dalCol.Type == DalColumnType.TInt ||
+                    dalCol.Type == DalColumnType.TInt8 ||
+                    dalCol.Type == DalColumnType.TUInt8 ||
+                    dalCol.Type == DalColumnType.TInt16 ||
+                    dalCol.Type == DalColumnType.TUInt16 ||
+                    dalCol.Type == DalColumnType.TInt32 ||
+                    dalCol.Type == DalColumnType.TUInt32 ||
+                    dalCol.Type == DalColumnType.TInt64 ||
+                    dalCol.Type == DalColumnType.TUInt64 ||
+                    dalCol.Type == DalColumnType.TDecimal ||
+                    dalCol.Type == DalColumnType.TMoney ||
+                    dalCol.Type == DalColumnType.TDouble ||
+                    dalCol.Type == DalColumnType.TFloat)
                 {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToBoolean({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToBoolean({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToBoolean({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TGuid)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "GuidFromDb({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : GuidFromDb({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : GuidFromDb({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TInt || dalCol.Type == DalColumnType.TInt32)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToInt32({0})";
-                    }
-                    else if (dalCol.DefaultValue == "0")
-                    {
-                        fromDb = "Int32OrZero({0})";
-                    }
-                    else if (dalCol.DefaultValue != "null")
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt32({{0}})", dalCol.ActualType));
-                    }
-                    else
-                    {
-                        fromDb = "Int32OrNullFromDb({0})";
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TUInt32)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToUInt32({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt32({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt32({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TInt8)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToSByte({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSByte({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TUInt8)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToByte({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToByte({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToByte({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TInt16)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToInt16({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt16({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TUInt16)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToUInt16({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt16({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt16({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TInt64)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToInt64({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToInt64({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TUInt64)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToUInt64({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToUInt64({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToUInt64({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToDecimal({0})";
-                    }
-                    else if (dalCol.DefaultValue == "0" || dalCol.DefaultValue == "0m")
-                    {
-                        fromDb = "DecimalOrZeroFromDb({0})";
-                    }
-                    else if (dalCol.DefaultValue != "null")
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDecimal({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDecimal({{0}})", dalCol.ActualType));
-                    }
-                    else
-                    {
-                        fromDb = "DecimalOrNullFromDb({0})";
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TDouble)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToDouble({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToDouble({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToDouble({{0}})", dalCol.ActualType));
-                    }
-                }
-                else if (dalCol.Type == DalColumnType.TFloat)
-                {
-                    if (!dalCol.IsNullable)
-                    {
-                        fromDb = "Convert.ToSingle({0})";
-                    }
-                    else
-                    {
-                        fromDb = (!dalCol.ActualType.EndsWith("?") ? "IsNull({0}) ? {1} : Convert.ToSingle({0})" : string.Format("IsNull({{0}}) ? ({0}){{1}} : Convert.ToSingle({{0}})", dalCol.ActualType));
-                    }
+                    BuildReaderStatement(dalCol, ref fromReader, ref fromDb);
                 }
                 else if (dalCol.Type == DalColumnType.TJson 
                     || dalCol.Type == DalColumnType.TJsonBinary)
                 {
-                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                    if (dalCol.IsNullable)
+                        fromReader = "reader.GetStringOrNull(Columns.{0})";
+                    else fromDb = "(string){0}";
                 }
                 else if (dalCol.Type == DalColumnType.TLongText ||
                     dalCol.Type == DalColumnType.TMediumText ||
@@ -186,7 +48,9 @@ namespace SequelNet.SchemaGenerator
                     dalCol.Type == DalColumnType.TString ||
                     dalCol.Type == DalColumnType.TFixedString)
                 {
-                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
+                    if (dalCol.IsNullable)
+                        fromReader = "reader.GetStringOrNull(Columns.{0})";
+                    else fromDb = "(string){0}";
                 }
                 else if (dalCol.Type == DalColumnType.TGeometry ||
                     dalCol.Type == DalColumnType.TGeometryCollection ||
@@ -250,12 +114,6 @@ namespace SequelNet.SchemaGenerator
                     }
                 }
 
-                else if (dalCol.Type == DalColumnType.TJson ||
-                    dalCol.Type == DalColumnType.TJsonBinary)
-                {
-                    fromDb = (!dalCol.IsNullable ? "(string){0}" : "StringOrNullFromDb({0})");
-                }
-
                 if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
                 {
                     fromDb = "(" + dalCol.EnumTypeName + ")" + fromDb;
@@ -282,6 +140,58 @@ namespace SequelNet.SchemaGenerator
             }
 
             stringBuilder.AppendFormat("}}{0}", "\r\n");
+        }
+
+        private static void BuildReaderStatement(DalColumn col, ref string fromReader, ref string fromDb)
+        {
+            var typeName = "";
+
+            switch (col.Type)
+            {
+                case DalColumnType.TInt: typeName = "Int32"; break;
+                case DalColumnType.TInt8: typeName = "SByte"; break;
+                case DalColumnType.TInt16: typeName = "Int16"; break;
+                case DalColumnType.TInt32: typeName = "Int32"; break;
+                case DalColumnType.TInt64: typeName = "Int64"; break;
+                case DalColumnType.TUInt8: typeName = "Byte"; break;
+                case DalColumnType.TUInt16: typeName = "UInt16"; break;
+                case DalColumnType.TUInt32: typeName = "UInt32"; break;
+                case DalColumnType.TUInt64: typeName = "UInt64"; break;
+                case DalColumnType.TFloat: typeName = "Float"; break;
+                case DalColumnType.TDouble: typeName = "Double"; break;
+                case DalColumnType.TDecimal: typeName = "Decimal"; break;
+                case DalColumnType.TMoney: typeName = "Decimal"; break;
+                case DalColumnType.TBool: typeName = "Boolean"; break;
+                case DalColumnType.TGuid: typeName = "Guid"; break;
+            }
+
+            if (col.IsNullable || col.ActualType.EndsWith("?"))
+            {
+                if (col.IsCustomType)
+                {
+                    fromReader = $"({col.ActualType})reader.Get{typeName}OrNull(Columns.{{0}})";
+                }
+                else
+                {
+                    fromReader = $"reader.Get{typeName}OrNull(Columns.{{0}})";
+
+                    if (!col.IsNullable && !string.IsNullOrEmpty(col.ActualDefaultValue))
+                    {
+                        fromReader = fromReader + " ?? " + col.ActualDefaultValue.Replace("{", "{{").Replace("}", "}}");
+                    }
+                }
+            }
+            else
+            {
+                if (col.IsCustomType)
+                {
+                    fromReader = $"({col.ActualType})reader.Get{typeName}(Columns.{{0}})";
+                }
+                else
+                {
+                    fromReader = $"reader.Get{typeName}(Columns.{{0}})";
+                }
+            }
         }
 	}
 }

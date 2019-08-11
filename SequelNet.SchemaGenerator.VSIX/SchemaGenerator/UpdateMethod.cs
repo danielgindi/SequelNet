@@ -8,7 +8,7 @@ namespace SequelNet.SchemaGenerator
 	{
         private static void WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Update(SequelConnector conn = null, string userName = null){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null, string userName = null){0}{{{0}", "\r\n");
 
             bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null;
             bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null;
@@ -93,7 +93,7 @@ namespace SequelNet.SchemaGenerator
                 stringBuilder.AppendFormat("{0}MarkAllColumnsNotMutated();{0}", "\r\n");
             }
 
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            stringBuilder.AppendFormat("}}{0}", "\r\n");
         }
 	}
 }
