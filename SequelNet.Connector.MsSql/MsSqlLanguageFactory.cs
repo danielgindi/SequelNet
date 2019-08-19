@@ -203,6 +203,16 @@ namespace SequelNet.Connector
             outputBuilder.Append(@"NEWID()");
         }
 
+        public override string Aggregate_Some(string rawExpression)
+        {
+            return $"(SUM({rawExpression}) > 0)";
+        }
+
+        public override string Aggregate_Every(string rawExpression)
+        {
+            return $"(COUNT({rawExpression}) = COUNT(*))";
+        }
+
         #endregion
 
         #region Types

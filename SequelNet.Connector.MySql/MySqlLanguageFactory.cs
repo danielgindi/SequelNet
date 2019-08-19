@@ -238,12 +238,12 @@ namespace SequelNet.Connector
 
         public override string Aggregate_Some(string rawExpression)
         {
-            return "SOME(" + rawExpression + ")";
+            return $"(SUM({rawExpression}) > 0)";
         }
 
         public override string Aggregate_Every(string rawExpression)
         {
-            return "EVERY(" + rawExpression + ")";
+            return $"(BIT_AND({rawExpression}) > 0)";
         }
 
         public override string GroupConcat(bool distinct, string rawExpression, string rawOrderBy, string separator)
