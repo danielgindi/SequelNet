@@ -1309,7 +1309,37 @@ namespace SequelNet
         {
             return new CountDistinct(phrase);
         }
-        
+
+        public static Every Every(object value, ValueObjectType valueType)
+        {
+            return new Every(value, valueType);
+        }
+
+        public static Every Every(string tableName, string columnName)
+        {
+            return new Every(tableName, columnName);
+        }
+
+        public static Every Every(string columnName)
+        {
+            return new Every(columnName);
+        }
+
+        public static Every Every(IPhrase phrase)
+        {
+            return new Every(phrase);
+        }
+
+        public static Every Every(Where where)
+        {
+            return new Every(where);
+        }
+
+        public static Every Every(WhereList where)
+        {
+            return new Every(where);
+        }
+
         public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator, OrderByList orderBy)
         {
             return new GroupConcat(distinct, tableName, columnName, separator, orderBy);
@@ -1448,6 +1478,36 @@ namespace SequelNet
         public static PassThroughAggregate PassThroughAggregate(string aggregateType, IPhrase phrase)
         {
             return new PassThroughAggregate(aggregateType, phrase);
+        }
+
+        public static Some Some(object value, ValueObjectType valueType)
+        {
+            return new Some(value, valueType);
+        }
+
+        public static Some Some(string tableName, string columnName)
+        {
+            return new Some(tableName, columnName);
+        }
+
+        public static Some Some(string columnName)
+        {
+            return new Some(columnName);
+        }
+
+        public static Some Some(IPhrase phrase)
+        {
+            return new Some(phrase);
+        }
+
+        public static Some Some(Where where)
+        {
+            return new Some(where);
+        }
+
+        public static Some Some(WhereList where)
+        {
+            return new Some(where);
         }
 
         public static StandardDeviationOfPopulation StandardDeviationOfPopulation(object value, ValueObjectType valueType)

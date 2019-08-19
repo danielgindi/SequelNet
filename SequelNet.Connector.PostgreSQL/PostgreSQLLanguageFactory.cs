@@ -205,6 +205,16 @@ namespace SequelNet.Connector
             outputBuilder.Append(@"RANDOM()");
         }
 
+        public override string Aggregate_Some(string rawExpression)
+        {
+            return "bool_or(" + rawExpression + ")";
+        }
+
+        public override string Aggregate_Every(string rawExpression)
+        {
+            return "bool_and(" + rawExpression + ")";
+        }
+
         #endregion
 
         #region Types

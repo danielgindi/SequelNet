@@ -236,6 +236,16 @@ namespace SequelNet.Connector
             outputBuilder.Append(@"RAND()");
         }
 
+        public override string Aggregate_Some(string rawExpression)
+        {
+            return "SOME(" + rawExpression + ")";
+        }
+
+        public override string Aggregate_Every(string rawExpression)
+        {
+            return "EVERY(" + rawExpression + ")";
+        }
+
         #endregion
 
         #region Types

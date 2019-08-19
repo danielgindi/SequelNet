@@ -214,6 +214,16 @@ namespace SequelNet.Connector
             outputBuilder.Append(@"RAND()");
         }
 
+        public virtual string Aggregate_Some(string rawExpression)
+        {
+            throw new NotImplementedException("SOME has not been implemented for this connector");
+        }
+
+        public virtual string Aggregate_Every(string rawExpression)
+        {
+            throw new NotImplementedException("EVERY has not been implemented for this connector");
+        }
+
         #endregion
 
         #region Types
