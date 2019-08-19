@@ -215,6 +215,38 @@ namespace SequelNet.Connector
             return "bool_and(" + rawExpression + ")";
         }
 
+        public override string GroupConcat(bool distinct, string rawExpression, string rawOrderBy, string separator)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append("string_agg(");
+
+            if (distinct)
+            {
+                sb.Append("DISTINCT ");
+            }
+
+            sb.Append(rawExpression);
+
+            if (separator != null)
+            {
+                sb.Append("," + PrepareValue(separator));
+            }
+            else
+            {
+                sb.Append(",','");
+            }
+
+            if (rawOrderBy != null)
+            {
+                sb.Append(rawOrderBy);
+            }
+
+            sb.Append(")");
+
+            return sb.ToString();
+        }
+
         #endregion
 
         #region Types

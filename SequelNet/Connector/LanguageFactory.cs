@@ -224,6 +224,11 @@ namespace SequelNet.Connector
             throw new NotImplementedException("EVERY has not been implemented for this connector");
         }
 
+        public virtual string GroupConcat(bool distinct, string rawExpression, string rawOrderBy, string separator)
+        {
+            throw new NotImplementedException("GROUP_CONCAT has not been implemented for this connector");
+        }
+
         #endregion
 
         #region Types

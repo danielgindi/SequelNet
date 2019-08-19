@@ -126,64 +126,15 @@ namespace SequelNet.Phrases
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
+            string rawOrderBy = null;
+            if (OrderBy != null && OrderBy.Count > 0)
             {
-                sb.Append("string_agg(");
-
-                if (Distinct)
-                {
-                    sb.Append("DISTINCT ");
-                }
-
-                sb.Append(Value.Build(conn, relatedQuery));
-
-                if (Separator != null)
-                {
-                    sb.Append("," + conn.Language.PrepareValue(Separator));
-                }
-                else
-                {
-                    sb.Append(",','");
-                }
-
-                if (OrderBy != null && OrderBy.Count > 0)
-                {
-                    OrderBy.BuildCommand(sb, conn, relatedQuery, false);
-                }
-
-                sb.Append(")");
-            }
-            else if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-            {
-                sb.Append("GROUP_CONCAT(");
-
-                if (Distinct)
-                {
-                    sb.Append("DISTINCT ");
-                }
-
-                sb.Append(Value.Build(conn, relatedQuery));
-
-                if (OrderBy != null && OrderBy.Count > 0)
-                {
-                    OrderBy.BuildCommand(sb, conn, relatedQuery, false);
-                }
-
-                if (Separator != null)
-                {
-                    sb.Append(" SEPARATOR " + conn.Language.PrepareValue(Separator));
-                }
-
-                sb.Append(")");
-            }
-            else
-            {
-                throw new NotSupportedException("SHA1 is not supported by " + conn.TYPE.ToString());
+                var sb = new StringBuilder();
+                OrderBy.BuildCommand(sb, conn, relatedQuery, false);
+                rawOrderBy = sb.ToString();
             }
 
-            return sb.ToString();
+            return conn.Language.GroupConcat(Distinct, Value.Build(conn, relatedQuery), rawOrderBy, Separator);
         }
     }
 }
