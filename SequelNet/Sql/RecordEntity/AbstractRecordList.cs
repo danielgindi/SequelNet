@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -66,6 +68,14 @@ namespace SequelNet
             return coll;
         }
 
+        public static async Task<TListType> FromReaderAsync(DataReader reader, CancellationToken? cancellationToken = null)
+        {
+            TListType coll = new TListType();
+            while (await reader.ReadAsync(cancellationToken)) 
+                coll.Add(AbstractRecord<TItemType>.FromReader(reader));
+            return coll;
+        }
+
         public static TListType FetchAll()
         {
             using (DataReader reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
@@ -89,20 +99,22 @@ namespace SequelNet
             return FetchByQuery(qry);
         }
 
-        public static TListType FetchByQuery(Query qry)
+        public static TListType FetchByQuery(Query qry, ConnectorBase conn = null)
         {
-            using (DataReader reader = qry.ExecuteReader())
-            {
+            using (var reader = qry.ExecuteReader(conn))
                 return FromReader(reader);
-            }
         }
 
-        public static TListType FetchByQuery(Query qry, ConnectorBase conn)
+        public static async Task<TListType> FetchByQueryAsync(Query qry, ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            using (DataReader reader = qry.ExecuteReader(conn))
-            {
-                return FromReader(reader);
-            }
+            using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken))
+                return await FromReaderAsync(reader, cancellationToken);
+        }
+
+        public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken = null)
+        {
+            using (var reader = await qry.ExecuteReaderAsync(null, cancellationToken))
+                return await FromReaderAsync(reader, cancellationToken);
         }
 
         public TListType Clone()

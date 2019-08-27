@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Globalization;
+using System.Threading.Tasks;
+using System.Threading;
 
 [assembly: CLSCompliant(true)]
 
@@ -71,6 +73,13 @@ namespace SequelNet.Connector
             if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             MySqlScript script = new MySqlScript((MySqlConnection)Connection, querySql);
             return script.Execute();
+        }
+
+        public override Task<int> ExecuteScriptAsync(string querySql, CancellationToken? cancellationToken = null)
+        {
+            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            MySqlScript script = new MySqlScript((MySqlConnection)Connection, querySql);
+            return script.ExecuteAsync(cancellationToken ?? CancellationToken.None);
         }
 
         #endregion

@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Collections;
 using System.Data;
 using SequelNet.Sql.Spatial;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace SequelNet.Connector
 {
@@ -356,6 +358,27 @@ namespace SequelNet.Connector
         }
 
         /// <summary>
+        /// Gets the value of the specified column as an instance of the specified type.
+        /// </summary>
+        /// <param name="ordinal">The zero-based column ordinal</param>
+        /// <returns>The value of the specified column.</returns>
+        public T GetFieldValue<T>(int ordinal)
+        {
+            return UnderlyingReader.GetFieldValue<T>(ordinal);
+        }
+
+        /// <summary>
+        /// Gets the value of the specified column as an instance of the specified type.
+        /// </summary>
+        /// <param name="ordinal">The zero-based column ordinal</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>The value of the specified column.</returns>
+        public Task<T> GetFieldValueAsync<T>(int ordinal, CancellationToken? cancellationToken = null)
+        {
+            return UnderlyingReader.GetFieldValueAsync<T>(ordinal, cancellationToken ?? CancellationToken.None);
+        }
+
+        /// <summary>
         /// Populates an array of objects with the column values of the current row.
         /// </summary>
         /// <param name="values">An array of System.Object into which to copy the attribute columns.</param>
@@ -457,6 +480,15 @@ namespace SequelNet.Connector
         public bool Read()
         {
             return UnderlyingReader.Read();
+        }
+
+        /// <summary>
+        /// Advances the reader to the next record in a result set.
+        /// </summary>
+        /// <returns>true if there are more rows; otherwise false.</returns>
+        public Task<bool> ReadAsync(CancellationToken? cancellationToken = null)
+        {
+            return UnderlyingReader.ReadAsync(cancellationToken ?? CancellationToken.None);
         }
 
         /// <summary>

@@ -35,15 +35,19 @@ namespace SequelNet
         /// </summary>
         /// <param name="connection">An existing connection to use.</param>
         /// <returns><typeparamref name="DataReader"/> object</returns>
-        public DataReader ExecuteReader(ConnectorBase connection = null)
+        public DataReader ExecuteReader(ConnectorBase connection = null, CommandBehavior commandBehavior = CommandBehavior.Default)
         {
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose)
+                {
+                    connection = ConnectorBase.NewInstance();
+                    commandBehavior |= CommandBehavior.CloseConnection;
+                }
 
                 var cmd = BuildDbCommand(connection);
-                return connection.ExecuteReader(cmd, true, needsDispose);
+                return connection.ExecuteReader(cmd, true, commandBehavior);
             }
             catch
             {

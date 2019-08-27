@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading;
+using System.Threading.Tasks;
 
 [assembly: CLSCompliant(true)]
 
@@ -66,7 +68,12 @@ namespace SequelNet.Connector
 
         public override int ExecuteScript(string querySql)
         {
-            throw new NotImplementedException(@"ExecuteScript");
+            return ExecuteNonQuery(querySql);
+        }
+
+        public override Task<int> ExecuteScriptAsync(string querySql, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteNonQueryAsync(querySql, cancellationToken);
         }
 
         #endregion

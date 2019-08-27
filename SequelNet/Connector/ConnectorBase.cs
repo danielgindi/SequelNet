@@ -5,6 +5,8 @@ using System.Data;
 using System.Configuration;
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Threading;
 
 [assembly: CLSCompliant(true)]
 
@@ -156,7 +158,7 @@ namespace SequelNet.Connector
         #endregion
 
         #region Executing
-        
+
         public virtual int ExecuteNonQuery(DbCommand command)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -164,7 +166,15 @@ namespace SequelNet.Connector
             command.Transaction = Transaction;
             return command.ExecuteNonQuery();
         }
-        
+
+        public virtual Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken? cancellationToken = null)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+            return command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+        }
+
         public virtual object ExecuteScalar(DbCommand command)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -173,8 +183,21 @@ namespace SequelNet.Connector
             return command.ExecuteScalar();
         }
 
-        public virtual DataReader ExecuteReader(DbCommand command, bool attachCommandToReader = false, bool attachConnectionToReader = false)
+        public virtual Task<object> ExecuteScalarAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+            command.Connection = Connection;
+            command.Transaction = Transaction;
+            return command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+        }
+
+        internal virtual DataReader ExecuteReader(
+            DbCommand command,
+            bool attachCommandToReader,
+            CommandBehavior commandBehavior)
+        {
+            var attachConnectionToReader = (commandBehavior & CommandBehavior.CloseConnection) != CommandBehavior.Default;
+
             try
             {
                 if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -183,7 +206,7 @@ namespace SequelNet.Connector
                 command.Transaction = Transaction;
 
                 return new DataReader(
-                    command.ExecuteReader(),
+                    command.ExecuteReader(commandBehavior),
                     attachCommandToReader ? command : null,
                     attachConnectionToReader ? this : null);
             }
@@ -198,7 +221,62 @@ namespace SequelNet.Connector
                 throw ex;
             }
         }
-        
+
+        public DataReader ExecuteReader(
+            DbCommand command,
+            CommandBehavior commandBehavior = CommandBehavior.Default)
+        {
+            return ExecuteReader(command, false, commandBehavior);
+        }
+
+        internal virtual Task<DataReader> ExecuteReaderAsync(
+            DbCommand command,
+            bool attachCommandToReader,
+            CommandBehavior commandBehavior,
+            CancellationToken? cancellationToken)
+        {
+            var attachConnectionToReader = (commandBehavior & CommandBehavior.CloseConnection) != CommandBehavior.Default;
+
+            try
+            {
+                if (Connection.State != ConnectionState.Open) Connection.Open();
+
+                command.Connection = Connection;
+                command.Transaction = Transaction;
+
+                return command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None).ContinueWith(x =>
+                {
+                    return new DataReader(
+                        x.Result,
+                        attachCommandToReader ? command : null,
+                        attachConnectionToReader ? this : null);
+                });
+            }
+            catch (Exception ex)
+            {
+                if (attachCommandToReader && command != null)
+                    command.Dispose();
+
+                if (attachConnectionToReader && Connection != null)
+                    Connection.Dispose();
+
+                throw ex;
+            }
+        }
+
+        public Task<DataReader> ExecuteReaderAsync(
+            DbCommand command,
+            CommandBehavior commandBehavior = CommandBehavior.Default,
+            CancellationToken? cancellationToken = null)
+        {
+            return ExecuteReaderAsync(command, false, commandBehavior, cancellationToken);
+        }
+
+        public Task<DataReader> ExecuteReaderAsync(DbCommand command, CancellationToken cancellationToken)
+        {
+            return ExecuteReaderAsync(command, false, CommandBehavior.Default, cancellationToken);
+        }
+
         public virtual DataSet ExecuteDataSet(DbCommand command)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -225,6 +303,16 @@ namespace SequelNet.Connector
             }
         }
 
+        public virtual Task<int> ExecuteNonQueryAsync(string querySql, CancellationToken? cancellationToken = null)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            using (var command = Factory.NewCommand(querySql, Connection, Transaction))
+            {
+                return command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+            }
+        }
+
         public virtual object ExecuteScalar(string querySql)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -235,20 +323,44 @@ namespace SequelNet.Connector
             }
         }
 
-        public virtual DataReader ExecuteReader(string querySql)
+        public virtual Task<object> ExecuteScalarAsync(string querySql, CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            var command = Factory.NewCommand(querySql, Connection, Transaction);
-            return ExecuteReader(command, true);
+            using (var command = Factory.NewCommand(querySql, Connection, Transaction))
+            {
+                return command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+            }
         }
 
-        public virtual DataReader ExecuteReader(string querySql, bool attachConnectionToReader)
+        public virtual DataReader ExecuteReader(string querySql, CommandBehavior commandBehavior = CommandBehavior.Default)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
-            return ExecuteReader(command, true, attachConnectionToReader);
+            return ExecuteReader(command, true, commandBehavior);
+        }
+
+        public virtual Task<DataReader> ExecuteReaderAsync(
+            string querySql,
+            CommandBehavior commandBehavior = CommandBehavior.Default,
+            CancellationToken? cancellationToken = null)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            var command = Factory.NewCommand(querySql, Connection, Transaction);
+            return ExecuteReaderAsync(
+                command, 
+                true, 
+                commandBehavior | CommandBehavior.CloseConnection, 
+                cancellationToken);
+        }
+
+        public Task<DataReader> ExecuteReaderAsync(
+            string querySql,
+            CancellationToken cancellationToken)
+        {
+            return ExecuteReaderAsync(querySql, CommandBehavior.Default, cancellationToken);
         }
 
         public virtual DataSet ExecuteDataSet(string querySql)
@@ -262,6 +374,8 @@ namespace SequelNet.Connector
         }
 
         public abstract int ExecuteScript(string querySql);
+
+        public abstract Task<int> ExecuteScriptAsync(string querySql, CancellationToken? cancellationToken = null);
 
         #endregion
 
