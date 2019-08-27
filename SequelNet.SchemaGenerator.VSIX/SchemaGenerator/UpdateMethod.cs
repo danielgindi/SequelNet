@@ -6,24 +6,15 @@ namespace SequelNet.SchemaGenerator
 {
     public partial class GeneratorCore
 	{
-        private static void WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
+        private static void WriteGetUpdateQuery(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null, string userName = null){0}{{{0}", "\r\n");
+            stringBuilder.AppendFormat("public override Query GetUpdateQuery(){0}{{{0}", "\r\n");
 
-            bool hasModifiedBy = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null;
             bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null;
 
-            if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
+            if (context.AtomicUpdates && (hasModifiedOn))
             {
                 stringBuilder.AppendFormat(@"if (HasMutatedColumns()){0}{{{0}", "\r\n");
-            }
-
-            if (!context.NoModifiedBy)
-            {
-                if (context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedBy") != null)
-                {
-                    stringBuilder.AppendFormat("ModifiedBy = userName;{0}", "\r\n");
-                }
             }
 
             if (!context.NoModifiedOn)
@@ -34,12 +25,12 @@ namespace SequelNet.SchemaGenerator
                 }
             }
 
-            if (context.AtomicUpdates && (hasModifiedBy || hasModifiedOn))
+            if (context.AtomicUpdates && (hasModifiedOn))
             {
                 stringBuilder.AppendFormat(@"}}{0}", "\r\n");
             }
 
-            if (hasModifiedBy || hasModifiedOn)
+            if (hasModifiedOn)
             {
                 stringBuilder.Append("\r\n");
             }
@@ -80,13 +71,24 @@ namespace SequelNet.SchemaGenerator
                 isFirst = false;
             }
 
-            stringBuilder.AppendFormat("{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}return qry = null;{0}", "\r\n");
+
+            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+        }
+
+        private static void WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
+        {
+            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null){0}{{{0}", "\r\n");
+
+            stringBuilder.AppendFormat("var qry = GetUpdateQuery();{0}{0}", "\r\n");
 
             if (context.AtomicUpdates)
             {
                 stringBuilder.AppendFormat("if (qry.HasInsertsOrUpdates){0}{{{0}", "\r\n");
             }
+
             stringBuilder.AppendFormat("qry.Execute(conn);{0}", "\r\n");
+
             if (context.AtomicUpdates)
             {
                 stringBuilder.AppendFormat("}}{0}", "\r\n");
@@ -95,5 +97,27 @@ namespace SequelNet.SchemaGenerator
 
             stringBuilder.AppendFormat("}}{0}", "\r\n");
         }
-	}
+
+        private static void WriteUpdateAsyncMethod(StringBuilder stringBuilder, ScriptContext context)
+        {
+            stringBuilder.AppendFormat("public override Task UpdateAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+
+            stringBuilder.AppendFormat("var qry = GetUpdateQuery();{0}{0}", "\r\n");
+
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("if (qry.HasInsertsOrUpdates){0}{{{0}", "\r\n");
+            }
+
+            stringBuilder.AppendFormat("qry.ExecuteAsync(conn, cancellationToken);{0}", "\r\n");
+
+            if (context.AtomicUpdates)
+            {
+                stringBuilder.AppendFormat("}}{0}", "\r\n");
+                stringBuilder.AppendFormat("{0}MarkAllColumnsNotMutated();{0}", "\r\n");
+            }
+
+            stringBuilder.AppendFormat("}}{0}", "\r\n");
+        }
+    }
 }

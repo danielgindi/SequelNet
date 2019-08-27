@@ -1,12 +1,12 @@
 ﻿using SequelNet.Connector;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SequelNet
 {
     public interface IRecordList
     {
-        void SaveAll(ConnectorBase conn);
-        void SaveAll();
-        void SaveAll(ConnectorBase conn, bool withTransaction);
-        void SaveAll(bool withTransaction);
+        void SaveAll(ConnectorBase conn = null, bool withTransaction = false);
+        Task SaveAllAsync(ConnectorBase conn = null, bool withTransaction = false, CancellationToken? cancellationToken = null);
     }
 }

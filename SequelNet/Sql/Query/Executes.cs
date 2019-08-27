@@ -232,6 +232,7 @@ namespace SequelNet
         /// <param name="connection">An existing connection to use.</param>
         /// <param name="lastInsertId">Where to put the last inserted ROWID</param>
         /// <returns>Number of affected rows</returns>
+        [Obsolete]
         public int Execute(ConnectorBase connection, out object lastInsertId)
         {
             return Execute(out lastInsertId, connection);

@@ -212,17 +212,9 @@ namespace SequelNet.SchemaGenerator
                 {
                     context.InsertAutoIncrement = true;
                 }
-                else if (currentLineTrimmed.StartsWith("@NoCreatedBy", StringComparison.OrdinalIgnoreCase))
-                {
-                    context.NoCreatedBy = true;
-                }
                 else if (currentLineTrimmed.StartsWith("@NoCreatedOn", StringComparison.OrdinalIgnoreCase))
                 {
                     context.NoCreatedOn = true;
-                }
-                else if (currentLineTrimmed.StartsWith("@NoModifiedBy", StringComparison.OrdinalIgnoreCase))
-                {
-                    context.NoModifiedBy = true;
                 }
                 else if (currentLineTrimmed.StartsWith("@NoModifiedOn", StringComparison.OrdinalIgnoreCase))
                 {

@@ -119,9 +119,17 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
                 string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName);
 
+            WriteGetInsertQuery(stringBuilder, context);
+            stringBuilder.Append("\r\n");
+            WriteGetUpdateQuery(stringBuilder, context);
+            stringBuilder.Append("\r\n");
             WriteInsertMethod(stringBuilder, context);
             stringBuilder.Append("\r\n");
+            WriteInsertAsyncMethod(stringBuilder, context);
+            stringBuilder.Append("\r\n");
             WriteUpdateMethod(stringBuilder, context);
+            stringBuilder.Append("\r\n");
+            WriteUpdateAsyncMethod(stringBuilder, context);
             stringBuilder.Append("\r\n");
             WriteReadMethod(stringBuilder, context);
 

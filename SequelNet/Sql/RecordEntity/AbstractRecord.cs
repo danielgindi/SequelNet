@@ -4,6 +4,8 @@ using System.Xml.Serialization;
 using SequelNet.Connector;
 using System.Collections;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SequelNet
 {
@@ -22,9 +24,7 @@ namespace SequelNet
         private static bool __FLAGS_RETRIEVED = false;
         private static bool __HAS_DELETED = false;
         private static bool __HAS_IS_DELETED = false;
-        private static bool __HAS_CREATED_BY = false;
         private static bool __HAS_CREATED_ON= false;
-        private static bool __HAS_MODIFIED_BY = false;
         private static bool __HAS_MODIFIED_ON = false;
 
         #endregion
@@ -161,9 +161,7 @@ namespace SequelNet
         {
             __HAS_DELETED = Schema.Columns.Find(@"Deleted") != null;
             __HAS_IS_DELETED = Schema.Columns.Find(@"IsDeleted") != null;
-            __HAS_CREATED_BY = Schema.Columns.Find(@"CreatedBy") != null;
             __HAS_CREATED_ON = Schema.Columns.Find(@"CreatedOn") != null;
-            __HAS_MODIFIED_BY = Schema.Columns.Find(@"ModifiedBy") != null;
             __HAS_MODIFIED_ON = Schema.Columns.Find(@"ModifiedOn") != null;
             __FLAGS_RETRIEVED = true;
         }
@@ -232,16 +230,13 @@ namespace SequelNet
 
         #region Virtual Read/Write Actions
 
-        public virtual void Insert(ConnectorBase connection = null, string userName = null)
+        public virtual Query GetInsertQuery()
         {
             if (!__FLAGS_RETRIEVED)
-            {
                 RetrieveFlags();
-            }
+
             if (__CLASS_TYPE == null)
-            {
                 __CLASS_TYPE = this.GetType();
-            }
 
             var qry = new Query(Schema);
 
@@ -249,16 +244,11 @@ namespace SequelNet
             {
                 var propInfo = __CLASS_TYPE.GetProperty(column.Name);
 
-                if (propInfo == null) 
+                if (propInfo == null)
                     propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
 
                 if (propInfo != null)
                     qry.Insert(column.Name, propInfo.GetValue(this, null));
-            }
-
-            if (__HAS_CREATED_BY && userName != null)
-            {
-                qry.Insert(@"CreatedBy", userName);
             }
 
             if (__HAS_CREATED_ON)
@@ -266,55 +256,109 @@ namespace SequelNet
                 qry.Insert(@"CreatedOn", DateTime.UtcNow);
             }
 
-            qry.Execute(connection);
-
-            _NewRecord = false;
-            MarkAllColumnsNotMutated();
+            return qry;
         }
 
-        public virtual void Update(ConnectorBase connection = null, string userName = null)
+        public virtual Query GetUpdateQuery()
         {
             if (!__FLAGS_RETRIEVED)
-            {
                 RetrieveFlags();
-            }
+
             if (__CLASS_TYPE == null)
-            {
                 __CLASS_TYPE = this.GetType();
-            }
 
             object primaryKey = SchemaPrimaryKeyName;
             bool isPrimaryKeyNullOrString = primaryKey == null || primaryKey is string;
 
             var qry = new Query(Schema);
 
-            foreach (var Column in Schema.Columns)
+            foreach (var column in Schema.Columns)
             {
-                if ((isPrimaryKeyNullOrString && Column.Name == (string)primaryKey) ||
-                    (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, Column.Name))) continue;
+                if ((isPrimaryKeyNullOrString && column.Name == (string)primaryKey) ||
+                    (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, column.Name))) continue;
 
-                var propInfo = __CLASS_TYPE.GetProperty(Column.Name);
-                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
+                var propInfo = __CLASS_TYPE.GetProperty(column.Name);
+                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
                 if (propInfo != null)
                 {
-                    if (_AtomicUpdates && !IsColumnMutated(Column.Name)) continue;
+                    if (_AtomicUpdates && !IsColumnMutated(column.Name)) continue;
 
-                    qry.Update(Column.Name, propInfo.GetValue(this, null));
+                    qry.Update(column.Name, propInfo.GetValue(this, null));
                 }
             }
 
             if (!_AtomicUpdates || qry.HasInsertsOrUpdates)
             {
-                if (__HAS_MODIFIED_BY && userName != null)
-                {
-                    qry.Update(@"ModifiedBy", userName);
-                }
-
                 if (__HAS_MODIFIED_ON)
                 {
                     qry.Update(@"ModifiedOn", DateTime.UtcNow);
                 }
             }
+
+            return qry;
+        }
+
+        public virtual void Insert(ConnectorBase connection = null)
+        {
+            var qry = GetInsertQuery();
+
+            if (__PRIMARY_KEY_MULTI)
+            {
+                qry.Execute(connection);
+            }
+            else
+            {
+                if (qry.Execute(out var lastInsertId, connection) > 0)
+                {
+                    if (__CLASS_TYPE == null)
+                        __CLASS_TYPE = this.GetType();
+
+                    var propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string);
+                    if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string + @"X");
+                    if (propInfo != null)
+                    {
+                        propInfo.SetValue(this, Convert.ChangeType(lastInsertId, FindColumnType(SchemaPrimaryKeyName as string)), null);
+                    }
+                }
+            }
+
+            _NewRecord = false;
+            MarkAllColumnsNotMutated();
+        }
+
+        public virtual async Task InsertAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            var qry = GetInsertQuery();
+
+            if (__PRIMARY_KEY_MULTI)
+            {
+                await qry.ExecuteAsync(connection, cancellationToken);
+            }
+            else
+            {
+                var results = await qry.ExecuteWithLastInsertIdAsync(connection, cancellationToken);
+
+                if (results.updates > 0)
+                {
+                    if (__CLASS_TYPE == null)
+                        __CLASS_TYPE = this.GetType();
+
+                    var propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string);
+                    if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string + @"X");
+                    if (propInfo != null)
+                    {
+                        propInfo.SetValue(this, Convert.ChangeType(results.lastInsertId, FindColumnType(SchemaPrimaryKeyName as string)), null);
+                    }
+                }
+            }
+
+            _NewRecord = false;
+            MarkAllColumnsNotMutated();
+        }
+
+        public virtual void Update(ConnectorBase connection = null)
+        {
+            var qry = GetUpdateQuery();
 
             if (qry.HasInsertsOrUpdates)
             {
@@ -324,21 +368,31 @@ namespace SequelNet
             MarkAllColumnsNotMutated();
         }
 
+        public virtual async Task UpdateAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            var qry = GetUpdateQuery();
+
+            if (qry.HasInsertsOrUpdates)
+            {
+                await qry.ExecuteAsync(connection, cancellationToken);
+            }
+
+            MarkAllColumnsNotMutated();
+        }
+
         public virtual void Read(DataReader reader)
         {
             if (__CLASS_TYPE == null)
-            {
                 __CLASS_TYPE = this.GetType();
-            }
 
             PropertyInfo propInfo;
-            foreach (var Column in Schema.Columns)
+            foreach (var column in Schema.Columns)
             {
-                propInfo = __CLASS_TYPE.GetProperty(Column.Name);
-                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(Column.Name + @"X");
+                propInfo = __CLASS_TYPE.GetProperty(column.Name);
+                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
                 if (propInfo != null)
                 {
-                    propInfo.SetValue(this, Convert.ChangeType(reader[Column.Name], Column.Type), null);
+                    propInfo.SetValue(this, Convert.ChangeType(reader[column.Name], column.Type), null);
                 }
             }
 
@@ -346,27 +400,39 @@ namespace SequelNet
             MarkAllColumnsNotMutated();
         }
 
-        public virtual void Save(string userName = null)
+        public virtual void Save(ConnectorBase connection = null)
         {
             if (_NewRecord)
             {
-                Insert(null, userName);
+                Insert(connection);
             }
             else
             {
-                Update(null, userName);
+                Update(connection);
             }
         }
 
-        public virtual void Save(ConnectorBase connection, string userName = null)
+        public virtual Task SaveAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             if (_NewRecord)
             {
-                Insert(connection, userName);
+                return InsertAsync(connection, cancellationToken);
             }
             else
             {
-                Update(connection, userName);
+                return UpdateAsync(connection, cancellationToken);
+            }
+        }
+        
+        public Task SaveAsync(CancellationToken cancellationToken)
+        {
+            if (_NewRecord)
+            {
+                return InsertAsync(null, cancellationToken);
+            }
+            else
+            {
+                return UpdateAsync(null, cancellationToken);
             }
         }
 
@@ -377,7 +443,6 @@ namespace SequelNet
         /// <summary>
         /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
-        /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
         /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
@@ -387,13 +452,28 @@ namespace SequelNet
         {
             object columnName = SchemaPrimaryKeyName;
             if (columnName == null) return 0;
-            return DeleteByParameter(columnName, primaryKeyValue, null, connection);
+            return DeleteByParameter(columnName, primaryKeyValue, connection);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
+        /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DeleteAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            object columnName = SchemaPrimaryKeyName;
+            if (columnName == null) return Task.FromResult(0);
+            return DeleteByParameterAsync(columnName, primaryKeyValue, connection, cancellationToken);
         }
 
         /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
-        /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
@@ -402,36 +482,34 @@ namespace SequelNet
         /// <returns>Number of affected rows.</returns>
         public static int Delete(string columnName, object value, ConnectorBase connection = null)
         {
-            return DeleteByParameter(columnName, value, null, connection);
+            return DeleteByParameter(columnName, value, connection);
         }
 
         /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
-        /// If the table has a ModifiedBy column, it will be updated with <paramref name="userName"/> or the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
         /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
-        /// <param name="userName">An optional username to use if updating a ModifiedBy column.</param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Number of affected rows.</returns>
-        public static int Delete(string columnName, object value, string userName, ConnectorBase connection = null)
+        public static Task<int> DeleteAsync(string columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            return DeleteByParameter(columnName, value, userName, connection);
+            return DeleteByParameterAsync(columnName, value, connection, cancellationToken);
         }
 
         /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
-        /// If the table has a ModifiedBy column, it will be updated with the current identified Username.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
         /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        private static int DeleteByParameter(object columnName, object value, string userName, ConnectorBase connection)
+        private static int DeleteByParameter(object columnName, object value, ConnectorBase connection)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -444,7 +522,6 @@ namespace SequelNet
 
                 if (__HAS_DELETED) qry.Update(@"Deleted", true);
                 if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
-                if (__HAS_MODIFIED_BY && !string.IsNullOrEmpty(userName)) qry.Update(@"ModifiedBy", userName);
                 if (__HAS_MODIFIED_ON) qry.Update(@"ModifiedOn", DateTime.UtcNow);
 
                 if (columnName is ICollection)
@@ -469,6 +546,52 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
+        /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        private static Task<int> DeleteByParameterAsync(object columnName, object value, ConnectorBase connection, CancellationToken? cancellationToken = null)
+        {
+            if (!__FLAGS_RETRIEVED)
+            {
+                RetrieveFlags();
+            }
+
+            if (__HAS_DELETED || __HAS_IS_DELETED)
+            {
+                Query qry = new Query(Schema);
+
+                if (__HAS_DELETED) qry.Update(@"Deleted", true);
+                if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
+                if (__HAS_MODIFIED_ON) qry.Update(@"ModifiedOn", DateTime.UtcNow);
+
+                if (columnName is ICollection)
+                {
+                    if (!(value is ICollection)) return Task.FromResult(0);
+
+                    IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                    IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+
+                    while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                    {
+                        qry.AND((string)keyEnumerator.Current, valueEnumerator.Current);
+                    }
+                }
+                else
+                {
+                    qry.Where((string)columnName, value);
+                }
+                return qry.ExecuteNonQueryAsync(connection, cancellationToken);
+            }
+            return DestroyByParameterAsync(columnName, value, connection, cancellationToken);
+        }
+
+        /// <summary>
         /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
         /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
@@ -482,6 +605,20 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DestroyAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            object columnName = SchemaPrimaryKeyName;
+            if (columnName == null) return Task.FromResult(0);
+            return DestroyByParameterAsync(columnName, primaryKeyValue, connection, cancellationToken);
+        }
+
+        /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
@@ -491,6 +628,19 @@ namespace SequelNet
         public static int Destroy(string columnName, object value, ConnectorBase connection = null)
         {
             return DestroyByParameter(columnName, value, connection);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DestroyAsync(string columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            return DestroyByParameterAsync(columnName, value, connection, cancellationToken);
         }
 
         /// <summary>
@@ -522,6 +672,38 @@ namespace SequelNet
             }
 
             return qry.ExecuteNonQuery(connection);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        private static Task<int> DestroyByParameterAsync(object columnName, object value, ConnectorBase connection, CancellationToken? cancellationToken = null)
+        {
+            Query qry = new Query(Schema).Delete();
+
+            if (columnName is ICollection)
+            {
+                if (!(value is ICollection)) return Task.FromResult(0);
+
+                IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+
+                while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                {
+                    qry.AND((string)keyEnumerator.Current, valueEnumerator.Current);
+                }
+            }
+            else
+            {
+                qry.Where((string)columnName, value);
+            }
+
+            return qry.ExecuteNonQueryAsync(connection, cancellationToken);
         }
 
         #endregion
@@ -592,6 +774,43 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static async Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            Query qry = new Query(Schema);
+
+            object primaryKey = SchemaPrimaryKeyName;
+            if (__PRIMARY_KEY_MULTI)
+            {
+                if (!(primaryKeyValue is ICollection)) return null;
+
+                IEnumerator keyEnumerator = ((IEnumerable)primaryKey).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)primaryKeyValue).GetEnumerator();
+
+                while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                {
+                    qry.AND((string)keyEnumerator.Current, valueEnumerator.Current);
+                }
+            }
+            else
+            {
+                qry.Where((string)primaryKey, primaryKeyValue);
+            }
+
+            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken))
+            {
+                if (await reader.ReadAsync(cancellationToken))
+                    return FromReader(reader);
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Loads a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// If the record was loaded, it will be marked as an "old" record.
         /// </summary>
@@ -601,7 +820,19 @@ namespace SequelNet
         {
             LoadByParam(SchemaPrimaryKeyName, primaryKeyValue, connection);
         }
-        
+
+        /// <summary>
+        /// Loads a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// If the record was loaded, it will be marked as an "old" record.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Task LoadByKeyAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            return LoadByParamAsync(SchemaPrimaryKeyName, primaryKeyValue, connection, cancellationToken);
+        }
+
         /// <summary>
         /// Loads a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the record was loaded, it will be marked as an "old" record.
@@ -630,9 +861,48 @@ namespace SequelNet
                 qry.Where((string)columnName, value);
             }
 
-            using (DataReader reader = qry.ExecuteReader(connection))
+            using (var reader = qry.ExecuteReader(connection))
             {
                 if (reader.Read())
+                {
+                    Read(reader);
+                    MarkOld();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// If the record was loaded, it will be marked as an "old" record.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        public async Task LoadByParamAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            Query qry = new Query(Schema);
+
+            if (columnName is ICollection)
+            {
+                if (!(value is ICollection)) 
+                    return;
+
+                IEnumerator keyEnumerator = ((IEnumerable)columnName).GetEnumerator();
+                IEnumerator valueEnumerator = ((IEnumerable)value).GetEnumerator();
+
+                while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
+                {
+                    qry.AND((string)keyEnumerator.Current, valueEnumerator.Current);
+                }
+            }
+            else
+            {
+                qry.Where((string)columnName, value);
+            }
+
+            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken))
+            {
+                if (await reader.ReadAsync(cancellationToken))
                 {
                     Read(reader);
                     MarkOld();

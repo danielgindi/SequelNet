@@ -21,9 +21,7 @@ namespace SequelNet.SchemaGenerator
         public bool AtomicUpdates = false;
         public bool SnakeColumnNames = false;
         public bool InsertAutoIncrement = false;
-        public bool NoCreatedBy = false;
         public bool NoCreatedOn = false;
-        public bool NoModifiedBy = false;
         public bool NoModifiedOn = false;
 
         public string SingleColumnPrimaryKeyName = null;

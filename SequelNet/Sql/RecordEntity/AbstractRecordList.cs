@@ -12,17 +12,7 @@ namespace SequelNet
         where TItemType : AbstractRecord<TItemType>, new()
         where TListType : AbstractRecordList<TItemType, TListType>, new()
     {
-        public virtual void SaveAll(ConnectorBase conn)
-        {
-            foreach (TItemType item in this) item.Save(conn);
-        }
-
-        public virtual void SaveAll()
-        {
-            foreach (TItemType item in this) item.Save();
-        }
-
-        public virtual void SaveAll(ConnectorBase conn, bool withTransaction)
+        public virtual void SaveAll(ConnectorBase conn = null, bool withTransaction = false)
         {
             bool ownsConnection = conn == null;
             bool ownsTransaction = false;
@@ -34,7 +24,10 @@ namespace SequelNet
                     ownsTransaction = true;
                     conn.BeginTransaction();
                 }
-                foreach (TItemType item in this) item.Save(conn);
+
+                foreach (TItemType item in this) 
+                    item.Save(conn);
+
                 if (ownsTransaction)
                 {
                     conn.CommitTransaction();
@@ -56,15 +49,65 @@ namespace SequelNet
             }
         }
 
-        public virtual void SaveAll(bool withTransaction)
+        public virtual async Task SaveAllAsync(ConnectorBase conn = null, bool withTransaction = false, CancellationToken? cancellationToken = null)
+        {
+            bool ownsConnection = conn == null;
+            bool ownsTransaction = false;
+            try
+            {
+                if (conn == null) conn = ConnectorBase.NewInstance();
+                if (withTransaction && !conn.HasTransaction)
+                {
+                    ownsTransaction = true;
+                    conn.BeginTransaction();
+                }
+
+                foreach (TItemType item in this)
+                    await item.SaveAsync(conn, cancellationToken);
+
+                if (ownsTransaction)
+                {
+                    conn.CommitTransaction();
+                    ownsTransaction = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (conn != null && ownsConnection)
+                {
+                    conn.Close();
+                    conn.Dispose();
+                    conn = null;
+                }
+            }
+        }
+
+        public void SaveAll(bool withTransaction)
         {
             SaveAll(null, withTransaction);
+        }
+
+        public Task SaveAllAsync(bool withTransaction, CancellationToken? cancellationToken = null)
+        {
+            return SaveAllAsync(null, withTransaction, cancellationToken);
+        }
+
+        public Task SaveAllAsync(CancellationToken cancellationToken)
+        {
+            return SaveAllAsync(null, false, cancellationToken);
         }
 
         public static TListType FromReader(DataReader reader)
         {
             TListType coll = new TListType();
-            while (reader.Read()) coll.Add(AbstractRecord<TItemType>.FromReader(reader));
+
+            while (reader.Read())
+                coll.Add(AbstractRecord<TItemType>.FromReader(reader));
+
             return coll;
         }
 
@@ -76,20 +119,25 @@ namespace SequelNet
             return coll;
         }
 
-        public static TListType FetchAll()
+        public static TListType FetchAll(ConnectorBase conn = null)
         {
-            using (DataReader reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader())
+            using (var reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
             {
                 return FromReader(reader);
             }
         }
 
-        public static TListType FetchAll(ConnectorBase conn)
+        public static async Task<TListType> FetchAllAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            using (DataReader reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
+            using (var reader = await new Query(AbstractRecord<TItemType>.Schema).ExecuteReaderAsync(conn, cancellationToken))
             {
-                return FromReader(reader);
+                return await FromReaderAsync(reader, cancellationToken);
             }
+        }
+
+        public static Task<TListType> FetchAllAsync(CancellationToken cancellationToken)
+        {
+            return FetchAllAsync(null, cancellationToken);
         }
 
         public static TListType Where(string columnName, object columnValue)
