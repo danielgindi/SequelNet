@@ -16,6 +16,9 @@ namespace SequelNet.Connector
 
         public virtual bool GroupBySupportsOrdering => false;
 
+        public virtual bool DeleteSupportsIgnore => false;
+        public virtual bool InsertSupportsIgnore => false;
+
         public virtual int VarCharMaxLength => 255;
 
         public virtual string VarCharMaxKeyword => null;

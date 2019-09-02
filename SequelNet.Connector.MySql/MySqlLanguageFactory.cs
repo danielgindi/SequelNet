@@ -54,6 +54,9 @@ namespace SequelNet.Connector
 
         public override bool GroupBySupportsOrdering => true;
 
+        public override bool DeleteSupportsIgnore => true;
+        public override bool InsertSupportsIgnore => true;
+
         public override int VarCharMaxLength
         {
             get

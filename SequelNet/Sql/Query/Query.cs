@@ -36,6 +36,7 @@ namespace SequelNet
         private GroupByHint _GroupByHint = GroupByHint.None;
         private bool _NeedTransaction = false;
         private int? _CommandTimeout = null;
+        private bool _IgnoreErrors = false;
 
         #endregion
 
@@ -211,6 +212,17 @@ namespace SequelNet
         public Query SetCommandTimeout(int timeout)
         {
             CommandTimeout = timeout;
+            return this;
+        }
+
+        /// <summary>
+        /// Ignore constraint errors (INSERT IGNORE etc.).
+        /// Caution: Not supported by most RDBMS.
+        /// </summary>
+        /// <param name="ignoreErrors">Should ignore?</param>
+        public Query SetIgnoreErrors(bool ignoreErrors)
+        {
+            IgnoreErrors = ignoreErrors;
             return this;
         }
 
@@ -617,6 +629,16 @@ namespace SequelNet
         {
             get { return _CommandTimeout; }
             set { _CommandTimeout = value; }
+        }
+
+        /// <summary>
+        /// Ignore constraint errors (INSERT IGNORE etc.)
+        /// Caution: Not supported by most RDBMS.
+        /// </summary>
+        public bool IgnoreErrors
+        {
+            get { return _IgnoreErrors; }
+            set { _IgnoreErrors = value; }
         }
 
         #endregion
