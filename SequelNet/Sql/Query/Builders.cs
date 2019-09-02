@@ -898,7 +898,14 @@ namespace SequelNet
                             break;
                         case QueryMode.Insert:
                             {
-                                sb.Append(@"INSERT INTO ");
+                                sb.Append("INSERT ");
+
+                                if (IgnoreErrors && language.InsertSupportsIgnore)
+                                {
+                                    sb.Append("IGNORE ");
+                                }
+
+                                sb.Append("INTO ");
 
                                 language.BuildTableName(this, connection, sb, false);
 
@@ -1242,7 +1249,12 @@ namespace SequelNet
 
                         case QueryMode.Delete:
                             {
-                                sb.Append(@"DELETE");
+                                sb.Append("DELETE ");
+
+                                if (IgnoreErrors && language.DeleteSupportsIgnore)
+                                {
+                                    sb.Append("IGNORE ");
+                                }
 
                                 language.BuildLimitOffset(this, true, sb);
 
