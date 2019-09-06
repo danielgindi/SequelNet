@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 [assembly: CLSCompliant(true)]
 
@@ -40,7 +40,7 @@ namespace SequelNet.Connector
 
         public override IConnectorFactory Factory => MySqlFactory.Instance;
 
-        private static Dictionary<MySqlMode, MySqlLanguageFactory> _LanguageFactories = new Dictionary<MySqlMode, MySqlLanguageFactory>();
+        private static ConcurrentDictionary<MySqlMode, MySqlLanguageFactory> _LanguageFactories = new ConcurrentDictionary<MySqlMode, MySqlLanguageFactory>();
         private MySqlLanguageFactory _LanguageFactory = null;
 
         public override LanguageFactory Language
@@ -77,7 +77,7 @@ namespace SequelNet.Connector
 
         #region Utilities
 
-        static private Dictionary<string, MySqlMode> _Map_ConnStr_SqlMode = new Dictionary<string, MySqlMode>();
+        static private ConcurrentDictionary<string, MySqlMode> _Map_ConnStr_SqlMode = new ConcurrentDictionary<string, MySqlMode>();
 
         private MySqlMode? _MySqlMode = null;
 

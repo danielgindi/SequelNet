@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using Npgsql;
 
 [assembly: CLSCompliant(true)]
@@ -39,7 +39,7 @@ namespace SequelNet.Connector
 
         public override IConnectorFactory Factory => PostgreSQLFactory.Instance;
 
-        private static Dictionary<PostgreSQLMode, PostgreSQLLanguageFactory> _LanguageFactories = new Dictionary<PostgreSQLMode, PostgreSQLLanguageFactory>();
+        private static ConcurrentDictionary<PostgreSQLMode, PostgreSQLLanguageFactory> _LanguageFactories = new ConcurrentDictionary<PostgreSQLMode, PostgreSQLLanguageFactory>();
         private PostgreSQLLanguageFactory _LanguageFactory = null;
 
         public override LanguageFactory Language
@@ -74,7 +74,7 @@ namespace SequelNet.Connector
 
         #region Utilities
 
-        static private Dictionary<string, PostgreSQLMode> _Map_ConnStr_SqlMode = new Dictionary<string, PostgreSQLMode>();
+        static private ConcurrentDictionary<string, PostgreSQLMode> _Map_ConnStr_SqlMode = new ConcurrentDictionary<string, PostgreSQLMode>();
 
         private PostgreSQLMode? _PostgreSQLMode = null;
 
