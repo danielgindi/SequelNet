@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Data;
 using System.Data.SqlClient;
 using System.Threading;
@@ -40,7 +40,7 @@ namespace SequelNet.Connector
 
         public override IConnectorFactory Factory => MsSqlFactory.Instance;
 
-        private static Dictionary<MsSqlVersion, MsSqlLanguageFactory> _LanguageFactories = new Dictionary<MsSqlVersion, MsSqlLanguageFactory>();
+        private static ConcurrentDictionary<MsSqlVersion, MsSqlLanguageFactory> _LanguageFactories = new ConcurrentDictionary<MsSqlVersion, MsSqlLanguageFactory>();
         private MsSqlLanguageFactory _LanguageFactory = null;
 
         public override LanguageFactory Language
@@ -80,7 +80,7 @@ namespace SequelNet.Connector
 
         #region Utilities
 
-        static private Dictionary<string, MsSqlVersion> _Map_ConnStr_Version = new Dictionary<string, MsSqlVersion>();
+        static private ConcurrentDictionary<string, MsSqlVersion> _Map_ConnStr_Version = new ConcurrentDictionary<string, MsSqlVersion>();
 
         private MsSqlVersion? _Version = null;
 
