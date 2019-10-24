@@ -94,28 +94,40 @@ namespace SequelNet.Connector
                 }
                 else
                 {
-                    version = new MsSqlVersion();
-
-                    try
+                    // Connection string may be altered after connection is opened (persisting without passwords etc.)
+                    if (Connection.State == System.Data.ConnectionState.Closed)
                     {
-                        using (var reader = ExecuteReader("SELECT SERVERPROPERTY('ProductVersion'), SERVERPROPERTY('ProductLevel'), SERVERPROPERTY('Edition')"))
+                        Connection.Open(); // Open to get ConnectionString to change to its secure form
+
+                        if (_Map_ConnStr_Version.TryGetValue(Connection.ConnectionString, out version))
+                            _Version = version;
+                    }
+
+                    if (_Version == null)
+                    {
+                        version = new MsSqlVersion();
+
+                        try
                         {
-                            if (reader.Read())
+                            using (var reader = ExecuteReader("SELECT SERVERPROPERTY('ProductVersion'), SERVERPROPERTY('ProductLevel'), SERVERPROPERTY('Edition')"))
                             {
-                                version.Version = reader.GetStringOrEmpty(0);
-                                version.Level = reader.GetStringOrEmpty(1);
-                                version.Edition = reader.GetStringOrEmpty(2);
+                                if (reader.Read())
+                                {
+                                    version.Version = reader.GetStringOrEmpty(0);
+                                    version.Level = reader.GetStringOrEmpty(1);
+                                    version.Edition = reader.GetStringOrEmpty(2);
+                                }
                             }
+
+                            _Version = version;
+                            _Map_ConnStr_Version[Connection.ConnectionString] = version;
+                        }
+                        catch
+                        {
                         }
 
-                        _Version = version;
-                        _Map_ConnStr_Version[Connection.ConnectionString] = version;
+                        return version;
                     }
-                    catch
-                    {
-                    }
-
-                    return version;
                 }
             }
 
