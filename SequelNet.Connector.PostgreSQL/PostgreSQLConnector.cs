@@ -88,28 +88,40 @@ namespace SequelNet.Connector
                 }
                 else
                 {
-                    sqlMode = new PostgreSQLMode();
-
-                    try
+                    // Connection string may be altered after connection is opened (persisting without passwords etc.)
+                    if (Connection.State == System.Data.ConnectionState.Closed)
                     {
-                        sqlMode.StandardConformingStrings = ExecuteScalar("show standard_conforming_strings").ToString() == @"on";
-                    }
-                    catch { }
+                        Connection.Open(); // Open to get ConnectionString to change to its secure form
 
-                    try
+                        if (_Map_ConnStr_SqlMode.TryGetValue(Connection.ConnectionString, out sqlMode))
+                            _PostgreSQLMode = sqlMode;
+                    }
+
+                    if (_PostgreSQLMode == null)
                     {
-                        sqlMode.BackslashQuote = ExecuteScalar("show backslash_quote").ToString() == @"on";
-                    }
-                    catch { }
+                        sqlMode = new PostgreSQLMode();
 
-                    try
-                    {
-                        sqlMode.Version = ExecuteScalar("select version()").ToString();
-                    }
-                    catch { }
+                        try
+                        {
+                            sqlMode.StandardConformingStrings = ExecuteScalar("show standard_conforming_strings").ToString() == @"on";
+                        }
+                        catch { }
 
-                    _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
-                    _PostgreSQLMode = sqlMode;
+                        try
+                        {
+                            sqlMode.BackslashQuote = ExecuteScalar("show backslash_quote").ToString() == @"on";
+                        }
+                        catch { }
+
+                        try
+                        {
+                            sqlMode.Version = ExecuteScalar("select version()").ToString();
+                        }
+                        catch { }
+
+                        _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
+                        _PostgreSQLMode = sqlMode;
+                    }
                 }
             }
 

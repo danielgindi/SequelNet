@@ -91,22 +91,34 @@ namespace SequelNet.Connector
                 }
                 else
                 {
-                    sqlMode = new MySqlMode();
-
-                    try
+                    // Connection string may be altered after connection is opened (persisting without passwords etc.)
+                    if (Connection.State == System.Data.ConnectionState.Closed)
                     {
-                        sqlMode.SqlMode = ExecuteScalar("SELECT @@SQL_MODE").ToString();
-                    }
-                    catch { }
+                        Connection.Open(); // Open to get ConnectionString to change to its secure form
 
-                    try
+                        if (_Map_ConnStr_SqlMode.TryGetValue(Connection.ConnectionString, out sqlMode))
+                            _MySqlMode = sqlMode;
+                    }
+
+                    if (_MySqlMode == null)
                     {
-                        sqlMode.Version = ExecuteScalar("SELECT @@VERSION").ToString();
-                    }
-                    catch { }
+                        sqlMode = new MySqlMode();
 
-                    _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
-                    _MySqlMode = sqlMode;
+                        try
+                        {
+                            sqlMode.SqlMode = ExecuteScalar("SELECT @@SQL_MODE").ToString();
+                        }
+                        catch { }
+
+                        try
+                        {
+                            sqlMode.Version = ExecuteScalar("SELECT @@VERSION").ToString();
+                        }
+                        catch { }
+
+                        _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
+                        _MySqlMode = sqlMode;
+                    }
                 }
             }
 
