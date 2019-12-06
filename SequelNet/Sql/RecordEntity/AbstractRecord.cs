@@ -6,6 +6,7 @@ using System.Collections;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace SequelNet
 {
@@ -20,6 +21,7 @@ namespace SequelNet
         private static object __PRIMARY_KEY_NAME = null;
         private static TableSchema __TABLE_SCHEMA = null;
         private static Type __CLASS_TYPE = null;
+        private static PropertyInfo __PRIMARY_KEY_PROP_INFO = null;
 
         private static bool __FLAGS_RETRIEVED = false;
         private static bool __HAS_DELETED = false;
@@ -33,12 +35,6 @@ namespace SequelNet
 
         private static bool _AtomicUpdates = false;
         private HashSet<string> _MutatedColumns = null;
-
-        #endregion
-
-        #region Protected variables
-
-        private bool _NewRecord = true;
 
         #endregion
 
@@ -61,10 +57,10 @@ namespace SequelNet
         #region Table schema stuff
 
         /// <summary>
-        /// Re-sets a cached version of the primary key names of this record. 
+        /// Caches information about the primary key for this record. 
         /// This is automatically called the first time that a primary-key-related action is called.
         /// </summary>
-        public static void CachePrimaryKeyName()
+        private static void CachePrimaryKeyName()
         {
             var keyNames = new List<string>();
 
@@ -100,11 +96,33 @@ namespace SequelNet
             __PRIMARY_KEY_MULTI = keyNames.Count > 1;
 
             __LOOKED_FOR_PRIMARY_KEY_NAME = true;
+
+            var classType = typeof(AbstractRecord<T>);
+
+            var propInfo = classType.GetProperty(SchemaPrimaryKeyName as string);
+            if (propInfo == null) propInfo = classType.GetProperty(SchemaPrimaryKeyName as string + @"X");
+            __PRIMARY_KEY_PROP_INFO = propInfo;
+        }
+
+        /// <summary>
+        /// Resets the cache of information about the primary key.
+        /// </summary>
+        public static void ResetPrimaryKeyCache()
+        {
+            __LOOKED_FOR_PRIMARY_KEY_NAME = false;
         }
 
         public abstract object GetPrimaryKeyValue();
 
         public abstract TableSchema GenerateTableSchema();
+
+        private static bool IsCompoundPrimaryKey()
+        {
+            if (!__LOOKED_FOR_PRIMARY_KEY_NAME)
+                CachePrimaryKeyName();
+
+            return __PRIMARY_KEY_MULTI;
+        }
 
         [XmlIgnore]
         public static TableSchema Schema
@@ -170,12 +188,8 @@ namespace SequelNet
 
         #region Mutated
 
-        public bool IsNewRecord
-        {
-            get { return _NewRecord; }
-            set { _NewRecord = value; }
-        }
-        
+        public bool IsNewRecord { get; set; }
+
         public static bool AtomicUpdates
         {
             get { return _AtomicUpdates; }
@@ -215,12 +229,14 @@ namespace SequelNet
         {
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MarkOld()
         {
             IsNewRecord = false;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MarkNew()
         {
             IsNewRecord = true;
@@ -229,6 +245,21 @@ namespace SequelNet
         #endregion
 
         #region Virtual Read/Write Actions
+
+        public virtual void SetPrimaryKeyValue(object value)
+        {
+            var propInfo = __PRIMARY_KEY_PROP_INFO;
+
+            if (propInfo == null)
+            {
+                CachePrimaryKeyName();
+                propInfo = __PRIMARY_KEY_PROP_INFO;
+            }
+
+            propInfo?.SetValue(
+                this,
+                Convert.ChangeType(value, FindColumnType(SchemaPrimaryKeyName as string)), null);
+        }
 
         public virtual Query GetInsertQuery()
         {
@@ -302,7 +333,7 @@ namespace SequelNet
         {
             var qry = GetInsertQuery();
 
-            if (__PRIMARY_KEY_MULTI)
+            if (IsCompoundPrimaryKey())
             {
                 qry.Execute(connection);
             }
@@ -310,50 +341,37 @@ namespace SequelNet
             {
                 if (qry.Execute(out var lastInsertId, connection) > 0)
                 {
-                    if (__CLASS_TYPE == null)
-                        __CLASS_TYPE = this.GetType();
-
-                    var propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string);
-                    if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string + @"X");
-                    if (propInfo != null)
-                    {
-                        propInfo.SetValue(this, Convert.ChangeType(lastInsertId, FindColumnType(SchemaPrimaryKeyName as string)), null);
-                    }
+                    SetPrimaryKeyValue(lastInsertId);
                 }
             }
 
-            _NewRecord = false;
+            MarkOld();
             MarkAllColumnsNotMutated();
         }
 
-        public virtual async Task InsertAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        public virtual async Task InsertAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
             var qry = GetInsertQuery();
 
-            if (__PRIMARY_KEY_MULTI)
+            if (IsCompoundPrimaryKey())
             {
-                await qry.ExecuteAsync(connection, cancellationToken);
+                await qry.ExecuteAsync(conn, cancellationToken);
+
+                MarkOld();
+                MarkAllColumnsNotMutated();
             }
             else
             {
-                var results = await qry.ExecuteWithLastInsertIdAsync(connection, cancellationToken);
+                var results = await qry.ExecuteWithLastInsertIdAsync(conn, cancellationToken);
 
                 if (results.updates > 0)
                 {
-                    if (__CLASS_TYPE == null)
-                        __CLASS_TYPE = this.GetType();
+                    SetPrimaryKeyValue(results.lastInsertId);
 
-                    var propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string);
-                    if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(SchemaPrimaryKeyName as string + @"X");
-                    if (propInfo != null)
-                    {
-                        propInfo.SetValue(this, Convert.ChangeType(results.lastInsertId, FindColumnType(SchemaPrimaryKeyName as string)), null);
-                    }
+                    MarkOld();
+                    MarkAllColumnsNotMutated();
                 }
             }
-
-            _NewRecord = false;
-            MarkAllColumnsNotMutated();
         }
 
         public virtual void Update(ConnectorBase connection = null)
@@ -368,13 +386,13 @@ namespace SequelNet
             MarkAllColumnsNotMutated();
         }
 
-        public virtual async Task UpdateAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        public virtual async Task UpdateAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
             var qry = GetUpdateQuery();
 
             if (qry.HasInsertsOrUpdates)
             {
-                await qry.ExecuteAsync(connection, cancellationToken);
+                await qry.ExecuteAsync(conn, cancellationToken);
             }
 
             MarkAllColumnsNotMutated();
@@ -396,13 +414,13 @@ namespace SequelNet
                 }
             }
 
-            _NewRecord = false;
+            MarkOld();
             MarkAllColumnsNotMutated();
         }
 
         public virtual void Save(ConnectorBase connection = null)
         {
-            if (_NewRecord)
+            if (IsNewRecord)
             {
                 Insert(connection);
             }
@@ -414,7 +432,7 @@ namespace SequelNet
 
         public virtual Task SaveAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            if (_NewRecord)
+            if (IsNewRecord)
             {
                 return InsertAsync(connection, cancellationToken);
             }
@@ -426,7 +444,7 @@ namespace SequelNet
         
         public Task SaveAsync(CancellationToken cancellationToken)
         {
-            if (_NewRecord)
+            if (IsNewRecord)
             {
                 return InsertAsync(null, cancellationToken);
             }
@@ -749,7 +767,7 @@ namespace SequelNet
             Query qry = new Query(Schema);
 
             object primaryKey = SchemaPrimaryKeyName;
-            if (__PRIMARY_KEY_MULTI)
+            if (IsCompoundPrimaryKey())
             {
                 if (!(primaryKeyValue is ICollection)) return null;
 
@@ -785,7 +803,7 @@ namespace SequelNet
             Query qry = new Query(Schema);
 
             object primaryKey = SchemaPrimaryKeyName;
-            if (__PRIMARY_KEY_MULTI)
+            if (IsCompoundPrimaryKey())
             {
                 if (!(primaryKeyValue is ICollection)) return null;
 

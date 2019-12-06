@@ -99,7 +99,7 @@ namespace SequelNet.SchemaGenerator
 
             stringBuilder.AppendFormat("#region Private Members{0}{0}", "\r\n");
             WriteValueStoredVariables(stringBuilder, context);
-            stringBuilder.AppendFormat("{0}#endregion{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
 
             #endregion
 
@@ -119,18 +119,18 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
                 string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName);
 
+            WriteSetPrimaryKeyValueMethod(stringBuilder, context);
+            stringBuilder.Append("\r\n");
             WriteGetInsertQuery(stringBuilder, context);
             stringBuilder.Append("\r\n");
             WriteGetUpdateQuery(stringBuilder, context);
+            if (WriteUpdateMethod(stringBuilder, context))
+                stringBuilder.Append("\r\n");
             stringBuilder.Append("\r\n");
-            WriteInsertMethod(stringBuilder, context);
-            stringBuilder.Append("\r\n");
-            WriteInsertAsyncMethod(stringBuilder, context);
-            stringBuilder.Append("\r\n");
-            WriteUpdateMethod(stringBuilder, context);
-            stringBuilder.Append("\r\n");
-            WriteUpdateAsyncMethod(stringBuilder, context);
-            stringBuilder.Append("\r\n");
+            if (WriteInsertMethod(stringBuilder, context))
+                stringBuilder.Append("\r\n");
+            if (WriteInsertAsyncMethod(stringBuilder, context))
+                stringBuilder.Append("\r\n");
             WriteReadMethod(stringBuilder, context);
 
             stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");

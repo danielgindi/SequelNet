@@ -39,7 +39,7 @@ namespace SequelNet.SchemaGenerator
                 stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
             }
 
-            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}", "\r\n");
+            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}{0}", "\r\n");
             foreach (var dalCol in context.Columns)
             {
                 if (dalCol.AutoIncrement || dalCol.NoSave)
@@ -71,53 +71,51 @@ namespace SequelNet.SchemaGenerator
                 isFirst = false;
             }
 
-            stringBuilder.AppendFormat("{0}return qry = null;{0}", "\r\n");
-
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
-        }
-
-        private static void WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
-        {
-            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null){0}{{{0}", "\r\n");
-
-            stringBuilder.AppendFormat("var qry = GetUpdateQuery();{0}{0}", "\r\n");
-
-            if (context.AtomicUpdates)
-            {
-                stringBuilder.AppendFormat("if (qry.HasInsertsOrUpdates){0}{{{0}", "\r\n");
-            }
-
-            stringBuilder.AppendFormat("qry.Execute(conn);{0}", "\r\n");
-
-            if (context.AtomicUpdates)
-            {
-                stringBuilder.AppendFormat("}}{0}", "\r\n");
-                stringBuilder.AppendFormat("{0}MarkAllColumnsNotMutated();{0}", "\r\n");
-            }
+            stringBuilder.AppendFormat("{0}return qry;{0}", "\r\n");
 
             stringBuilder.AppendFormat("}}{0}", "\r\n");
         }
 
-        private static void WriteUpdateAsyncMethod(StringBuilder stringBuilder, ScriptContext context)
+        private static bool WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override Task UpdateAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+            bool hasUpdateMethod = !string.IsNullOrEmpty(context.CustomBeforeUpdate);
 
-            stringBuilder.AppendFormat("var qry = GetUpdateQuery();{0}{0}", "\r\n");
-
-            if (context.AtomicUpdates)
+            if (hasUpdateMethod)
             {
-                stringBuilder.AppendFormat("if (qry.HasInsertsOrUpdates){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null){0}{{{0}", "\r\n");
+
+                if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
+                }
+
+                stringBuilder.AppendFormat("super.Update(conn);{0}", "\r\n");
+
+                stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
             }
 
-            stringBuilder.AppendFormat("qry.ExecuteAsync(conn, cancellationToken);{0}", "\r\n");
+            return hasUpdateMethod;
+        }
 
-            if (context.AtomicUpdates)
+        private static bool WriteUpdateAsyncMethod(StringBuilder stringBuilder, ScriptContext context)
+        {
+            bool hasUpdateMethod = !string.IsNullOrEmpty(context.CustomBeforeUpdate);
+
+            if (hasUpdateMethod)
             {
-                stringBuilder.AppendFormat("}}{0}", "\r\n");
-                stringBuilder.AppendFormat("{0}MarkAllColumnsNotMutated();{0}", "\r\n");
+                stringBuilder.AppendFormat("public override Task UpdateAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+
+                if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
+                }
+
+                stringBuilder.AppendFormat("super.UpdateAsync(conn, cancellationToken);{0}", "\r\n");
+
+                stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
             }
 
-            stringBuilder.AppendFormat("}}{0}", "\r\n");
+            return hasUpdateMethod;
         }
     }
 }

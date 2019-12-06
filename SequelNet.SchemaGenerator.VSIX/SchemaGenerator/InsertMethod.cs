@@ -26,12 +26,7 @@ namespace SequelNet.SchemaGenerator
                 stringBuilder.Append("\r\n");
             }
 
-            if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
-            {
-                stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
-            }
-
-            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}", "\r\n");
+            stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}{0}", "\r\n");
 
             foreach (DalColumn dalCol in context.Columns)
             {
@@ -72,9 +67,9 @@ namespace SequelNet.SchemaGenerator
                 }
             }
 
-            stringBuilder.AppendFormat("{0}return qry = null;{0}", "\r\n");
+            stringBuilder.AppendFormat("{0}return qry;{0}", "\r\n");
 
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            stringBuilder.AppendFormat("}}{0}", "\r\n");
         }
 
         private static string GetLastInsertValueConvertFormat(ScriptContext context)
@@ -201,55 +196,60 @@ namespace SequelNet.SchemaGenerator
             return valueConvertorFormat;
         }
 
-        private static void WriteInsertMethod(StringBuilder stringBuilder, ScriptContext context)
+        private static void WriteSetPrimaryKeyValueMethod(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn = null){0}{{{0}", "\r\n");
-            
-            stringBuilder.AppendFormat("var qry = GetInsertQuery();{0}", "\r\n");
-
-            stringBuilder.AppendFormat("{0}object lastInsert = null;{0}if (qry.Execute(out lastInsert, conn) > 0){0}{{{0}", "\r\n");
             if (!string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName))
             {
-                stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n",
-                    context.SingleColumnPrimaryKeyName, 
-                    string.Format(GetLastInsertValueConvertFormat(context), "(lastInsert)"));
-            }
+                stringBuilder.AppendFormat("public override void SetPrimaryKeyValue(object value){0}{{{0}", "\r\n");
 
-            stringBuilder.AppendFormat("MarkOld();{0}", "\r\n");
-
-            if (context.AtomicUpdates)
-            {
-                stringBuilder.AppendFormat("MarkAllColumnsNotMutated();{0}", "\r\n");
-            }
-
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
-        }
-
-        private static void WriteInsertAsyncMethod(StringBuilder stringBuilder, ScriptContext context)
-        {
-            stringBuilder.AppendFormat("public override Task InsertAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
-
-            stringBuilder.AppendFormat("var qry = GetInsertQuery();{0}", "\r\n");
-
-            stringBuilder.AppendFormat("{0}var results = qry.ExecuteWithLastInsertIdAsync(conn, cancellationToken);{0}", "\r\n");
-            stringBuilder.AppendFormat("{0}if (results.updates > 0) {{{0}", "\r\n");
-            if (!string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName))
-            {
                 stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n",
                     context.SingleColumnPrimaryKeyName,
-                    string.Format(GetLastInsertValueConvertFormat(context), "(results.lastInsertId)"));
+                    string.Format(GetLastInsertValueConvertFormat(context), "value"));
+
+                stringBuilder.AppendFormat("}}{0}", "\r\n");
             }
+        }
 
-            stringBuilder.AppendFormat("MarkOld();{0}", "\r\n");
+        private static bool WriteInsertMethod(StringBuilder stringBuilder, ScriptContext context)
+        {
+            bool hasInsertMethod = !string.IsNullOrEmpty(context.CustomBeforeInsert);
 
-            if (context.AtomicUpdates)
+            if (hasInsertMethod)
             {
-                stringBuilder.AppendFormat("MarkAllColumnsNotMutated();{0}", "\r\n");
+                stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn = null){0}{{{0}", "\r\n");
+
+                if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
+                }
+
+                stringBuilder.AppendFormat("super.Insert(conn);{0}", "\r\n");
+
+                stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
             }
 
-            stringBuilder.AppendFormat("}}{0}", "\r\n"); // if
+            return hasInsertMethod;
+        }
 
-            stringBuilder.AppendFormat("}}{0}", "\r\n"); // function
+        private static bool WriteInsertAsyncMethod(StringBuilder stringBuilder, ScriptContext context)
+        {
+            bool hasInsertMethod = !string.IsNullOrEmpty(context.CustomBeforeInsert);
+
+            if (hasInsertMethod)
+            {
+                stringBuilder.AppendFormat("public override Task InsertAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+
+                if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
+                {
+                    stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
+                }
+
+                stringBuilder.AppendFormat("super.InsertAsync(conn, cancellationToken);{0}", "\r\n");
+
+                stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            }
+
+            return hasInsertMethod;
         }
     }
 }
