@@ -188,7 +188,7 @@ namespace SequelNet
 
         #region Mutated
 
-        public bool IsNewRecord { get; set; }
+        public bool IsNewRecord { get; set; } = true;
 
         public static bool AtomicUpdates
         {
