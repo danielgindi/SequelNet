@@ -38,7 +38,7 @@
     <RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
     <Product>PostgreSQL connector for SequelNet</Product>
     <PackageId>SequelNet.Connector.PostgreSQL</PackageId>
-    <Version>3.0.4</Version>
+    <Version>3.0.5</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
