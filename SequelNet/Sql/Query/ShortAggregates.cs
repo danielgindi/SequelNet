@@ -30,7 +30,7 @@ namespace SequelNet
             else return Convert.ToInt64(res);
         }
 
-        public System.Threading.Tasks.Task<Int64> GetCountAsync(CancellationToken? cancellationToken = null)
+        public System.Threading.Tasks.Task<Int64> GetCountAsync(CancellationToken? cancellationToken)
         {
             return GetCountAsync(null, "*", null, cancellationToken);
         }
@@ -80,7 +80,7 @@ namespace SequelNet
             return this.ExecuteAggregate(new Phrases.Max(schemaName, columnName, IsDistinct), conn);
         }
 
-        public System.Threading.Tasks.Task<object> GetMaxAsync(CancellationToken? cancellationToken = null)
+        public System.Threading.Tasks.Task<object> GetMaxAsync(CancellationToken? cancellationToken)
         {
             return GetMaxAsync(null, null, null, cancellationToken);
         }
@@ -128,7 +128,7 @@ namespace SequelNet
             return this.ExecuteAggregate(new Phrases.Min(schemaName, columnName, IsDistinct), conn);
         }
 
-        public System.Threading.Tasks.Task<object> GetMinAsync(CancellationToken? cancellationToken = null)
+        public System.Threading.Tasks.Task<object> GetMinAsync(CancellationToken? cancellationToken)
         {
             return GetMinAsync(null, null, null, cancellationToken);
         }
@@ -176,7 +176,7 @@ namespace SequelNet
             return this.ExecuteAggregate(new Phrases.Sum(schemaName, columnName, IsDistinct), conn);
         }
 
-        public System.Threading.Tasks.Task<object> GetSumAsync(CancellationToken? cancellationToken = null)
+        public System.Threading.Tasks.Task<object> GetSumAsync(CancellationToken? cancellationToken)
         {
             return GetSumAsync(null, null, null, cancellationToken);
         }
