@@ -258,7 +258,7 @@ namespace SequelNet
 
             propInfo?.SetValue(
                 this,
-                Convert.ChangeType(value, FindColumnType(SchemaPrimaryKeyName as string)), null);
+                Convert.ChangeType(value, Schema.Columns.Find(SchemaPrimaryKeyName as string)?.Type), null);
         }
 
         public virtual Query GetInsertQuery()
@@ -817,30 +817,6 @@ namespace SequelNet
         #endregion
 
         #region Column utilities
-
-        private Type FindColumnType(string columnName)
-        {
-            foreach (var col in Schema.Columns)
-            {
-                if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return col.Type;
-                }
-            }
-            return null;
-        }
-
-        private DataType FindColumnDataType(string columnName)
-        {
-            foreach (var col in Schema.Columns)
-            {
-                if (col.Name.Equals(columnName, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    return col.ActualDataType;
-                }
-            }
-            return DataType.None;
-        }
         
         #endregion
 
@@ -854,7 +830,7 @@ namespace SequelNet
         /// <returns>A record (marked as "old") or null.</returns>
         public static T FetchByID(object primaryKeyValue, ConnectorBase connection = null)
         {
-            Query qry = new Query(Schema);
+            Query qry = new Query(Schema).LimitRows(1);
 
             object primaryKey = SchemaPrimaryKeyName;
             if (IsCompoundPrimaryKey())
@@ -890,7 +866,7 @@ namespace SequelNet
         /// <returns>A record (marked as "old") or null.</returns>
         public static async Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            Query qry = new Query(Schema);
+            Query qry = new Query(Schema).LimitRows(1);
 
             object primaryKey = SchemaPrimaryKeyName;
             if (IsCompoundPrimaryKey())
@@ -972,7 +948,7 @@ namespace SequelNet
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         public void LoadByParam(object columnName, object value, ConnectorBase connection = null)
         {
-            Query qry = new Query(Schema);
+            Query qry = new Query(Schema).LimitRows(1);
 
             if (columnName is ICollection)
             {
@@ -1011,7 +987,7 @@ namespace SequelNet
         /// <param name="cancellationToken">Cancellation token.</param>
         public async Task LoadByParamAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            Query qry = new Query(Schema);
+            Query qry = new Query(Schema).LimitRows(1);
 
             if (columnName is ICollection)
             {
