@@ -576,5 +576,51 @@ namespace SequelNet
         {
             return ExecuteCollectionAsync<R, L>(null, cancellationToken);
         }
+
+        public Task<object> ExecuteAggregateAsync(
+            BaseAggregatePhrase aggregate,
+            CancellationToken? cancellationToken = null)
+        {
+            return ExecuteAggregateAsync(aggregate, null, cancellationToken);
+        }
+
+        public async Task<object> ExecuteAggregateAsync(
+            BaseAggregatePhrase aggregate,
+            ConnectorBase connection,
+            CancellationToken? cancellationToken = null)
+        {
+            bool ownsConnection = false;
+            if (connection == null)
+            {
+                ownsConnection = true;
+                connection = ConnectorBase.NewInstance();
+            }
+            try
+            {
+                var oldSelectList = _ListSelect;
+                bool oldIsDistinct = IsDistinct;
+                IsDistinct = false;
+
+                var list = new SelectColumnList();
+                list.Add(new SelectColumn(aggregate));
+                _ListSelect = list;
+
+                object ret = await ExecuteScalarAsync(connection, cancellationToken);
+
+                _ListSelect = oldSelectList;
+                IsDistinct = oldIsDistinct;
+
+                return ret;
+            }
+            finally
+            {
+                if (ownsConnection && connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                    connection = null;
+                }
+            }
+        }
     }
 }

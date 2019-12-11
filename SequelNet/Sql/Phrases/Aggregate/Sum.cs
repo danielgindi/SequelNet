@@ -2,49 +2,54 @@
 
 namespace SequelNet.Phrases
 {
-    public class Sum : IPhrase
+    public class Sum : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
+        public bool Distinct = false;
 
         #region Constructors
 
-        public Sum()
+        public Sum(bool distinct = false) : base()
         {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
+            this.Distinct = distinct;
         }
 
-        public Sum(string tableName, string columnName)
+        public Sum(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Distinct = distinct;
         }
 
-        public Sum(string columnName)
-            : this(null, columnName)
+        public Sum(string columnName, bool distinct = false) : base(columnName)
         {
+            this.Distinct = distinct;
         }
 
-        public Sum(object value, ValueObjectType valueType)
+        public Sum(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Distinct = distinct;
         }
 
-        public Sum(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public Sum(IPhrase phrase, bool distinct = false) : base(phrase)
         {
+            this.Distinct = distinct;
         }
 
-        public Sum(Where where)
-            : this(where, ValueObjectType.Value)
+        public Sum(Where where, bool distinct = false) : base(where)
         {
+            this.Distinct = distinct;
+        }
+
+        public Sum(WhereList where, bool distinct = false) : base(where)
+        {
+            this.Distinct = distinct;
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"SUM(";
+            ret = Distinct ? "SUM(DISTINCT " : "SUM(";
 
             ret += Value.Build(conn, relatedQuery);
 

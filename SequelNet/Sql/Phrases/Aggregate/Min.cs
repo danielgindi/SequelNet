@@ -2,49 +2,54 @@
 
 namespace SequelNet.Phrases
 {
-    public class Min : IPhrase
+    public class Min : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
+        public bool Distinct = false;
 
         #region Constructors
 
-        public Min()
+        public Min(bool distinct = false) : base()
         {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
+            this.Distinct = distinct;
         }
 
-        public Min(string tableName, string columnName)
+        public Min(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Distinct = distinct;
         }
 
-        public Min(string columnName)
-            : this(null, columnName)
+        public Min(string columnName, bool distinct = false) : base(columnName)
         {
+            this.Distinct = distinct;
         }
 
-        public Min(object value, ValueObjectType valueType)
+        public Min(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Distinct = distinct;
         }
 
-        public Min(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public Min(IPhrase phrase, bool distinct = false) : base(phrase)
         {
+            this.Distinct = distinct;
         }
 
-        public Min(Where where)
-            : this(where, ValueObjectType.Value)
+        public Min(Where where, bool distinct = false) : base(where)
         {
+            this.Distinct = distinct;
+        }
+
+        public Min(WhereList where, bool distinct = false) : base(where)
+        {
+            this.Distinct = distinct;
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"MIN(";
+            ret = Distinct ? "MIN(DISTINCT " : "MIN(";
 
             ret += Value.Build(conn, relatedQuery);
 

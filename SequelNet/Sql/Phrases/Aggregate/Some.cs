@@ -2,50 +2,41 @@
 
 namespace SequelNet.Phrases
 {
-    public class Some : IPhrase
+    public class Some : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
-
         #region Constructors
 
-        public Some()
-        {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
-        }
-
-        public Some(string tableName, string columnName)
-        {
-            this.Value = new ValueWrapper(tableName, columnName);
-        }
-
-        public Some(string columnName)
-            : this(null, columnName)
+        public Some() : base()
         {
         }
 
-        public Some(object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(value, valueType);
-        }
-
-        public Some(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public Some(string tableName, string columnName) : base(tableName, columnName)
         {
         }
 
-        public Some(Where where)
-            : this(where, ValueObjectType.Value)
+        public Some(string columnName) : base(columnName)
         {
         }
 
-        public Some(WhereList where)
-            : this(where, ValueObjectType.Value)
+        public Some(object value, ValueObjectType valueType) : base(value, valueType)
+        {
+        }
+
+        public Some(IPhrase phrase) : base(phrase)
+        {
+        }
+
+        public Some(Where where) : base(where)
+        {
+        }
+
+        public Some(WhereList where) : base(where)
         {
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             return conn.Language.Aggregate_Some(Value.Build(conn, relatedQuery));
         }

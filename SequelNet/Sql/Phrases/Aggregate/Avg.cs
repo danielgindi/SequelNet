@@ -2,49 +2,45 @@
 
 namespace SequelNet.Phrases
 {
-    public class Avg : IPhrase
+    public class Avg : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
-
         #region Constructors
 
-        public Avg()
-        {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
-        }
-
-        public Avg(string tableName, string columnName)
-        {
-            this.Value = new ValueWrapper(tableName, columnName);
-        }
-
-        public Avg(string columnName)
-            : this(null, columnName)
+        public Avg() : base()
         {
         }
 
-        public Avg(object value, ValueObjectType valueType)
-        {
-            this.Value = new ValueWrapper(value, valueType);
-        }
-
-        public Avg(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public Avg(string tableName, string columnName) : base(tableName, columnName)
         {
         }
 
-        public Avg(Where where)
-            : this(where, ValueObjectType.Value)
+        public Avg(string columnName) : base(columnName)
+        {
+        }
+
+        public Avg(object value, ValueObjectType valueType) : base(value, valueType)
+        {
+        }
+
+        public Avg(IPhrase phrase) : base(phrase)
+        {
+        }
+
+        public Avg(Where where) : base(where)
+        {
+        }
+
+        public Avg(WhereList where) : base(where)
         {
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"AVG(";
+            ret = "AVG(";
 
             ret += Value.Build(conn, relatedQuery);
 

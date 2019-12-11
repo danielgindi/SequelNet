@@ -44,7 +44,7 @@ namespace SequelNet
         public TableSchema(string schemaName, ColumnList columns)
         {
             this.DatabaseOwner = string.Empty;
-            this.Name = schemaName ?? @"";
+            this.Name = schemaName ?? "";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -53,8 +53,8 @@ namespace SequelNet
 
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns)
         {
-            this.DatabaseOwner = databaseOwner ?? @"";
-            this.Name = schemaName ?? @"";
+            this.DatabaseOwner = databaseOwner ?? "";
+            this.Name = schemaName ?? "";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -64,7 +64,7 @@ namespace SequelNet
         public TableSchema(string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
             this.DatabaseOwner = string.Empty;
-            this.Name = schemaName ?? @"";
+            this.Name = schemaName ?? "";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();
@@ -75,8 +75,8 @@ namespace SequelNet
 
         public TableSchema(string databaseOwner, string schemaName, ColumnList columns, IndexList indexes, ForeignKeyList foreignKeys)
         {
-            this.DatabaseOwner = databaseOwner ?? @"";
-            this.Name = schemaName ?? @"";
+            this.DatabaseOwner = databaseOwner ?? "";
+            this.Name = schemaName ?? "";
             this.Columns = new ColumnList();
             if (columns != null) this.Columns.InsertRange(0, columns);
             this.Indexes = new IndexList();

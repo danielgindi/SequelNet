@@ -2,44 +2,45 @@
 
 namespace SequelNet.Phrases
 {
-    public class StandardDeviationOfSample : IPhrase
+    public class StandardDeviationOfSample : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
-
         #region Constructors
 
-        public StandardDeviationOfSample()
-        {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
-        }
-
-        public StandardDeviationOfSample(string tableName, string columnName)
-        {
-            this.Value = new ValueWrapper(tableName, columnName);
-        }
-
-        public StandardDeviationOfSample(string columnName)
-            : this(null, columnName)
+        public StandardDeviationOfSample() : base()
         {
         }
 
-        public StandardDeviationOfSample(object value, ValueObjectType valueType)
+        public StandardDeviationOfSample(string tableName, string columnName) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(value, valueType);
         }
 
-        public StandardDeviationOfSample(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public StandardDeviationOfSample(string columnName) : base(columnName)
+        {
+        }
+
+        public StandardDeviationOfSample(object value, ValueObjectType valueType) : base(value, valueType)
+        {
+        }
+
+        public StandardDeviationOfSample(IPhrase phrase) : base(phrase)
+        {
+        }
+
+        public StandardDeviationOfSample(Where where) : base(where)
+        {
+        }
+
+        public StandardDeviationOfSample(WhereList where) : base(where)
         {
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"STDDEV_SAMP(";
+            ret = "STDDEV_SAMP(";
 
             ret += Value.Build(conn, relatedQuery);
 

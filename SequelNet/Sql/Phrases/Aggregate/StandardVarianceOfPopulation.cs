@@ -2,44 +2,45 @@
 
 namespace SequelNet.Phrases
 {
-    public class StandardVarianceOfPopulation : IPhrase
+    public class StandardVarianceOfPopulation : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
-
         #region Constructors
 
-        public StandardVarianceOfPopulation()
-        {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
-        }
-
-        public StandardVarianceOfPopulation(string tableName, string columnName)
-        {
-            this.Value = new ValueWrapper(tableName, columnName);
-        }
-
-        public StandardVarianceOfPopulation(string columnName)
-            : this(null, columnName)
+        public StandardVarianceOfPopulation() : base()
         {
         }
 
-        public StandardVarianceOfPopulation(object value, ValueObjectType valueType)
+        public StandardVarianceOfPopulation(string tableName, string columnName) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(value, valueType);
         }
 
-        public StandardVarianceOfPopulation(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public StandardVarianceOfPopulation(string columnName) : base(columnName)
+        {
+        }
+
+        public StandardVarianceOfPopulation(object value, ValueObjectType valueType) : base(value, valueType)
+        {
+        }
+
+        public StandardVarianceOfPopulation(IPhrase phrase) : base(phrase)
+        {
+        }
+
+        public StandardVarianceOfPopulation(Where where) : base(where)
+        {
+        }
+
+        public StandardVarianceOfPopulation(WhereList where) : base(where)
         {
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"VAR_POP(";
+            ret = "VAR_POP(";
 
             ret += Value.Build(conn, relatedQuery);
 

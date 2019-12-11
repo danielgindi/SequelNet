@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -413,27 +414,55 @@ namespace SequelNet
             return AbstractRecordList<R, L>.FetchByQuery(this, connection);
         }
 
-        public object ExecuteAggregate(string columnName, string aggregateFunction, bool isDistinctQuery)
+        private SelectColumnList GenerateAggregateSelectList(
+            string schemaName, string columnName,
+            string aggregateFunction,
+            bool isDistinctQuery,
+            ConnectorBase connection)
         {
-            return ExecuteAggregate(null, null, columnName, aggregateFunction, isDistinctQuery, null);
+            var list = new SelectColumnList();
+
+            if (schemaName != null || _SchemaAlias == null)
+            {
+                schemaName = schemaName ?? _SchemaName;
+
+                if (Schema.DatabaseOwner.Length > 0)
+                {
+                    schemaName = connection.Language.WrapFieldName(Schema.DatabaseOwner) + "."
+                        + connection.Language.WrapFieldName(schemaName);
+                }
+                else
+                {
+                    schemaName = connection.Language.WrapFieldName(schemaName);
+                }
+            }
+            else
+            {
+                schemaName = schemaName ?? _SchemaAlias;
+                schemaName = connection.Language.WrapFieldName(schemaName);
+            }
+
+            var select = new SelectColumn(
+                aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") +
+                (columnName == "*"
+                ? columnName
+                : (schemaName + "." + connection.Language.WrapFieldName(columnName)))
+                + @")", true);
+
+            list.Add(select);
+
+            return list;
         }
 
-        public object ExecuteAggregate(string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery)
+        public object ExecuteAggregate(string columnName, string aggregateFunction, bool isDistinctQuery, ConnectorBase connection = null)
         {
-            return ExecuteAggregate(null, schemaName, columnName, aggregateFunction, isDistinctQuery, null);
+            return ExecuteAggregate(null, columnName, aggregateFunction, isDistinctQuery, connection);
         }
 
-        public object ExecuteAggregate(string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery, ConnectorBase connection)
-        {
-            return ExecuteAggregate(null, schemaName, columnName, aggregateFunction, isDistinctQuery, connection);
-        }
-
-        public object ExecuteAggregate(string databaseOwner, string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery)
-        {
-            return ExecuteAggregate(databaseOwner, schemaName, columnName, aggregateFunction, isDistinctQuery, null);
-        }
-
-        public object ExecuteAggregate(string databaseOwner, string schemaName, string columnName, string aggregateFunction, bool isDistinctQuery, ConnectorBase connection)
+        public object ExecuteAggregate(
+            string schemaName, string columnName, string aggregateFunction, 
+            bool isDistinctQuery,
+            ConnectorBase connection = null)
         {
             bool ownsConnection = false;
             if (connection == null)
@@ -443,47 +472,11 @@ namespace SequelNet
             }
             try
             {
-                SelectColumnList oldSelectList = _ListSelect;
+                var oldSelectList = _ListSelect;
                 bool oldIsDistinct = IsDistinct;
                 IsDistinct = false;
-                
-                _ListSelect = new SelectColumnList();
-                if (schemaName != null)
-                {
-                    if (databaseOwner != null && databaseOwner.Length > 0)
-                    {
-                        schemaName = connection.Language.WrapFieldName(databaseOwner) + @"." + connection.Language.WrapFieldName(schemaName);
-                    }
-                    else
-                    {
-                        schemaName = connection.Language.WrapFieldName(schemaName);
-                    }
-                }
-                else
-                {
-                    if (_SchemaAlias != null)
-                    {
-                        schemaName = connection.Language.WrapFieldName(_SchemaAlias);
-                    }
-                    else
-                    {
-                        schemaName = @"";
-                        if (Schema.DatabaseOwner.Length > 0)
-                        {
-                            schemaName = connection.Language.WrapFieldName(Schema.DatabaseOwner) + @".";
-                        }
-                        schemaName += connection.Language.WrapFieldName(_SchemaName);
-                    }
-                }
 
-                SelectColumn select = new SelectColumn(
-                    aggregateFunction + (isDistinctQuery ? @"(DISTINCT " : @"(") + 
-                    (columnName == "*" 
-                    ? columnName 
-                    : (schemaName + "." + connection.Language.WrapFieldName(columnName)))
-                    + @")", true);
-
-                _ListSelect.Add(select);
+                _ListSelect = GenerateAggregateSelectList(schemaName, columnName, aggregateFunction, isDistinctQuery, connection);
 
                 object ret = ExecuteScalar(connection);
 
@@ -492,9 +485,41 @@ namespace SequelNet
 
                 return ret;
             }
-            catch (Exception ex)
+            finally
             {
-                throw ex;
+                if (ownsConnection && connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                    connection = null;
+                }
+            }
+        }
+
+        public object ExecuteAggregate(BaseAggregatePhrase aggregate, ConnectorBase connection = null)
+        {
+            bool ownsConnection = false;
+            if (connection == null)
+            {
+                ownsConnection = true;
+                connection = ConnectorBase.NewInstance();
+            }
+            try
+            {
+                var oldSelectList = _ListSelect;
+                bool oldIsDistinct = IsDistinct;
+                IsDistinct = false;
+
+                var list = new SelectColumnList();
+                list.Add(new SelectColumn(aggregate));
+                _ListSelect = list;
+
+                object ret = ExecuteScalar(connection);
+
+                _ListSelect = oldSelectList;
+                IsDistinct = oldIsDistinct;
+
+                return ret;
             }
             finally
             {

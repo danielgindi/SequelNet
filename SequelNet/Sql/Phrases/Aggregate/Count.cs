@@ -2,55 +2,54 @@
 
 namespace SequelNet.Phrases
 {
-    public class Count : IPhrase
+    public class Count : BaseAggregatePhrase
     {
         public bool Distinct = false;
-        public ValueWrapper Value;
 
         #region Constructors
 
-        public Count(bool distinct = false)
+        public Count(bool distinct = false) : base()
         {
             this.Distinct = distinct;
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
         }
 
-        public Count(string tableName, string columnName, bool distinct = false)
+        public Count(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
         {
             this.Distinct = distinct;
-            this.Value = new ValueWrapper(tableName, columnName);
         }
 
-        public Count(string columnName, bool distinct = false)
-            : this(null, columnName, distinct)
-        {
-        }
-
-        public Count(object value, ValueObjectType valueType, bool distinct = false)
+        public Count(string columnName, bool distinct = false) : base(columnName)
         {
             this.Distinct = distinct;
-            this.Value = new ValueWrapper(value, valueType);
         }
 
-        public Count(IPhrase phrase, bool distinct = false)
-            : this(phrase, ValueObjectType.Value, distinct)
+        public Count(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
         {
+            this.Distinct = distinct;
+        }
+
+        public Count(IPhrase phrase, bool distinct = false) : base(phrase)
+        {
+            this.Distinct = distinct;
+        }
+
+        public Count(Where where, bool distinct = false) : base(where)
+        {
+            this.Distinct = distinct;
+        }
+
+        public Count(WhereList where, bool distinct = false) : base(where)
+        {
+            this.Distinct = distinct;
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            if (Distinct)
-            {
-                ret = @"COUNT(DISTINCT ";
-            }
-            else
-            {
-                ret = @"COUNT(";
-            }
+            ret = Distinct ? "COUNT(DISTINCT " : "COUNT(";
 
             ret += Value.Build(conn, relatedQuery);
 

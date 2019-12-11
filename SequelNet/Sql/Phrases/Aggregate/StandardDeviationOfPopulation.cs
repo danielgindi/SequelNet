@@ -2,44 +2,45 @@
 
 namespace SequelNet.Phrases
 {
-    public class StandardDeviationOfPopulation : IPhrase
+    public class StandardDeviationOfPopulation : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
-
         #region Constructors
 
-        public StandardDeviationOfPopulation()
-        {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
-        }
-
-        public StandardDeviationOfPopulation(string tableName, string columnName)
-        {
-            this.Value = new ValueWrapper(tableName, columnName);
-        }
-
-        public StandardDeviationOfPopulation(string columnName)
-            : this(null, columnName)
+        public StandardDeviationOfPopulation() : base()
         {
         }
 
-        public StandardDeviationOfPopulation(object value, ValueObjectType valueType)
+        public StandardDeviationOfPopulation(string tableName, string columnName) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(value, valueType);
         }
 
-        public StandardDeviationOfPopulation(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public StandardDeviationOfPopulation(string columnName) : base(columnName)
+        {
+        }
+
+        public StandardDeviationOfPopulation(object value, ValueObjectType valueType) : base(value, valueType)
+        {
+        }
+
+        public StandardDeviationOfPopulation(IPhrase phrase) : base(phrase)
+        {
+        }
+
+        public StandardDeviationOfPopulation(Where where) : base(where)
+        {
+        }
+
+        public StandardDeviationOfPopulation(WhereList where) : base(where)
         {
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"STDDEV_POP(";
+            ret = "STDDEV_POP(";
 
             ret += Value.Build(conn, relatedQuery);
 

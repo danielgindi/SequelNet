@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -9,43 +10,49 @@ namespace SequelNet
 
         public Int64 GetCount()
         {
-            return GetCount(null, null, @"*", null);
+            return GetCount(null, "*", null);
         }
 
         public Int64 GetCount(ConnectorBase conn)
         {
-            return GetCount(null, null, @"*", conn);
+            return GetCount(null, "*", conn);
         }
 
-        public Int64 GetCount(string columnName)
+        public Int64 GetCount(string columnName, ConnectorBase conn = null)
         {
-            return GetCount(null, null, columnName, null);
+            return GetCount(null, columnName, conn);
         }
 
-        public Int64 GetCount(string columnName, ConnectorBase conn)
+        public Int64 GetCount(string schemaName, string columnName, ConnectorBase conn = null)
         {
-            return GetCount(null, null, columnName, conn);
+            object res = this.ExecuteAggregate(new Phrases.Count(schemaName, columnName, IsDistinct), conn);
+            if (res == null) return 0;
+            else return Convert.ToInt64(res);
         }
 
-        public Int64 GetCount(string schemaName, string columnName)
+        public System.Threading.Tasks.Task<Int64> GetCountAsync(CancellationToken? cancellationToken = null)
         {
-            return GetCount(null, schemaName, columnName, null);
+            return GetCountAsync(null, "*", null, cancellationToken);
         }
 
-        public Int64 GetCount(string schemaName, string columnName, ConnectorBase conn)
+        public System.Threading.Tasks.Task<Int64> GetCountAsync(ConnectorBase conn, CancellationToken? cancellationToken = null)
         {
-            return GetCount(null, schemaName, columnName, conn);
+            return GetCountAsync(null, "*", conn, cancellationToken);
         }
 
-        public Int64 GetCount(string databaseOwner, string schemaName, string columnName)
+        public System.Threading.Tasks.Task<Int64> GetCountAsync(
+            string columnName = null,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            return GetCount(databaseOwner, schemaName, columnName, null);
+            return GetCountAsync(null, columnName, conn, cancellationToken);
         }
 
-        public Int64 GetCount(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
+        public async System.Threading.Tasks.Task<Int64> GetCountAsync(
+            string schemaName, string columnName,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            object res = this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"COUNT", IsDistinct, conn);
-            if (IsNull(res)) return 0;
+            object res = await this.ExecuteAggregateAsync(new Phrases.Count(schemaName, columnName, IsDistinct), conn, cancellationToken);
+            if (res == null) return 0;
             else return Convert.ToInt64(res);
         }
 
@@ -55,32 +62,46 @@ namespace SequelNet
 
         public object GetMax(string columnName)
         {
-            return GetMax(null, null, columnName, null);
+            return GetMax(null, columnName, null);
         }
 
         public object GetMax(string columnName, ConnectorBase conn)
         {
-            return GetMax(null, null, columnName, conn);
+            return GetMax(null, columnName, conn);
         }
 
         public object GetMax(string schemaName, string columnName)
         {
-            return GetMax(null, schemaName, columnName, null);
+            return GetMax(schemaName, columnName, null);
         }
 
         public object GetMax(string schemaName, string columnName, ConnectorBase conn)
         {
-            return GetMax(null, schemaName, columnName, conn);
+            return this.ExecuteAggregate(new Phrases.Max(schemaName, columnName, IsDistinct), conn);
         }
 
-        public object GetMax(string databaseOwner, string schemaName, string columnName)
+        public System.Threading.Tasks.Task<object> GetMaxAsync(CancellationToken? cancellationToken = null)
         {
-            return GetMax(databaseOwner, schemaName, columnName, null);
+            return GetMaxAsync(null, null, null, cancellationToken);
         }
 
-        public object GetMax(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
+        public System.Threading.Tasks.Task<object> GetMaxAsync(ConnectorBase conn, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"MAX", false, conn);
+            return GetMaxAsync(null, null, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetMaxAsync(
+            string columnName = null,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return GetMaxAsync(null, columnName, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetMaxAsync(
+            string schemaName, string columnName,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return this.ExecuteAggregateAsync(new Phrases.Max(schemaName, columnName, IsDistinct), conn, cancellationToken);
         }
 
         #endregion
@@ -89,32 +110,46 @@ namespace SequelNet
 
         public object GetMin(string columnName)
         {
-            return GetMin(null, null, columnName, null);
+            return GetMin(null, columnName, null);
         }
 
         public object GetMin(string columnName, ConnectorBase conn)
         {
-            return GetMin(null, null, columnName, conn);
+            return GetMin(null, columnName, conn);
         }
 
         public object GetMin(string schemaName, string columnName)
         {
-            return GetMin(null, schemaName, columnName, null);
+            return GetMin(schemaName, columnName, null);
         }
 
         public object GetMin(string schemaName, string columnName, ConnectorBase conn)
         {
-            return GetMin(null, schemaName, columnName, conn);
+            return this.ExecuteAggregate(new Phrases.Min(schemaName, columnName, IsDistinct), conn);
         }
 
-        public object GetMin(string databaseOwner, string schemaName, string columnName)
+        public System.Threading.Tasks.Task<object> GetMinAsync(CancellationToken? cancellationToken = null)
         {
-            return GetMin(databaseOwner, schemaName, columnName, null);
+            return GetMinAsync(null, null, null, cancellationToken);
         }
 
-        public object GetMin(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
+        public System.Threading.Tasks.Task<object> GetMinAsync(ConnectorBase conn, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"MIN", false, conn);
+            return GetMinAsync(null, null, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetMinAsync(
+            string columnName = null,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return GetMinAsync(null, columnName, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetMinAsync(
+            string schemaName, string columnName,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return this.ExecuteAggregateAsync(new Phrases.Min(schemaName, columnName, IsDistinct), conn, cancellationToken);
         }
 
         #endregion
@@ -123,32 +158,46 @@ namespace SequelNet
 
         public object GetSum(string columnName)
         {
-            return GetSum(null, null, columnName, null);
+            return GetSum(null, columnName, null);
         }
 
         public object GetSum(string columnName, ConnectorBase conn)
         {
-            return GetSum(null, null, columnName, conn);
+            return GetSum(null, columnName, conn);
         }
 
         public object GetSum(string schemaName, string columnName)
         {
-            return GetSum(null, schemaName, columnName, null);
+            return GetSum(schemaName, columnName, null);
         }
 
         public object GetSum(string schemaName, string columnName, ConnectorBase conn)
         {
-            return GetSum(null, schemaName, columnName, conn);
+            return this.ExecuteAggregate(new Phrases.Sum(schemaName, columnName, IsDistinct), conn);
         }
 
-        public object GetSum(string databaseOwner, string schemaName, string columnName)
+        public System.Threading.Tasks.Task<object> GetSumAsync(CancellationToken? cancellationToken = null)
         {
-            return GetSum(databaseOwner, schemaName, columnName, null);
+            return GetSumAsync(null, null, null, cancellationToken);
         }
 
-        public object GetSum(string databaseOwner, string schemaName, string columnName, ConnectorBase conn)
+        public System.Threading.Tasks.Task<object> GetSumAsync(ConnectorBase conn, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregate(databaseOwner, schemaName, columnName, @"SUM", IsDistinct, conn);
+            return GetSumAsync(null, null, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetSumAsync(
+            string columnName = null,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return GetSumAsync(null, columnName, conn, cancellationToken);
+        }
+
+        public System.Threading.Tasks.Task<object> GetSumAsync(
+            string schemaName, string columnName,
+            ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+        {
+            return this.ExecuteAggregateAsync(new Phrases.Sum(schemaName, columnName, IsDistinct), conn, cancellationToken);
         }
 
         #endregion

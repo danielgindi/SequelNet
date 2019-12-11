@@ -2,49 +2,54 @@
 
 namespace SequelNet.Phrases
 {
-    public class Max : IPhrase
+    public class Max : BaseAggregatePhrase
     {
-        public ValueWrapper Value;
+        public bool Distinct = false;
 
         #region Constructors
 
-        public Max()
+        public Max(bool distinct = false) : base()
         {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
+            this.Distinct = distinct;
         }
 
-        public Max(string tableName, string columnName)
+        public Max(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Distinct = distinct;
         }
 
-        public Max(string columnName)
-            : this(null, columnName)
+        public Max(string columnName, bool distinct = false) : base(columnName)
         {
+            this.Distinct = distinct;
         }
 
-        public Max(object value, ValueObjectType valueType)
+        public Max(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Distinct = distinct;
         }
 
-        public Max(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
+        public Max(IPhrase phrase, bool distinct = false) : base(phrase)
         {
+            this.Distinct = distinct;
         }
 
-        public Max(Where where)
-            : this(where, ValueObjectType.Value)
+        public Max(Where where, bool distinct = false) : base(where)
         {
+            this.Distinct = distinct;
+        }
+
+        public Max(WhereList where, bool distinct = false) : base(where)
+        {
+            this.Distinct = distinct;
         }
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
             string ret;
 
-            ret = @"MAX(";
+            ret = Distinct ? "MAX(DISTINCT " : "MAX(";
 
             ret += Value.Build(conn, relatedQuery);
 
