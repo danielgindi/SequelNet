@@ -374,6 +374,11 @@ namespace SequelNet
             }
         }
 
+        public Task InsertAsync(CancellationToken? cancellationToken)
+        {
+            return InsertAsync(null, cancellationToken);
+        }
+
         public virtual void Update(ConnectorBase connection = null)
         {
             var qry = GetUpdateQuery();
@@ -396,6 +401,11 @@ namespace SequelNet
             }
 
             MarkAllColumnsNotMutated();
+        }
+
+        public Task UpdateAsync(CancellationToken? cancellationToken)
+        {
+            return UpdateAsync(null, cancellationToken);
         }
 
         public virtual void Read(DataReader reader)
@@ -441,8 +451,8 @@ namespace SequelNet
                 return UpdateAsync(connection, cancellationToken);
             }
         }
-        
-        public Task SaveAsync(CancellationToken cancellationToken)
+
+        public Task SaveAsync(CancellationToken? cancellationToken)
         {
             if (IsNewRecord)
             {
@@ -490,6 +500,21 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
+        /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DeleteAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+        {
+            object columnName = SchemaPrimaryKeyName;
+            if (columnName == null) return Task.FromResult(0);
+            return DeleteByParameterAsync(columnName, primaryKeyValue, null, cancellationToken);
+        }
+
+        /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
         /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
@@ -525,9 +550,23 @@ namespace SequelNet
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
         /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DeleteAsync(string columnName, object value, CancellationToken? cancellationToken)
+        {
+            return DeleteByParameterAsync(columnName, value, null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
+        /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>Number of affected rows.</returns>
-        private static int DeleteByParameter(object columnName, object value, ConnectorBase connection)
+        private static int DeleteByParameter(object columnName, object value, ConnectorBase connection = null)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -573,7 +612,7 @@ namespace SequelNet
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Number of affected rows.</returns>
-        private static Task<int> DeleteByParameterAsync(object columnName, object value, ConnectorBase connection, CancellationToken? cancellationToken = null)
+        private static Task<int> DeleteByParameterAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             if (!__FLAGS_RETRIEVED)
             {
@@ -610,6 +649,20 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// If the table has a Deleted or IsDeleted column, it will be marked instead of actually deleted.
+        /// If the table has a ModifiedOn column, it will be updated with the current UTC date/time.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        private static Task<int> DeleteByParameterAsync(object columnName, object value, CancellationToken? cancellationToken)
+        {
+            return DeleteByParameterAsync(columnName, value, null, cancellationToken);
+        }
+
+        /// <summary>
         /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
         /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
@@ -637,6 +690,19 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Deletes a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DestroyAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+        {
+            object columnName = SchemaPrimaryKeyName;
+            if (columnName == null) return Task.FromResult(0);
+            return DestroyByParameterAsync(columnName, primaryKeyValue, null, cancellationToken);
+        }
+
+        /// <summary>
         /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
         /// </summary>
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
@@ -659,6 +725,18 @@ namespace SequelNet
         public static Task<int> DestroyAsync(string columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             return DestroyByParameterAsync(columnName, value, connection, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        public static Task<int> DestroyAsync(string columnName, object value, CancellationToken? cancellationToken)
+        {
+            return DestroyByParameterAsync(columnName, value, null, cancellationToken);
         }
 
         /// <summary>
@@ -722,6 +800,18 @@ namespace SequelNet
             }
 
             return qry.ExecuteNonQueryAsync(connection, cancellationToken);
+        }
+
+        /// <summary>
+        /// Deletes a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Number of affected rows.</returns>
+        private static Task<int> DestroyByParameterAsync(object columnName, object value, CancellationToken? cancellationToken)
+        {
+            return DestroyByParameterAsync(columnName, value, null, cancellationToken);
         }
 
         #endregion
@@ -829,6 +919,17 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static Task<T> FetchByIdAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+        {
+            return FetchByIdAsync(primaryKeyValue, null, cancellationToken);
+        }
+
+        /// <summary>
         /// Loads a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// If the record was loaded, it will be marked as an "old" record.
         /// </summary>
@@ -849,6 +950,17 @@ namespace SequelNet
         public Task LoadByKeyAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             return LoadByParamAsync(SchemaPrimaryKeyName, primaryKeyValue, connection, cancellationToken);
+        }
+
+        /// <summary>
+        /// Loads a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// If the record was loaded, it will be marked as an "old" record.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Task LoadByKeyAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+        {
+            return LoadByParamAsync(SchemaPrimaryKeyName, primaryKeyValue, null, cancellationToken);
         }
 
         /// <summary>
@@ -896,6 +1008,7 @@ namespace SequelNet
         /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
         /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         public async Task LoadByParamAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             Query qry = new Query(Schema);
@@ -926,6 +1039,18 @@ namespace SequelNet
                     MarkOld();
                 }
             }
+        }
+
+        /// <summary>
+        /// Loads a record from the db, by matching <paramref name="columnName"/> to <paramref name="value"/>.
+        /// If the record was loaded, it will be marked as an "old" record.
+        /// </summary>
+        /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
+        /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        public Task LoadByParamAsync(object columnName, object value, CancellationToken? cancellationToken = null)
+        {
+            return LoadByParamAsync(columnName, value, null, cancellationToken);
         }
 
         /// <summary>

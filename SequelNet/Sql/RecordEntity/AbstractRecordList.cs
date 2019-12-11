@@ -86,6 +86,11 @@ namespace SequelNet
             }
         }
 
+        public Task SaveAllAsync(ConnectorBase conn, CancellationToken? cancellationToken)
+        {
+            return SaveAllAsync(conn, false, cancellationToken);
+        }
+
         public void SaveAll(bool withTransaction)
         {
             SaveAll(null, withTransaction);
@@ -96,7 +101,7 @@ namespace SequelNet
             return SaveAllAsync(null, withTransaction, cancellationToken);
         }
 
-        public Task SaveAllAsync(CancellationToken cancellationToken)
+        public Task SaveAllAsync(CancellationToken? cancellationToken)
         {
             return SaveAllAsync(null, false, cancellationToken);
         }
@@ -114,7 +119,7 @@ namespace SequelNet
         public static async Task<TListType> FromReaderAsync(DataReader reader, CancellationToken? cancellationToken = null)
         {
             TListType coll = new TListType();
-            while (await reader.ReadAsync(cancellationToken)) 
+            while (await reader.ReadAsync(cancellationToken))
                 coll.Add(AbstractRecord<TItemType>.FromReader(reader));
             return coll;
         }
@@ -135,7 +140,7 @@ namespace SequelNet
             }
         }
 
-        public static Task<TListType> FetchAllAsync(CancellationToken cancellationToken)
+        public static Task<TListType> FetchAllAsync(CancellationToken? cancellationToken)
         {
             return FetchAllAsync(null, cancellationToken);
         }
@@ -159,7 +164,7 @@ namespace SequelNet
                 return await FromReaderAsync(reader, cancellationToken);
         }
 
-        public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken = null)
+        public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
         {
             using (var reader = await qry.ExecuteReaderAsync(null, cancellationToken))
                 return await FromReaderAsync(reader, cancellationToken);

@@ -59,7 +59,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><typeparamref name="DataReader"/> object</returns>
-        public Task<DataReader> ExecuteReaderAsync(CancellationToken cancellationToken)
+        public Task<DataReader> ExecuteReaderAsync(CancellationToken? cancellationToken)
         {
             return ExecuteReaderAsync(null, CommandBehavior.Default, cancellationToken);
         }
@@ -125,7 +125,7 @@ namespace SequelNet
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>an object</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public Task<object> ExecuteScalarAsync(CancellationToken cancellationToken)
+        public Task<object> ExecuteScalarAsync(CancellationToken? cancellationToken)
         {
             return ExecuteScalarAsync(null, cancellationToken);
         }
@@ -160,7 +160,7 @@ namespace SequelNet
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
 #pragma warning disable CS3024 // Constraint type is not CLS-compliant
-        public Task<Nullable<T>> ExecuteScalarOrNullAsync<T>(CancellationToken cancellationToken) where T : struct, IConvertible
+        public Task<Nullable<T>> ExecuteScalarOrNullAsync<T>(CancellationToken? cancellationToken) where T : struct, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
             return ExecuteScalarOrNullAsync<T>(null, cancellationToken);
@@ -193,7 +193,7 @@ namespace SequelNet
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
 #pragma warning disable CS3024 // Constraint type is not CLS-compliant
-        public Task<T> ExecuteScalarAsync<T>(CancellationToken cancellationToken) where T : class, IConvertible
+        public Task<T> ExecuteScalarAsync<T>(CancellationToken? cancellationToken) where T : class, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
             return ExecuteScalarAsync<T>(null, cancellationToken);
@@ -236,7 +236,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows</returns>
-        public Task<int> ExecuteNonQueryAsync(CancellationToken cancellationToken)
+        public Task<int> ExecuteNonQueryAsync(CancellationToken? cancellationToken)
         {
             return ExecuteNonQueryAsync(null, cancellationToken);
         }
@@ -259,7 +259,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows</returns>
-        public Task<int> ExecuteAsync(CancellationToken cancellationToken)
+        public Task<int> ExecuteAsync(CancellationToken? cancellationToken)
         {
             return ExecuteNonQueryAsync(null, cancellationToken);
         }
@@ -315,7 +315,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows - and the lastInserId</returns>
-        public Task<(int updates, object lastInsertId)> ExecuteWithLastInsertIdAsync(CancellationToken cancellationToken)
+        public Task<(int updates, object lastInsertId)> ExecuteWithLastInsertIdAsync(CancellationToken? cancellationToken)
         {
             return ExecuteWithLastInsertIdAsync(null, cancellationToken);
         }
@@ -336,7 +336,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Array of values. Will never return null.</returns>
-        public Task<T[]> ExecuteScalarArrayAsync<T>(CancellationToken cancellationToken)
+        public Task<T[]> ExecuteScalarArrayAsync<T>(CancellationToken? cancellationToken)
         {
             return ExecuteScalarArrayAsync<T>(null, cancellationToken);
         }
@@ -370,7 +370,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>List of values. Will never return null.</returns>
-        public Task<List<T>> ExecuteScalarListAsync<T>(CancellationToken cancellationToken)
+        public Task<List<T>> ExecuteScalarListAsync<T>(CancellationToken? cancellationToken)
         {
             return ExecuteScalarListAsync<T>(null, cancellationToken);
         }
@@ -413,7 +413,7 @@ namespace SequelNet
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>List of values by the SELECT order. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public Task<List<object>> ExecuteOneRowToListAsync(CancellationToken cancellationToken)
+        public Task<List<object>> ExecuteOneRowToListAsync(CancellationToken? cancellationToken)
         {
             return ExecuteOneRowToListAsync(null, cancellationToken);
         }
@@ -461,7 +461,7 @@ namespace SequelNet
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
-        public Task<Dictionary<string, object>> ExecuteOneRowToDictionaryAsync(CancellationToken cancellationToken)
+        public Task<Dictionary<string, object>> ExecuteOneRowToDictionaryAsync(CancellationToken? cancellationToken)
         {
             return ExecuteOneRowToDictionaryAsync(null, cancellationToken);
         }
@@ -501,7 +501,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Each item in the list is a list of values by the SELECT order. Will never return null.</returns>
-        public Task<List<List<object>>> ExecuteListOfListsAsync(CancellationToken cancellationToken)
+        public Task<List<List<object>>> ExecuteListOfListsAsync(CancellationToken? cancellationToken)
         {
             return ExecuteListOfListsAsync(null, cancellationToken);
         }
@@ -547,7 +547,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
-        public Task<List<Dictionary<string, object>>> ExecuteListOfDictionariesAsync(CancellationToken cancellationToken)
+        public Task<List<Dictionary<string, object>>> ExecuteListOfDictionariesAsync(CancellationToken? cancellationToken)
         {
             return ExecuteListOfDictionariesAsync(null, cancellationToken);
         }
@@ -570,7 +570,7 @@ namespace SequelNet
         /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
-        public Task<L> ExecuteCollectionAsync<R, L>(CancellationToken cancellationToken)
+        public Task<L> ExecuteCollectionAsync<R, L>(CancellationToken? cancellationToken)
             where R : AbstractRecord<R>, new()
             where L : AbstractRecordList<R, L>, new()
         {
