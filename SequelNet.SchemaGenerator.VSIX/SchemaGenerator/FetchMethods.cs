@@ -13,92 +13,94 @@ namespace SequelNet.SchemaGenerator
 
             if (primaryKeyColumns.Count > 0)
             {
-                bool first;
+                var sbQueryCond = new StringBuilder();
+                var sbQueryStart = new StringBuilder();
+
+                sbQueryStart.AppendFormat("var qry = new Query(Schema){0}", "\r\n");
+                var first = true;
+                foreach (var dalCol in primaryKeyColumns)
+                {
+                    if (!first)
+                    {
+                        sbQueryCond.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
+                    }
+                    else
+                    {
+                        sbQueryCond.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
+                        first = false;
+                    }
+                }
+
+                var sbParams = new StringBuilder();
+                var sbParamsCall = new StringBuilder();
+                first = true;
+                foreach (var dalCol in primaryKeyColumns)
+                {
+                    if (!first)
+                    {
+                        sbParams.Append(", ");
+                        sbParamsCall.Append(", ");
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+
+                    sbParams.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
+                    sbParamsCall.AppendFormat("{0}", FirstLetterLowerCase(dalCol.PropertyName));
+                }
 
                 // FetchByID(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static {1} FetchByID(", "\r\n", context.ClassName);
-                first = true;
-                foreach (var dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.Append(", ");
-                    }
-                    else
-                    {
-                        first = false;
-                    }
-                    stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
-                }
-                stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("public static {1} FetchByID({2}, ConnectorBase conn = null){0}{{{0}", "\r\n",
+                    context.ClassName, sbParams);
+                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
+                stringBuilder.AppendFormat("using (var reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
 
-                stringBuilder.AppendFormat("Query qry = new Query(Schema){0}", "\r\n");
-                first = true;
-                foreach (var dalCol in primaryKeyColumns)
-                {
-                    if (!first)
-                    {
-                        stringBuilder.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
-                    }
-                    else
-                    {
-                        stringBuilder.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
-                        first = false;
-                    }
-                }
-                stringBuilder.AppendFormat(";{0}using (DataReader reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+                // FetchByIdAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
+                stringBuilder.AppendFormat("public static async System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}", "\r\n",
+                    context.ClassName, sbParams);
+                stringBuilder.AppendFormat(", ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
+                stringBuilder.AppendFormat("using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken)){0}{{{0}if (await reader.ReadAsync(cancellationToken)){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+
+                // FetchByIdAsync(..., CancellationToken? cancellationToken) function
+                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
+                    context.ClassName, sbParams);
+                stringBuilder.AppendFormat("return FetchByIdAsync({1}, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
 
                 if (primaryKeyColumns.Count > 1)
                 {
-                    // Delete(..., ConnectorBase conn = null) function
-                    stringBuilder.AppendFormat("public static int Delete(", "\r\n");
-                    first = true;
-                    foreach (var dalCol in primaryKeyColumns)
-                    {
-                        if (!first)
-                        {
-                            stringBuilder.Append(", ");
-                        }
-                        else
-                        {
-                            first = false;
-                        }
-                        stringBuilder.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
-                    }
-                    stringBuilder.AppendFormat(", ConnectorBase conn = null){0}{{{0}", "\r\n");
-
-                    stringBuilder.AppendFormat("Query qry = new Query(Schema)", "\r\n");
+                    var sbQueryDelete = new StringBuilder();
 
                     var colIsDeleted = context.Columns.Find(x => x.Name.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase));
                     var colDeleted = context.Columns.Find(x => x.Name.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase));
 
                     if (colIsDeleted != null)
                     {
-                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colIsDeleted.PropertyName);
+                        sbQueryDelete.AppendFormat("{0}.Update(Columns.{1}, true)", "\r\n", colIsDeleted.PropertyName);
                     }
                     else if (colDeleted != null)
                     {
-                        stringBuilder.AppendFormat("{0}    .Update(Columns.{1}, true)", "\r\n", colDeleted.PropertyName);
+                        sbQueryDelete.AppendFormat("{0}.Update(Columns.{1}, true)", "\r\n", colDeleted.PropertyName);
                     }
                     else
                     {
-                        stringBuilder.AppendFormat("{0}    .Delete()", "\r\n");
+                        sbQueryDelete.AppendFormat("{0}.Delete()", "\r\n");
                     }
 
-                    first = true;
-                    foreach (var dalCol in primaryKeyColumns)
-                    {
-                        if (!first)
-                        {
-                            stringBuilder.AppendFormat("{0}    .AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
-                        }
-                        else
-                        {
-                            stringBuilder.AppendFormat("{0}    .Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
-                            first = false;
-                        }
-                    }
-                    stringBuilder.AppendFormat(";{0}return qry.Execute(conn);{0}}}{0}", "\r\n");
+                    // Delete(..., ConnectorBase conn = null) function
+                    stringBuilder.AppendFormat("public static int Delete({1}, ConnectorBase conn = null){0}{{{0}", "\r\n", sbParams);
+                    stringBuilder.AppendFormat("{1}{2}{3};{0}", "\r\n", sbQueryStart, sbQueryDelete, sbQueryCond);
+                    stringBuilder.AppendFormat("return qry.Execute(conn);{0}}}{0}{0}", "\r\n");
+
+                    // DeleteAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
+                    stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<int> DeleteAsync({1}, ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n", sbParams);
+                    stringBuilder.AppendFormat("{1}{2}{3};{0}", "\r\n", sbQueryStart, sbQueryDelete, sbQueryCond);
+                    stringBuilder.AppendFormat("return qry.ExecuteAsync(conn, cancellationToken);{0}}}{0}{0}", "\r\n");
+
+                    // DeleteAsync(..., CancellationToken? cancellationToken) function
+                    stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<int> DeleteAsync({1}, CancellationToken? cancellationToken){0}{{{0}", "\r\n", sbParams);
+                    stringBuilder.AppendFormat("return DeleteAsync({1}, null, cancellationToken);{0}}}{0}", "\r\n", sbParamsCall);
                 }
             }
         }
