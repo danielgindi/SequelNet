@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Threading;
 
 namespace SequelNet.Connector
 {
@@ -10,9 +11,9 @@ namespace SequelNet.Connector
         private const string NEW_LINE = "\r\n";
         private const string DELIMITER = "$$";
 
-        public static void GenerateBackup(MySqlConnector conn, Stream outputStream, BackupOptions options)
+        public static async System.Threading.Tasks.Task GenerateBackup(MySqlConnector conn, Stream outputStream, BackupOptions options, CancellationToken? cancellationToken = null)
         {
-            using (StreamWriter writer = new StreamWriter(outputStream, Encoding.UTF8))
+            using (var writer = new StreamWriter(outputStream, Encoding.UTF8))
             {
                 if (options.BOM)
                 {
@@ -24,10 +25,10 @@ namespace SequelNet.Connector
                 writer.Write(string.Format(@"SET AUTOCOMMIT=0 {0}{1}", DELIMITER, NEW_LINE));
                 if (options.WrapInTransaction) writer.Write(string.Format(@"START TRANSACTION {0}{1}", DELIMITER, NEW_LINE));
 
-                if (options.ExportRoutines) ExportRoutines(conn, writer);
-                if (options.ExportTableCreate) ExportTableCreate(conn, writer, options.ExportTableDrop);
-                if (options.ExportTableData) ExportTableData(conn, writer, options);
-                if (options.ExportTriggers) ExportTriggers(conn, writer);
+                if (options.ExportRoutines) await ExportRoutines(conn, writer, cancellationToken);
+                if (options.ExportTableCreate) await ExportTableCreate(conn, writer, options.ExportTableDrop, cancellationToken);
+                if (options.ExportTableData) await ExportTableData(conn, writer, options, cancellationToken);
+                if (options.ExportTriggers) await ExportTriggers(conn, writer, cancellationToken);
 
                 writer.Write(string.Format(@"SET FOREIGN_KEY_CHECKS=1 {0}{1}", DELIMITER, NEW_LINE));
                 if (options.WrapInTransaction) writer.Write(string.Format(@"COMMIT {0}{1}", DELIMITER, NEW_LINE));
@@ -114,25 +115,25 @@ namespace SequelNet.Connector
             return null;
         }
 
-        static public List<string> GetObjectList(MySqlConnector conn, DbObjectType type)
+        static public async System.Threading.Tasks.Task<List<string>> GetObjectList(MySqlConnector conn, DbObjectType type, CancellationToken? cancellationToken = null)
         {
             string sql;
 
             switch (type)
             {
                 case DbObjectType.TABLE:
-                    sql = @"SHOW TABLES";
+                    sql = "SHOW TABLES";
                     break;
 
                 default:
-                    sql = string.Format(@"SHOW {0} STATUS", type.ToString());
+                    sql = string.Format("SHOW {0} STATUS", type.ToString());
                     break;
             }
 
             var lstResults = new List<string>();
-            using (var reader = conn.ExecuteReader(sql))
+            using (var reader = await conn.ExecuteReaderAsync(sql, cancellationToken ?? CancellationToken.None))
             {
-                while (reader.Read())
+                while (await reader.ReadAsync(cancellationToken))
                 {
                     switch (type)
                     {
@@ -154,16 +155,17 @@ namespace SequelNet.Connector
             return !IsNull(conn.ExecuteScalar(sql));
         }
 
-        static private void ExportRoutines(MySqlConnector conn, StreamWriter writer)
+        static private async System.Threading.Tasks.Task ExportRoutines(MySqlConnector conn, StreamWriter writer, CancellationToken? cancellationToken = null)
         {
-            List<string> lstProcedures = GetObjectList(conn, DbObjectType.PROCEDURE);
-            List<string> lstFunctions = GetObjectList(conn, DbObjectType.FUNCTION);
+            var lstProcedures = await GetObjectList(conn, DbObjectType.PROCEDURE, cancellationToken);
+            var lstFunctions = await GetObjectList(conn, DbObjectType.FUNCTION, cancellationToken);
 
             foreach (string proc in lstProcedures)
             {
                 writer.Write(string.Format(@"DROP PROCEDURE IF EXISTS {2} {0}{1}", DELIMITER, NEW_LINE, proc));
                 writer.Write(string.Format(@"{2} {0}{1}", DELIMITER, NEW_LINE, GetObjectCreate(conn, DbObjectType.PROCEDURE, proc, false)));
             }
+
             foreach (string func in lstFunctions)
             {
                 writer.Write(string.Format(@"DROP FUNCTION IF EXISTS {2} {0}{1}", DELIMITER, NEW_LINE, func));
@@ -171,10 +173,10 @@ namespace SequelNet.Connector
             }
         }
 
-        static private void ExportTableCreate(MySqlConnector conn, StreamWriter writer, bool dropTables)
+        static private async System.Threading.Tasks.Task ExportTableCreate(MySqlConnector conn, StreamWriter writer, bool dropTables, CancellationToken? cancellationToken = null)
         {
-            List<string> lstTables = GetObjectList(conn, DbObjectType.TABLE);
-            List<string> lstViews = new List<string>();
+            var lstTables = await GetObjectList(conn, DbObjectType.TABLE, cancellationToken);
+            var lstViews = new List<string>();
 
             foreach (string table in lstTables)
             {
@@ -205,9 +207,9 @@ namespace SequelNet.Connector
             }
         }
 
-        static private void ExportTableData(MySqlConnector conn, StreamWriter writer, BackupOptions options)
+        static private async System.Threading.Tasks.Task ExportTableData(MySqlConnector conn, StreamWriter writer, BackupOptions options, CancellationToken? cancellationToken = null)
         {
-            List<string> lstTables = GetObjectList(conn, DbObjectType.TABLE);
+            var lstTables = await GetObjectList(conn, DbObjectType.TABLE, cancellationToken);
 
             foreach (string table in lstTables)
             {
@@ -216,11 +218,13 @@ namespace SequelNet.Connector
                     continue;
                 }
 
-                Query query = options.GetTableDataQuery(table);
+                var query = options.GetTableDataQuery(table);
 
-                using (var reader = (query == null ? conn.ExecuteReader(string.Format(@"SELECT * FROM {0}", table)) : query.ExecuteReader(conn)))
+                using (var reader = (query == null 
+                    ? await conn.ExecuteReaderAsync(string.Format(@"SELECT * FROM {0}", table), cancellationToken ?? CancellationToken.None)
+                    : await query.ExecuteReaderAsync(conn, cancellationToken)))
                 {
-                    while (reader.Read())
+                    while (await reader.ReadAsync(cancellationToken))
                     {
                         writer.Write(string.Format(@"INSERT INTO {0} (", table));
                         for (Int32 idx = 0, count = reader.GetColumnCount(); idx < count; idx++)
@@ -240,11 +244,11 @@ namespace SequelNet.Connector
             }
         }
 
-        static private void ExportTriggers(MySqlConnector conn, StreamWriter writer)
+        static private async System.Threading.Tasks.Task ExportTriggers(MySqlConnector conn, StreamWriter writer, CancellationToken? cancellationToken = null)
         {
-            using (var reader = conn.ExecuteReader(@"SHOW TRIGGERS"))
+            using (var reader = await conn.ExecuteReaderAsync("SHOW TRIGGERS", cancellationToken ?? CancellationToken.None))
             {
-                while (reader.Read())
+                while (await reader.ReadAsync(cancellationToken))
                 {
                     writer.WriteLine(@"CREATE TRIGGER {0} ", StringFromDb(reader[@"Trigger"]));
                     writer.WriteLine(@"{0} {1} ON {2} ", StringFromDb(reader[@"Timing"]), StringFromDb(reader[@"Event"]), StringFromDb(reader[@"Table"]));
