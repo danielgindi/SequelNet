@@ -98,8 +98,8 @@ namespace SequelNet
             if (!__PRIMARY_KEY_MULTI)
             {
                 var classType = typeof(AbstractRecord<T>);
-                var propInfo = classType.GetProperty(SchemaPrimaryKeyName as string);
-                if (propInfo == null) propInfo = classType.GetProperty(SchemaPrimaryKeyName as string + @"X");
+                var propInfo = classType.GetProperty(keyNames[0]);
+                if (propInfo == null) propInfo = classType.GetProperty(keyNames[0] + @"X");
                 __PRIMARY_KEY_PROP_INFO = propInfo;
             }
 
