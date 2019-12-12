@@ -95,13 +95,15 @@ namespace SequelNet
 
             __PRIMARY_KEY_MULTI = keyNames.Count > 1;
 
+            if (!__PRIMARY_KEY_MULTI)
+            {
+                var classType = typeof(AbstractRecord<T>);
+                var propInfo = classType.GetProperty(SchemaPrimaryKeyName as string);
+                if (propInfo == null) propInfo = classType.GetProperty(SchemaPrimaryKeyName as string + @"X");
+                __PRIMARY_KEY_PROP_INFO = propInfo;
+            }
+
             __LOOKED_FOR_PRIMARY_KEY_NAME = true;
-
-            var classType = typeof(AbstractRecord<T>);
-
-            var propInfo = classType.GetProperty(SchemaPrimaryKeyName as string);
-            if (propInfo == null) propInfo = classType.GetProperty(SchemaPrimaryKeyName as string + @"X");
-            __PRIMARY_KEY_PROP_INFO = propInfo;
         }
 
         /// <summary>
@@ -248,14 +250,12 @@ namespace SequelNet
 
         public virtual void SetPrimaryKeyValue(object value)
         {
-            var propInfo = __PRIMARY_KEY_PROP_INFO;
-
-            if (propInfo == null)
+            if (!__LOOKED_FOR_PRIMARY_KEY_NAME)
             {
                 CachePrimaryKeyName();
-                propInfo = __PRIMARY_KEY_PROP_INFO;
             }
 
+            var propInfo = __PRIMARY_KEY_PROP_INFO;
             propInfo?.SetValue(
                 this,
                 Convert.ChangeType(value, Schema.Columns.Find(SchemaPrimaryKeyName as string)?.Type), null);
