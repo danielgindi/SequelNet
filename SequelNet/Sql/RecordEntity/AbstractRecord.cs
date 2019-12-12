@@ -170,9 +170,18 @@ namespace SequelNet
                     }
                     value = keys.ToArray();
                 }
+
                 __PRIMARY_KEY_NAME = value;
                 __PRIMARY_KEY_MULTI = __PRIMARY_KEY_NAME is ICollection;
-                
+
+                if (!__PRIMARY_KEY_MULTI)
+                {
+                    var classType = typeof(AbstractRecord<T>);
+                    var propInfo = classType.GetProperty(__PRIMARY_KEY_NAME as string);
+                    if (propInfo == null) propInfo = classType.GetProperty(__PRIMARY_KEY_NAME as string + @"X");
+                    __PRIMARY_KEY_PROP_INFO = propInfo;
+                }
+
                 __LOOKED_FOR_PRIMARY_KEY_NAME = true;
             }
         }
