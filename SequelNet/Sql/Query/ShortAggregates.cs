@@ -25,7 +25,12 @@ namespace SequelNet
 
         public Int64 GetCount(string schemaName, string columnName, ConnectorBase conn = null)
         {
-            object res = this.ExecuteAggregate(new Phrases.Count(schemaName, columnName, IsDistinct), conn);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Count(IsDistinct);
+            else agg = new Phrases.Count(schemaName, columnName, IsDistinct);
+
+            object res = this.ExecuteAggregate(agg, conn);
             if (res == null) return 0;
             else return Convert.ToInt64(res);
         }
@@ -51,7 +56,12 @@ namespace SequelNet
             string schemaName, string columnName,
             ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            object res = await this.ExecuteAggregateAsync(new Phrases.Count(schemaName, columnName, IsDistinct), conn, cancellationToken);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Count(IsDistinct);
+            else agg = new Phrases.Count(schemaName, columnName, IsDistinct);
+
+            object res = await this.ExecuteAggregateAsync(agg, conn, cancellationToken);
             if (res == null) return 0;
             else return Convert.ToInt64(res);
         }
@@ -77,7 +87,12 @@ namespace SequelNet
 
         public object GetMax(string schemaName, string columnName, ConnectorBase conn)
         {
-            return this.ExecuteAggregate(new Phrases.Max(schemaName, columnName, IsDistinct), conn);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Max(IsDistinct);
+            else agg = new Phrases.Max(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregate(agg, conn);
         }
 
         public System.Threading.Tasks.Task<object> GetMaxAsync(CancellationToken? cancellationToken)
@@ -101,7 +116,12 @@ namespace SequelNet
             string schemaName, string columnName,
             ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregateAsync(new Phrases.Max(schemaName, columnName, IsDistinct), conn, cancellationToken);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Max(IsDistinct);
+            else agg = new Phrases.Max(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregateAsync(agg, conn, cancellationToken);
         }
 
         #endregion
@@ -125,7 +145,12 @@ namespace SequelNet
 
         public object GetMin(string schemaName, string columnName, ConnectorBase conn)
         {
-            return this.ExecuteAggregate(new Phrases.Min(schemaName, columnName, IsDistinct), conn);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Min(IsDistinct);
+            else agg = new Phrases.Min(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregate(agg, conn);
         }
 
         public System.Threading.Tasks.Task<object> GetMinAsync(CancellationToken? cancellationToken)
@@ -149,7 +174,12 @@ namespace SequelNet
             string schemaName, string columnName,
             ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregateAsync(new Phrases.Min(schemaName, columnName, IsDistinct), conn, cancellationToken);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Min(IsDistinct);
+            else agg = new Phrases.Min(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregateAsync(agg, conn, cancellationToken);
         }
 
         #endregion
@@ -173,7 +203,12 @@ namespace SequelNet
 
         public object GetSum(string schemaName, string columnName, ConnectorBase conn)
         {
-            return this.ExecuteAggregate(new Phrases.Sum(schemaName, columnName, IsDistinct), conn);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Sum(IsDistinct);
+            else agg = new Phrases.Sum(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregate(agg, conn);
         }
 
         public System.Threading.Tasks.Task<object> GetSumAsync(CancellationToken? cancellationToken)
@@ -197,7 +232,12 @@ namespace SequelNet
             string schemaName, string columnName,
             ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            return this.ExecuteAggregateAsync(new Phrases.Sum(schemaName, columnName, IsDistinct), conn, cancellationToken);
+            BaseAggregatePhrase agg;
+            if (columnName == null || columnName == "*")
+                agg = new Phrases.Sum(IsDistinct);
+            else agg = new Phrases.Sum(schemaName, columnName, IsDistinct);
+
+            return this.ExecuteAggregateAsync(agg, conn, cancellationToken);
         }
 
         #endregion
