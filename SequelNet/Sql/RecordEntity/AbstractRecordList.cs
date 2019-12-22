@@ -34,10 +34,6 @@ namespace SequelNet
                     ownsTransaction = false;
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
             finally
             {
                 if (conn != null && ownsConnection)
@@ -70,10 +66,6 @@ namespace SequelNet
                     conn.CommitTransaction();
                     ownsTransaction = false;
                 }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
             }
             finally
             {

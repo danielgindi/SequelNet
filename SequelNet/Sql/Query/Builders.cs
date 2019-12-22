@@ -1537,10 +1537,6 @@ namespace SequelNet
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
             finally
             {
                 if (ownsConnection && connection != null)
