@@ -167,12 +167,14 @@ namespace SequelNet.Connector
             return command.ExecuteNonQuery();
         }
 
-        public virtual Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken? cancellationToken = null)
+        public virtual async Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                await Connection.OpenAsync();
+
             command.Connection = Connection;
             command.Transaction = Transaction;
-            return command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+            return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
         }
 
         public virtual object ExecuteScalar(DbCommand command)
@@ -183,12 +185,14 @@ namespace SequelNet.Connector
             return command.ExecuteScalar();
         }
 
-        public virtual Task<object> ExecuteScalarAsync(DbCommand command, CancellationToken? cancellationToken = null)
+        public virtual async Task<object> ExecuteScalarAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                await Connection.OpenAsync();
+
             command.Connection = Connection;
             command.Transaction = Transaction;
-            return command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+            return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
         }
 
         internal virtual DataReader ExecuteReader(
@@ -229,7 +233,7 @@ namespace SequelNet.Connector
             return ExecuteReader(command, false, commandBehavior);
         }
 
-        internal virtual Task<DataReader> ExecuteReaderAsync(
+        internal virtual async Task<DataReader> ExecuteReaderAsync(
             DbCommand command,
             bool attachCommandToReader,
             CommandBehavior commandBehavior,
@@ -239,12 +243,13 @@ namespace SequelNet.Connector
 
             try
             {
-                if (Connection.State != ConnectionState.Open) Connection.Open();
+                if (Connection.State != ConnectionState.Open) 
+                    await Connection.OpenAsync();
 
                 command.Connection = Connection;
                 command.Transaction = Transaction;
 
-                return command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None).ContinueWith(x =>
+                return await command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None).ContinueWith(x =>
                 {
                     return new DataReader(
                         x.Result,
@@ -303,13 +308,14 @@ namespace SequelNet.Connector
             }
         }
 
-        public virtual Task<int> ExecuteNonQueryAsync(string querySql, CancellationToken? cancellationToken = null)
+        public virtual async Task<int> ExecuteNonQueryAsync(string querySql, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                await Connection.OpenAsync();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
-                return command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+                return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
             }
         }
 
@@ -323,13 +329,14 @@ namespace SequelNet.Connector
             }
         }
 
-        public virtual Task<object> ExecuteScalarAsync(string querySql, CancellationToken? cancellationToken = null)
+        public virtual async Task<object> ExecuteScalarAsync(string querySql, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open) 
+                await Connection.OpenAsync();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
-                return command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+                return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
             }
         }
 
@@ -341,15 +348,16 @@ namespace SequelNet.Connector
             return ExecuteReader(command, true, commandBehavior);
         }
 
-        public virtual Task<DataReader> ExecuteReaderAsync(
+        public virtual async Task<DataReader> ExecuteReaderAsync(
             string querySql,
             CommandBehavior commandBehavior = CommandBehavior.Default,
             CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                await Connection.OpenAsync();
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
-            return ExecuteReaderAsync(
+            return await ExecuteReaderAsync(
                 command, 
                 true, 
                 commandBehavior | CommandBehavior.CloseConnection, 
