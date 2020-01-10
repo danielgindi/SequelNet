@@ -94,13 +94,6 @@ namespace SequelNet
             First = whereList;
         }
 
-        public Where(object thisLiteral, WhereComparison comparedBy, object thatLiteral)
-        {
-            Comparison = comparedBy;
-            First = thisLiteral;
-            Second = thatLiteral;
-        }
-
         public Where(object thisObject, ValueObjectType thisObjectType, WhereComparison comparedBy, object thatObject, ValueObjectType thatObjectType)
         {
             Comparison = comparedBy;
@@ -108,14 +101,6 @@ namespace SequelNet
             FirstType = thisObjectType;
             Second = thatObject;
             SecondType = thatObjectType;
-        }
-
-        public Where(object thisLiteral, object betweenThisLiteral, object andThatLiteral)
-        {
-            Comparison = WhereComparison.Between;
-            First = thisLiteral;
-            Second = betweenThisLiteral;
-            Third = andThatLiteral;
         }
 
         public Where(object thisObject, ValueObjectType thisObjectType,
@@ -195,14 +180,6 @@ namespace SequelNet
             First = whereList;
         }
 
-        public Where(WhereCondition condition, object thisLiteral, WhereComparison comparedBy, object thatLiteral)
-        {
-            Condition = condition;
-            Comparison = comparedBy;
-            First = thisLiteral;
-            Second = thatLiteral;
-        }
-
         public Where(WhereCondition condition, object thisObject, ValueObjectType thisObjectType, WhereComparison comparedBy, object thatObject, ValueObjectType thatObjectType)
         {
             Condition = condition;
@@ -211,15 +188,6 @@ namespace SequelNet
             FirstType = thisObjectType;
             Second = thatObject;
             SecondType = thatObjectType;
-        }
-
-        public Where(WhereCondition condition, object thisLiteral, object betweenThisLiteral, object andThatLiteral)
-        {
-            Condition = condition;
-            Comparison = WhereComparison.Between;
-            First = thisLiteral;
-            Second = betweenThisLiteral;
-            Third = andThatLiteral;
         }
 
         public Where(WhereCondition condition,
