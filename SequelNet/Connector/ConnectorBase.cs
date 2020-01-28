@@ -249,13 +249,14 @@ namespace SequelNet.Connector
                 command.Connection = Connection;
                 command.Transaction = Transaction;
 
-                return await command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None).ContinueWith(x =>
-                {
-                    return new DataReader(
-                        x.Result,
-                        attachCommandToReader ? command : null,
-                        attachConnectionToReader ? this : null);
-                });
+                return await command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None)
+                    .ContinueWith(x =>
+                    {
+                        return new DataReader(
+                            x.Result,
+                            attachCommandToReader ? command : null,
+                            attachConnectionToReader ? this : null);
+                    }, TaskContinuationOptions.NotOnFaulted | TaskContinuationOptions.NotOnCanceled);
             }
             catch (Exception ex)
             {
