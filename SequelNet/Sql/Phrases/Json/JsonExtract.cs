@@ -41,6 +41,11 @@ namespace SequelNet.Phrases
             this.Unquote = unquote;
         }
 
+        public JsonExtract(string columnName, string path = "$", bool unquote = true)
+            : this(null, columnName, path, unquote)
+        {
+        }
+
         public JsonExtract(IPhrase phrase, string path = "$", bool unquote = true)
             : this(phrase, ValueObjectType.Value, path, unquote)
         {
