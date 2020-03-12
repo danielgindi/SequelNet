@@ -27,31 +27,31 @@ namespace SequelNet.Phrases
 
         #region Constructors
 
-        public JsonExtract(object value, ValueObjectType valueType, string path = "$", bool unquote = true)
+        public JsonExtract(object value, ValueObjectType valueType, string path, bool unquote = true)
         {
             this.Value = new ValueWrapper(value, valueType);
             this.Path = path;
             this.Unquote = unquote;
         }
 
-        public JsonExtract(string tableName, string columnName, string path = "$", bool unquote = true)
+        public JsonExtract(string tableName, string columnName, string path, bool unquote = true)
         {
             this.Value = new ValueWrapper(tableName, columnName);
             this.Path = path;
             this.Unquote = unquote;
         }
 
-        public JsonExtract(string columnName, string path = "$", bool unquote = true)
+        public JsonExtract(string columnName, string path, bool unquote = true)
             : this(null, columnName, path, unquote)
         {
         }
 
-        public JsonExtract(IPhrase phrase, string path = "$", bool unquote = true)
+        public JsonExtract(IPhrase phrase, string path, bool unquote = true)
             : this(phrase, ValueObjectType.Value, path, unquote)
         {
         }
 
-        public JsonExtract(Where where, string path = "$", bool unquote = true)
+        public JsonExtract(Where where, string path, bool unquote = true)
             : this(where, ValueObjectType.Value, path, unquote)
         {
         }

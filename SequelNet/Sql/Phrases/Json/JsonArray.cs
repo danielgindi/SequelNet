@@ -96,7 +96,7 @@ namespace SequelNet.Phrases
                     }
 
                 default:
-                    throw new NotSupportedException("JsonExtract is not supported by current DB type");
+                    throw new NotSupportedException("JsonArray is not supported by current DB type");
             }
         }
     }
