@@ -444,11 +444,6 @@ namespace SequelNet
             return new JsonExtract(tableName, columnName, path, unquote);
         }
 
-        public static JsonExtract JsonExtract(string columnName, string path = "$", bool unquote = true)
-        {
-            return new JsonExtract(columnName, path, unquote);
-        }
-
         public static JsonExtract JsonExtract(IPhrase phrase, string path = "$", bool unquote = true)
         {
             return new JsonExtract(phrase, path, unquote);
