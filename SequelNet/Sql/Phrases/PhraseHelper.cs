@@ -434,29 +434,29 @@ namespace SequelNet
             return new JsonArrayInsert(doc, path, value);
         }
 
-        public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path = "$")
+        public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path = "$", bool unquote = true)
         {
-            return new JsonExtract(value, valueType, path);
+            return new JsonExtract(value, valueType, path, unquote);
         }
 
-        public static JsonExtract JsonExtract(string tableName, string columnName, string path = "$")
+        public static JsonExtract JsonExtract(string tableName, string columnName, string path = "$", bool unquote = true)
         {
-            return new JsonExtract(tableName, columnName, path);
+            return new JsonExtract(tableName, columnName, path, unquote);
         }
 
-        public static JsonExtract JsonExtract(string columnName, string path = "$")
+        public static JsonExtract JsonExtract(string columnName, string path = "$", bool unquote = true)
         {
-            return new JsonExtract(columnName, path);
+            return new JsonExtract(columnName, path, unquote);
         }
 
-        public static JsonExtract JsonExtract(IPhrase phrase, string path = "$")
+        public static JsonExtract JsonExtract(IPhrase phrase, string path = "$", bool unquote = true)
         {
-            return new JsonExtract(phrase, path);
+            return new JsonExtract(phrase, path, unquote);
         }
 
-        public static JsonExtract JsonExtract(Where where, string path = "$")
+        public static JsonExtract JsonExtract(Where where, string path = "$", bool unquote = true)
         {
-            return new JsonExtract(where, path);
+            return new JsonExtract(where, path, unquote);
         }
 
         static public JsonInsert JsonInsert(

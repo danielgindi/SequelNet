@@ -23,33 +23,36 @@ namespace SequelNet.Phrases
     {
         public ValueWrapper Value;
         public string Path = "$";
+        public bool Unquote = false;
 
         #region Constructors
-        
-        public JsonExtract(object value, ValueObjectType valueType, string path = "$")
+
+        public JsonExtract(object value, ValueObjectType valueType, string path = "$", bool unquote = true)
         {
             this.Value = new ValueWrapper(value, valueType);
             this.Path = path;
+            this.Unquote = unquote;
         }
 
-        public JsonExtract(string tableName, string columnName, string path = "$")
+        public JsonExtract(string tableName, string columnName, string path = "$", bool unquote = true)
         {
             this.Value = new ValueWrapper(tableName, columnName);
             this.Path = path;
+            this.Unquote = unquote;
         }
 
-        public JsonExtract(string columnName, string path = "$")
-            : this(null, columnName, path)
+        public JsonExtract(string columnName, string path = "$", bool unquote = true)
+            : this(null, columnName, path, unquote)
         {
         }
 
-        public JsonExtract(IPhrase phrase, string path = "$")
-            : this(phrase, ValueObjectType.Value, path)
+        public JsonExtract(IPhrase phrase, string path = "$", bool unquote = true)
+            : this(phrase, ValueObjectType.Value, path, unquote)
         {
         }
 
-        public JsonExtract(Where where, string path = "$")
-            : this(where, ValueObjectType.Value, path)
+        public JsonExtract(Where where, string path = "$", bool unquote = true)
+            : this(where, ValueObjectType.Value, path, unquote)
         {
         }
 
@@ -63,11 +66,14 @@ namespace SequelNet.Phrases
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        ret += "JSON_UNQUOTE(JSON_EXTRACT(";
-                        ret += Value.Build(conn, relatedQuery);
-                        ret += ", ";
-                        ret += conn.Language.PrepareValue(Path);
-                        ret += "))";
+                        var phrase = $"JSON_EXTRACT({Value.Build(conn, relatedQuery)}, {conn.Language.PrepareValue(Path)})";
+
+                        if (Unquote)
+                            ret += 
+                                $"(CASE WHEN JSON_TYPE({phrase} = 'NULL' THEN NULL" +
+                                $"WHEN JSON_TYPE({phrase}) = 'STRING' THEN JSON_UNQUOTE({phrase})" +
+                                $"ELSE {phrase} END)";
+                        else ret += phrase;
                     }
                     break;
 
