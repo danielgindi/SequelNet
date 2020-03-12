@@ -70,9 +70,9 @@ namespace SequelNet.Phrases
 
                         if (Unquote)
                             ret += 
-                                $"(CASE WHEN JSON_TYPE({phrase} = 'NULL' THEN NULL" +
-                                $"WHEN JSON_TYPE({phrase}) = 'STRING' THEN JSON_UNQUOTE({phrase})" +
-                                $"ELSE {phrase} END)";
+                                $"(CASE WHEN JSON_TYPE({phrase}) = 'NULL' THEN NULL" +
+                                $" WHEN JSON_TYPE({phrase}) = 'STRING' THEN JSON_UNQUOTE({phrase})" +
+                                $" ELSE {phrase} END)";
                         else ret += phrase;
                     }
                     break;
