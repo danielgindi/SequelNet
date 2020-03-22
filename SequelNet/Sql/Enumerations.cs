@@ -111,6 +111,16 @@
         DateTime,
 
         /// <summary>
+        /// Date
+        /// </summary>
+        Date,
+
+        /// <summary>
+        /// Time
+        /// </summary>
+        Time,
+
+        /// <summary>
         /// Guid
         /// </summary>
         Guid,

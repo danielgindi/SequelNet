@@ -75,9 +75,14 @@ namespace SequelNet.SchemaGenerator
             }
             else if (dalCol.Type == DalColumnType.TDateTime ||
                 dalCol.Type == DalColumnType.TDateTimeUtc ||
-                dalCol.Type == DalColumnType.TDateTimeLocal)
+                dalCol.Type == DalColumnType.TDateTimeLocal ||
+                dalCol.Type == DalColumnType.TDate)
             {
                 dalCol.ActualType = "DateTime";
+            }
+            else if (dalCol.Type == DalColumnType.TTime)
+            {
+                dalCol.ActualType = "TimeSpan";
             }
             else if (dalCol.Type == DalColumnType.TInt)
             {
@@ -268,7 +273,15 @@ namespace SequelNet.SchemaGenerator
 
             var dataTypeString = "";
 
-            if (dalCol.Type == DalColumnType.TText)
+            if (dalCol.Type == DalColumnType.TDate)
+            {
+                dataTypeString = "DataType.Date";
+            }
+            else if (dalCol.Type == DalColumnType.TTime)
+            {
+                dataTypeString = "DataType.Time";
+            }
+            else if (dalCol.Type == DalColumnType.TText)
             {
                 dataTypeString = "DataType.Text";
             }

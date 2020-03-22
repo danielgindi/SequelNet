@@ -24,10 +24,12 @@ namespace SequelNet.SchemaGenerator
 		TGuid,
 
 		TDateTime,
-        TDateTimeUtc,
-        TDateTimeLocal,
+		TDateTimeUtc,
+		TDateTimeLocal,
+		TDate,
+		TTime,
 
-        TDecimal,
+		TDecimal,
 		TMoney,
 		TDouble,
 		TFloat,

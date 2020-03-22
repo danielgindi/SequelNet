@@ -228,6 +228,25 @@ namespace SequelNet.Connector
         }
 
         /// <summary>
+        /// Gets the value of the specified column as a System.TimeSpan object.
+        /// </summary>
+        /// <param name="ordinal">The zero-based column ordinal.</param>
+        /// <returns>The value of the specified column.</returns>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
+        public TimeSpan GetTimeSpan(int ordinal)
+        {
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is TimeSpan)
+                return (TimeSpan)value;
+            else if (value is string)
+                return TimeSpan.Parse((string)value);
+            else if (value != null)
+                throw new InvalidCastException("Failed to convert " + value.GetType().ToString() + " to TimeSpan"); 
+            
+            throw new NoNullAllowedException("Value is null while the return value is not nullable");
+        }
+
+        /// <summary>
         /// Gets the value of the specified column as a System.Decimal object.
         /// </summary>
         /// <param name="ordinal">The zero-based column ordinal.</param>
@@ -608,6 +627,18 @@ namespace SequelNet.Connector
             return UnderlyingReader.GetDateTime(ordinal);
         }
 
+        /// <summary>
+        /// Gets the value of the specified column as a System.TimeSpan object.
+        /// </summary>
+        /// <param name="columnName">The column name.</param>
+        /// <returns>The value of the specified column.</returns>
+        /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
+        public TimeSpan GetTimeSpan(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return GetTimeSpan(ordinal);
+        }
+
         public decimal GetDecimal(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -919,6 +950,17 @@ namespace SequelNet.Connector
                 date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
             }
             return date;
+        }
+
+        public TimeSpan? GetTimeSpanOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? null : (TimeSpan?)GetTimeSpan(ordinal);
+        }
+
+        public TimeSpan? GetTimeSpanOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? null : (TimeSpan?)GetTimeSpan(ordinal);
         }
 
         public float? GetFloatOrNull(int ordinal)

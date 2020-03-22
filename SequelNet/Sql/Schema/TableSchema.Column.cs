@@ -100,6 +100,10 @@ namespace SequelNet
                 {
                     return DataType.DateTime;
                 }
+                else if (this.Type.Equals(typeof(TimeSpan)))
+                {
+                    return DataType.Time;
+                }
                 else if (this.Type.Equals(typeof(Guid)))
                 {
                     return DataType.Guid;

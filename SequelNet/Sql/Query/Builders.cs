@@ -495,6 +495,14 @@ namespace SequelNet
                 {
                     sb.Append(language.DateTimeType);
                 }
+                else if (dataType == DataType.Date)
+                {
+                    sb.Append(language.DateType);
+                }
+                else if (dataType == DataType.Time)
+                {
+                    sb.Append(language.TimeType);
+                }
                 else if (dataType == DataType.Numeric)
                 {
                     if (column.NumberPrecision > 0)

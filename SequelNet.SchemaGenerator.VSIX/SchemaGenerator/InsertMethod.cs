@@ -148,6 +148,14 @@ namespace SequelNet.SchemaGenerator
             {
                 valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Local)";
             }
+            else if (dalCol.Type == DalColumnType.TDate)
+            {
+                valueConvertorFormat = "Convert.ToDateTime({0})";
+            }
+            else if (dalCol.Type == DalColumnType.TTime)
+            {
+                valueConvertorFormat = "({0}) is TimeSpan ? (TimeSpan)({0}) : TimeSpan.Parse((string)({0}))";
+            }
             else if (dalCol.Type == DalColumnType.TJson ||
                 dalCol.Type == DalColumnType.TJsonBinary)
             {

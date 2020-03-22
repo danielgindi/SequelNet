@@ -86,7 +86,8 @@ namespace SequelNet.SchemaGenerator
 
                 else if (dalCol.Type == DalColumnType.TDateTime ||
                     dalCol.Type == DalColumnType.TDateTimeUtc ||
-                    dalCol.Type == DalColumnType.TDateTimeLocal)
+                    dalCol.Type == DalColumnType.TDateTimeLocal ||
+                    dalCol.Type == DalColumnType.TDate)
                 {
                     fromReader = "reader.GetDateTime";
 
@@ -98,6 +99,25 @@ namespace SequelNet.SchemaGenerator
                     {
                         fromReader += "Local";
                     }
+
+                    if (dalCol.IsNullable)
+                    {
+                        fromReader += "OrNull";
+                    }
+
+                    fromReader += "(Columns.{0})";
+
+                    if (dalCol.IsNullable &&
+                        !string.IsNullOrEmpty(dalCol.DefaultValue) &&
+                        dalCol.DefaultValue != "null")
+                    {
+                        fromReader += " ?? " + dalCol.DefaultValue;
+                    }
+                }
+
+                else if (dalCol.Type == DalColumnType.TTime)
+                {
+                    fromReader = "reader.GetTimeSpan";
 
                     if (dalCol.IsNullable)
                     {

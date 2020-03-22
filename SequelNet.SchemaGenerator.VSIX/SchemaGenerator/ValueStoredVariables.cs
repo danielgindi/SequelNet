@@ -42,6 +42,14 @@ namespace SequelNet.SchemaGenerator
                     {
                         defaultValue = "DateTime.Now";
                     }
+                    else if (dalColumn.Type == DalColumnType.TDate)
+                    {
+                        defaultValue = "DateTime.UtcNow";
+                    }
+                    else if (dalColumn.Type == DalColumnType.TTime)
+                    {
+                        defaultValue = "TimeSpan.Zero";
+                    }
                     else if (dalColumn.Type == DalColumnType.TInt)
                     {
                         defaultValue = "0";

@@ -259,6 +259,8 @@ namespace SequelNet.Connector
         public virtual string LongTextType => @"NTEXT";
         public virtual string BooleanType => @"BOOLEAN";
         public virtual string DateTimeType => @"DATETIME";
+        public virtual string DateType => @"DATE";
+        public virtual string TimeType => @"TIME";
         public virtual string BlobType => @"BLOB";
         public virtual string GuidType => @"GUID";
         public virtual string JsonType => @"TEXT";

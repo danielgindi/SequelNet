@@ -611,6 +611,14 @@ namespace SequelNet.SchemaGenerator
                         {
                             dalColumn.Type = DalColumnType.TDateTimeLocal;
                         }
+                        else if (columnKeyword.Equals("DATE", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TDate;
+                        }
+                        else if (columnKeyword.Equals("TIME", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TTime;
+                        }
                         else if (columnKeyword.StartsWith("Default ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.DefaultValue = columnKeyword.Substring(8);
