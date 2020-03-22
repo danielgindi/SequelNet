@@ -39,7 +39,7 @@
     <RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
     <Product>Oracle MySql connector for SequelNet</Product>
     <PackageId>SequelNet.Connector.MySql</PackageId>
-    <Version>3.0.21</Version>
+    <Version>3.0.22</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
