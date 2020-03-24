@@ -1754,9 +1754,82 @@ namespace SequelNet
                 innerObject);
         }
 
-        public static GeographyDistanceMath GeographyDistanceMath(GeographyDistanceMath.PointWrapper from, GeographyDistanceMath.PointWrapper to)
+        public static GeographySphericalDistance GeographySphericalDistance(
+            object outerValue, ValueObjectType outerValueType,
+            object innerValue, ValueObjectType innerValueType)
         {
-            return new GeographyDistanceMath(from, to);
+            return new GeographySphericalDistance(
+                outerValue, outerValueType,
+                innerValue, innerValueType);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            object outerValue, ValueObjectType outerValueType,
+            string innerColumnName)
+        {
+            return new GeographySphericalDistance(
+                outerValue, outerValueType,
+                innerColumnName);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            object outerValue, ValueObjectType outerValueType,
+            string innerTableName, string innerColumnName)
+        {
+            return new GeographySphericalDistance(
+                outerValue, outerValueType,
+                innerTableName, innerColumnName);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            Geometry outerValue,
+            string innerColumnName)
+        {
+            return new GeographySphericalDistance(
+                outerValue,
+                innerColumnName);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            Geometry outerValue,
+            string innerTableName, string innerColumnName)
+        {
+            return new GeographySphericalDistance(
+                outerValue,
+                innerTableName, innerColumnName);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(Geometry outerValue, Geometry innerValue)
+        {
+            return new GeographySphericalDistance(
+                outerValue,
+                innerValue);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            string outerColumnName,
+            Geometry innerObject)
+        {
+            return new GeographySphericalDistance(
+                outerColumnName,
+                innerObject);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(
+            string outerTableName, string outerColumnName,
+            Geometry innerObject)
+        {
+            return new GeographySphericalDistance(
+                outerTableName, outerColumnName,
+                innerObject);
+        }
+
+        public static GeographySphericalDistanceMath GeographySphericalDistance(
+            ValueWrapper fromLat, ValueWrapper fromLng,
+            ValueWrapper toLat, ValueWrapper toLng
+            )
+        {
+            return new GeographySphericalDistanceMath(fromLat, fromLng, toLat, toLng);
         }
 
         public static ST_X ST_X(string tableName, string columnName)

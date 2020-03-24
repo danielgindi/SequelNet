@@ -121,6 +121,11 @@ namespace SequelNet.Connector
             return "ST_Distance(" + g1 + ", " + g2 + ")";
         }
 
+        public override string ST_Distance_Sphere(string g1, string g2)
+        {
+            return "ST_Distance_Sphere(" + g1 + ", " + g2 + ")";
+        }
+
         public override string ST_GeomFromText(string text, string srid = null)
         {
             if (Is5_7OrLater())

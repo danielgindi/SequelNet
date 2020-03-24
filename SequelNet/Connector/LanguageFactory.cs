@@ -105,22 +105,27 @@ namespace SequelNet.Connector
 
         public virtual string ST_Contains(string g1, string g2)
         {
-            return "ST_Contains(" + g1 + ", " + g2 + ")";
+            throw new NotImplementedException("ST_Contains has not been implemented for this connector");
         }
 
         public virtual string ST_Distance(string g1, string g2)
         {
-            return "ST_Distance(" + g1 + ", " + g2 + ")";
+            throw new NotImplementedException("ST_Distance has not been implemented for this connector");
+        }
+
+        public virtual string ST_Distance_Sphere(string g1, string g2)
+        {
+            throw new NotImplementedException("ST_Distance_Sphere has not been implemented for this connector");
         }
 
         public virtual string ST_GeomFromText(string text, string srid = null)
         {
-            return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            throw new NotImplementedException("ST_GeomFromText has not been implemented for this connector");
         }
 
         public virtual string ST_GeogFromText(string text, string srid = null)
         {
-            return "ST_GeogFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            throw new NotImplementedException("ST_GeogFromText has not been implemented for this connector");
         }
 
         public virtual void BuildNullSafeEqualsTo(
