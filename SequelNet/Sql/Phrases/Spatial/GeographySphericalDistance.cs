@@ -4,6 +4,9 @@ using SequelNet.Connector;
 
 namespace SequelNet.Phrases
 {
+    /// <summary>
+    /// This will return value in meters
+    /// </summary>
     public class GeographySphericalDistance : IPhrase
     {
         public string OuterTableName;

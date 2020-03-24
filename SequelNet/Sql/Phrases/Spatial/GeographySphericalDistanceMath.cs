@@ -11,6 +11,9 @@ namespace SequelNet.Phrases
     /// TX = To latitude
     /// TY = To longitude
     /// D =  2R * ASIN(SQRT(POWER(SIN((FX-TX) * PI/360), 2) + COS(FX * PI/180) * COS(TX * PI/180) * POWER(SIN((FY - TY) * PI/360), 2)))
+    /// meters = D * 1000
+    /// 
+    /// This will return value in meters
     /// </summary>
     public class GeographySphericalDistanceMath : IPhrase
     {
@@ -50,6 +53,7 @@ namespace SequelNet.Phrases
             sb.Append(@"-");
             sb.Append(ty);
             sb.Append(@") * PI()/360.0), 2)))");
+            sb.Append(@" * 1000.0"); // Return in meters
 
             return sb.ToString();
         }
