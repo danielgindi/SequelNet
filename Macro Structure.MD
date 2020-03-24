@@ -35,6 +35,7 @@
  `Collate` - the name of a collation for this column  
  `Unique` / `Unique Index` - Defines a UNIQUE index on this column  
  `Foreign` _TableClassName_._ColumnName_ - Defines a foreign key for this column  
+ `SRID 4326` - Will set SRID 4326 for the geometry column  
 
 ##### Keywords that affect the AbstractRecord<> structure: (Case Insensitive)
 
