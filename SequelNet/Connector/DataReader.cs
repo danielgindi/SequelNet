@@ -151,6 +151,16 @@ namespace SequelNet.Connector
             return UnderlyingReader.GetByte(ordinal);
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public sbyte GetSByte(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is sbyte svalue)
+                return svalue;
+            return Convert.ToSByte(value);
+        }
+
         /// <summary>
         /// Reads a stream of bytes from the specified column, starting at location indicated
         ///    by dataOffset, into the buffer, starting at the location indicated by bufferOffset.
@@ -312,6 +322,16 @@ namespace SequelNet.Connector
             return UnderlyingReader.GetInt16(ordinal);
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt16 GetUInt16(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is UInt16 uvalue)
+                return uvalue;
+            return Convert.ToUInt16(value);
+        }
+
         /// <summary>
         /// Gets the value of the specified column as a 32-bit signed integer.
         /// </summary>
@@ -323,6 +343,16 @@ namespace SequelNet.Connector
             return UnderlyingReader.GetInt32(ordinal);
         }
 
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt32 GetUInt32(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is UInt32 uvalue)
+                return uvalue;
+            return Convert.ToUInt32(value);
+        }
+
         /// <summary>
         /// Gets the value of the specified column as a 64-bit signed integer.
         /// </summary>
@@ -332,6 +362,16 @@ namespace SequelNet.Connector
         public long GetInt64(int ordinal)
         {
             return UnderlyingReader.GetInt64(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt64 GetUInt64(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is UInt64 uvalue)
+                return uvalue;
+            return Convert.ToUInt64(value);
         }
 
         /// <summary>
@@ -589,7 +629,15 @@ namespace SequelNet.Connector
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.GetByte(ordinal);
         }
-        
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public sbyte GetSByte(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return GetSByte(ordinal);
+        }
+
         public long GetBytes(string columnName, long dataOffset, byte[] buffer, int bufferOffset, int length)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -674,19 +722,43 @@ namespace SequelNet.Connector
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.GetInt16(ordinal);
         }
-        
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt16 GetUInt16(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return GetUInt16(ordinal);
+        }
+
         public int GetInt32(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.GetInt32(ordinal);
         }
-        
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt32 GetUInt32(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return GetUInt32(ordinal);
+        }
+
         public long GetInt64(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
-            return UnderlyingReader.GetInt64(ordinal);
+            return GetInt64(ordinal);
         }
-                
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt64 GetUInt64(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return GetUInt64(ordinal);
+        }
+
         public string GetString(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -744,6 +816,43 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? defaultValue : UnderlyingReader.GetBoolean(ordinal);
         }
 
+        public byte? GetByteOrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (byte?)null : UnderlyingReader.GetByte(ordinal);
+        }
+
+        public byte? GetByteOrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (byte?)null : UnderlyingReader.GetByte(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public sbyte? GetSByteOrNull(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (sbyte?)null : GetSByte(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public sbyte? GetSByteOrNull(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (sbyte?)null : GetSByte(ordinal);
+        }
+
+        public Int16? GetInt16OrNull(int ordinal)
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (Int16?)null : UnderlyingReader.GetInt16(ordinal);
+        }
+
+        public Int16? GetInt16OrNull(string columnName)
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (Int16?)null : UnderlyingReader.GetInt16(ordinal);
+        }
+
         public int? GetInt32OrNull(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? (int?)null : UnderlyingReader.GetInt32(ordinal);
@@ -786,6 +895,51 @@ namespace SequelNet.Connector
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt64(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt16? GetUInt16OrNull(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt16?)null : GetUInt16(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt16? GetUInt16OrNull(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt16?)null : GetUInt16(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt32? GetUInt32OrNull(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt32?)null : GetUInt32(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt32? GetUInt32OrNull(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt32?)null : GetUInt32(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt64? GetUInt64OrNull(int ordinal)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt64?)null : GetUInt64(ordinal);
+        }
+
+#pragma warning disable CS3002 // Return type is not CLS-compliant
+        public UInt64? GetUInt64OrNull(string columnName)
+#pragma warning restore CS3002 // Return type is not CLS-compliant
+        {
+            var ordinal = UnderlyingReader.GetOrdinal(columnName);
+            return UnderlyingReader.IsDBNull(ordinal) ? (UInt64?)null : GetUInt64(ordinal);
         }
 
         public string GetStringOrNull(int ordinal)
