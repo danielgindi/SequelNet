@@ -124,11 +124,11 @@ namespace SequelNet.SchemaGenerator
                 }
                 else if (defaultValue != null)
                 {
-                    stringBuilder.AppendFormat(" = {1};{0}", "\r\n", defaultValue);
+                    stringBuilder.AppendFormat(" = {1};{0}{0}", "\r\n", defaultValue);
                 }
                 else
                 {
-                    stringBuilder.AppendFormat(";{0}", "\r\n");
+                    stringBuilder.AppendFormat(";{0}{0}", "\r\n");
                 }
             }
         }

@@ -33,7 +33,7 @@ namespace SequelNet.SchemaGenerator
                 {
                     stringBuilder.AppendFormat("set{{ _{2} = value; }}{0}", formatArgs);
                 }
-                stringBuilder.AppendFormat("}}{0}", formatArgs);
+                stringBuilder.AppendFormat("}}{0}{0}", formatArgs);
             }
         }
 	}

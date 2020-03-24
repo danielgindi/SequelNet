@@ -99,7 +99,7 @@ namespace SequelNet.SchemaGenerator
 
             stringBuilder.AppendFormat("#region Private Members{0}{0}", "\r\n");
             WriteValueStoredVariables(stringBuilder, context);
-            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
+            stringBuilder.AppendFormat("#endregion{0}{0}", "\r\n");
 
             #endregion
 
@@ -107,7 +107,7 @@ namespace SequelNet.SchemaGenerator
 
             stringBuilder.AppendFormat("#region Properties{0}{0}", "\r\n");
             WriteValueProperties(stringBuilder, context);
-            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
+            stringBuilder.AppendFormat("#endregion{0}{0}", "\r\n");
 
             #endregion
 
