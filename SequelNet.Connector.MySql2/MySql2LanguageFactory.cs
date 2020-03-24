@@ -499,7 +499,7 @@ namespace SequelNet.Connector
             {
                 sb.Append(" AS ");
 
-                sb.Append(column.ComputedColumn.Build(connection, relatedQuery));
+                sb.Append(column.ComputedColumn?.Build(connection, relatedQuery));
 
                 if (column.ComputedColumnStored)
                 {

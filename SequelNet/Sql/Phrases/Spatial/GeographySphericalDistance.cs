@@ -9,158 +9,98 @@ namespace SequelNet.Phrases
     /// </summary>
     public class GeographySphericalDistance : IPhrase
     {
-        public string OuterTableName;
-        public object OuterValue;
-        public ValueObjectType OuterValueType;
-        public string InnerTableName;
-        public object InnerValue;
-        public ValueObjectType InnerValueType;
+        public ValueWrapper From;
+        public ValueWrapper To;
 
         #region Constructors
 
         public GeographySphericalDistance(
-            object outerValue, ValueObjectType outerValueType,
-            object innerValue, ValueObjectType innerValueType)
+            ValueWrapper from,
+            ValueWrapper to)
         {
-            this.OuterValue = outerValue;
-            this.OuterValueType = outerValueType;
-            this.InnerValue = innerValue;
-            this.InnerValueType = innerValueType;
+            this.From = from;
+            this.To = to;
         }
 
         public GeographySphericalDistance(
-            object outerValue, ValueObjectType outerValueType,
-            string innerColumnName)
+            object fromValue, ValueObjectType fromValueType,
+            object toValue, ValueObjectType toValueType)
         {
-            this.OuterValue = outerValue;
-            this.OuterValueType = outerValueType;
-            this.InnerValue = innerColumnName;
-            this.InnerValueType = ValueObjectType.ColumnName;
+            this.From = ValueWrapper.From(fromValue, fromValueType);
+            this.To = ValueWrapper.From(toValue, toValueType);
         }
 
         public GeographySphericalDistance(
-            object outerValue, ValueObjectType outerValueType,
-            string innerTableName, string innerColumnName)
+            object fromValue, ValueObjectType fromValueType,
+            string toColumnName)
         {
-            this.OuterValue = outerValue;
-            this.OuterValueType = outerValueType;
-            this.InnerTableName = innerTableName;
-            this.InnerValue = innerColumnName;
-            this.InnerValueType = ValueObjectType.ColumnName;
+            this.From = ValueWrapper.From(fromValue, fromValueType);
+            this.To = ValueWrapper.From(toColumnName, ValueObjectType.ColumnName);
         }
 
         public GeographySphericalDistance(
-            Geometry outerValue,
-            string innerColumnName)
+            object fromValue, ValueObjectType fromValueType,
+            string toTableName, string toColumnName)
         {
-            this.OuterValue = outerValue;
-            this.OuterValueType = ValueObjectType.Value;
-            this.InnerValue = innerColumnName;
-            this.InnerValueType = ValueObjectType.ColumnName;
+            this.From = ValueWrapper.From(fromValue, fromValueType);
+            this.To = ValueWrapper.From(toTableName, toColumnName);
         }
 
         public GeographySphericalDistance(
-            Geometry outerValue,
-            string innerTableName, string innerColumnName)
+            Geometry fromValue,
+            string toColumnName)
         {
-            this.OuterValue = outerValue;
-            this.OuterValueType = ValueObjectType.Value;
-            this.InnerTableName = innerTableName;
-            this.InnerValue = innerColumnName;
-            this.InnerValueType = ValueObjectType.ColumnName;
-        }
-
-        public GeographySphericalDistance(Geometry outerValue, Geometry innerValue)
-        {
-            this.OuterValue = outerValue;
-            this.OuterValueType = ValueObjectType.Value;
-            this.InnerValue = innerValue;
-            this.InnerValueType = ValueObjectType.Value;
+            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
+            this.To = ValueWrapper.From(toColumnName, ValueObjectType.ColumnName);
         }
 
         public GeographySphericalDistance(
-            string outerColumnName,
-            Geometry innerObject)
+            Geometry fromValue,
+            string toTableName, string toColumnName)
         {
-            this.OuterValue = outerColumnName;
-            this.OuterValueType = ValueObjectType.ColumnName;
-            this.InnerValue = innerObject;
-            this.InnerValueType = ValueObjectType.Value;
+            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
+            this.To = ValueWrapper.From(toTableName, toColumnName);
+        }
+
+        public GeographySphericalDistance(Geometry fromValue, Geometry toValue)
+        {
+            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
+            this.To = ValueWrapper.From(toValue, ValueObjectType.Value);
         }
 
         public GeographySphericalDistance(
-            string outerTableName, string outerColumnName, 
-            Geometry innerObject)
+            string fromColumnName,
+            Geometry toObject)
         {
-            this.OuterTableName = outerTableName;
-            this.OuterValue = outerColumnName;
-            this.OuterValueType = ValueObjectType.ColumnName;
-            this.InnerValue = innerObject;
-            this.InnerValueType = ValueObjectType.Value;
+            this.From = ValueWrapper.From(fromColumnName, ValueObjectType.ColumnName);
+            this.To = ValueWrapper.From(toObject, ValueObjectType.Value);
+        }
+
+        public GeographySphericalDistance(
+            string fromTableName, string fromColumnName, 
+            Geometry toObject)
+        {
+            this.From = ValueWrapper.From(fromTableName, fromColumnName);
+            this.To = ValueWrapper.From(toObject, ValueObjectType.Value);
         }
 
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            StringBuilder sb1 = new StringBuilder();
-            StringBuilder sb2 = new StringBuilder();
-                        
-            if (OuterValueType == ValueObjectType.ColumnName)
-            {
-                if (OuterTableName != null && OuterTableName.Length > 0)
-                {
-                    sb1.Append(conn.Language.WrapFieldName(OuterTableName));
-                    sb1.Append(".");
-                }
-                sb1.Append(conn.Language.WrapFieldName(OuterValue.ToString()));
-            }
-            else if (OuterValueType == ValueObjectType.Value)
-            {
-                if (OuterValue is Geometry)
-                {
-                    ((Geometry)OuterValue).BuildValue(sb1, conn);
-                }
-                else
-                {
-                    sb1.Append(conn.Language.PrepareValue(conn, OuterValue, relatedQuery));
-                }
-            }
-            else sb1.Append(OuterValue);
-            
-            if (InnerValueType == ValueObjectType.ColumnName)
-            {
-                if (InnerTableName != null && InnerTableName.Length > 0)
-                {
-                    sb2.Append(conn.Language.WrapFieldName(InnerTableName));
-                    sb2.Append(".");
-                }
-                sb2.Append(conn.Language.WrapFieldName(InnerValue.ToString()));
-            }
-            else if (InnerValueType == ValueObjectType.Value)
-            {
-                if (InnerValue is Geometry)
-                {
-                    ((Geometry)InnerValue).BuildValue(sb2, conn);
-                }
-                else
-                {
-                    sb2.Append(conn.Language.PrepareValue(conn, InnerValue, relatedQuery));
-                }
-            }
-            else sb2.Append(InnerValue);
-
             try
             {
-                return conn.Language.ST_Distance_Sphere(sb1.ToString(), sb2.ToString());
+                return conn.Language.ST_Distance_Sphere(
+                    From.Build(conn, relatedQuery), 
+                    To.Build(conn, relatedQuery));
             }
             catch (NotImplementedException)
             {
                 return new GeographySphericalDistanceMath(
-                    ValueWrapper.From(new ST_X(ValueWrapper.Literal(sb1.ToString()))),
-                    ValueWrapper.From(new ST_Y(ValueWrapper.Literal(sb1.ToString()))),
-                    ValueWrapper.From(new ST_X(ValueWrapper.Literal(sb2.ToString()))),
-                    ValueWrapper.From(new ST_Y(ValueWrapper.Literal(sb2.ToString())))
+                    ValueWrapper.From(new ST_X(From)),
+                    ValueWrapper.From(new ST_Y(From)),
+                    ValueWrapper.From(new ST_X(To)),
+                    ValueWrapper.From(new ST_Y(To))
                 ).BuildPhrase(conn, relatedQuery);
             }
         }

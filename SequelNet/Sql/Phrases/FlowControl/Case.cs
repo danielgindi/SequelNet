@@ -7,13 +7,13 @@ namespace SequelNet.Phrases
     {
         public class WhenClause
         {
-            public ValueWrapper When;
-            public ValueWrapper Then;
+            public ValueWrapper? When;
+            public ValueWrapper? Then;
         }
 
-        public ValueWrapper Value;
+        public ValueWrapper? Value;
         public List<WhenClause> Conditions = new List<WhenClause>();
-        public ValueWrapper ElseValue;
+        public ValueWrapper? ElseValue;
 
         private WhenClause _CurrentWhen;
 
@@ -146,18 +146,18 @@ namespace SequelNet.Phrases
 
             if (Value != null)
             {
-                ret += " " + Value.Build(conn, relatedQuery);
+                ret += " " + Value?.Build(conn, relatedQuery);
             }
 
             foreach (var when in Conditions)
             {
-                ret += " WHEN " + (when.When == null ? "NULL" : when.When.Build(conn, relatedQuery));
-                ret += " THEN " + (when.Then == null ? "NULL" : when.Then.Build(conn, relatedQuery));
+                ret += " WHEN " + (when.When == null ? "NULL" : when.When?.Build(conn, relatedQuery));
+                ret += " THEN " + (when.Then == null ? "NULL" : when.Then?.Build(conn, relatedQuery));
             }
 
             if (ElseValue != null)
             {
-                ret += " ELSE " + ElseValue.Build(conn, relatedQuery);
+                ret += " ELSE " + ElseValue?.Build(conn, relatedQuery);
             }
 
             ret += " END";

@@ -298,18 +298,18 @@ namespace SequelNet.Sql.Spatial
                     break;
                 case WkbCoordinateSystem.XYZ:
                     {
-                        pt.Z = reader.ReadDouble();
+                        pt.Z = (ValueWrapper)reader.ReadDouble();
                     }
                     break;
                 case WkbCoordinateSystem.XYM:
                     {
-                        pt.M = reader.ReadDouble();
+                        pt.M = (ValueWrapper)reader.ReadDouble();
                     }
                     break;
                 case WkbCoordinateSystem.XYZM:
                     {
-                        pt.Z = reader.ReadDouble();
-                        pt.M = reader.ReadDouble();
+                        pt.Z = (ValueWrapper)reader.ReadDouble();
+                        pt.M = (ValueWrapper)reader.ReadDouble();
                     }
                     break;
                 default:

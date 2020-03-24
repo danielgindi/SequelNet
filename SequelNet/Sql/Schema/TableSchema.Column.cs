@@ -35,7 +35,7 @@ namespace SequelNet
             public int NumberScale;
             public string Charset;
             public string Collate;
-            public ValueWrapper ComputedColumn;
+            public ValueWrapper? ComputedColumn;
             public bool ComputedColumnStored;
             public int? SRID;
 

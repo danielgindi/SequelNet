@@ -1,21 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet
 {
-    public class ValueWrapper
+    public struct ValueWrapper : IEquatable<ValueWrapper>
     {
         public string TableName;
         public object Value;
         public ValueObjectType Type;
 
         #region Constructors
-
-        public ValueWrapper()
-        {
-            this.Type = ValueObjectType.Value;
-        }
 
         public ValueWrapper(string tableName, object value, ValueObjectType type)
         {
@@ -33,12 +29,14 @@ namespace SequelNet
 
         public ValueWrapper(string column)
         {
+            this.TableName = null;
             this.Value = column;
             this.Type = ValueObjectType.ColumnName;
         }
 
         public ValueWrapper(object value, ValueObjectType type)
         {
+            this.TableName = null;
             this.Value = value;
             this.Type = type;
         }
@@ -156,29 +154,79 @@ namespace SequelNet
 
         #region Casts
 
-        public static implicit operator ValueWrapper(float value)
+        public static explicit operator ValueWrapper(float value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(double value)
+        public static explicit operator ValueWrapper(double value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int16 value)
+        public static explicit operator ValueWrapper(Int16 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int32 value)
+        public static explicit operator ValueWrapper(Int32 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int64 value)
+        public static explicit operator ValueWrapper(Int64 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ValueWrapper other))
+                return false;
+
+            if (TableName != other.TableName)
+                return false;
+
+            if (Type != other.Type)
+                return false;
+
+            if (!Object.Equals(Value, other.Value))
+                return false;
+
+            return true;
+        }
+
+        public bool Equals(ValueWrapper other)
+        {
+            if (TableName != other.TableName)
+                return false;
+
+            if (Type != other.Type)
+                return false;
+
+            if (!Object.Equals(Value, other.Value))
+                return false;
+
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = 1551432323;
+            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TableName);
+            hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(Value);
+            hashCode = hashCode * -1521134295 + Type.GetHashCode();
+            return hashCode;
+        }
+
+        public static bool operator ==(ValueWrapper lhs, ValueWrapper rhs)
+        {
+            return lhs.Equals(rhs);
+        }
+
+        public static bool operator !=(ValueWrapper lhs, ValueWrapper rhs)
+        {
+            return !lhs.Equals(rhs);
         }
 
         #endregion

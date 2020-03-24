@@ -21,24 +21,24 @@ namespace SequelNet
 
             public Point(double x, double y)
             {
-                this.X = x;
-                this.Y = y;
+                this.X = (ValueWrapper)x;
+                this.Y = (ValueWrapper)y;
             }
 
             public Point(double x, double y, double? z = null, double? m = null)
             {
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-                this.M = m;
+                this.X = (ValueWrapper)x;
+                this.Y = (ValueWrapper)y;
+                this.Z = (ValueWrapper)z;
+                this.M = (ValueWrapper)m;
             }
 
             public Point(double x, double y, double? z, double? m, int srid)
             {
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-                this.M = m;
+                this.X = (ValueWrapper)x;
+                this.Y = (ValueWrapper)y;
+                this.Z = (ValueWrapper)z;
+                this.M = (ValueWrapper)m;
                 this.SRID = srid;
             }
 
@@ -70,10 +70,10 @@ namespace SequelNet
             {
                 get
                 {
-                    if (X == null || (X.Value is Double xd && (
+                    if (X.Value == null || (X.Value is Double xd && (
                         Double.IsNaN(xd) || Double.IsInfinity(xd)
                     ))) return false;
-                    if (Y == null || (Y.Value is Double yd && (
+                    if (Y.Value == null || (Y.Value is Double yd && (
                         Double.IsNaN(yd) || Double.IsInfinity(yd)
                     ))) return false;
                     return true;

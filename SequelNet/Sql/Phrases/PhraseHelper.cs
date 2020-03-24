@@ -1614,6 +1614,11 @@ namespace SequelNet
 
         #region Spatial
 
+        public static GeographyContains GeographyContains(ValueWrapper outer, ValueWrapper inner)
+        {
+            return new GeographyContains(outer, inner);
+        }
+
         public static GeographyContains GeographyContains(
             object outerValue, ValueObjectType outerValueType,
             object innerValue, ValueObjectType innerValueType)
@@ -1684,6 +1689,11 @@ namespace SequelNet
                 innerObject);
         }
 
+        public static GeographyDistance GeographyDistance(ValueWrapper from, ValueWrapper to)
+        {
+            return new GeographyDistance(from, to);
+        }
+
         public static GeographyDistance GeographyDistance(
             object outerValue, ValueObjectType outerValueType,
             object innerValue, ValueObjectType innerValueType)
@@ -1752,6 +1762,11 @@ namespace SequelNet
             return new GeographyDistance(
                 outerTableName, outerColumnName,
                 innerObject);
+        }
+
+        public static GeographySphericalDistance GeographySphericalDistance(ValueWrapper from, ValueWrapper to)
+        {
+            return new GeographySphericalDistance(from, to);
         }
 
         public static GeographySphericalDistance GeographySphericalDistance(
