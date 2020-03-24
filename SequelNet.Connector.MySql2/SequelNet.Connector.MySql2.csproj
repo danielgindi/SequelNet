@@ -39,7 +39,7 @@
     <RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
     <Product>mysql-net (async) connector for SequelNet</Product>
     <PackageId>SequelNet.Connector.MySql2</PackageId>
-    <Version>3.0.24</Version>
+    <Version>3.0.25</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
