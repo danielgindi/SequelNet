@@ -864,11 +864,13 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? (int?)null : UnderlyingReader.GetInt32(ordinal);
         }
 
+        [Obsolete("Use GetInt32OrNull(ordinal) ?? 0")]
         public int GetInt32OrZero(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt32(ordinal);
         }
 
+        [Obsolete("Use GetInt32OrNull(columnName) ?? 0")]
         public int GetInt32OrZero(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -886,11 +888,13 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? (Int64?)null : UnderlyingReader.GetInt64(ordinal);
         }
 
+        [Obsolete("Use GetInt64OrZero(ordinal) ?? 0")]
         public Int64 GetInt64OrZero(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetInt64(ordinal);
         }
 
+        [Obsolete("Use GetInt64OrZero(columnName) ?? 0")]
         public Int64 GetInt64OrZero(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -1128,11 +1132,13 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? (float?)null : UnderlyingReader.GetFloat(ordinal);
         }
 
+        [Obsolete("Use GetFloatOrZero(ordinal) ?? 0")]
         public float GetFloatOrZero(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetFloat(ordinal);
         }
 
+        [Obsolete("Use GetFloatOrZero(columnName) ?? 0")]
         public float GetFloatOrZero(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -1161,11 +1167,13 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? (double?)null : UnderlyingReader.GetDouble(ordinal);
         }
 
+        [Obsolete("Use GetDoubleOrZero(ordinal) ?? 0")]
         public double GetDoubleOrZero(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDouble(ordinal);
         }
 
+        [Obsolete("Use GetDoubleOrZero(columnName) ?? 0")]
         public double GetDoubleOrZero(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -1183,11 +1191,13 @@ namespace SequelNet.Connector
             return UnderlyingReader.IsDBNull(ordinal) ? (decimal?)null : UnderlyingReader.GetDecimal(ordinal);
         }
 
+        [Obsolete("Use GetDecimalOrZero(ordinal) ?? 0")]
         public decimal GetDecimalOrZero(int ordinal)
         {
             return UnderlyingReader.IsDBNull(ordinal) ? 0 : UnderlyingReader.GetDecimal(ordinal);
         }
 
+        [Obsolete("Use GetDecimalOrZero(columnName) ?? 0")]
         public decimal GetDecimalOrZero(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
