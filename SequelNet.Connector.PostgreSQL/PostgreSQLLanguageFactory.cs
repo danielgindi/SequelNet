@@ -104,14 +104,20 @@ namespace SequelNet.Connector
             return "ST_Distance_Sphere(" + g1 + ", " + g2 + ")";
         }
 
-        public override string ST_GeomFromText(string text, string srid = null)
+        public override string ST_GeomFromText(string text, string srid = null, bool literalText = false)
         {
-            return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            if (!literalText)
+                text = PrepareValue(text);
+
+            return "ST_GeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
-        public override string ST_GeogFromText(string text, string srid = null)
+        public override string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
-            return "ST_GeogFromText(" + PrepareValue(text) + ")";
+            if (!literalText)
+                text = PrepareValue(text);
+
+            return "ST_GeogFromText(" + text + ")";
         }
 
         public override void BuildNullSafeEqualsTo(

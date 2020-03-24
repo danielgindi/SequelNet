@@ -112,52 +112,47 @@ namespace SequelNet
                     if (_Points.Count == 0) return Double.NaN;
                     Point FirstPoint = _Points[0];
                     Point LastPoint = _Points[_Points.Count - 1];
-                    double deltaX = LastPoint.X - FirstPoint.X;
-                    double deltaY = LastPoint.Y - FirstPoint.Y;
+                    double deltaX = (double)LastPoint.X.Value - (double)FirstPoint.X.Value;
+                    double deltaY = (double)LastPoint.Y.Value - (double)FirstPoint.Y.Value;
                     double length = Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
-                    double angleRAD = Math.Asin(Math.Abs(LastPoint.Y - FirstPoint.Y) / length);
+                    double angleRAD = Math.Asin(Math.Abs((double)LastPoint.Y.Value - (double)FirstPoint.Y.Value) / length);
                     double angle = (angleRAD * 180) / Math.PI;
 
-                    if (((FirstPoint.X < LastPoint.X) && (FirstPoint.Y > LastPoint.Y)) ||
-                         ((FirstPoint.X > LastPoint.X) && (FirstPoint.Y < LastPoint.Y)))
+                    if ((((double)FirstPoint.X.Value < (double)LastPoint.X.Value) && ((double)FirstPoint.Y.Value > (double)LastPoint.Y.Value)) ||
+                         (((double)FirstPoint.X.Value > (double)LastPoint.X.Value) && ((double)FirstPoint.Y.Value < (double)LastPoint.Y.Value)))
                         angle = 360 - angle;
                     return angle;
                 }
             }
-            
-            static IFormatProvider formatProvider = CultureInfo.InvariantCulture.NumberFormat;
+
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("LINESTRING(", ValueObjectType.Value);
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
+            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",", ValueObjectType.Value);
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                var sbGeom = new StringBuilder();
-                sbGeom.Append(@"LINESTRING(");
+                string geom = BuildValueText(conn).Build(conn);
+
+                sb.Append(IsGeographyType
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
+            }
+
+            public override ValueWrapper BuildValueText(ConnectorBase conn)
+            {
+                var concat = new Phrases.Concat(OPEN_STRING_VALUE);
 
                 bool first = true;
                 foreach (var pt in _Points)
                 {
-                    if (first) first = false; else sbGeom.Append(',');
-                    sbGeom.Append(pt.X.ToString(formatProvider));
-                    sbGeom.Append(' ');
-                    sbGeom.Append(pt.Y.ToString(formatProvider));
+                    if (first) first = false; 
+                    else concat.Values.Add(COMMA_STRING_VALUE);
+                    concat.Values.Add(pt.BuildValueText(conn));
                 }
 
-                sbGeom.Append(')');
+                concat.Values.Add(CLOSE_STRING_VALUE);
 
-                sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString())
-                    : conn.Language.ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
-            }
-
-            public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
-            {
-                sb.Append(@"LINESTRING(");
-                foreach (Point pt in _Points)
-                {
-                    sb.Append(pt.X.ToString(formatProvider));
-                    sb.Append(' ');
-                    sb.Append(pt.Y.ToString(formatProvider));
-                }
-                sb.Append(@")");
+                return ValueWrapper.From(concat);
             }
 
             #region Common Calculation Helpers
@@ -197,18 +192,6 @@ namespace SequelNet
             }
 
             /// <summary>
-            /// Generates a bounding rect around a lat/lon coordinate, to constrain queries.
-            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
-            /// </summary>
-            /// <param name="latLonPoint"></param>
-            /// <param name="distanceInKilometers">Kinda' like radius</param>
-            /// <returns></returns>
-            static public LineString RectForDistanceAroundLatLon(Point latLonPoint, double distanceInKilometers)
-            {
-                return RectForDistanceAroundLatLon(latLonPoint.X, latLonPoint.Y, distanceInKilometers);
-            }
-
-            /// <summary>
             /// Generates a bounding rect around a lat/lon rect, to constrain queries.
             /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
             /// To prevent problems with this approach, we're changing the "radius" to a real radius of the bounding circle, which will be almost exact
@@ -241,20 +224,6 @@ namespace SequelNet
                 rect.Points.Add(new Point(lat2 + distanceLat, lon2 + distanceLon2));
                 rect.Points.Add(new Point(lat1 - distanceLat, lon1 - distanceLon1));
                 return rect;
-            }
-
-            /// <summary>
-            /// Generates a bounding rect around a lat/lon rect, to constrain queries.
-            /// Anyway this is a spherical rectangle, not a real rectangle, so it's not an exact rectangle but a rather strange rect.
-            /// To prevent problems with this approach, we're changing the "radius" to a real radius of the bounding circle, which will be almost exact
-            /// </summary>
-            /// <param name="rectCorner1"></param>
-            /// <param name="rectCorner2"></param>
-            /// <param name="distanceInKilometers">Kinda' like radius</param>
-            /// <returns></returns>
-            static public LineString RectForDistanceAroundRect(Point rectCorner1, Point rectCorner2, double distanceInKilometers)
-            {
-                return RectForDistanceAroundRect(rectCorner1.X, rectCorner1.Y, rectCorner2.X, rectCorner2.Y, distanceInKilometers);
             }
 
             #endregion

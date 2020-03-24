@@ -58,38 +58,35 @@ namespace SequelNet
                 }
             }
 
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("GEOMETRYCOLLECTION(", ValueObjectType.Value);
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
+            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",", ValueObjectType.Value);
+
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                var sbGeom = new StringBuilder();
+                string geom = BuildValueText(conn).Build(conn);
 
-                sbGeom.Append(@"GEOMETRYCOLLECTION(");
+                sb.Append(IsGeographyType
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
+            }
+
+            public override ValueWrapper BuildValueText(ConnectorBase conn)
+            {
+                var concat = new Phrases.Concat(OPEN_STRING_VALUE);
 
                 bool firstGeometry = true;
                 foreach (var geometry in _Geometries)
                 {
-                    if (firstGeometry) firstGeometry = false; else sbGeom.Append(',');
-                    geometry.BuildValueForCollection(sbGeom, conn);
+                    if (firstGeometry) firstGeometry = false; 
+                    else concat.Values.Add(COMMA_STRING_VALUE);
+
+                    concat.Values.Add(geometry.BuildValueText(conn));
                 }
 
-                sbGeom.Append(')');
+                concat.Values.Add(CLOSE_STRING_VALUE);
 
-                sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString())
-                    : conn.Language.ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
-            }
-
-            public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
-            {
-                sb.Append(@"GEOMETRYCOLLECTION(");
-                bool firstGeometry = true;
-
-                foreach (GeometryType geometry in _Geometries)
-                {
-                    if (firstGeometry) firstGeometry = false; else sb.Append(',');
-                    geometry.BuildValueForCollection(sb, conn);
-                }
-
-                sb.Append(@")");
+                return ValueWrapper.From(concat);
             }
         }
     }

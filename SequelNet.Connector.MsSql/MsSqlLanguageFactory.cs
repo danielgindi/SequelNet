@@ -103,14 +103,20 @@ namespace SequelNet.Connector
             return g1 + ".STDistance(" + g2 + ")";
         }
 
-        public override string ST_GeomFromText(string text, string srid = null)
+        public override string ST_GeomFromText(string text, string srid = null, bool literalText = false)
         {
-            return "geometry::STGeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            if (!literalText)
+                text = PrepareValue(text);
+
+            return "geometry::STGeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
-        public override string ST_GeogFromText(string text, string srid = null)
+        public override string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
-            return "geography::STGeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+            if (!literalText)
+                text = PrepareValue(text);
+
+            return "geography::STGeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
         public override void BuildLimitOffset(

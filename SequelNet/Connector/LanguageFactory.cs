@@ -118,12 +118,12 @@ namespace SequelNet.Connector
             throw new NotImplementedException("ST_Distance_Sphere has not been implemented for this connector");
         }
 
-        public virtual string ST_GeomFromText(string text, string srid = null)
+        public virtual string ST_GeomFromText(string text, string srid = null, bool literalText = false)
         {
             throw new NotImplementedException("ST_GeomFromText has not been implemented for this connector");
         }
 
-        public virtual string ST_GeogFromText(string text, string srid = null)
+        public virtual string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
             throw new NotImplementedException("ST_GeogFromText has not been implemented for this connector");
         }

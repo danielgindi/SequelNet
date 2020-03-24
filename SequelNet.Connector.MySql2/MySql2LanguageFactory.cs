@@ -126,21 +126,24 @@ namespace SequelNet.Connector
             return "ST_Distance_Sphere(" + g1 + ", " + g2 + ")";
         }
 
-        public override string ST_GeomFromText(string text, string srid = null)
+        public override string ST_GeomFromText(string text, string srid = null, bool literalText = false)
         {
+            if (!literalText)
+                text = PrepareValue(text);
+
             if (Is5_7OrLater())
             {
-                return "ST_GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+                return "ST_GeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
             }
             else
             {
-                return "GeomFromText(" + PrepareValue(text) + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+                return "GeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
             }
         }
 
-        public override string ST_GeogFromText(string text, string srid = null)
+        public override string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
-            return ST_GeomFromText(text, srid);
+            return ST_GeomFromText(text, srid, literalText);
         }
 
         public override void BuildNullSafeEqualsTo(

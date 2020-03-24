@@ -75,54 +75,63 @@ namespace SequelNet
                 }
             }
 
-            static IFormatProvider formatProvider = CultureInfo.InvariantCulture.NumberFormat;
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POLYGON(", ValueObjectType.Value);
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
+            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",", ValueObjectType.Value);
+            private static ValueWrapper OPEN_SUB_STRING_VALUE = ValueWrapper.From("(", ValueObjectType.Value);
+            private static ValueWrapper CLOSE_SUB_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                var sbGeom = new StringBuilder();
-                BuildValueForCollection(sbGeom, conn);
+                string geom = BuildValueText(conn).Build(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()) 
-                    : conn.Language.ST_GeomFromText(sbGeom.ToString(), SRID == null ? "" : SRID.Value.ToString()));
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
             }
 
-            public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
+            public override ValueWrapper BuildValueText(ConnectorBase conn)
             {
+                var concat = new Phrases.Concat(OPEN_STRING_VALUE);
+
                 bool firstLineString = true, first;
-                sb.Append(@"POLYGON(");
 
                 if (_Exterior != null)
                 {
-                    firstLineString = false; ;
-                    sb.Append('(');
+                    firstLineString = false;
+
+                    concat.Values.Add(OPEN_SUB_STRING_VALUE);
                     first = true;
                     foreach (Point pt in _Exterior.Points)
                     {
-                        if (first) first = false; else sb.Append(',');
-                        sb.Append(pt.X.ToString(formatProvider));
-                        sb.Append(' ');
-                        sb.Append(pt.Y.ToString(formatProvider));
+                        if (first) first = false;
+                        else concat.Values.Add(COMMA_STRING_VALUE);
+
+                        concat.Values.Add(pt.BuildValueText(conn));
                     }
-                    sb.Append(')');
+                    concat.Values.Add(CLOSE_SUB_STRING_VALUE);
                 }
 
                 foreach (var ring in _Holes)
                 {
-                    if (firstLineString) firstLineString = false; else sb.Append(',');
-                    sb.Append('(');
+                    if (firstLineString) firstLineString = false; 
+                    else concat.Values.Add(COMMA_STRING_VALUE);
+
+                    concat.Values.Add(OPEN_SUB_STRING_VALUE);
                     first = true;
                     foreach (var pt in ring.Points)
                     {
-                        if (first) first = false; else sb.Append(',');
-                        sb.Append(pt.X.ToString(formatProvider));
-                        sb.Append(' ');
-                        sb.Append(pt.Y.ToString(formatProvider));
+                        if (first) first = false;
+                        else concat.Values.Add(COMMA_STRING_VALUE);
+
+                        concat.Values.Add(pt.BuildValueText(conn));
                     }
-                    sb.Append(')');
+                    concat.Values.Add(CLOSE_SUB_STRING_VALUE);
                 }
 
-                sb.Append(')');
+                concat.Values.Add(CLOSE_STRING_VALUE);
+
+                return ValueWrapper.From(concat);
             }
         }
     }

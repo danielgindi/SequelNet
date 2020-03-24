@@ -9,10 +9,10 @@ namespace SequelNet
     {
         public class Point : Geometry
         {
-            public double X;
-            public double Y;
-            public double? Z;
-            public double? M;
+            public ValueWrapper X;
+            public ValueWrapper Y;
+            public ValueWrapper Z;
+            public ValueWrapper M;
 
             public Point()
             {
@@ -42,6 +42,22 @@ namespace SequelNet
                 this.SRID = srid;
             }
 
+            public Point(ValueWrapper x, ValueWrapper y, int srid)
+            {
+                this.X = x;
+                this.Y = y;
+                this.SRID = srid;
+            }
+
+            public Point(ValueWrapper x, ValueWrapper y, ValueWrapper z, ValueWrapper m, int srid)
+            {
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
+                this.M = m;
+                this.SRID = srid;
+            }
+
             public override bool IsEmpty
             {
                 get
@@ -49,36 +65,47 @@ namespace SequelNet
                     return false;
                 }
             }
+
             public override bool IsValid
             {
                 get
                 {
-                    if (Double.IsNaN(X)) return false;
-                    if (Double.IsInfinity(X)) return false;
-                    if (Double.IsNaN(Y)) return false;
-                    if (Double.IsInfinity(Y)) return false;
+                    if (X == null || (X.Value is Double xd && (
+                        Double.IsNaN(xd) || Double.IsInfinity(xd)
+                    ))) return false;
+                    if (Y == null || (Y.Value is Double yd && (
+                        Double.IsNaN(yd) || Double.IsInfinity(yd)
+                    ))) return false;
                     return true;
                 }
             }
 
-            static IFormatProvider formatProvider = CultureInfo.InvariantCulture.NumberFormat;
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POINT(", ValueObjectType.Value);
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
+            private static ValueWrapper SPACE_STRING_VALUE = ValueWrapper.From(" ", ValueObjectType.Value);
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                var geom = "POINT(" + X.ToString(formatProvider) + " " + Y.ToString(formatProvider) + ")";
+                string geom = BuildValueText(conn).Build(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString()) 
-                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString()));
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
             }
 
-            public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
+            public override ValueWrapper BuildValueText(ConnectorBase conn)
             {
-                sb.Append("POINT(");
-                sb.Append(X.ToString(formatProvider));
-                sb.Append(' ');
-                sb.Append(Y.ToString(formatProvider));
-                sb.Append(")");
+                if (X.Type == ValueObjectType.Value &&
+                    Y.Type == ValueObjectType.Value)
+                {
+                    var geom = $"POINT({X.Build(conn)} {Y.Build(conn)})";
+                    return ValueWrapper.Literal(geom);
+                }
+                else
+                {
+                    var geom = new Phrases.Concat(OPEN_STRING_VALUE, X, SPACE_STRING_VALUE, Y, CLOSE_STRING_VALUE);
+                    return ValueWrapper.From(geom);
+                }
             }
         }
     }

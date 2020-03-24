@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -32,14 +33,12 @@ namespace SequelNet
 
         public ValueWrapper(string column)
         {
-            this.TableName = null;
             this.Value = column;
             this.Type = ValueObjectType.ColumnName;
         }
 
         public ValueWrapper(object value, ValueObjectType type)
         {
-            this.TableName = null;
             this.Value = value;
             this.Type = type;
         }
@@ -151,6 +150,35 @@ namespace SequelNet
             {
                 outputBuilder.Append(Value.ToString());
             }
+        }
+
+        #endregion
+
+        #region Casts
+
+        public static implicit operator ValueWrapper(float value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(double value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Int16 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Int32 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Int64 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
         }
 
         #endregion
