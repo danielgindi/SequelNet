@@ -695,7 +695,7 @@ namespace SequelNet.SchemaGenerator
                         {
                             dalColumn.Collate = columnKeyword.Substring(8);
                         }
-                        else if (columnKeyword.Equals("SRID", StringComparison.OrdinalIgnoreCase))
+                        else if (columnKeyword.StartsWith("SRID ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.SRID = Convert.ToInt32(columnKeyword.Substring(5));
                         }
