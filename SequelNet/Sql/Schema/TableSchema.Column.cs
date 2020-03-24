@@ -37,6 +37,7 @@ namespace SequelNet
             public string Collate;
             public ValueWrapper ComputedColumn;
             public bool ComputedColumnStored;
+            public int? SRID;
 
             public Column() { }
             

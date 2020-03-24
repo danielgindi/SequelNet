@@ -529,6 +529,13 @@ namespace SequelNet.SchemaGenerator
                     dalCol.ComputedStored ? "true" : "false");
             }
 
+            if (dalCol.SRID != null)
+            {
+                stringBuilder.AppendFormat("{0}SRID = {1},",
+                    "\r\n",
+                    dalCol.SRID);
+            }
+
             if (!string.IsNullOrEmpty(dalCol.Charset))
             {
                 stringBuilder.AppendFormat("{0}Charset = {1},",

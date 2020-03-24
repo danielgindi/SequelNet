@@ -9,7 +9,6 @@ namespace SequelNet.Connector
         #region Syntax
 
         public virtual bool IsBooleanFalseOrderedFirst => true;
-        public virtual bool ShouldPrefixAutoIncrementWithType => true;
 
         public virtual bool UpdateFromInsteadOfJoin => false;
         public virtual bool UpdateJoinRequiresFromLeftTable => false;
@@ -19,9 +18,10 @@ namespace SequelNet.Connector
         public virtual bool DeleteSupportsIgnore => false;
         public virtual bool InsertSupportsIgnore => false;
 
-        public virtual int VarCharMaxLength => 255;
+        public virtual bool SupportsColumnComment => false;
+        public virtual ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.InType;
 
-        public virtual string VarCharMaxKeyword => null;
+        public virtual int VarCharMaxLength => 255;
 
         public virtual string UtcNow()
         {
@@ -106,6 +106,11 @@ namespace SequelNet.Connector
         public virtual string ST_Contains(string g1, string g2)
         {
             return "ST_Contains(" + g1 + ", " + g2 + ")";
+        }
+
+        public virtual string ST_Distance(string g1, string g2)
+        {
+            return "ST_Distance(" + g1 + ", " + g2 + ")";
         }
 
         public virtual string ST_GeomFromText(string text, string srid = null)
@@ -195,6 +200,16 @@ namespace SequelNet.Connector
             }
         }
 
+        public virtual void BuildColumnPropertiesDataType(
+            StringBuilder sb,
+            ConnectorBase connection, 
+            TableSchema.Column column,
+            Query relatedQuery,
+            out bool isDefaultAllowed)
+        {
+            throw new NotImplementedException("BuildColumnPropertiesDataType has not been implemented for this connector");
+        }
+
         public virtual void BuildLimitOffset(
             Query query,
             bool top,
@@ -231,70 +246,6 @@ namespace SequelNet.Connector
         {
             throw new NotImplementedException("GROUP_CONCAT has not been implemented for this connector");
         }
-
-        #endregion
-
-        #region Types
-
-        public virtual string AutoIncrementType => @"AUTOINCREMENT";
-        public virtual string AutoIncrementBigIntType => @"AUTOINCREMENT";
-
-        public virtual string TinyIntType => @"INT";
-        public virtual string UnsignedTinyIntType => @"INT";
-        public virtual string SmallIntType => @"INT";
-        public virtual string UnsignedSmallIntType => @"INT";
-        public virtual string IntType => @"INT";
-        public virtual string UnsignedIntType => @"INT";
-        public virtual string BigIntType => @"INT";
-        public virtual string UnsignedBigIntType => @"INT";
-        public virtual string NumericType => @"NUMERIC";
-        public virtual string DecimalType => @"DECIMAL";
-        public virtual string MoneyType => @"DECIMAL";
-        public virtual string FloatType => @"FLOAT";
-        public virtual string DoubleType => @"DOUBLE";
-        public virtual string VarCharType => @"NVARCHAR";
-        public virtual string CharType => @"NCHAR";
-        public virtual string TextType => @"NTEXT";
-        public virtual string MediumTextType => @"NTEXT";
-        public virtual string LongTextType => @"NTEXT";
-        public virtual string BooleanType => @"BOOLEAN";
-        public virtual string DateTimeType => @"DATETIME";
-        public virtual string DateType => @"DATE";
-        public virtual string TimeType => @"TIME";
-        public virtual string BlobType => @"BLOB";
-        public virtual string GuidType => @"GUID";
-        public virtual string JsonType => @"TEXT";
-        public virtual string JsonBinaryType => @"TEXT";
-
-        public virtual string TypeGeometry => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeometryCollectionType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string PointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string LineStringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string PolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string LineType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string CurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string SurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string LinearRingType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string MultiPointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string MultiLineStringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string MultiPolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string MultiCurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string MultiSurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-
-        public virtual string GeographicType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicCollectionType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicPointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicLinestringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicPolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicLineType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicCurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicSurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicLinearringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicMultipointType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicMultilinestringType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicMultipolygonType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicMulticurveType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
-        public virtual string GeographicMultisurfaceType => throw new NotImplementedException(@"Geospatial data types not supported in this database");
 
         #endregion
 
@@ -446,5 +397,11 @@ namespace SequelNet.Connector
         public virtual string LikeEscapingStatement => @"ESCAPE('\')";
 
         #endregion
+
+        public enum ColumnSRIDLocationMode
+        {
+            InType,
+            AfterNullability
+        }
     }
 }

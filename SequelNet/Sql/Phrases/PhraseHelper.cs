@@ -1684,9 +1684,79 @@ namespace SequelNet
                 innerObject);
         }
 
-        public static GeographyDistance GeographyDistance(GeographyDistance.PointWrapper from, GeographyDistance.PointWrapper to)
+        public static GeographyDistance GeographyDistance(
+            object outerValue, ValueObjectType outerValueType,
+            object innerValue, ValueObjectType innerValueType)
         {
-            return new GeographyDistance(from, to);
+            return new GeographyDistance(
+                outerValue, outerValueType,
+                innerValue, innerValueType);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            object outerValue, ValueObjectType outerValueType,
+            string innerColumnName)
+        {
+            return new GeographyDistance(
+                outerValue, outerValueType,
+                innerColumnName);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            object outerValue, ValueObjectType outerValueType,
+            string innerTableName, string innerColumnName)
+        {
+            return new GeographyDistance(
+                outerValue, outerValueType,
+                innerTableName, innerColumnName);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            Geometry outerValue,
+            string innerColumnName)
+        {
+            return new GeographyDistance(
+                outerValue,
+                innerColumnName);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            Geometry outerValue,
+            string innerTableName, string innerColumnName)
+        {
+            return new GeographyDistance(
+                outerValue,
+                innerTableName, innerColumnName);
+        }
+
+        public static GeographyDistance GeographyDistance(Geometry outerValue, Geometry innerValue)
+        {
+            return new GeographyDistance(
+                outerValue,
+                innerValue);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            string outerColumnName,
+            Geometry innerObject)
+        {
+            return new GeographyDistance(
+                outerColumnName,
+                innerObject);
+        }
+
+        public static GeographyDistance GeographyDistance(
+            string outerTableName, string outerColumnName,
+            Geometry innerObject)
+        {
+            return new GeographyDistance(
+                outerTableName, outerColumnName,
+                innerObject);
+        }
+
+        public static GeographyDistanceMath GeographyDistanceMath(GeographyDistanceMath.PointWrapper from, GeographyDistanceMath.PointWrapper to)
+        {
+            return new GeographyDistanceMath(from, to);
         }
 
         public static ST_X ST_X(string tableName, string columnName)

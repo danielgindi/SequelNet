@@ -24,8 +24,6 @@ namespace SequelNet.Connector
 
         public override int VarCharMaxLength => 4000;
 
-        public override string VarCharMaxKeyword => "MAX";
-
         public override string UtcNow()
         {
             return @"GETUTCDATE()";
@@ -98,6 +96,11 @@ namespace SequelNet.Connector
         public override string ST_Contains(string g1, string g2)
         {
             return g1 + ".STContains(" + g2 + ")";
+        }
+
+        public override string ST_Distance(string g1, string g2)
+        {
+            return g1 + ".STDistance(" + g2 + ")";
         }
 
         public override string ST_GeomFromText(string text, string srid = null)
@@ -197,7 +200,215 @@ namespace SequelNet.Connector
                 outputBuilder.Append(@")");
             }
         }
-        
+
+        public override void BuildColumnPropertiesDataType(
+            StringBuilder sb,
+            ConnectorBase connection,
+            TableSchema.Column column,
+            Query relatedQuery,
+            out bool isDefaultAllowed)
+        {
+            isDefaultAllowed = true;
+
+            if (column.LiteralType != null && column.LiteralType.Length > 0)
+            {
+                sb.Append(column.LiteralType);
+                return;
+            }
+
+            DataType dataType = column.ActualDataType;
+            if (dataType == DataType.VarChar)
+            {
+                if (column.MaxLength < 0)
+                {
+                    sb.Append("NVARCHAR");
+                    sb.Append(@"(MAX)");
+                }
+                else if (column.MaxLength == 0)
+                    sb.Append("NTEXT");
+                else if (column.MaxLength <= VarCharMaxLength)
+                {
+                    sb.Append("NVARCHAR");
+                    sb.AppendFormat(@"({0})", column.MaxLength);
+                }
+                else if (column.MaxLength < 65536)
+                    sb.Append("NTEXT");
+                else if (column.MaxLength < 16777215)
+                    sb.Append("NTEXT");
+                else
+                    sb.Append("NTEXT");
+            }
+            else if (dataType == DataType.Char)
+            {
+                if (column.MaxLength < 0)
+                {
+                    sb.Append("NVARCHAR");
+                    sb.Append(@"(MAX)");
+                }
+                else if (column.MaxLength == 0 || column.MaxLength >= VarCharMaxLength)
+                {
+                    sb.Append("NVARCHAR");
+                    sb.AppendFormat(@"({0})", VarCharMaxLength);
+                }
+                else
+                {
+                    sb.Append("NVARCHAR");
+                    sb.AppendFormat(@"({0})", column.MaxLength);
+                }
+            }
+            else if (dataType == DataType.Text)
+                sb.Append("NTEXT");
+            else if (dataType == DataType.MediumText)
+                sb.Append("NTEXT");
+            else if (dataType == DataType.LongText)
+                sb.Append("NTEXT");
+            else if (dataType == DataType.Boolean)
+                sb.Append("bit");
+            else if (dataType == DataType.DateTime)
+                sb.Append("DATETIME");
+            else if (dataType == DataType.Date)
+                sb.Append("DATE");
+            else if (dataType == DataType.Time)
+                sb.Append("TIME");
+            else if (dataType == DataType.Numeric)
+            {
+                if (column.NumberPrecision > 0)
+                {
+                    sb.Append("NUMERIC");
+                    sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
+                }
+                else
+                    sb.Append("NUMERIC");
+            }
+            else if (dataType == DataType.Float)
+                sb.Append("FLOAT(4)");
+            else if (dataType == DataType.Double)
+                sb.Append("FLOAT(8)");
+            else if (dataType == DataType.Decimal)
+            {
+                if (column.NumberPrecision > 0)
+                {
+                    sb.Append("DECIMAL");
+                    sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
+                }
+                else
+                    sb.Append("DECIMAL");
+            }
+            else if (dataType == DataType.Money)
+            {
+                if (column.NumberPrecision > 0)
+                    sb.Append("MONEY");
+                else
+                    sb.Append("MONEY");
+            }
+            else if (dataType == DataType.TinyInt)
+                sb.Append("TINYINT");
+            else if (dataType == DataType.UnsignedTinyInt)
+                sb.Append("TINYINT");
+            else if (dataType == DataType.SmallInt)
+                sb.Append("SMALLINT");
+            else if (dataType == DataType.UnsignedSmallInt)
+                sb.Append("SMALLINT");
+            else if (dataType == DataType.Int)
+                sb.Append("TINYINT");
+            else if (dataType == DataType.UnsignedInt)
+                sb.Append("INT");
+            else if (dataType == DataType.BigInt)
+                sb.Append("BIGINT");
+            else if (dataType == DataType.UnsignedBigInt)
+                sb.Append("BIGINT");
+            else if (dataType == DataType.Json)
+                sb.Append("TEXT");
+            else if (dataType == DataType.JsonBinary)
+                sb.Append("TEXT");
+            else if (dataType == DataType.Blob)
+                sb.Append("IMAGE");
+            else if (dataType == DataType.Guid)
+                sb.Append("UNIQUEIDENTIFIER");
+            else if (dataType == DataType.Geometry)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.GeometryCollection)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Point)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.LineString)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Polygon)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Line)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Curve)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Surface)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.LinearRing)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.MultiPoint)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.MultiLineString)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.MultiPolygon)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.MultiCurve)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.MultiSurface)
+                sb.Append("GEOMETRY");
+            else if (dataType == DataType.Geographic)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicCollection)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicPoint)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicLineString)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicPolygon)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicLine)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicCurve)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicSurface)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicLinearRing)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicMultiPoint)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicMultiLineString)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicMultiPolygon)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicMultiCurve)
+                sb.Append("GEOGRAPHIC");
+            else if (dataType == DataType.GeographicMultiSurface)
+                sb.Append("GEOGRAPHIC");
+            else throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+
+            if (column.AutoIncrement)
+                sb.Append(" IDENTITY");
+
+            if (column.ComputedColumn != null)
+            {
+                sb.Append(" AS ");
+
+                sb.Append(column.ComputedColumn.Build(connection, relatedQuery));
+
+                if (column.ComputedColumnStored)
+                    sb.Append(" PERSISTED");
+            }
+
+            if (!string.IsNullOrEmpty(column.Collate))
+            {
+                sb.Append(@" COLLATE");
+                sb.Append(column.Collate);
+            }
+
+            if (!string.IsNullOrEmpty(column.Charset))
+            {
+                sb.Append(@" CHARACTER SET");
+                sb.Append(column.Charset);
+            }
+        }
+
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"NEWID()");
@@ -212,68 +423,6 @@ namespace SequelNet.Connector
         {
             return $"(COUNT({rawExpression}) = COUNT(*))";
         }
-
-        #endregion
-
-        #region Types
-
-        public override string AutoIncrementType => @"IDENTITY";
-        public override string AutoIncrementBigIntType => @"IDENTITY";
-
-        public override string TinyIntType => @"TINYINT";
-        public override string UnsignedTinyIntType => @"TINYINT";
-        public override string SmallIntType => @"SMALLINT";
-        public override string UnsignedSmallIntType => @"SMALLINT";
-        public override string IntType => @"INT";
-        public override string UnsignedIntType => @"INT";
-        public override string BigIntType => @"BIGINT";
-        public override string UnsignedBigIntType => @"BIGINT";
-        public override string NumericType => @"NUMERIC";
-        public override string DecimalType => @"DECIMAL";
-        public override string MoneyType => @"MONEY";
-        public override string FloatType => @"FLOAT(4)";
-        public override string DoubleType => @"FLOAT(8)";
-        public override string VarCharType => @"NVARCHAR";
-        public override string CharType => @"NCHAR";
-        public override string TextType => @"NTEXT";
-        public override string MediumTextType => @"NTEXT";
-        public override string LongTextType => @"NTEXT";
-        public override string BooleanType => @"bit";
-        public override string DateTimeType => @"DATETIME";
-        public override string BlobType => @"IMAGE";
-        public override string GuidType => @"UNIQUEIDENTIFIER";
-        public override string JsonType => @"TEXT";
-        public override string JsonBinaryType => @"TEXT";
-
-        public override string TypeGeometry => @"GEOMETRY";
-        public override string GeometryCollectionType => @"GEOMETRY";
-        public override string PointType => @"GEOMETRY";
-        public override string LineStringType => @"GEOMETRY";
-        public override string PolygonType => @"GEOMETRY";
-        public override string LineType => @"GEOMETRY";
-        public override string CurveType => @"GEOMETRY";
-        public override string SurfaceType => @"GEOMETRY";
-        public override string LinearRingType => @"GEOMETRY";
-        public override string MultiPointType => @"GEOMETRY";
-        public override string MultiLineStringType => @"GEOMETRY";
-        public override string MultiPolygonType => @"GEOMETRY";
-        public override string MultiCurveType => @"GEOMETRY";
-        public override string MultiSurfaceType => @"GEOMETRY";
-
-        public override string GeographicType => @"GEOGRAPHIC";
-        public override string GeographicCollectionType => @"GEOGRAPHIC";
-        public override string GeographicPointType => @"GEOGRAPHIC";
-        public override string GeographicLinestringType => @"GEOGRAPHIC";
-        public override string GeographicPolygonType => @"GEOGRAPHIC";
-        public override string GeographicLineType => @"GEOGRAPHIC";
-        public override string GeographicCurveType => @"GEOGRAPHIC";
-        public override string GeographicSurfaceType => @"GEOGRAPHIC";
-        public override string GeographicLinearringType => @"GEOGRAPHIC";
-        public override string GeographicMultipointType => @"GEOGRAPHIC";
-        public override string GeographicMultilinestringType => @"GEOGRAPHIC";
-        public override string GeographicMultipolygonType => @"GEOGRAPHIC";
-        public override string GeographicMulticurveType => @"GEOGRAPHIC";
-        public override string GeographicMultisurfaceType => @"GEOGRAPHIC";
 
         #endregion
 

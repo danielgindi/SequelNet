@@ -25,19 +25,21 @@ namespace SequelNet
                 this.Y = y;
             }
 
-            public Point(double x, double y, double z)
-            {
-                this.X = x;
-                this.Y = y;
-                this.Z = z;
-            }
-
-            public Point(double x, double y, double? z, double? m)
+            public Point(double x, double y, double? z = null, double? m = null)
             {
                 this.X = x;
                 this.Y = y;
                 this.Z = z;
                 this.M = m;
+            }
+
+            public Point(double x, double y, double? z, double? m, int srid)
+            {
+                this.X = x;
+                this.Y = y;
+                this.Z = z;
+                this.M = m;
+                this.SRID = srid;
             }
 
             public override bool IsEmpty
@@ -72,11 +74,11 @@ namespace SequelNet
 
             public override void BuildValueForCollection(StringBuilder sb, ConnectorBase conn)
             {
-                sb.Append(@"POINT(");
+                sb.Append("POINT(");
                 sb.Append(X.ToString(formatProvider));
                 sb.Append(' ');
                 sb.Append(Y.ToString(formatProvider));
-                sb.Append(@")");
+                sb.Append(")");
             }
         }
     }

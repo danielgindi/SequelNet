@@ -27,6 +27,7 @@ namespace SequelNet.SchemaGenerator
         public string IsMutatedProperty;
         public string Charset;
         public string Collate;
+        public int? SRID;
         public bool VirtualProp;
         public string Computed;
         public bool ComputedStored;

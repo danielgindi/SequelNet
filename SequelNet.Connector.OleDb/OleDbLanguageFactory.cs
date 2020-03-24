@@ -9,7 +9,6 @@ namespace SequelNet.Connector
         #region Syntax
 
         public override bool IsBooleanFalseOrderedFirst => false;
-        public override bool ShouldPrefixAutoIncrementWithType => false;
 
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => true;
@@ -98,6 +97,145 @@ namespace SequelNet.Connector
             outputBuilder.Append(@")");
         }
 
+        public override void BuildColumnPropertiesDataType(
+            StringBuilder sb,
+            ConnectorBase connection,
+            TableSchema.Column column,
+            Query relatedQuery,
+            out bool isDefaultAllowed)
+        {
+            isDefaultAllowed = true;
+
+            if (column.LiteralType != null && column.LiteralType.Length > 0)
+            {
+                sb.Append(column.LiteralType);
+                return;
+            }
+
+            DataType dataType = column.ActualDataType;
+            if (dataType == DataType.VarChar)
+            {
+                if (column.MaxLength < 0)
+                {
+                    sb.Append("VARCHAR");
+                    sb.Append(@"(MAX)");
+                }
+                else if (column.MaxLength == 0)
+                    sb.Append("TEXT");
+                else if (column.MaxLength <= VarCharMaxLength)
+                {
+                    sb.Append("VARCHAR");
+                    sb.AppendFormat(@"({0})", column.MaxLength);
+                }
+                else if (column.MaxLength < 65536)
+                    sb.Append("TEXT");
+                else if (column.MaxLength < 16777215)
+                    sb.Append("TEXT");
+                else
+                    sb.Append("TEXT");
+            }
+            else if (dataType == DataType.Char)
+            {
+                if (column.MaxLength < 0)
+                {
+                    sb.Append("VARCHAR");
+                    sb.Append(@"(MAX)");
+                }
+                else if (column.MaxLength == 0 || column.MaxLength >= VarCharMaxLength)
+                {
+                    sb.Append("VARCHAR");
+                    sb.AppendFormat(@"({0})", VarCharMaxLength);
+                }
+                else
+                {
+                    sb.Append("VARCHAR");
+                    sb.AppendFormat(@"({0})", column.MaxLength);
+                }
+            }
+            else if (dataType == DataType.Text)
+                sb.Append("TEXT");
+            else if (dataType == DataType.MediumText)
+                sb.Append("TEXT");
+            else if (dataType == DataType.LongText)
+                sb.Append("TEXT");
+            else if (dataType == DataType.Boolean)
+                sb.Append("BIT");
+            else if (dataType == DataType.DateTime)
+                sb.Append("DATETIME");
+            else if (dataType == DataType.Date)
+                sb.Append("DATE");
+            else if (dataType == DataType.Time)
+                sb.Append("TIME");
+            else if (dataType == DataType.Numeric)
+            {
+                if (column.NumberPrecision > 0)
+                {
+                    sb.Append("NUMERIC");
+                    sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
+                }
+                else
+                    sb.Append("NUMERIC");
+            }
+            else if (dataType == DataType.Float)
+                sb.Append("SINGLE");
+            else if (dataType == DataType.Double)
+                sb.Append("DOUBLE");
+            else if (dataType == DataType.Decimal)
+                sb.Append("DECIMAL");
+            else if (dataType == DataType.Money)
+                sb.Append("DECIMAL");
+            else if (dataType == DataType.TinyInt)
+                sb.Append("BYTE");
+            else if (dataType == DataType.UnsignedTinyInt)
+                sb.Append("TINYINT");
+            else if (dataType == DataType.SmallInt)
+                sb.Append("SHORT");
+            else if (dataType == DataType.UnsignedSmallInt)
+                sb.Append("SHORT");
+            else if (dataType == DataType.Int)
+                sb.Append("AUTOINCREMENT");
+            else if (dataType == DataType.UnsignedInt)
+                sb.Append("INT");
+            else if (dataType == DataType.BigInt)
+                sb.Append("AUTOINCREMENT");
+            else if (dataType == DataType.UnsignedBigInt)
+                sb.Append("INT");
+            else if (dataType == DataType.Json)
+                sb.Append("TEXT");
+            else if (dataType == DataType.JsonBinary)
+                sb.Append("TEXT");
+            else if (dataType == DataType.Blob)
+                sb.Append("IMAGE");
+            else if (dataType == DataType.Guid)
+                sb.Append("UNIQUEIDENTIFIER");
+            else throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+
+            if (column.AutoIncrement)
+                sb.Append(" IDENTITY");
+
+            if (column.ComputedColumn != null)
+            {
+                sb.Append(" AS ");
+
+                sb.Append(column.ComputedColumn.Build(connection, relatedQuery));
+
+                if (column.ComputedColumnStored)
+                    sb.Append(" PERSISTED");
+            }
+
+            if (!string.IsNullOrEmpty(column.Collate))
+            {
+                sb.Append(@" COLLATE");
+                sb.Append(column.Collate);
+            }
+
+            if (!string.IsNullOrEmpty(column.Charset))
+            {
+                sb.Append(@" CHARACTER SET");
+                sb.Append(column.Charset);
+            }
+        }
+
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             if (seedValue != null)
@@ -109,38 +247,6 @@ namespace SequelNet.Connector
                 outputBuilder.Append(@"RND(NULL)");
             }
         }
-
-        #endregion
-
-        #region Types
-
-        public override string AutoIncrementType => @"AUTOINCREMENT";
-        public override string AutoIncrementBigIntType => @"AUTOINCREMENT";
-
-        public override string TinyIntType => @"BYTE";
-        public override string UnsignedTinyIntType => @"TINYINT";
-        public override string SmallIntType => @"SHORT";
-        public override string UnsignedSmallIntType => @"SHORT";
-        public override string IntType => @"INT";
-        public override string UnsignedIntType => @"INT";
-        public override string BigIntType => @"INT";
-        public override string UnsignedBigIntType => @"INT";
-        public override string NumericType => @"NUMERIC";
-        public override string DecimalType => @"DECIMAL";
-        public override string MoneyType => @"DECIMAL";
-        public override string FloatType => @"SINGLE";
-        public override string DoubleType => @"DOUBLE";
-        public override string VarCharType => @"VARCHAR";
-        public override string CharType => @"CHAR";
-        public override string TextType => @"TEXT";
-        public override string MediumTextType => @"TEXT";
-        public override string LongTextType => @"TEXT";
-        public override string BooleanType => @"BIT";
-        public override string DateTimeType => @"DATETIME";
-        public override string GuidType => @"UNIQUEIDENTIFIER";
-        public override string BlobType => @"IMAGE";
-        public override string JsonType => @"TEXT";
-        public override string JsonBinaryType => @"TEXT";
 
         #endregion
 

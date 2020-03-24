@@ -354,16 +354,22 @@ namespace SequelNet
 
         public void BuildColumnProperties(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, bool noDefault)
         {
-            sb.Append(connection.Language.WrapFieldName(column.Name));
+            var language = connection.Language;
+
+            sb.Append(language.WrapFieldName(column.Name));
             sb.Append(' ');
 
-            bool isTextField;
-            BuildColumnPropertiesDataType(sb, connection, column, out isTextField);
+            language.BuildColumnPropertiesDataType(
+                sb: sb,
+                connection: connection, 
+                column: column, 
+                relatedQuery: this, 
+                isDefaultAllowed: out var isDefaultAllowed);
 
-            if (!string.IsNullOrEmpty(column.Comment) && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+            if (!string.IsNullOrEmpty(column.Comment) && language.SupportsColumnComment)
             {
                 sb.AppendFormat(@" COMMENT {0}",
-                    connection.Language.PrepareValue(column.Comment));
+                    language.PrepareValue(column.Comment));
             }
 
             if (!column.Nullable)
@@ -371,9 +377,14 @@ namespace SequelNet
                 sb.Append(@" NOT NULL");
             }
 
+            if (column.SRID != null && language.ColumnSRIDLocation == LanguageFactory.ColumnSRIDLocationMode.AfterNullability)
+            {
+                sb.Append(" SRID " + column.SRID.Value);
+            }
+
             if (column.ComputedColumn == null)
             {
-                if (!noDefault && column.Default != null && (!(isTextField && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)))
+                if (!noDefault && column.Default != null && isDefaultAllowed)
                 {
                     sb.Append(@" DEFAULT ");
                     Query.PrepareColumnValue(column, column.Default, sb, connection, this);
@@ -381,397 +392,6 @@ namespace SequelNet
             }
 
             sb.Append(' ');
-        }
-
-        public void BuildColumnPropertiesDataType(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, out bool isTextField)
-        {
-            if (column.LiteralType != null && column.LiteralType.Length > 0)
-            {
-                isTextField = column.ActualDataType == DataType.VarChar ||
-                    column.ActualDataType == DataType.Char ||
-                    column.ActualDataType == DataType.Text ||
-                    column.ActualDataType == DataType.MediumText ||
-                    column.ActualDataType == DataType.LongText ||
-                    column.Type == typeof(string);
-
-                sb.Append(column.LiteralType);
-                return;
-            }
-
-            var language = connection.Language;
-
-            isTextField = false;
-            DataType dataType = column.ActualDataType;
-            if (!column.AutoIncrement || language.ShouldPrefixAutoIncrementWithType)
-            {
-                if (dataType == DataType.VarChar)
-                {
-                    if (column.MaxLength < 0)
-                    {
-                        if (language.VarCharMaxKeyword != null)
-                        {
-                            sb.Append(language.VarCharType);
-                            sb.AppendFormat(@"({0})", language.VarCharMaxKeyword);
-                        }
-                        else
-                        {
-                            sb.Append(language.VarCharType);
-                            sb.AppendFormat(@"({0})", language.VarCharMaxLength);
-                        }
-                    }
-                    else if (column.MaxLength == 0)
-                    {
-                        sb.Append(language.TextType);
-                        isTextField = true;
-                    }
-                    else if (column.MaxLength <= language.VarCharMaxLength)
-                    {
-                        sb.Append(language.VarCharType);
-                        sb.AppendFormat(@"({0})", column.MaxLength);
-                    }
-                    else if (column.MaxLength < 65536)
-                    {
-                        sb.Append(language.TextType);
-                        isTextField = true;
-                    }
-                    else if (column.MaxLength < 16777215)
-                    {
-                        sb.Append(language.MediumTextType);
-                        isTextField = true;
-                    }
-                    else
-                    {
-                        sb.Append(language.LongTextType);
-                        isTextField = true;
-                    }
-                }
-
-                if (dataType == DataType.Char)
-                {
-                    if (column.MaxLength < 0)
-                    {
-                        if (language.VarCharMaxKeyword != null)
-                        {
-                            sb.Append(language.CharType);
-                            sb.AppendFormat(@"({0})", language.VarCharMaxKeyword);
-                        }
-                        else
-                        {
-                            sb.Append(language.CharType);
-                            sb.AppendFormat(@"({0})", language.VarCharMaxLength);
-                        }
-                    }
-                    else if (column.MaxLength == 0 || column.MaxLength >= language.VarCharMaxLength)
-                    {
-                        sb.Append(language.CharType);
-                        sb.AppendFormat(@"({0})", language.VarCharMaxLength);
-                    }
-                    else
-                    {
-                        sb.Append(language.CharType);
-                        sb.AppendFormat(@"({0})", column.MaxLength);
-                    }
-                }
-                else if (dataType == DataType.Text)
-                {
-                    sb.Append(language.TextType);
-                    isTextField = true;
-                }
-                else if (dataType == DataType.MediumText)
-                {
-                    sb.Append(language.MediumTextType);
-                    isTextField = true;
-                }
-                else if (dataType == DataType.LongText)
-                {
-                    sb.Append(language.LongTextType);
-                    isTextField = true;
-                }
-                else if (dataType == DataType.Boolean)
-                {
-                    sb.Append(language.BooleanType);
-                }
-                else if (dataType == DataType.DateTime)
-                {
-                    sb.Append(language.DateTimeType);
-                }
-                else if (dataType == DataType.Date)
-                {
-                    sb.Append(language.DateType);
-                }
-                else if (dataType == DataType.Time)
-                {
-                    sb.Append(language.TimeType);
-                }
-                else if (dataType == DataType.Numeric)
-                {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append(language.NumericType);
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append(language.NumericType);
-                    }
-                }
-                else if (dataType == DataType.Float)
-                {
-                    if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                    {
-                        sb.Append(language.FloatType);
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append(language.FloatType);
-                    }
-                }
-                else if (dataType == DataType.Double)
-                {
-                    if (column.NumberPrecision > 0 && connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                    {
-                        sb.Append(language.DoubleType);
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append(language.DoubleType);
-                    }
-                }
-                else if (dataType == DataType.Decimal)
-                {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append(language.DecimalType);
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append(language.DecimalType);
-                    }
-                }
-                else if (dataType == DataType.Money)
-                {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append(language.MoneyType);
-                        if (connection.TYPE != ConnectorBase.SqlServiceType.MSSQL)
-                        {
-                            sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                        }
-                    }
-                    else
-                    {
-                        sb.Append(language.MoneyType);
-                    }
-                }
-                else if (dataType == DataType.TinyInt)
-                {
-                    sb.Append(language.TinyIntType);
-                }
-                else if (dataType == DataType.UnsignedTinyInt)
-                {
-                    sb.Append(language.UnsignedTinyIntType);
-                }
-                else if (dataType == DataType.SmallInt)
-                {
-                    sb.Append(language.SmallIntType);
-                }
-                else if (dataType == DataType.UnsignedSmallInt)
-                {
-                    sb.Append(language.UnsignedSmallIntType);
-                }
-                else if (dataType == DataType.Int)
-                {
-                    sb.Append(language.IntType);
-                }
-                else if (dataType == DataType.UnsignedInt)
-                {
-                    sb.Append(language.UnsignedIntType);
-                }
-                else if (dataType == DataType.BigInt)
-                {
-                    sb.Append(language.BigIntType);
-                }
-                else if (dataType == DataType.UnsignedBigInt)
-                {
-                    sb.Append(language.UnsignedBigIntType);
-                }
-                else if (dataType == DataType.Json)
-                {
-                    sb.Append(language.JsonType);
-                }
-                else if (dataType == DataType.JsonBinary)
-                {
-                    sb.Append(language.JsonBinaryType);
-                }
-                else if (dataType == DataType.Blob)
-                {
-                    sb.Append(language.BlobType);
-                }
-                else if (dataType == DataType.Guid)
-                {
-                    sb.Append(language.GuidType);
-                }
-                else if (dataType == DataType.Geometry)
-                {
-                    sb.Append(language.TypeGeometry);
-                }
-                else if (dataType == DataType.GeometryCollection)
-                {
-                    sb.Append(language.GeometryCollectionType);
-                }
-                else if (dataType == DataType.Point)
-                {
-                    sb.Append(language.PointType);
-                }
-                else if (dataType == DataType.LineString)
-                {
-                    sb.Append(language.LineStringType);
-                }
-                else if (dataType == DataType.Polygon)
-                {
-                    sb.Append(language.PolygonType);
-                }
-                else if (dataType == DataType.Line)
-                {
-                    sb.Append(language.LineType);
-                }
-                else if (dataType == DataType.Curve)
-                {
-                    sb.Append(language.CurveType);
-                }
-                else if (dataType == DataType.Surface)
-                {
-                    sb.Append(language.SurfaceType);
-                }
-                else if (dataType == DataType.LinearRing)
-                {
-                    sb.Append(language.LinearRingType);
-                }
-                else if (dataType == DataType.MultiPoint)
-                {
-                    sb.Append(language.MultiPointType);
-                }
-                else if (dataType == DataType.MultiLineString)
-                {
-                    sb.Append(language.MultiLineStringType);
-                }
-                else if (dataType == DataType.MultiPolygon)
-                {
-                    sb.Append(language.MultiPolygonType);
-                }
-                else if (dataType == DataType.MultiCurve)
-                {
-                    sb.Append(language.MultiCurveType);
-                }
-                else if (dataType == DataType.MultiSurface)
-                {
-                    sb.Append(language.MultiSurfaceType);
-                }
-                else if (dataType == DataType.Geographic)
-                {
-                    sb.Append(language.GeographicType);
-                }
-                else if (dataType == DataType.GeographicCollection)
-                {
-                    sb.Append(language.GeographicCollectionType);
-                }
-                else if (dataType == DataType.GeographicPoint)
-                {
-                    sb.Append(language.GeographicPointType);
-                }
-                else if (dataType == DataType.GeographicLineString)
-                {
-                    sb.Append(language.GeographicLinestringType);
-                }
-                else if (dataType == DataType.GeographicPolygon)
-                {
-                    sb.Append(language.GeographicPolygonType);
-                }
-                else if (dataType == DataType.GeographicLine)
-                {
-                    sb.Append(language.GeographicLineType);
-                }
-                else if (dataType == DataType.GeographicCurve)
-                {
-                    sb.Append(language.GeographicCurveType);
-                }
-                else if (dataType == DataType.GeographicSurface)
-                {
-                    sb.Append(language.GeographicSurfaceType);
-                }
-                else if (dataType == DataType.GeographicLinearRing)
-                {
-                    sb.Append(language.GeographicLinearringType);
-                }
-                else if (dataType == DataType.GeographicMultiPoint)
-                {
-                    sb.Append(language.GeographicMultipointType);
-                }
-                else if (dataType == DataType.GeographicMultiLineString)
-                {
-                    sb.Append(language.GeographicMultilinestringType);
-                }
-                else if (dataType == DataType.GeographicMultiPolygon)
-                {
-                    sb.Append(language.GeographicMultipolygonType);
-                }
-                else if (dataType == DataType.GeographicMultiCurve)
-                {
-                    sb.Append(language.GeographicMulticurveType);
-                }
-                else if (dataType == DataType.GeographicMultiSurface)
-                {
-                    sb.Append(language.GeographicMultisurfaceType);
-                }
-            }
-
-            if (column.AutoIncrement)
-            {
-                sb.Append(' ');
-
-                if (dataType == DataType.BigInt || dataType == DataType.UnsignedBigInt)
-                {
-                    sb.Append(language.AutoIncrementBigIntType);
-                }
-                else
-                {
-                    sb.Append(language.AutoIncrementType);
-                }
-            }
-
-            if (column.ComputedColumn != null)
-            {
-                sb.Append(" AS ");
-
-                sb.Append(column.ComputedColumn.Build(connection, this));
-
-                if (column.ComputedColumnStored)
-                {
-                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                    {
-                        sb.Append(" PERSISTED");
-                    }
-                    else
-                    {
-                        sb.Append(" STORED");
-                    }
-                }
-            }
-
-            if (connection.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL && !string.IsNullOrEmpty(column.Charset))
-            {
-                sb.Append(@" COLLATE");
-                sb.Append(column.Collate);
-            }
-
-            if (!string.IsNullOrEmpty(column.Charset))
-            {
-                sb.Append(@" CHARACTER SET");
-                sb.Append(column.Charset);
-            }
         }
 
         public string BuildCommand()
@@ -1431,8 +1051,12 @@ namespace SequelNet
 
                                     sb.Append(alterColumnStatement);
                                     sb.Append(@" TYPE ");
-                                    bool isTextField; // UNUSED HERE
-                                    BuildColumnPropertiesDataType(sb, connection, _AlterColumn, out isTextField);
+                                    connection.Language.BuildColumnPropertiesDataType(
+                                        sb: sb,
+                                        connection: connection,
+                                        column: _AlterColumn,
+                                        relatedQuery: this,
+                                        isDefaultAllowed: out _);
                                     sb.Append(',');
 
                                     sb.Append(alterColumnStatement);
