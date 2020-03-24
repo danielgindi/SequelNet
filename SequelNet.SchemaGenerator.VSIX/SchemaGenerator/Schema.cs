@@ -129,6 +129,7 @@ namespace SequelNet.SchemaGenerator
                 dalCol.Type == DalColumnType.TFixedString)
             {
                 dalCol.ActualType = "string";
+                isReferenceType = true;
             }
             else if (dalCol.Type == DalColumnType.TDecimal ||
                 dalCol.Type == DalColumnType.TMoney)
@@ -147,6 +148,7 @@ namespace SequelNet.SchemaGenerator
                 dalCol.Type == DalColumnType.TJsonBinary)
             {
                 dalCol.ActualType = "string";
+                isReferenceType = true;
             }
             else if (dalCol.Type == DalColumnType.TGeometry)
             {
@@ -292,8 +294,6 @@ namespace SequelNet.SchemaGenerator
             {
                 // Do not change it, specified by ACTUALTYPE
                 isReferenceType = 
-                    dalCol.ActualType != "string" &&
-                    dalCol.ActualType != "String" &&
                     dalCol.ActualType != "int" &&
                     dalCol.ActualType != "Int16" &&
                     dalCol.ActualType != "Int32" &&
