@@ -354,6 +354,10 @@ namespace SequelNet.Connector
             {
                 return ((IPhrase)value).BuildPhrase(conn, relatedQuery);
             }
+            else if (value is ValueWrapper)
+            {
+                return ((ValueWrapper)value).Build(conn, relatedQuery);
+            }
             else if (value is Geometry)
             {
                 var sb = new StringBuilder();
