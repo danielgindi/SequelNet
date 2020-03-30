@@ -66,7 +66,7 @@ namespace SequelNet
 
         public static ValueWrapper From(string tableName, string column)
         {
-            return new ValueWrapper(tableName, column);
+            return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
         }
 
         public static ValueWrapper From(object value, ValueObjectType type)
@@ -82,6 +82,16 @@ namespace SequelNet
         public static ValueWrapper From(Where where)
         {
             return new ValueWrapper(where);
+        }
+
+        public static ValueWrapper Column(string tableName, string column)
+        {
+            return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
+        }
+
+        public static ValueWrapper Column(string column)
+        {
+            return new ValueWrapper(column, ValueObjectType.ColumnName);
         }
 
         public static ValueWrapper Literal(string literal)

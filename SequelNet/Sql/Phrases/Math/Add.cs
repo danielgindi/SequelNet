@@ -1,118 +1,140 @@
 ﻿using System;
+using System.Collections.Generic;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
 {
     public class Add : IPhrase
     {
-        public ValueWrapper Value1;
-        public ValueWrapper Value2;
+        public List<ValueWrapper> Values = new List<ValueWrapper>();
 
         #region Constructors
 
+        public Add(params ValueWrapper[] values)
+        {
+            this.Values.AddRange(values);
+        }
+
         public Add(
             string tableName1, string columnName1,
             string tableName2, string columnName2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(tableName2, columnName2))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(tableName2, columnName2);
         }
 
         public Add(
             string tableName1, string columnName1,
             object value2, ValueObjectType valueType2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, valueType2))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, valueType2);
         }
 
         public Add(
             object value1, ValueObjectType valueType1,
             string tableName2, string columnName2)
+            : this(
+                  new ValueWrapper(value1, valueType1),
+                  new ValueWrapper(tableName2, columnName2))
         {
-            this.Value1 = new ValueWrapper(value1, valueType1);
-            this.Value2 = new ValueWrapper(tableName2, columnName2);
         }
 
         public Add(
             object value1, ValueObjectType valueType1,
             object value2, ValueObjectType valueType2)
+            : this(
+                  new ValueWrapper(value1, valueType1),
+                  new ValueWrapper(value2, valueType2))
         {
-            this.Value1 = new ValueWrapper(value1, valueType1);
-            this.Value2 = new ValueWrapper(value2, valueType2);
         }
 
         public Add(string tableName1, string columnName1, Int32 value2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string tableName1, string columnName1, Int64 value2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string tableName1, string columnName1, decimal value2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string tableName1, string columnName1, double value2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string tableName1, string columnName1, float value2)
+            : this(
+                  new ValueWrapper(tableName1, columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(tableName1, columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string columnName1, Int32 value2)
+            : this(
+                  new ValueWrapper(columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string columnName1, Int64 value2)
+            : this(
+                  new ValueWrapper(columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string columnName1, decimal value2)
+            : this(
+                  new ValueWrapper(columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string columnName1, double value2)
+            : this(
+                  new ValueWrapper(columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         public Add(string columnName1, float value2)
+            : this(
+                  new ValueWrapper(columnName1),
+                  new ValueWrapper(value2, ValueObjectType.Value))
         {
-            this.Value1 = new ValueWrapper(columnName1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
         }
 
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = @"";
+            string ret = "";
+            bool first = true;
 
-            ret += Value1.Build(conn, relatedQuery);
+            foreach (var value in Values)
+            {
+                if (first) first = false;
+                else ret += " + ";
 
-            ret += @"+";
-
-            ret += Value2.Build(conn, relatedQuery);
+                ret += value.Build(conn, relatedQuery);
+            }
 
             return ret;
         }
