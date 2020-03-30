@@ -33,6 +33,21 @@ namespace SequelNet.Phrases
             this.Separator = separator;
         }
 
+        public GroupConcat(bool distinct, string tableName, string columnName, char separator, OrderByList orderBy)
+        {
+            this.Distinct = distinct;
+            this.Value = new ValueWrapper(tableName, columnName);
+            this.Separator = separator.ToString();
+            this.OrderBy = orderBy;
+        }
+
+        public GroupConcat(bool distinct, string tableName, string columnName, char separator)
+        {
+            this.Distinct = distinct;
+            this.Value = new ValueWrapper(tableName, columnName);
+            this.Separator = separator.ToString();
+        }
+
         public GroupConcat(bool distinct, string tableName, string columnName, OrderByList orderBy)
         {
             this.Distinct = distinct;
@@ -61,6 +76,21 @@ namespace SequelNet.Phrases
             this.Separator = separator;
         }
 
+        public GroupConcat(bool distinct, ValueWrapper value, char separator, OrderByList orderBy)
+        {
+            this.Distinct = distinct;
+            this.Value = value;
+            this.Separator = separator.ToString();
+            this.OrderBy = orderBy;
+        }
+
+        public GroupConcat(bool distinct, ValueWrapper value, char separator)
+        {
+            this.Distinct = distinct;
+            this.Value = value;
+            this.Separator = separator.ToString();
+        }
+
         public GroupConcat(bool distinct, ValueWrapper value, OrderByList orderBy)
         {
             this.Distinct = distinct;
@@ -87,6 +117,19 @@ namespace SequelNet.Phrases
             this.Separator = separator;
         }
 
+        public GroupConcat(string tableName, string columnName, char separator, OrderByList orderBy)
+        {
+            this.Value = new ValueWrapper(tableName, columnName);
+            this.Separator = separator.ToString();
+            this.OrderBy = orderBy;
+        }
+
+        public GroupConcat(string tableName, string columnName, char separator)
+        {
+            this.Value = new ValueWrapper(tableName, columnName);
+            this.Separator = separator.ToString();
+        }
+
         public GroupConcat(string tableName, string columnName, OrderByList orderBy)
         {
             this.Value = new ValueWrapper(tableName, columnName);
@@ -109,6 +152,19 @@ namespace SequelNet.Phrases
         {
             this.Value = value;
             this.Separator = separator;
+        }
+
+        public GroupConcat(ValueWrapper value, char separator, OrderByList orderBy)
+        {
+            this.Value = value;
+            this.Separator = separator.ToString();
+            this.OrderBy = orderBy;
+        }
+
+        public GroupConcat(ValueWrapper value, char separator)
+        {
+            this.Value = value;
+            this.Separator = separator.ToString();
         }
 
         public GroupConcat(ValueWrapper value, OrderByList orderBy)

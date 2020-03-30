@@ -1350,6 +1350,16 @@ namespace SequelNet
             return new GroupConcat(distinct, tableName, columnName, separator);
         }
 
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, char separator, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, tableName, columnName, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, char separator)
+        {
+            return new GroupConcat(distinct, tableName, columnName, separator);
+        }
+
         public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, OrderByList orderBy)
         {
             return new GroupConcat(distinct, tableName, columnName, orderBy);
@@ -1366,6 +1376,16 @@ namespace SequelNet
         }
 
         public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator)
+        {
+            return new GroupConcat(distinct, value, separator);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, char separator, OrderByList orderBy)
+        {
+            return new GroupConcat(distinct, value, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, char separator)
         {
             return new GroupConcat(distinct, value, separator);
         }
@@ -1390,6 +1410,16 @@ namespace SequelNet
             return new GroupConcat(tableName, columnName, separator);
         }
 
+        public static GroupConcat GroupConcat(string tableName, string columnName, char separator, OrderByList orderBy)
+        {
+            return new GroupConcat(tableName, columnName, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(string tableName, string columnName, char separator)
+        {
+            return new GroupConcat(tableName, columnName, separator);
+        }
+
         public static GroupConcat GroupConcat(string tableName, string columnName, OrderByList orderBy)
         {
             return new GroupConcat(tableName, columnName, orderBy);
@@ -1406,6 +1436,16 @@ namespace SequelNet
         }
 
         public static GroupConcat GroupConcat(ValueWrapper value, string separator)
+        {
+            return new GroupConcat(value, separator);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value, char separator, OrderByList orderBy)
+        {
+            return new GroupConcat(value, separator, orderBy);
+        }
+
+        public static GroupConcat GroupConcat(ValueWrapper value, char separator)
         {
             return new GroupConcat(value, separator);
         }
