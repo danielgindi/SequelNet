@@ -322,6 +322,10 @@ namespace SequelNet.Connector
             {
                 return PrepareValue((string)value);
             }
+            else if (value is char)
+            {
+                return PrepareValue(((char)value).ToString());
+            }
             else if (value is DateTime)
             {
                 return '\'' + FormatDate((DateTime)value) + '\'';
