@@ -11,7 +11,6 @@ namespace SequelNet
 
         private TableSchema _Schema;
         private string _SchemaName = null;
-        private object _FromExpression = null;
         private string _SchemaAlias = null;
         private OrderByList _ListOrderBy;
         private GroupByList _ListGroupBy;
@@ -20,20 +19,11 @@ namespace SequelNet
         private AssignmentColumnList _ListInsertUpdate;
         private WhereList _ListWhere;
         private JoinList _ListJoin;
-        private object _InsertExpression = null;
         private string _StoredProcedureName;
         private List<DbParameterWrapper> _StoredProcedureParameters = null;
         internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();
-        private QueryMode _QueryMode = QueryMode.Select;
-        private bool _IsDistinct = false;
-        private Int64 _Limit = 0;
-        private Int64 _Offset = 0;
         private QueryHint _QueryHint = QueryHint.None;
         private GroupByHint _GroupByHint = GroupByHint.None;
-        private bool _NeedTransaction = false;
-        private int? _CommandTimeout = null;
-        private bool _IgnoreErrors = false;
-        private List<AlterTableQueryData> _AlterTableSteps = null;
 
         #endregion
 
@@ -61,7 +51,7 @@ namespace SequelNet
         {
             this.Schema = null;
 
-            _FromExpression = fromExpression;
+            FromExpression = fromExpression;
             _SchemaAlias = alias;
             _SchemaName = _SchemaAlias;
 
@@ -132,7 +122,7 @@ namespace SequelNet
 
         public Query ClearAlterTable()
         {
-            _AlterTableSteps = null;
+            AlterTableSteps = null;
             return this;
         }
 
@@ -178,33 +168,33 @@ namespace SequelNet
         /// <summary>
         /// Sets LIMIT for query results
         /// </summary>
-        /// <param name="Limit">Limit. 0 for not limit.</param>
+        /// <param name="limit">Limit. 0 for not limit.</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query LimitRows(Int64 Limit)
+        public Query LimitRows(Int64 limit)
         {
-            _Limit = Limit;
+            this.Limit = limit;
             return this;
         }
 
         /// <summary>
         /// Sets OFFSET for query results
         /// </summary>
-        /// <param name="Offset">Offset</param>
+        /// <param name="offset">Offset</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query OffsetRows(Int64 Offset)
+        public Query OffsetRows(Int64 offset)
         {
-            _Offset = Offset;
+            this.Offset = offset;
             return this;
         }
 
         /// <summary>
         /// Sets a hint for this query.
         /// </summary>
-        /// <param name="QueryHint">Hint</param>
+        /// <param name="queryHint">Hint</param>
         /// <returns>Current <typeparamref name="Query"/> object</returns>
-        public Query Hint(QueryHint QueryHint)
+        public Query Hint(QueryHint queryHint)
         {
-            _QueryHint = QueryHint;
+            _QueryHint = queryHint;
             return this;
         }
 
@@ -479,11 +469,7 @@ namespace SequelNet
         /// <summary>
         /// Current query type.
         /// </summary>
-        public QueryMode QueryMode
-        {
-            get { return _QueryMode; }
-            set { _QueryMode = value; }
-        }
+        public QueryMode QueryMode { get; set; } = QueryMode.Select;
 
         /// <summary>
         /// Current query type.
@@ -502,11 +488,7 @@ namespace SequelNet
         /// <summary>
         /// Expression that replaces a table to select from.
         /// </summary>
-        public object FromExpression
-        {
-            get { return _FromExpression; }
-            set { _FromExpression = value; }
-        }
+        public object FromExpression { get; set; } = null;
 
         /// <summary>
         /// Setting a schema name.
@@ -540,11 +522,7 @@ namespace SequelNet
         /// <summary>
         /// Is this Query returning DISTINCT values.
         /// </summary>
-        public bool IsDistinct
-        {
-            get { return _IsDistinct; }
-            set { _IsDistinct = value; }
-        }
+        public bool IsDistinct { get; set; } = false;
 
         /// <summary>
         /// Do we have already some INSERTs or UPDATEs set for this query?
@@ -555,40 +533,28 @@ namespace SequelNet
             {
                 return _ListInsertUpdate != null &&
                     _ListInsertUpdate.Count > 0 && (
-                  _QueryMode == QueryMode.Insert ||
-                  _QueryMode == QueryMode.Update ||
-                  _QueryMode == QueryMode.InsertOrUpdate);
+                  QueryMode == QueryMode.Insert ||
+                  QueryMode == QueryMode.Update ||
+                  QueryMode == QueryMode.InsertOrUpdate);
             }
         }
 
         /// <summary>
         /// LIMIT for query results.
         /// </summary>
-        public Int64 Limit
-        {
-            get { return _Limit; }
-            set { _Limit = value; }
-        }
+        public Int64 Limit { get; set; } = 0;
 
         /// <summary>
         /// OFFSET for query results.
         /// Note: MSSQL do not natively support paging.
         /// </summary>
-        public Int64 Offset
-        {
-            get { return _Offset; }
-            set { _Offset = value; }
-        }
+        public Int64 Offset { get; set; } = 0;
 
         /// <summary>
         /// The expression that is used for INSERT. e.g. INSERT INTO {schema} FROM {expression}.
         /// This can be a <typeparamref name="Query"/> or a <typeparamref name="String"/>.
         /// </summary>
-        public object InsertExpression
-        {
-            get { return _InsertExpression; }
-            set { _InsertExpression = value; }
-        }
+        public object InsertExpression { get; set; } = null;
 
         /// <summary>
         /// Main <typeparamref name="TableSchema"/> for this query
@@ -619,40 +585,24 @@ namespace SequelNet
         /// Does this query needs a transaction?
         /// The query will be automatically wrapped in a transaction, if the connection is not already in a transaction.
         /// </summary>
-        public bool NeedTransaction
-        {
-            get { return _NeedTransaction; }
-            set { _NeedTransaction = value; }
-        }
+        public bool NeedTransaction { get; set; } = false;
 
         /// <summary>
         /// The command timeout. If null, default command timeout will be used.
         /// </summary>
-        public int? CommandTimeout
-        {
-            get { return _CommandTimeout; }
-            set { _CommandTimeout = value; }
-        }
+        public int? CommandTimeout { get; set; } = null;
 
         /// <summary>
         /// Ignore constraint errors (INSERT IGNORE etc.)
         /// Caution: Not supported by most RDBMS.
         /// </summary>
-        public bool IgnoreErrors
-        {
-            get { return _IgnoreErrors; }
-            set { _IgnoreErrors = value; }
-        }
+        public bool IgnoreErrors { get; set; } = false;
 
         /// <summary>
         /// List of alter table steps in a big ALTER TABLE statement.
         /// May be null if not steps were added yet.
         /// </summary>
-        public List<AlterTableQueryData> AlterTableSteps
-        {
-            get { return _AlterTableSteps; }
-            set { _AlterTableSteps = value; }
-        }
+        public List<AlterTableQueryData> AlterTableSteps { get; set; } = null;
 
         #endregion
     }

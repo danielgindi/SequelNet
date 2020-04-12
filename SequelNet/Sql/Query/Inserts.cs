@@ -27,7 +27,7 @@
 
         public Query SetInsertExpression(object insertExpression)
         {
-            _InsertExpression = insertExpression;
+            InsertExpression = insertExpression;
             return this;
         }
     }

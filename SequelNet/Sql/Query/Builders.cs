@@ -737,7 +737,7 @@ namespace SequelNet
                                 }
                                 else
                                 {
-                                    _NeedTransaction = true;
+                                    NeedTransaction = true;
 
                                     if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                     {
@@ -851,7 +851,7 @@ namespace SequelNet
                             {
                                 if ((Schema.Indexes.Count + Schema.ForeignKeys.Count) > 1)
                                 {
-                                    _NeedTransaction = true;
+                                    NeedTransaction = true;
                                 }
 
                                 var qry2 = Query.New(Schema);

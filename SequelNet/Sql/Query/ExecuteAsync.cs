@@ -89,7 +89,7 @@ namespace SequelNet
                 if (needsDispose) connection = ConnectorBase.NewInstance();
 
                 bool transaction = false;
-                if (_NeedTransaction && !connection.HasTransaction)
+                if (NeedTransaction && !connection.HasTransaction)
                 {
                     transaction = true;
                     connection.BeginTransaction();
@@ -213,7 +213,7 @@ namespace SequelNet
                 if (needsDispose) connection = ConnectorBase.NewInstance();
 
                 bool transaction = false;
-                if (_NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
+                if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
                 int retValue = 0;
 
                 using (var cmd = BuildDbCommand(connection))
@@ -278,7 +278,7 @@ namespace SequelNet
                 if (needsDispose) connection = ConnectorBase.NewInstance();
 
                 bool transaction = false;
-                if (_NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
+                if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
 
                 int retValue = 0;
 

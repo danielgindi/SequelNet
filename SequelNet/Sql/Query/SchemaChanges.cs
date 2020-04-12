@@ -56,10 +56,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.CreateIndex,
                 Index = index,
@@ -94,10 +94,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.CreateForeignKey,
                 ForeignKey = foreignKey,
@@ -132,10 +132,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.AddColumn,
                 Column = column,
@@ -194,10 +194,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.ChangeColumn,
                 Column = column,
@@ -233,10 +233,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.DropColumn,
                 OldItemName = columnName,
@@ -260,10 +260,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.DropForeignKey,
                 OldItemName = foreignKeyName,
@@ -287,10 +287,10 @@ namespace SequelNet
 
             this.QueryMode = QueryMode.AlterTable;
 
-            if (this._AlterTableSteps == null)
-                this._AlterTableSteps = new List<AlterTableQueryData>();
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
 
-            this._AlterTableSteps.Add(new AlterTableQueryData
+            this.AlterTableSteps.Add(new AlterTableQueryData
             {
                 Type = AlterTableType.DropIndex,
                 OldItemName = indexName,
