@@ -227,13 +227,13 @@ namespace SequelNet.Connector
 
             if (!string.IsNullOrEmpty(column.Collate))
             {
-                sb.Append(@" COLLATE");
+                sb.Append(@" COLLATE ");
                 sb.Append(column.Collate);
             }
 
             if (!string.IsNullOrEmpty(column.Charset))
             {
-                sb.Append(@" CHARACTER SET");
+                sb.Append(@" CHARACTER SET ");
                 sb.Append(column.Charset);
             }
         }
