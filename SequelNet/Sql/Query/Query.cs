@@ -20,10 +20,7 @@ namespace SequelNet
         private AssignmentColumnList _ListInsertUpdate;
         private WhereList _ListWhere;
         private JoinList _ListJoin;
-        private TableSchema.Column _AlterColumn;
         private object _InsertExpression = null;
-        private string _AlterColumnOldName;
-        private string _DropColumnName;
         private string _StoredProcedureName;
         private List<DbParameterWrapper> _StoredProcedureParameters = null;
         internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();
@@ -31,12 +28,12 @@ namespace SequelNet
         private bool _IsDistinct = false;
         private Int64 _Limit = 0;
         private Int64 _Offset = 0;
-        private object _CreateIndexObject = null;
         private QueryHint _QueryHint = QueryHint.None;
         private GroupByHint _GroupByHint = GroupByHint.None;
         private bool _NeedTransaction = false;
         private int? _CommandTimeout = null;
         private bool _IgnoreErrors = false;
+        private List<AlterTableQueryData> _AlterTableSteps = null;
 
         #endregion
 
@@ -130,6 +127,12 @@ namespace SequelNet
         public Query ClearStoredProcedureParameters()
         {
             _StoredProcedureParameters = null;
+            return this;
+        }
+
+        public Query ClearAlterTable()
+        {
+            _AlterTableSteps = null;
             return this;
         }
 
@@ -639,6 +642,16 @@ namespace SequelNet
         {
             get { return _IgnoreErrors; }
             set { _IgnoreErrors = value; }
+        }
+
+        /// <summary>
+        /// List of alter table steps in a big ALTER TABLE statement.
+        /// May be null if not steps were added yet.
+        /// </summary>
+        public List<AlterTableQueryData> AlterTableSteps
+        {
+            get { return _AlterTableSteps; }
+            set { _AlterTableSteps = value; }
         }
 
         #endregion

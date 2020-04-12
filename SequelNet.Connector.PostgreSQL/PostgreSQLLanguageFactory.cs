@@ -22,6 +22,9 @@ namespace SequelNet.Connector
         public override bool UpdateFromInsteadOfJoin => true;
         public override bool UpdateJoinRequiresFromLeftTable => false;
 
+        public override bool HasSeparateRenameColumn => true;
+        public override Func<TableSchema.Index, bool> HasSeparateCreateIndex => (index) => index.Mode != TableSchema.IndexMode.PrimaryKey;
+
         public override int VarCharMaxLength => 357913937;
 
         public override string UtcNow()
@@ -161,18 +164,13 @@ namespace SequelNet.Connector
         }
 
         public override void BuildCreateIndex(
-            Query qry,
-            ConnectorBase conn,
             TableSchema.Index index,
-            StringBuilder outputBuilder)
+            StringBuilder outputBuilder,
+            Query qry,
+            ConnectorBase conn)
         {
-            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            if (index.Mode == TableSchema.IndexMode.PrimaryKey)
             {
-                outputBuilder.Append(@"ALTER TABLE ");
-
-                BuildTableName(qry, conn, outputBuilder, false);
-
-                outputBuilder.Append(@" ADD CONSTRAINT ");
                 outputBuilder.Append(WrapFieldName(index.Name));
                 outputBuilder.Append(@" PRIMARY KEY ");
 
@@ -210,7 +208,7 @@ namespace SequelNet.Connector
                     outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
                     outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                 }
-                outputBuilder.Append(@")");
+                outputBuilder.Append(@");");
             }
         }
 
@@ -220,11 +218,11 @@ namespace SequelNet.Connector
         }
 
         public override void BuildColumnPropertiesDataType(
+            TableSchema.Column column,
+            out bool isDefaultAllowed,
             StringBuilder sb,
             ConnectorBase connection,
-            TableSchema.Column column,
-            Query relatedQuery,
-            out bool isDefaultAllowed)
+            Query relatedQuery)
         {
             isDefaultAllowed = true;
 
@@ -492,9 +490,49 @@ namespace SequelNet.Connector
             return sb.ToString();
         }
 
+        public override void BuildSeparateRenameColumn(
+            Query qry,
+            ConnectorBase conn,
+            AlterTableQueryData alterData,
+            StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"ALTER TABLE ");
+
+            BuildTableName(qry, conn, outputBuilder, false);
+
+            outputBuilder.Append(@" RENAME COLUMN ");
+            outputBuilder.Append(WrapFieldName(alterData.OldItemName));
+            outputBuilder.Append(@" TO ");
+            outputBuilder.Append(WrapFieldName(alterData.Column.Name));
+            outputBuilder.Append(';');
+        }
+
+        public override void BuildChangeColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            // Alter type
+            sb.Append(WrapFieldName(alterData.Column.Name));
+            sb.Append(@" TYPE ");
+            BuildColumnPropertiesDataType(
+                column: alterData.Column,
+                isDefaultAllowed: out _,
+                sb: sb,
+                connection: conn,
+                relatedQuery: relatedQuery);
+            sb.Append(',');
+
+            // Alter nullability
+            sb.Append(ChangeColumnCommandName + " " + WrapFieldName(alterData.Column.Name));
+            sb.Append(alterData.Column.Nullable ? " DROP NOT NULL," : " SET NOT NULL,");
+
+            // Alter default
+            sb.Append(ChangeColumnCommandName + " " + WrapFieldName(alterData.Column.Name));
+            sb.Append(" SET DEFAULT ");
+            Query.PrepareColumnValue(alterData.Column, alterData.Column.Default, sb, conn, relatedQuery);
+        }
+
         #endregion
 
-        #region Reading values from SQL
+         #region Reading values from SQL
 
         public override Geometry ReadGeometry(object value)
         {

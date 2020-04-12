@@ -22,6 +22,32 @@ namespace SequelNet.Connector
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => true;
 
+        public override bool HasSeparateRenameColumn => true;
+        public override Func<TableSchema.Index, bool> HasSeparateCreateIndex => (index) => index.Mode != TableSchema.IndexMode.PrimaryKey;
+        public override Func<AlterTableType, AlterTableType, bool> IsAlterTableTypeMixCompatible => (type1, type2) =>
+        {
+            // Same
+            if (type1 == type2)
+                return true;
+
+            // Multiple ALTER TABLE ADD ...
+            if (
+                (type1 == AlterTableType.AddColumn || type1 == AlterTableType.CreateIndex || type1 == AlterTableType.CreateForeignKey) ==
+                (type2 == AlterTableType.AddColumn || type2 == AlterTableType.CreateIndex || type2 == AlterTableType.CreateForeignKey)
+                )
+                return true;
+
+            // Can't mix
+            return false;
+        };
+        public override bool SupportsMultipleAlterColumn => false;
+        public override bool SameAlterTableCommandsAreCommaSeparated => true;
+        public override string AlterTableAddCommandName => "ADD";
+        public override string AlterTableAddColumnCommandName => "";
+        public override string AlterTableAddIndexCommandName => "CONSTRAINT";
+        public override string AlterTableAddForeignKeyCommandName => "CONSTRAINT";
+        public override string ChangeColumnCommandName => "ALTER COLUMN";
+
         public override int VarCharMaxLength => 4000;
 
         public override string UtcNow()
@@ -154,18 +180,13 @@ namespace SequelNet.Connector
         }
 
         public override void BuildCreateIndex(
-            Query qry,
-            ConnectorBase conn,
             TableSchema.Index index,
-            StringBuilder outputBuilder)
+            StringBuilder outputBuilder,
+            Query qry,
+            ConnectorBase conn)
         {
-            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            if (index.Mode == TableSchema.IndexMode.PrimaryKey)
             {
-                outputBuilder.Append(@"ALTER TABLE ");
-
-                BuildTableName(qry, conn, outputBuilder, false);
-
-                outputBuilder.Append(@" ADD CONSTRAINT ");
                 outputBuilder.Append(WrapFieldName(index.Name));
                 outputBuilder.Append(@" PRIMARY KEY ");
 
@@ -203,16 +224,16 @@ namespace SequelNet.Connector
                     outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
                     outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
                 }
-                outputBuilder.Append(@")");
+                outputBuilder.Append(@");");
             }
         }
 
         public override void BuildColumnPropertiesDataType(
+            TableSchema.Column column,
+            out bool isDefaultAllowed,
             StringBuilder sb,
             ConnectorBase connection,
-            TableSchema.Column column,
-            Query relatedQuery,
-            out bool isDefaultAllowed)
+            Query relatedQuery)
         {
             isDefaultAllowed = true;
 
@@ -420,6 +441,23 @@ namespace SequelNet.Connector
             outputBuilder.Append(@"NEWID()");
         }
 
+        public override void BuildSeparateRenameColumn(
+            Query qry,
+            ConnectorBase conn,
+            AlterTableQueryData alterData,
+            StringBuilder outputBuilder)
+        {
+            outputBuilder.Append(@"EXEC sp_rename ");
+
+            BuildTableName(qry, conn, outputBuilder, false);
+
+            outputBuilder.Append('.');
+            outputBuilder.Append(WrapFieldName(alterData.OldItemName));
+            outputBuilder.Append(',');
+            outputBuilder.Append(WrapFieldName(alterData.Column.Name));
+            outputBuilder.Append(@",'COLUMN';");
+        }
+
         public override string Aggregate_Some(string rawExpression)
         {
             return $"(SUM({rawExpression}) > 0)";
@@ -428,6 +466,13 @@ namespace SequelNet.Connector
         public override string Aggregate_Every(string rawExpression)
         {
             return $"(COUNT({rawExpression}) = COUNT(*))";
+        }
+
+        public override void BuildChangeColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            // TODO: Find another way of specifying DEFAULT / removing DEFAULT value accordingly for MSSQL
+
+            BuildColumnProperties(alterData.Column, true, sb, conn, relatedQuery);
         }
 
         #endregion

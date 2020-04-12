@@ -21,6 +21,22 @@ namespace SequelNet.Connector
         public virtual bool SupportsColumnComment => false;
         public virtual ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.InType;
 
+        public virtual bool SupportsRenameColumn => true;
+        public virtual bool HasSeparateRenameColumn => false;
+        public virtual Func<TableSchema.Index, bool> HasSeparateCreateIndex => (index) => false;
+        public virtual Func<AlterTableType, AlterTableType, bool> IsAlterTableTypeMixCompatible => (type1, type2) => true;
+        public virtual bool SupportsMultipleAlterTable => true;
+        public virtual bool SupportsMultipleAlterColumn => true;
+        public virtual bool SameAlterTableCommandsAreCommaSeparated => false;
+        public virtual string AlterTableAddCommandName => "";
+        public virtual string AlterTableAddColumnCommandName => "ADD COLUMN";
+        public virtual string AlterTableAddIndexCommandName => "ADD CONSTRAINT";
+        public virtual string AlterTableAddForeignKeyCommandName => "ADD CONSTRAINT";
+        public virtual string ChangeColumnCommandName => "ALTER COLUMN";
+        public virtual string DropColumnCommandName => "DROP COLUMN";
+        public virtual string DropIndexCommandName => "DROP INDEX";
+        public virtual string DropForeignKeyCommandName => "DROP CONSTRAINT";
+
         public virtual int VarCharMaxLength => 255;
 
         public virtual string UtcNow()
@@ -205,12 +221,52 @@ namespace SequelNet.Connector
             }
         }
 
+        public virtual void BuildColumnProperties(TableSchema.Column column, bool noDefault, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append(WrapFieldName(column.Name));
+            sb.Append(' ');
+
+            BuildColumnPropertiesDataType(
+                column: column,
+                isDefaultAllowed: out var isDefaultAllowed,
+                sb: sb,
+                connection: conn,
+                relatedQuery: relatedQuery);
+
+            if (!string.IsNullOrEmpty(column.Comment) && SupportsColumnComment)
+            {
+                sb.AppendFormat(@" COMMENT {0}",
+                    PrepareValue(column.Comment));
+            }
+
+            if (!column.Nullable)
+            {
+                sb.Append(@" NOT NULL");
+            }
+
+            if (column.SRID != null && ColumnSRIDLocation == ColumnSRIDLocationMode.AfterNullability)
+            {
+                sb.Append(" SRID " + column.SRID.Value);
+            }
+
+            if (column.ComputedColumn == null)
+            {
+                if (!noDefault && column.Default != null && isDefaultAllowed)
+                {
+                    sb.Append(@" DEFAULT ");
+                    Query.PrepareColumnValue(column, column.Default, sb, conn, relatedQuery);
+                }
+            }
+
+            sb.Append(' ');
+        }
+
         public virtual void BuildColumnPropertiesDataType(
-            StringBuilder sb,
-            ConnectorBase connection, 
             TableSchema.Column column,
-            Query relatedQuery,
-            out bool isDefaultAllowed)
+            out bool isDefaultAllowed,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
         {
             throw new NotImplementedException("BuildColumnPropertiesDataType has not been implemented for this connector");
         }
@@ -224,12 +280,68 @@ namespace SequelNet.Connector
         }
 
         public virtual void BuildCreateIndex(
-            Query qry,
-            ConnectorBase conn,
             TableSchema.Index index,
-            StringBuilder outputBuilder)
+            StringBuilder outputBuilder,
+            Query qry,
+            ConnectorBase conn)
         {
             throw new NotImplementedException("Index syntax has not been implemented for this connector");
+        }
+
+        public virtual void BuildCreateForeignKey(TableSchema.ForeignKey foreignKey, StringBuilder sb, ConnectorBase connection)
+        {
+            sb.Append(WrapFieldName(foreignKey.Name));
+            sb.Append(@" FOREIGN KEY (");
+
+            for (int i = 0; i < foreignKey.Columns.Length; i++)
+            {
+                if (i > 0) sb.Append(",");
+                sb.Append(WrapFieldName(foreignKey.Columns[i]));
+            }
+            sb.AppendFormat(@") REFERENCES {0} (", foreignKey.ForeignTable);
+            for (int i = 0; i < foreignKey.ForeignColumns.Length; i++)
+            {
+                if (i > 0) sb.Append(",");
+                sb.Append(WrapFieldName(foreignKey.ForeignColumns[i]));
+            }
+            sb.Append(@")");
+            if (foreignKey.OnDelete != TableSchema.ForeignKeyReference.None)
+            {
+                switch (foreignKey.OnDelete)
+                {
+                    case TableSchema.ForeignKeyReference.Cascade:
+                        sb.Append(@" ON DELETE CASCADE");
+                        break;
+                    case TableSchema.ForeignKeyReference.NoAction:
+                        sb.Append(@" ON DELETE NO ACTION");
+                        break;
+                    case TableSchema.ForeignKeyReference.Restrict:
+                        sb.Append(@" ON DELETE RESTRICT");
+                        break;
+                    case TableSchema.ForeignKeyReference.SetNull:
+                        sb.Append(@" ON DELETE SET NULL");
+                        break;
+                }
+            }
+
+            if (foreignKey.OnUpdate != TableSchema.ForeignKeyReference.None)
+            {
+                switch (foreignKey.OnUpdate)
+                {
+                    case TableSchema.ForeignKeyReference.Cascade:
+                        sb.Append(@" ON UPDATE CASCADE");
+                        break;
+                    case TableSchema.ForeignKeyReference.NoAction:
+                        sb.Append(@" ON UPDATE NO ACTION");
+                        break;
+                    case TableSchema.ForeignKeyReference.Restrict:
+                        sb.Append(@" ON UPDATE RESTRICT");
+                        break;
+                    case TableSchema.ForeignKeyReference.SetNull:
+                        sb.Append(@" ON UPDATE SET NULL");
+                        break;
+                }
+            }
         }
 
         public virtual void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
@@ -250,6 +362,25 @@ namespace SequelNet.Connector
         public virtual string GroupConcat(bool distinct, string rawExpression, string rawOrderBy, string separator)
         {
             throw new NotImplementedException("GROUP_CONCAT has not been implemented for this connector");
+        }
+
+        public virtual void BuildSeparateRenameColumn(
+            Query qry,
+            ConnectorBase conn,
+            AlterTableQueryData alterData,
+            StringBuilder outputBuilder)
+        {
+            throw new NotImplementedException("BuildSeparateRenameColumn has not been implemented for this connector");
+        }
+
+        public virtual void BuildChangeColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            BuildColumnProperties(alterData.Column, false, sb, conn, relatedQuery);
+        }
+
+        public virtual void BuildAddColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            BuildColumnProperties(alterData.Column, false, sb, conn, relatedQuery);
         }
 
         #endregion

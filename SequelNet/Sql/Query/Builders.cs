@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -279,119 +280,6 @@ namespace SequelNet
                     RelatedQuery = this
                 });
             }
-        }
-
-        private void BuildCreateIndex(StringBuilder sb, ConnectorBase connection, object indexObj)
-        {
-            var language = connection.Language;
-
-            if (indexObj is TableSchema.Index index)
-            {
-                language.BuildCreateIndex(this, connection, index, sb);
-            }
-            else if (indexObj is TableSchema.ForeignKey)
-            {
-                TableSchema.ForeignKey foreignKey = indexObj as TableSchema.ForeignKey;
-
-                sb.Append(@"ALTER TABLE ");
-
-                language.BuildTableName(this, connection, sb, false);
-
-                sb.Append(@" ADD CONSTRAINT ");
-                sb.Append(language.WrapFieldName(foreignKey.Name));
-                sb.Append(@" FOREIGN KEY (");
-
-                for (int i = 0; i < foreignKey.Columns.Length; i++)
-                {
-                    if (i > 0) sb.Append(",");
-                    sb.Append(language.WrapFieldName(foreignKey.Columns[i]));
-                }
-                sb.AppendFormat(@") REFERENCES {0} (", foreignKey.ForeignTable);
-                for (int i = 0; i < foreignKey.ForeignColumns.Length; i++)
-                {
-                    if (i > 0) sb.Append(",");
-                    sb.Append(language.WrapFieldName(foreignKey.ForeignColumns[i]));
-                }
-                sb.Append(@")");
-                if (foreignKey.OnDelete != TableSchema.ForeignKeyReference.None)
-                {
-                    switch (foreignKey.OnDelete)
-                    {
-                        case TableSchema.ForeignKeyReference.Cascade:
-                            sb.Append(@" ON DELETE CASCADE");
-                            break;
-                        case TableSchema.ForeignKeyReference.NoAction:
-                            sb.Append(@" ON DELETE NO ACTION");
-                            break;
-                        case TableSchema.ForeignKeyReference.Restrict:
-                            sb.Append(@" ON DELETE RESTRICT");
-                            break;
-                        case TableSchema.ForeignKeyReference.SetNull:
-                            sb.Append(@" ON DELETE SET NULL");
-                            break;
-                    }
-                }
-                if (foreignKey.OnUpdate != TableSchema.ForeignKeyReference.None)
-                {
-                    switch (foreignKey.OnUpdate)
-                    {
-                        case TableSchema.ForeignKeyReference.Cascade:
-                            sb.Append(@" ON UPDATE CASCADE");
-                            break;
-                        case TableSchema.ForeignKeyReference.NoAction:
-                            sb.Append(@" ON UPDATE NO ACTION");
-                            break;
-                        case TableSchema.ForeignKeyReference.Restrict:
-                            sb.Append(@" ON UPDATE RESTRICT");
-                            break;
-                        case TableSchema.ForeignKeyReference.SetNull:
-                            sb.Append(@" ON UPDATE SET NULL");
-                            break;
-                    }
-                }
-            }
-        }
-
-        public void BuildColumnProperties(StringBuilder sb, ConnectorBase connection, TableSchema.Column column, bool noDefault)
-        {
-            var language = connection.Language;
-
-            sb.Append(language.WrapFieldName(column.Name));
-            sb.Append(' ');
-
-            language.BuildColumnPropertiesDataType(
-                sb: sb,
-                connection: connection, 
-                column: column, 
-                relatedQuery: this, 
-                isDefaultAllowed: out var isDefaultAllowed);
-
-            if (!string.IsNullOrEmpty(column.Comment) && language.SupportsColumnComment)
-            {
-                sb.AppendFormat(@" COMMENT {0}",
-                    language.PrepareValue(column.Comment));
-            }
-
-            if (!column.Nullable)
-            {
-                sb.Append(@" NOT NULL");
-            }
-
-            if (column.SRID != null && language.ColumnSRIDLocation == LanguageFactory.ColumnSRIDLocationMode.AfterNullability)
-            {
-                sb.Append(" SRID " + column.SRID.Value);
-            }
-
-            if (column.ComputedColumn == null)
-            {
-                if (!noDefault && column.Default != null && isDefaultAllowed)
-                {
-                    sb.Append(@" DEFAULT ");
-                    Query.PrepareColumnValue(column, column.Default, sb, connection, this);
-                }
-            }
-
-            sb.Append(' ');
         }
 
         public string BuildCommand()
@@ -925,7 +813,7 @@ namespace SequelNet
                                 {
                                     if (col.IsPrimaryKey) iPrimaryKeys++;
                                     if (bSep) sb.Append(@", "); else bSep = true;
-                                    BuildColumnProperties(sb, connection, col, false);
+                                    language.BuildColumnProperties(col, false, sb, connection, this);
                                 }
 
                                 if (iPrimaryKeys > 0)
@@ -959,202 +847,182 @@ namespace SequelNet
                             }
                             break;
 
-                        case QueryMode.CreateIndex:
-                            BuildCreateIndex(sb, connection, _CreateIndexObject);
-                            break;
-
                         case QueryMode.CreateIndexes:
                             {
                                 if ((Schema.Indexes.Count + Schema.ForeignKeys.Count) > 1)
                                 {
                                     _NeedTransaction = true;
                                 }
+
+                                var qry2 = Query.New(Schema);
+                                qry2._SchemaAlias = _SchemaAlias;
+                                qry2._SchemaName = _SchemaName;
+
                                 foreach (TableSchema.Index index in Schema.Indexes)
-                                {
-                                    BuildCreateIndex(sb, connection, index);
-                                    sb.Append(@";");
-                                }
+                                    qry2.CreateIndex(index);
+
                                 foreach (TableSchema.ForeignKey foreignKey in Schema.ForeignKeys)
-                                {
-                                    BuildCreateIndex(sb, connection, foreignKey);
-                                    sb.Append(@";");
-                                }
+                                    qry2.CreateForeignKey(foreignKey);
+
+                                sb.Append(qry2.BuildCommand(connection));
                             }
                             break;
 
-                        case QueryMode.AddColumn:
+                        case QueryMode.AlterTable:
+                            if (AlterTableSteps != null)
                             {
-                                sb.Append(@"ALTER TABLE ");
+                                bool hasAlter = false;
 
-                                language.BuildTableName(this, connection, sb, false);
-
-                                sb.Append(@" ADD ");
-
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                {
-                                    sb.Append(@"COLUMN ");
-                                }
-
-                                BuildColumnProperties(sb, connection, _AlterColumn, false);
-
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                {
-                                    int idx = Schema.Columns.IndexOf(_AlterColumn);
-                                    if (idx == 0) sb.Append(@"FIRST ");
-                                    else sb.AppendFormat(@"AFTER {0} ", language.WrapFieldName(Schema.Columns[idx - 1].Name));
-                                }
-                            }
-                            break;
-
-                        case QueryMode.ChangeColumn:
-                            {
-                                if (_AlterColumnOldName != null && _AlterColumnOldName.Length == 0) _AlterColumnOldName = null;
-
-                                if (_AlterColumnOldName != null)
-                                {
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MSSQL)
+                                Action addAlter = () => {
+                                    if (!hasAlter)
                                     {
-                                        sb.Append(@"EXEC sp_rename ");
-
+                                        sb.Append("ALTER TABLE ");
                                         language.BuildTableName(this, connection, sb, false);
-
-                                        sb.Append('.');
-                                        sb.Append(language.WrapFieldName(_AlterColumnOldName));
-                                        sb.Append(',');
-                                        sb.Append(language.WrapFieldName(_AlterColumn.Name));
-                                        sb.Append(@",'COLUMN';");
-                                    }
-                                    else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                    {
-                                        sb.Append(@"ALTER TABLE ");
-
-                                        language.BuildTableName(this, connection, sb, false);
-
-                                        sb.Append(@" RENAME COLUMN ");
-                                        sb.Append(language.WrapFieldName(_AlterColumnOldName));
-                                        sb.Append(@" TO ");
-                                        sb.Append(language.WrapFieldName(_AlterColumn.Name));
-                                        sb.Append(';');
-                                    }
-                                }
-
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                {
-                                    // Very limited syntax, will have to do this with several statements
-
-                                    sb.Append(@"ALTER TABLE ");
-
-                                    language.BuildTableName(this, connection, sb, false);
-
-                                    string alterColumnStatement = @" ALTER COLUMN ";
-                                    alterColumnStatement += language.WrapFieldName(_AlterColumn.Name);
-
-                                    sb.Append(alterColumnStatement);
-                                    sb.Append(@" TYPE ");
-                                    connection.Language.BuildColumnPropertiesDataType(
-                                        sb: sb,
-                                        connection: connection,
-                                        column: _AlterColumn,
-                                        relatedQuery: this,
-                                        isDefaultAllowed: out _);
-                                    sb.Append(',');
-
-                                    sb.Append(alterColumnStatement);
-                                    sb.Append(_AlterColumn.Nullable ? @" DROP NOT NULL;" : @" SET NOT NULL;");
-
-                                    sb.Append(alterColumnStatement);
-                                    sb.Append(@" SET DEFAULT ");
-                                    Query.PrepareColumnValue(_AlterColumn, _AlterColumn.Default, sb, connection, this);
-                                    sb.Append(';');
-                                }
-                                else
-                                {
-                                    sb.Append(@"ALTER TABLE ");
-
-                                    language.BuildTableName(this, connection, sb, false);
-
-                                    sb.Append(' ');
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                                    {
-                                        sb.AppendFormat(@"CHANGE {0} ", language.WrapFieldName(_AlterColumnOldName != null ? _AlterColumnOldName : _AlterColumn.Name));
                                     }
                                     else
                                     {
-                                        sb.Append(@"ALTER COLUMN ");
+                                        sb.Append(", ");
                                     }
-                                    BuildColumnProperties(sb, connection, _AlterColumn, connection.TYPE == ConnectorBase.SqlServiceType.MSSQL);
-                                    if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                };
+
+                                Action closeAlter = () => {
+                                    if (hasAlter)
                                     {
-                                        int idx = Schema.Columns.IndexOf(_AlterColumn);
-                                        if (idx == 0) sb.Append(@"FIRST ");
-                                        else sb.AppendFormat(@"AFTER {0} ", language.WrapFieldName(Schema.Columns[idx - 1].Name));
+                                        sb.Append(";");
+                                        hasAlter = false;
                                     }
-                                }
-                            }
-                            break;
+                                };
 
-                        case QueryMode.DropColumn:
-                            {
-                                sb.Append(@"ALTER TABLE ");
-
-                                language.BuildTableName(this, connection, sb, false);
-
-                                sb.Append(@" DROP COLUMN ");
-                                sb.Append(language.WrapFieldName(_DropColumnName));
-                            }
-                            break;
-
-                        case QueryMode.DropForeignKey:
-                            {
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
+                                var lastStepType = AlterTableType.AddColumn;
+                                
+                                foreach (var step in AlterTableSteps)
                                 {
-                                    sb.Append(@"ALTER TABLE ");
+                                    if (!language.SupportsMultipleAlterTable)
+                                        closeAlter();
 
-                                    language.BuildTableName(this, connection, sb, false);
+                                    var isStepAddType = 
+                                        step.Type == AlterTableType.AddColumn || 
+                                        step.Type == AlterTableType.CreateIndex;
 
-                                    sb.Append(@" DROP FOREIGN KEY ");
-                                    sb.Append(language.WrapFieldName(_DropColumnName));
-                                }
-                                else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                {
-                                    sb.Append(@"ALTER TABLE ");
+                                    if (!language.IsAlterTableTypeMixCompatible(step.Type, lastStepType))
+                                    {
+                                        closeAlter();
+                                    }
 
-                                    language.BuildTableName(this, connection, sb, false);
+                                    bool shouldAddCommand = !language.SameAlterTableCommandsAreCommaSeparated || !hasAlter;
 
-                                    sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(language.WrapFieldName(_DropColumnName));
-                                }
-                                else
-                                {
-                                    sb.Append(@"ALTER TABLE ");
+                                    lastStepType = step.Type;
 
-                                    language.BuildTableName(this, connection, sb, false);
+                                    switch (step.Type)
+                                    {
+                                        case AlterTableType.AddColumn:
+                                            {
+                                                addAlter();
 
-                                    sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(language.WrapFieldName(_DropColumnName));
-                                }
-                            }
-                            break;
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.AlterTableAddCommandName + " ");
 
-                        case QueryMode.DropIndex:
-                            {
-                                if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL || connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                                {
-                                    sb.Append(@"ALTER TABLE ");
+                                                sb.Append(language.AlterTableAddColumnCommandName + " ");
 
-                                    language.BuildTableName(this, connection, sb, false);
+                                                language.BuildAddColumn(step, sb, connection, this);
+                                            }
+                                            break;
 
-                                    sb.Append(@" DROP INDEX ");
-                                    sb.Append(language.WrapFieldName(_DropColumnName));
-                                }
-                                else
-                                {
-                                    sb.Append(@"ALTER TABLE ");
+                                        case AlterTableType.ChangeColumn:
+                                            {
+                                                if (!string.IsNullOrEmpty(step.OldItemName))
+                                                {
+                                                    if (!language.SupportsRenameColumn)
+                                                    {
+                                                        throw new NotImplementedException("Column rename is not implemented in this db connector.");
+                                                    }
 
-                                    language.BuildTableName(this, connection, sb, false);
+                                                    if (language.HasSeparateRenameColumn)
+                                                    {
+                                                        closeAlter();
 
-                                    sb.Append(@" DROP CONSTRAINT ");
-                                    sb.Append(language.WrapFieldName(_DropColumnName));
+                                                        language.BuildSeparateRenameColumn(this, connection, step, sb);
+                                                    }
+                                                }
+
+                                                if (!language.SupportsMultipleAlterColumn)
+                                                    closeAlter();
+
+                                                addAlter();
+
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.ChangeColumnCommandName + " ");
+
+                                                language.BuildChangeColumn(step, sb, connection, this);
+                                            }
+                                            break;
+
+                                        case AlterTableType.DropColumn:
+                                            {
+                                                addAlter();
+
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.DropColumnCommandName);
+
+                                                sb.Append(language.WrapFieldName(step.OldItemName));
+                                            }
+                                            break;
+
+                                        case AlterTableType.CreateIndex:
+                                            {
+                                                if (language.HasSeparateCreateIndex(step.Index))
+                                                {
+                                                    closeAlter();
+                                                }
+                                                else
+                                                {
+                                                    addAlter();
+
+                                                    if (shouldAddCommand)
+                                                        sb.Append(language.AlterTableAddCommandName + " ");
+
+                                                    sb.Append(language.AlterTableAddIndexCommandName + " ");
+                                                }
+
+                                                language.BuildCreateIndex(step.Index, sb, this, connection);
+                                            }
+                                            break;
+
+                                        case AlterTableType.DropIndex:
+                                            {
+                                                addAlter();
+
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.DropIndexCommandName + " ");
+
+                                                sb.Append(language.WrapFieldName(step.OldItemName));
+                                            }
+                                            break;
+
+                                        case AlterTableType.CreateForeignKey:
+                                            {
+                                                addAlter();
+
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.AlterTableAddCommandName + " ");
+
+                                                sb.Append(language.AlterTableAddForeignKeyCommandName + " ");
+
+                                                language.BuildCreateForeignKey(step.ForeignKey, sb, connection);
+                                            }
+                                            break;
+
+                                        case AlterTableType.DropForeignKey:
+                                            {
+                                                addAlter();
+
+                                                if (shouldAddCommand)
+                                                    sb.Append(language.DropForeignKeyCommandName + " ");
+
+                                                sb.Append(language.WrapFieldName(step.OldItemName));
+                                            }
+                                            break;
+                                    }
                                 }
                             }
                             break;

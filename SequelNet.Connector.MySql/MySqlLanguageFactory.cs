@@ -60,6 +60,9 @@ namespace SequelNet.Connector
         public override bool SupportsColumnComment => true;
         public override ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.AfterNullability;
 
+        public override string ChangeColumnCommandName => "CHANGE";
+        public override string DropForeignKeyCommandName => "DROP FOREIGN KEY";
+
         public override int VarCharMaxLength
         {
             get
@@ -189,38 +192,34 @@ namespace SequelNet.Connector
         }
 
         public override void BuildCreateIndex(
-            Query qry,
-            ConnectorBase conn,
             TableSchema.Index index,
-            StringBuilder outputBuilder)
+            StringBuilder outputBuilder,
+            Query qry,
+            ConnectorBase conn)
         {
-            outputBuilder.Append(@"ALTER TABLE ");
+            outputBuilder.Append(WrapFieldName(index.Name));
+            outputBuilder.Append(" ");
 
-            BuildTableName(qry, conn, outputBuilder, false);
-
-            outputBuilder.Append(@" ADD ");
-
-            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            if (index.Mode == TableSchema.IndexMode.PrimaryKey)
             {
-                outputBuilder.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", WrapFieldName(index.Name));
+                outputBuilder.Append("PRIMARY KEY ");
             }
             else
             {
                 switch (index.Mode)
                 {
                     case TableSchema.IndexMode.Unique:
-                        outputBuilder.Append(@"UNIQUE ");
+                        outputBuilder.Append("UNIQUE ");
                         break;
                     case TableSchema.IndexMode.FullText:
-                        outputBuilder.Append(@"FULLTEXT ");
+                        outputBuilder.Append("FULLTEXT ");
                         break;
                     case TableSchema.IndexMode.Spatial:
-                        outputBuilder.Append(@"SPATIAL ");
+                        outputBuilder.Append("SPATIAL ");
                         break;
                 }
-                outputBuilder.Append(@"INDEX ");
-                outputBuilder.Append(WrapFieldName(index.Name));
-                outputBuilder.Append(@" ");
+
+                outputBuilder.Append("INDEX ");
             }
 
             if (index.Mode != TableSchema.IndexMode.Spatial)
@@ -251,11 +250,11 @@ namespace SequelNet.Connector
         }
 
         public override void BuildColumnPropertiesDataType(
-            StringBuilder sb, 
-            ConnectorBase connection,
             TableSchema.Column column,
-            Query relatedQuery,
-            out bool isDefaultAllowed)
+            out bool isDefaultAllowed,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
         {
             isDefaultAllowed = true;
 
@@ -561,6 +560,37 @@ namespace SequelNet.Connector
             sb.Append(")");
 
             return sb.ToString();
+        }
+
+        public override void BuildChangeColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append(WrapFieldName(string.IsNullOrEmpty(alterData.OldItemName) ? alterData.Column.Name : alterData.OldItemName));
+            sb.Append(" ");
+
+            BuildColumnProperties(
+                column: alterData.Column,
+                noDefault: false,
+                sb: sb,
+                conn: conn, 
+                relatedQuery: relatedQuery);
+
+            int idx = relatedQuery.Schema.Columns.IndexOf(alterData.Column);
+            if (idx == 0) sb.Append(@"FIRST ");
+            else sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
+        }
+
+        public override void BuildAddColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            BuildColumnProperties(
+                column: alterData.Column,
+                noDefault: false,
+                sb: sb,
+                conn: conn,
+                relatedQuery: relatedQuery);
+
+            int idx = relatedQuery.Schema.Columns.IndexOf(alterData.Column);
+            if (idx == 0) sb.Append(@"FIRST ");
+            else sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
         }
 
         #endregion

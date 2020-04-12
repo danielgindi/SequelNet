@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Collections.Generic;
 
 namespace SequelNet
 {
@@ -15,7 +16,10 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
+            ClearAlterTable();
+
             this.QueryMode = QueryMode.CreateTable;
+
             return this;
         }
 
@@ -30,7 +34,10 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
+            ClearAlterTable();
+
             this.QueryMode = QueryMode.CreateIndexes;
+
             return this;
         }
 
@@ -46,8 +53,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            this.QueryMode = QueryMode.CreateIndex;
-            this._CreateIndexObject = index;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.CreateIndex,
+                Index = index,
+            });
+
             return this;
         }
 
@@ -74,8 +91,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            this.QueryMode = QueryMode.CreateIndex;
-            this._CreateIndexObject = foreignKey;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.CreateForeignKey,
+                ForeignKey = foreignKey,
+            });
+
             return this;
         }
 
@@ -102,8 +129,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _AlterColumn = column;
-            this.QueryMode = QueryMode.AddColumn;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.AddColumn,
+                Column = column,
+            });
+
             return this;
         }
 
@@ -154,9 +191,19 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _AlterColumn = column;
-            _AlterColumnOldName = oldColumnName;
-            this.QueryMode = QueryMode.ChangeColumn;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.ChangeColumn,
+                Column = column,
+                OldItemName = oldColumnName,
+            });
+
             return this;
         }
 
@@ -168,15 +215,7 @@ namespace SequelNet
         /// <returns>Current <typeparamref name="Query"/> object</returns>
         public Query ChangeColumn(string oldColumnName, string newColumnName)
         {
-            ClearSelect();
-            ClearOrderBy();
-            ClearGroupBy();
-            ClearInsertAndUpdate();
-            ClearStoredProcedureParameters();
-            _AlterColumn = Schema.Columns.Find(newColumnName);
-            _AlterColumnOldName = oldColumnName;
-            this.QueryMode = QueryMode.ChangeColumn;
-            return this;
+            return ChangeColumn(oldColumnName, Schema.Columns.Find(newColumnName));
         }
         
         /// <summary>
@@ -191,8 +230,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = columnName;
-            this.QueryMode = QueryMode.DropColumn;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.DropColumn,
+                OldItemName = columnName,
+            });
+
             return this;
         }
 
@@ -208,8 +257,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = foreignKeyName;
-            this.QueryMode = QueryMode.DropForeignKey;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.DropForeignKey,
+                OldItemName = foreignKeyName,
+            });
+
             return this;
         }
         
@@ -225,8 +284,18 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
-            _DropColumnName = indexName;
-            this.QueryMode = QueryMode.DropIndex;
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this._AlterTableSteps == null)
+                this._AlterTableSteps = new List<AlterTableQueryData>();
+
+            this._AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.DropIndex,
+                OldItemName = indexName,
+            });
+
             return this;
         }
 
@@ -241,7 +310,10 @@ namespace SequelNet
             ClearGroupBy();
             ClearInsertAndUpdate();
             ClearStoredProcedureParameters();
+            ClearAlterTable();
+
             this.QueryMode = QueryMode.DropTable;
+
             return this;
         }
 

@@ -13,6 +13,14 @@ namespace SequelNet.Connector
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => true;
 
+        public override bool SupportsRenameColumn => false;
+        public override bool SupportsMultipleAlterTable => false;
+        public override string AlterTableAddCommandName => "";
+        public override string AlterTableAddColumnCommandName => "ADD COLUMN";
+        public override string AlterTableAddIndexCommandName => "ADD";
+        public override string AlterTableAddForeignKeyCommandName => "ADD CONSTRAINT";
+        public override string DropIndexCommandName => "DROP CONSTRAINT";
+
         public override string UtcNow()
         {
             return @"now()"; // NOT UTC
@@ -65,18 +73,12 @@ namespace SequelNet.Connector
         }
 
         public override void BuildCreateIndex(
-            Query qry,
-            ConnectorBase conn,
             TableSchema.Index index,
-            StringBuilder outputBuilder)
+            StringBuilder outputBuilder,
+            Query qry,
+            ConnectorBase conn)
         {
-            outputBuilder.Append(@"ALTER TABLE ");
-
-            BuildTableName(qry, conn, outputBuilder, false);
-
-            outputBuilder.Append(@" ADD ");
-
-            if (index.Mode == SequelNet.TableSchema.IndexMode.PrimaryKey)
+            if (index.Mode == TableSchema.IndexMode.PrimaryKey)
             {
                 outputBuilder.AppendFormat(@"CONSTRAINT {0} PRIMARY KEY ", WrapFieldName(index.Name));
             }
@@ -98,11 +100,11 @@ namespace SequelNet.Connector
         }
 
         public override void BuildColumnPropertiesDataType(
+            TableSchema.Column column,
+            out bool isDefaultAllowed,
             StringBuilder sb,
             ConnectorBase connection,
-            TableSchema.Column column,
-            Query relatedQuery,
-            out bool isDefaultAllowed)
+            Query relatedQuery)
         {
             isDefaultAllowed = true;
 

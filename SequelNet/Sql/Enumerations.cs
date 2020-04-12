@@ -29,15 +29,21 @@
         Delete,
         InsertOrUpdate,
         CreateTable,
-        CreateIndex,
         CreateIndexes,
+        AlterTable,
+        DropTable,
+        ExecuteStoredProcedure
+    }
+
+    public enum AlterTableType
+    {
         AddColumn,
         ChangeColumn,
         DropColumn,
-        DropForeignKey,
+        CreateIndex,
         DropIndex,
-        DropTable,
-        ExecuteStoredProcedure
+        CreateForeignKey,
+        DropForeignKey,
     }
 
     public enum WhereComparison
