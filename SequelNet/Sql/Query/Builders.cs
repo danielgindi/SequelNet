@@ -878,6 +878,8 @@ namespace SequelNet
                                     {
                                         sb.Append("ALTER TABLE ");
                                         language.BuildTableName(this, connection, sb, false);
+                                        sb.Append(" ");
+                                        hasAlter = true;
                                     }
                                     else
                                     {
