@@ -1,6 +1,7 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
 using System.Text;
+using System.Linq;
 
 namespace SequelNet.Connector
 {
@@ -48,6 +49,60 @@ namespace SequelNet.Connector
         #endregion
 
         #region Syntax
+
+        public override Func<Query, ConnectorBase, Exception, int> OnExecuteNonQueryException => (qry, conn, ex) =>
+        {
+            if (ex is MySql.Data.MySqlClient.MySqlException myex &&
+                myex.Code == 1054 &&
+                qry.QueryMode == QueryMode.AlterTable &&
+                qry.AlterTableSteps.Any(x =>
+                    (x.Type == AlterTableType.AddColumn || x.Type == AlterTableType.ChangeColumn) &&
+                    !x.IgnoreColumnPosition) == true)
+            {
+                for (int i = 0; i < qry.AlterTableSteps.Count; i++)
+                {
+                    var step = qry.AlterTableSteps[i];
+
+                    if (step.Type == AlterTableType.AddColumn || step.Type == AlterTableType.ChangeColumn)
+                    {
+                        step.IgnoreColumnPosition = true;
+
+                        qry.AlterTableSteps[i] = step;
+                    }
+                }
+
+                return qry.Execute(conn);
+            }
+
+            throw ex;
+        };
+
+        public override Func<Query, ConnectorBase, Exception, System.Threading.Tasks.Task<int>> OnExecuteNonQueryExceptionAsync => (qry, conn, ex) =>
+        {
+            if (ex is MySql.Data.MySqlClient.MySqlException myex &&
+                myex.Code == 1054 &&
+                qry.QueryMode == QueryMode.AlterTable &&
+                qry.AlterTableSteps.Any(x =>
+                    (x.Type == AlterTableType.AddColumn || x.Type == AlterTableType.ChangeColumn) &&
+                    !x.IgnoreColumnPosition) == true)
+            {
+                for (int i = 0; i < qry.AlterTableSteps.Count; i++)
+                {
+                    var step = qry.AlterTableSteps[i];
+
+                    if (step.Type == AlterTableType.AddColumn || step.Type == AlterTableType.ChangeColumn)
+                    {
+                        step.IgnoreColumnPosition = true;
+
+                        qry.AlterTableSteps[i] = step;
+                    }
+                }
+
+                return qry.ExecuteNonQueryAsync(conn);
+            }
+
+            throw ex;
+        };
 
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => false;
@@ -576,7 +631,7 @@ namespace SequelNet.Connector
 
             int idx = relatedQuery.Schema.Columns.IndexOf(alterData.Column);
             if (idx == 0) sb.Append(@"FIRST ");
-            else sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
+            else if (!alterData.IgnoreColumnPosition) sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
         }
 
         public override void BuildAddColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
@@ -590,7 +645,7 @@ namespace SequelNet.Connector
 
             int idx = relatedQuery.Schema.Columns.IndexOf(alterData.Column);
             if (idx == 0) sb.Append(@"FIRST ");
-            else sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
+            else if (!alterData.IgnoreColumnPosition) sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
         }
 
         #endregion

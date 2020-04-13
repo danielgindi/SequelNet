@@ -8,6 +8,9 @@ namespace SequelNet.Connector
     {
         #region Syntax
 
+        public virtual Func<Query, ConnectorBase, Exception, int> OnExecuteNonQueryException => null;
+        public virtual Func<Query, ConnectorBase, Exception, System.Threading.Tasks.Task<int>> OnExecuteNonQueryExceptionAsync => null;
+
         public virtual bool IsBooleanFalseOrderedFirst => true;
 
         public virtual bool UpdateFromInsteadOfJoin => false;

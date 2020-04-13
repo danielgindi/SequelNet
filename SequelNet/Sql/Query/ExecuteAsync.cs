@@ -222,6 +222,10 @@ namespace SequelNet
                 if (transaction) connection.CommitTransaction();
                 return retValue;
             }
+            catch (Exception ex) when (!(ex is OperationCanceledException) && connection.Language.OnExecuteNonQueryException != null)
+            {
+                return await connection.Language.OnExecuteNonQueryExceptionAsync(this, connection, ex);
+            }
             finally
             {
                 if (needsDispose && connection != null)

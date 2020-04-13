@@ -164,6 +164,10 @@ namespace SequelNet
                 if (transaction) connection.CommitTransaction();
                 return retValue;
             }
+            catch (Exception ex) when (connection.Language.OnExecuteNonQueryException != null)
+            {
+                return connection.Language.OnExecuteNonQueryException(this, connection, ex);
+            }
             finally
             {
                 if (needsDispose && connection != null)

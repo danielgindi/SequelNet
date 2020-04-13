@@ -12,5 +12,6 @@ namespace SequelNet
         public TableSchema.Index Index;
         public TableSchema.ForeignKey ForeignKey;
         public string OldItemName;
+        public bool IgnoreColumnPosition;
     }
 }
