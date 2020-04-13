@@ -117,6 +117,7 @@ namespace SequelNet.Connector
 
         public override string ChangeColumnCommandName => "CHANGE";
         public override string DropForeignKeyCommandName => "DROP FOREIGN KEY";
+        public override string AlterTableAddIndexCommandName => "ADD";
 
         public override int VarCharMaxLength
         {
@@ -252,11 +253,16 @@ namespace SequelNet.Connector
             Query qry,
             ConnectorBase conn)
         {
-            outputBuilder.Append(WrapFieldName(index.Name));
-            outputBuilder.Append(" ");
-
             if (index.Mode == TableSchema.IndexMode.PrimaryKey)
             {
+                outputBuilder.Append("CONSTRAINT ");
+
+                if (!string.IsNullOrEmpty(index.Name))
+                {
+                    outputBuilder.Append(WrapFieldName(index.Name));
+                    outputBuilder.Append(" ");
+                }
+
                 outputBuilder.Append("PRIMARY KEY ");
             }
             else
@@ -275,6 +281,12 @@ namespace SequelNet.Connector
                 }
 
                 outputBuilder.Append("INDEX ");
+
+                if (!string.IsNullOrEmpty(index.Name))
+                {
+                    outputBuilder.Append(WrapFieldName(index.Name));
+                    outputBuilder.Append(" ");
+                }
             }
 
             if (index.Mode != TableSchema.IndexMode.Spatial)
