@@ -24,7 +24,7 @@ namespace SequelNet.SchemaGenerator
                 }
 
                 stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}", formatArgs);
-                stringBuilder.AppendFormat("get{{ return _{2}; }}{0}", formatArgs);
+                stringBuilder.AppendFormat("get {{ return _{2}; }}{0}", formatArgs);
                 if (context.AtomicUpdates && dalCol.Computed == null)
                 {
                     stringBuilder.AppendFormat("set{{ _{2} = value; MarkColumnMutated(Columns.{2}); }}{0}", formatArgs);

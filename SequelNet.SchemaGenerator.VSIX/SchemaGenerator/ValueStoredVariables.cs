@@ -14,8 +14,9 @@ namespace SequelNet.SchemaGenerator
                 {
                     stringBuilder.Append("internal ");
                 }
-                string defaultValue = null;
-                defaultValue = dalColumn.DefaultValue;
+
+                string defaultValue = dalColumn.DefaultValue;
+
                 if (string.IsNullOrEmpty(defaultValue) || defaultValue == "null")
                 {
                     if (!string.IsNullOrEmpty(dalColumn.EnumTypeName))
@@ -107,14 +108,13 @@ namespace SequelNet.SchemaGenerator
                         defaultValue = "null";
                     }
                 }
+
                 if (dalColumn.ActualDefaultValue.Length > 0)
-                {
                     defaultValue = dalColumn.ActualDefaultValue;
-                }
+
                 if (dalColumn.NoProperty)
-                {
                     continue;
-                }
+
                 stringBuilder.Append(dalColumn.ActualType);
                 stringBuilder.AppendFormat(" _{0}", dalColumn.PropertyName);
                 if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue.Length > 0 & (dalColumn.ActualDefaultValue == "null")) && dalColumn.IsNullable)
@@ -124,11 +124,11 @@ namespace SequelNet.SchemaGenerator
                 }
                 else if (defaultValue != null)
                 {
-                    stringBuilder.AppendFormat(" = {1};{0}{0}", "\r\n", defaultValue);
+                    stringBuilder.AppendFormat(" = {1};{0}", "\r\n", defaultValue);
                 }
                 else
                 {
-                    stringBuilder.AppendFormat(";{0}{0}", "\r\n");
+                    stringBuilder.AppendFormat(";{0}", "\r\n");
                 }
             }
         }
