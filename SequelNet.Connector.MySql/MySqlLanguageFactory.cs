@@ -344,7 +344,11 @@ namespace SequelNet.Connector
             {
                 if (column.MaxLength < 0)
                 {
-                    sb.Append("NATIONAL VARCHAR");
+                    if (!string.IsNullOrEmpty(column.Charset))
+                        sb.Append("VARCHAR");
+                    else
+                        sb.Append("NATIONAL VARCHAR");
+
                     sb.AppendFormat(@"({0})", VarCharMaxLength);
                 }
                 else if (column.MaxLength == 0)
@@ -354,7 +358,11 @@ namespace SequelNet.Connector
                 }
                 else if (column.MaxLength <= VarCharMaxLength)
                 {
-                    sb.Append("NATIONAL VARCHAR");
+                    if (!string.IsNullOrEmpty(column.Charset))
+                        sb.Append("VARCHAR");
+                    else
+                        sb.Append("NATIONAL VARCHAR");
+
                     sb.AppendFormat(@"({0})", column.MaxLength);
                 }
                 else if (column.MaxLength < 65536)
@@ -375,19 +383,21 @@ namespace SequelNet.Connector
             }
             else if (dataType == DataType.Char)
             {
+                if (!string.IsNullOrEmpty(column.Charset))
+                    sb.Append("CHAR");
+                else
+                    sb.Append("NATIONAL CHAR");
+
                 if (column.MaxLength < 0)
                 {
-                    sb.Append("NATIONAL CHAR");
                     sb.AppendFormat(@"({0})", VarCharMaxLength);
                 }
                 else if (column.MaxLength == 0 || column.MaxLength >= VarCharMaxLength)
                 {
-                    sb.Append("NATIONAL CHAR");
                     sb.AppendFormat(@"({0})", VarCharMaxLength);
                 }
                 else
                 {
-                    sb.Append("NATIONAL CHAR");
                     sb.AppendFormat(@"({0})", column.MaxLength);
                 }
             }
@@ -497,7 +507,7 @@ namespace SequelNet.Connector
             else if (dataType == DataType.Blob)
                 sb.Append("BLOB");
             else if (dataType == DataType.Guid)
-                sb.Append("NATIONAL CHAR(36)");
+                sb.Append("CHAR(36)");
             else if (dataType == DataType.Geometry)
                 sb.Append("GEOMETRY");
             else if (dataType == DataType.GeometryCollection)
