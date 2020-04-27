@@ -386,6 +386,16 @@ namespace SequelNet.Connector
             BuildColumnProperties(alterData.Column, false, sb, conn, relatedQuery);
         }
 
+        public virtual string BuildFindString(
+            ConnectorBase conn,
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            ValueWrapper? startAt,
+            Query relatedQuery)
+        {
+            throw new NotImplementedException(@"BuildFindString not implemented for this connector");
+        }
+
         #endregion
 
         #region Reading values from SQL

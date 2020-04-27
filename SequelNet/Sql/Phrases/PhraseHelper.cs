@@ -2058,17 +2058,27 @@ namespace SequelNet
                 replace, replaceWithType);
         }
         
-        public static Substring Substring(object value, ValueObjectType valueType, int from, int length)
+        public static Substring Substring(object value, ValueObjectType valueType, int from, int? length = null)
         {
             return new Substring(value, valueType, from, length);
         }
 
-        public static Substring Substring(string tableName, string columnName, int from, int length)
+        public static Substring Substring(object value, ValueObjectType valueType, ValueWrapper from, ValueWrapper? length = null)
+        {
+            return new Substring(value, valueType, from, length);
+        }
+        
+        public static Substring Substring(ValueWrapper value, ValueWrapper from, ValueWrapper? length = null)
+        {
+            return new Substring(value, from, length);
+        }
+
+        public static Substring Substring(string tableName, string columnName, int from, int? length = null)
         {
             return new Substring(tableName, columnName, from, length);
         }
 
-        public static Substring Substring(string columnName, int from, int length)
+        public static Substring Substring(string columnName, int from, int? length = null)
         {
             return new Substring(columnName, from, length);
         }
@@ -2086,6 +2096,22 @@ namespace SequelNet
         public static Concat Concat(bool ignoreNulls, params ValueWrapper[] values)
         {
             return new Concat(ignoreNulls, values);
+        }
+
+        public static FindString FindString(
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            ValueWrapper? startAt = null)
+        {
+            return new FindString(needle, haystack, startAt);
+        }
+
+        public static FindString FindString(
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            int startAt)
+        {
+            return new FindString(needle, haystack, startAt);
         }
 
         #endregion

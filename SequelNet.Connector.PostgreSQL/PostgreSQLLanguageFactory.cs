@@ -530,9 +530,32 @@ namespace SequelNet.Connector
             Query.PrepareColumnValue(alterData.Column, alterData.Column.Default, sb, conn, relatedQuery);
         }
 
+        public override string BuildFindString(
+            ConnectorBase conn,
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            ValueWrapper? startAt,
+            Query relatedQuery)
+        {
+            string ret = "POSITION(";
+
+            ret += needle.Build(conn, relatedQuery);
+            ret += " IN ";
+            ret += haystack.Build(conn, relatedQuery);
+
+            if (startAt != null)
+            {
+                throw new NotImplementedException("FindString (POSITION) with `startAt` argument is not supported in postgre");
+            }
+
+            ret += ")";
+
+            return ret;
+        }
+
         #endregion
 
-         #region Reading values from SQL
+        #region Reading values from SQL
 
         public override Geometry ReadGeometry(object value)
         {

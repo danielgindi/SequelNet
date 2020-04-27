@@ -670,6 +670,30 @@ namespace SequelNet.Connector
             else if (!alterData.IgnoreColumnPosition) sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
         }
 
+        public override string BuildFindString(
+            ConnectorBase conn,
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            ValueWrapper? startAt,
+            Query relatedQuery)
+        {
+            string ret = "LOCATE(";
+
+            ret += needle.Build(conn, relatedQuery);
+            ret += ",";
+            ret += haystack.Build(conn, relatedQuery);
+
+            if (startAt != null)
+            {
+                ret += ",";
+                ret += startAt.Value.Build(conn, relatedQuery);
+            }
+
+            ret += ")";
+
+            return ret;
+        }
+
         #endregion
 
         #region Reading values from SQL

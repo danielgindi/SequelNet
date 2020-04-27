@@ -250,6 +250,30 @@ namespace SequelNet.Connector
             }
         }
 
+        public override string BuildFindString(
+            ConnectorBase conn,
+            ValueWrapper needle,
+            ValueWrapper haystack,
+            ValueWrapper? startAt,
+            Query relatedQuery)
+        {
+            string ret = "InStr(";
+
+            if (startAt != null)
+            {
+                ret += startAt.Value.Build(conn, relatedQuery);
+                ret += ",";
+            }
+
+            ret += haystack.Build(conn, relatedQuery);
+            ret += ",";
+            ret += needle.Build(conn, relatedQuery);
+
+            ret += ")";
+
+            return ret;
+        }
+
         #endregion
 
         #region Reading values from SQL

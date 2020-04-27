@@ -84,6 +84,69 @@ namespace SequelNet
             return new ValueWrapper(where);
         }
 
+        public static ValueWrapper From(byte value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static ValueWrapper From(sbyte value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(Int16 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static ValueWrapper From(UInt16 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(Int32 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static ValueWrapper From(UInt32 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(Int64 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static ValueWrapper From(UInt64 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(float value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(double value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static ValueWrapper From(decimal value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
         public static ValueWrapper Column(string tableName, string column)
         {
             return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
@@ -164,6 +227,52 @@ namespace SequelNet
 
         #region Casts
 
+        public static explicit operator ValueWrapper(byte value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+        
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static explicit operator ValueWrapper(sbyte value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static explicit operator ValueWrapper(Int16 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static explicit operator ValueWrapper(UInt16 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static explicit operator ValueWrapper(Int32 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static explicit operator ValueWrapper(UInt32 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static explicit operator ValueWrapper(Int64 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static explicit operator ValueWrapper(UInt64 value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
         public static explicit operator ValueWrapper(float value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
@@ -174,17 +283,17 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int16 value)
+        public static explicit operator ValueWrapper(decimal value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int32 value)
+        public static explicit operator ValueWrapper(Where value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int64 value)
+        public static explicit operator ValueWrapper(WhereList value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
