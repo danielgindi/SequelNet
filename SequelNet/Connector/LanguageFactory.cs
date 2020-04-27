@@ -396,6 +396,29 @@ namespace SequelNet.Connector
             throw new NotImplementedException(@"BuildFindString not implemented for this connector");
         }
 
+        public virtual string BuildSubstring(
+            ConnectorBase conn,
+            ValueWrapper value,
+            ValueWrapper from,
+            ValueWrapper? length,
+            Query relatedQuery)
+        {
+            string ret = "SUBSTRING(";
+
+            ret += value.Build(conn, relatedQuery);
+
+            ret += " FROM " + from.Build(conn, relatedQuery);
+
+            if (length != null)
+            {
+                ret += " FOR " + length.Value.Build(conn, relatedQuery);
+            }
+
+            ret += ")";
+
+            return ret;
+        }
+
         #endregion
 
         #region Reading values from SQL

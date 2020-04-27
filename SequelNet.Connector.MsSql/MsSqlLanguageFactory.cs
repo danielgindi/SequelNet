@@ -499,6 +499,33 @@ namespace SequelNet.Connector
             return ret;
         }
 
+        public override string BuildSubstring(
+            ConnectorBase conn,
+            ValueWrapper value,
+            ValueWrapper from,
+            ValueWrapper? length,
+            Query relatedQuery)
+        {
+            string ret = "SUBSTRING(";
+
+            ret += value.Build(conn, relatedQuery);
+
+            ret += ", " + from.Build(conn, relatedQuery);
+
+            if (length != null)
+            {
+                ret += ", " + length.Value.Build(conn, relatedQuery);
+            }
+            else
+            {
+                throw new NotImplementedException("MSSQL does not allow omitting the `length` argument of SUBSTRING");
+            }
+
+            ret += ")";
+
+            return ret;
+        }
+
         #endregion
 
         #region Reading values from SQL

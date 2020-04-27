@@ -52,23 +52,7 @@ namespace SequelNet.Phrases
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "SUBSTRING(";
-
-            ret += Value.Build(conn, relatedQuery);
-
-            if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL ||
-                conn.TYPE == ConnectorBase.SqlServiceType.MSACCESS)
-            {
-                ret += ", " + From + ", " + Length;
-            }
-            else
-            {
-                ret += " FROM " + From + " FOR " + Length;
-            }
-
-            ret += ")";
-
-            return ret;
+            return conn.Language.BuildSubstring(conn, Value, From, Length, relatedQuery);
         }
     }
 }
