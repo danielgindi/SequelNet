@@ -39,7 +39,7 @@
     <RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
     <Product>Microsoft SQL Server connector for SequelNet</Product>
     <PackageId>SequelNet.Connector.MsSql</PackageId>
-    <Version>3.0.39</Version>
+    <Version>3.0.40</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
