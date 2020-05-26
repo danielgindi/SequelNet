@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using SequelNet.Connector;
 
@@ -58,37 +59,44 @@ namespace SequelNet
         #endregion
 
         #region Convenience
-        
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(string tableName, object value, ValueObjectType type)
         {
             return new ValueWrapper(tableName, value, type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(string tableName, string column)
         {
             return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(object value, ValueObjectType type)
         {
             return new ValueWrapper(value, type);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(IPhrase phrase)
         {
             return new ValueWrapper(phrase);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(Where where)
         {
             return new ValueWrapper(where);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(byte value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static ValueWrapper From(sbyte value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
@@ -96,11 +104,13 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(Int16 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static ValueWrapper From(UInt16 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
@@ -108,11 +118,13 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(Int32 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static ValueWrapper From(UInt32 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
@@ -120,11 +132,13 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(Int64 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static ValueWrapper From(UInt64 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
@@ -132,31 +146,37 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(float value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(double value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(decimal value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper Column(string tableName, string column)
         {
             return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper Column(string column)
         {
             return new ValueWrapper(column, ValueObjectType.ColumnName);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper Literal(string literal)
         {
             return new ValueWrapper(null, literal, ValueObjectType.Literal);
