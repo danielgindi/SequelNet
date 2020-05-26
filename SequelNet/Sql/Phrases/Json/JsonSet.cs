@@ -20,30 +20,36 @@ namespace SequelNet.Phrases
         }
 
         public JsonSet(
-            object doc, ValueObjectType docType,
+            ValueWrapper doc,
             string path,
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(doc, docType);
+            this.Document = doc;
             this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
+        }
+
+        public JsonSet(
+            object doc, ValueObjectType docType,
+            string path,
+            object value, ValueObjectType valueType)
+            : this(ValueWrapper.From(doc, docType), path, value, valueType)
+        {
         }
 
         public JsonSet(
             string docTableName, string docColumnName,
             string path,
             object value, ValueObjectType valueType)
-            : this()
+            : this(ValueWrapper.Column(docTableName, docColumnName), path, value, valueType)
         {
-            this.Document = new ValueWrapper(docTableName, docColumnName);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
         }
 
         public JsonSet(
             string docColumnName,
             string path,
             object value, ValueObjectType valueType)
-            : this(null, docColumnName, path, value, valueType)
+            : this(ValueWrapper.Column(docColumnName), path, value, valueType)
         {
         }
 
@@ -51,10 +57,8 @@ namespace SequelNet.Phrases
             IPhrase doc,
             string path,
             object value, ValueObjectType valueType)
-            : this()
+            : this(ValueWrapper.From(doc), path, value, valueType)
         {
-            this.Document = new ValueWrapper(doc);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
         }
 
         public JsonSet(
@@ -63,19 +67,26 @@ namespace SequelNet.Phrases
             IPhrase value)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
+            this.Document = ValueWrapper.From(doc);
             this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value)));
+        }
+
+        public JsonSet(
+            ValueWrapper doc,
+            params JsonPathValue[] pathValues)
+            : this()
+        {
+            this.Document = doc;
+
+            foreach (var pair in pathValues)
+                this.Values.Add(pair);
         }
 
         public JsonSet(
             IPhrase doc,
             params JsonPathValue[] pathValues)
-            : this()
+            : this(ValueWrapper.From(doc), pathValues)
         {
-            this.Document = new ValueWrapper(doc);
-
-            foreach (var pair in pathValues)
-                this.Values.Add(pair);
         }
 
         #endregion

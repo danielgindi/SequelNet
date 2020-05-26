@@ -20,43 +20,42 @@ namespace SequelNet.Phrases
         }
 
         public JsonRemove(
-            object doc, ValueObjectType docType,
+            ValueWrapper doc,
             params string[] paths)
             : this()
         {
-            this.Document = new ValueWrapper(doc, docType);
+            this.Document = doc;
 
             foreach (var path in paths)
                 this.Paths.Add(path);
+        }
+
+        public JsonRemove(
+            object doc, ValueObjectType docType,
+            params string[] paths)
+            : this(ValueWrapper.From(doc, docType), paths)
+        {
         }
 
         public JsonRemove(
             string docTableName, string docColumnName,
             params string[] paths)
-            : this()
+            : this(ValueWrapper.Column(docTableName, docColumnName), paths)
         {
-            this.Document = new ValueWrapper(docTableName, docColumnName);
-
-            foreach (var path in paths)
-                this.Paths.Add(path);
         }
 
         public JsonRemove(
             string docColumnName,
             params string[] paths)
-            : this(null, docColumnName, paths)
+            : this(ValueWrapper.Column(docColumnName), paths)
         {
         }
 
         public JsonRemove(
             IPhrase doc,
             params string[] paths)
-            : this()
+            : this(ValueWrapper.From(doc), paths)
         {
-            this.Document = new ValueWrapper(doc);
-
-            foreach (var path in paths)
-                this.Paths.Add(path);
         }
 
         #endregion

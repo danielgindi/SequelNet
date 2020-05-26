@@ -555,6 +555,14 @@ namespace SequelNet
         }
 
         static public JsonSet JsonSet(
+            ValueWrapper doc,
+            string path,
+            object value, ValueObjectType valueType)
+        {
+            return new JsonSet(doc, path, value, valueType);
+        }
+
+        static public JsonSet JsonSet(
             object doc, ValueObjectType docType,
             string path,
             object value, ValueObjectType valueType)
@@ -595,10 +603,24 @@ namespace SequelNet
         }
 
         static public JsonSet JsonSet(
+            ValueWrapper doc,
+            params JsonPathValue[] pathValues)
+        {
+            return new JsonSet(doc, pathValues);
+        }
+
+        static public JsonSet JsonSet(
             IPhrase doc,
             params JsonPathValue[] pathValues)
         {
             return new JsonSet(doc, pathValues);
+        }
+
+        static public JsonRemove JsonRemove(
+            ValueWrapper doc,
+            params string[] paths)
+        {
+            return new JsonRemove(doc, paths);
         }
 
         static public JsonRemove JsonRemove(
