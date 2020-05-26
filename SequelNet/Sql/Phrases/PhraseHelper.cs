@@ -594,6 +594,41 @@ namespace SequelNet
             return new JsonSet(doc, path, value);
         }
 
+        static public JsonSet JsonSet(
+            IPhrase doc,
+            params JsonPathValue[] pathValues)
+        {
+            return new JsonSet(doc, pathValues);
+        }
+
+        static public JsonRemove JsonRemove(
+            object doc, ValueObjectType docType,
+            params string[] paths)
+        {
+            return new JsonRemove(doc, docType, paths);
+        }
+
+        static public JsonRemove JsonRemove(
+            string docTableName, string docColumnName,
+            params string[] paths)
+        {
+            return new JsonRemove(docTableName, docColumnName, paths);
+        }
+
+        static public JsonRemove JsonRemove(
+            string docColumnName,
+            params string[] paths)
+        {
+            return new JsonRemove(docColumnName, paths);
+        }
+
+        static public JsonRemove JsonRemove(
+            IPhrase doc,
+            params string[] paths)
+        {
+            return new JsonRemove(doc, paths);
+        }
+
         #endregion
 
         #region Flow Control

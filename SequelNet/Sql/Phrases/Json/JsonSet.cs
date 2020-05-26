@@ -67,6 +67,17 @@ namespace SequelNet.Phrases
             this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value)));
         }
 
+        public JsonSet(
+            IPhrase doc,
+            params JsonPathValue[] pathValues)
+            : this()
+        {
+            this.Document = new ValueWrapper(doc);
+
+            foreach (var pair in pathValues)
+                this.Values.Add(pair);
+        }
+
         #endregion
 
         public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
