@@ -20,7 +20,7 @@ namespace SequelNet.Migrations
         /// </summary>
         /// <param name="version">Version number for this migration</param>
         /// <param name="description">Description for this migration</param>
-        public MigrationAttribute(Int64 version, string description)
+        public MigrationAttribute(Int64 version, string description = null)
         {
             Version = version;
             Description = description;
@@ -40,15 +40,17 @@ namespace SequelNet.Migrations
         public MigrationAttribute(
             int year, int month, int day,
             int hour, int minutes, int seconds,
-            string description)
+            string description = null)
+            : this(
+                version:
+                    Math.Min(year, 9999) * 10000000000L +
+                    Math.Min(month, 99) * 100000000L +
+                    Math.Min(day, 99) * 1000000L +
+                    Math.Min(hour, 99) * 10000L +
+                    Math.Min(minutes, 99) * 100L +
+                    Math.Min(seconds, 99),
+                description: description)
         {
-            Version = Math.Min(year, 9999) * 10000000000L +
-                Math.Min(month, 99) * 100000000L +
-                Math.Min(day, 99) * 1000000L +
-                Math.Min(hour, 99) * 10000L +
-                Math.Min(minutes, 99) * 100L +
-                Math.Min(seconds, 99);
-            Description = description;
         }
 
         /// <summary>

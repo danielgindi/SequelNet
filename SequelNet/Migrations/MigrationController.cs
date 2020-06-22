@@ -145,19 +145,19 @@ namespace SequelNet.Migrations
 
                 if (up)
                 {
-                    ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Attribute.Description, migration.Type, true));
+                    ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
 
                     migration.Migration.Up();
 
-                    ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Attribute.Description, migration.Type, true));
+                    ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
                 }
                 else
                 {
-                    ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Attribute.Description, migration.Type, false));
+                    ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
                     migration.Migration.Down();
 
-                    ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Attribute.Description, migration.Type, false));
+                    ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
                     _State.CurrentVersion--;
                 }
