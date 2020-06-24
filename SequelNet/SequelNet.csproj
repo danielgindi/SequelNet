@@ -33,7 +33,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <Version>3.0.42</Version>
+    <Version>3.0.43</Version>
     <Company />
     <Product>SequelNet Data Access Layer</Product>
     <Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2009</Copyright>
