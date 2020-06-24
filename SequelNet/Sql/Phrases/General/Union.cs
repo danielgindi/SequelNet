@@ -17,13 +17,13 @@ namespace SequelNet.Phrases
         {
             StringBuilder sb = new StringBuilder();
             bool first = true;
-            //sb.Append(@"(");
+            sb.Append("(");
             foreach (Query qry in Queries)
             {
-                if (first) first = false; else sb.Append(All ? @" UNION ALL" : @" UNION");
+                if (first) first = false; else sb.Append(All ? " UNION ALL" : " UNION");
                 sb.Append(qry.BuildCommand(conn));
             }
-            //sb.Append(@")");
+            sb.Append(")");
             return sb.ToString();
         }
     }
