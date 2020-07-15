@@ -755,6 +755,11 @@ namespace SequelNet.Connector
             }
         }
 
+        public override string PrepareValue(bool value)
+        {
+            return value ? "TRUE" : "FALSE";
+        }
+
         public override string PrepareValue(Guid value)
         {
             return '\'' + value.ToString(@"D") + '\'';
