@@ -90,9 +90,18 @@ namespace SequelNet.Migrations
         /// Migrate to the latest version available
         /// </summary>
         /// <returns>The count of migrations that we ran</returns>
+        public System.Threading.Tasks.Task<int> MigrateUpAsync()
+        {
+            return MigrateToAsync(Int64.MaxValue);
+        }
+
+        /// <summary>
+        /// Migrate to the latest version available
+        /// </summary>
+        /// <returns>The count of migrations that we ran</returns>
         public int MigrateUp()
         {
-            return MigrateTo(Int64.MaxValue);
+            return MigrateUpAsync().GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -101,6 +110,16 @@ namespace SequelNet.Migrations
         /// <param name="targetVersion">The version you want to get to</param>
         /// <returns>The count of migrations that we ran</returns>
         public int MigrateTo(Int64 targetVersion)
+        {
+            return MigrateToAsync(targetVersion).GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Run the matching set of migrations towards <paramref name="targetVersion"/>
+        /// </summary>
+        /// <param name="targetVersion">The version you want to get to</param>
+        /// <returns>The count of migrations that we ran</returns>
+        public async System.Threading.Tasks.Task<int> MigrateToAsync(Int64 targetVersion)
         {
             if (_State == null || !_State.IsRollingBack)
             {
@@ -147,7 +166,7 @@ namespace SequelNet.Migrations
                 {
                     ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
 
-                    migration.Migration.Up();
+                    await migration.Migration.UpAsync();
 
                     ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
                 }
@@ -155,7 +174,7 @@ namespace SequelNet.Migrations
                 {
                     ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
-                    migration.Migration.Down();
+                    await migration.Migration.DownAsync();
 
                     ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
@@ -177,7 +196,7 @@ namespace SequelNet.Migrations
         /// You can't rollback a rollback. It will always strive to reach the rollback's destination.
         /// </summary>
         /// <returns>The count of migrations that we ran</returns>
-        public int Rollback()
+        public async System.Threading.Tasks.Task<int> RollbackAsync()
         {
             if (_State == null)
             {
@@ -193,11 +212,21 @@ namespace SequelNet.Migrations
                 _State.TargetVersion = to;
             }
 
-            var counter = MigrateTo(_State.TargetVersion);
+            var counter = await MigrateToAsync(_State.TargetVersion);
 
             MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.TargetVersion));
 
             return counter;
+        }
+
+        /// <summary>
+        /// Try to rollback the last or current migration.
+        /// You can't rollback a rollback. It will always strive to reach the rollback's destination.
+        /// </summary>
+        /// <returns>The count of migrations that we ran</returns>
+        public int Rollback()
+        {
+            return RollbackAsync().GetAwaiter().GetResult();
         }
 
         /// <summary>
