@@ -8,7 +8,7 @@ namespace SequelNet.Migrations
     public class DecoratedMigration
     {
         public Type Type { get; internal set; }
-        internal Migration _Migration;
+        internal IMigration _Migration;
         public MigrationAttribute Attribute { get; internal set; }
 
         internal DecoratedMigration(Type migrationType)
@@ -22,18 +22,18 @@ namespace SequelNet.Migrations
             }
         }
 
-        internal DecoratedMigration(Migration migration) : this(migration.GetType())
+        internal DecoratedMigration(IMigration migration) : this(migration.GetType())
         {
             this.Migration = migration;
         }
 
-        internal Migration Migration
+        internal IMigration Migration
         {
             get
             {
                 if (_Migration == null)
                 {
-                    _Migration = Activator.CreateInstance(Type) as Migration;
+                    _Migration = Activator.CreateInstance(Type) as IMigration;
                 }
 
                 return _Migration;

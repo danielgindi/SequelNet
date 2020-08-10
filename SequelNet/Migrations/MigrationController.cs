@@ -22,7 +22,7 @@ namespace SequelNet.Migrations
         {
         }
 
-        public MigrationController(List<Migration> migrations, MigrationVersionQueryDelegate versionQueryHandler)
+        public MigrationController(List<IMigration> migrations, MigrationVersionQueryDelegate versionQueryHandler)
         {
             SetMigrations(migrations);
             this.VersionQueryHandler = versionQueryHandler;
@@ -34,7 +34,7 @@ namespace SequelNet.Migrations
             this.VersionQueryHandler = versionQueryHandler;
         }
 
-        public void SetMigrations(List<Migration> migrations)
+        public void SetMigrations(List<IMigration> migrations)
         {
             _Migrations.Clear();
 
@@ -166,7 +166,14 @@ namespace SequelNet.Migrations
                 {
                     ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
 
-                    await migration.Migration.UpAsync();
+                    if (migration.Migration is MigrationAsync ma)
+                    {
+                        await ma.UpAsync();
+                    }
+                    else if (migration.Migration is Migration m)
+                    {
+                        m.Up();
+                    }
 
                     ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
                 }
@@ -174,7 +181,14 @@ namespace SequelNet.Migrations
                 {
                     ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
-                    await migration.Migration.DownAsync();
+                    if (migration.Migration is MigrationAsync ma)
+                    {
+                        await ma.DownAsync();
+                    }
+                    else if (migration.Migration is Migration m)
+                    {
+                        m.Down();
+                    }
 
                     ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
