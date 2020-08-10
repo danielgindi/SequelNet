@@ -337,7 +337,7 @@ namespace SequelNet.Connector
             else if (dataType == DataType.UnsignedSmallInt)
                 sb.Append("SMALLINT");
             else if (dataType == DataType.Int)
-                sb.Append("TINYINT");
+                sb.Append("INT");
             else if (dataType == DataType.UnsignedInt)
                 sb.Append("INT");
             else if (dataType == DataType.BigInt)
