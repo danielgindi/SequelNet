@@ -61,7 +61,7 @@ namespace SequelNet.SchemaGenerator
                     context.ClassName, sbParams);
                 stringBuilder.AppendFormat(", ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
                 stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken)){0}{{{0}if (await reader.ReadAsync(cancellationToken)){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat("using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false)){0}{{{0}if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false)){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
 
                 // FetchByIdAsync(..., CancellationToken? cancellationToken) function
                 stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",

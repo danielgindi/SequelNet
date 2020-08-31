@@ -61,7 +61,7 @@ namespace SequelNet
                 agg = new Phrases.Count(IsDistinct);
             else agg = new Phrases.Count(schemaName, columnName, IsDistinct);
 
-            object res = await this.ExecuteAggregateAsync(agg, conn, cancellationToken);
+            object res = await this.ExecuteAggregateAsync(agg, conn, cancellationToken).ConfigureAwait(false);
             if (res == null) return 0;
             else return Convert.ToInt64(res);
         }

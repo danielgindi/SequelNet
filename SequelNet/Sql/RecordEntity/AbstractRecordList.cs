@@ -59,7 +59,7 @@ namespace SequelNet
                 }
 
                 foreach (TItemType item in this)
-                    await item.SaveAsync(conn, cancellationToken);
+                    await item.SaveAsync(conn, cancellationToken).ConfigureAwait(false);
 
                 if (ownsTransaction)
                 {
@@ -111,7 +111,7 @@ namespace SequelNet
         public static async Task<TListType> FromReaderAsync(DataReader reader, CancellationToken? cancellationToken = null)
         {
             TListType coll = new TListType();
-            while (await reader.ReadAsync(cancellationToken))
+            while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 coll.Add(AbstractRecord<TItemType>.FromReader(reader));
             return coll;
         }
@@ -126,9 +126,9 @@ namespace SequelNet
 
         public static async Task<TListType> FetchAllAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            using (var reader = await new Query(AbstractRecord<TItemType>.Schema).ExecuteReaderAsync(conn, cancellationToken))
+            using (var reader = await new Query(AbstractRecord<TItemType>.Schema).ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
             {
-                return await FromReaderAsync(reader, cancellationToken);
+                return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
             }
         }
 
@@ -152,14 +152,14 @@ namespace SequelNet
 
         public static async Task<TListType> FetchByQueryAsync(Query qry, ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
-            using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken))
-                return await FromReaderAsync(reader, cancellationToken);
+            using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
+                return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
         }
 
         public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
         {
-            using (var reader = await qry.ExecuteReaderAsync(null, cancellationToken))
-                return await FromReaderAsync(reader, cancellationToken);
+            using (var reader = await qry.ExecuteReaderAsync(null, cancellationToken).ConfigureAwait(false))
+                return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
         }
 
         public TListType Clone()

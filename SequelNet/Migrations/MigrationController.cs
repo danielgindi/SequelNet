@@ -168,7 +168,7 @@ namespace SequelNet.Migrations
 
                     if (migration.Migration is MigrationAsync ma)
                     {
-                        await ma.UpAsync();
+                        await ma.UpAsync().ConfigureAwait(false);
                     }
                     else if (migration.Migration is Migration m)
                     {
@@ -183,7 +183,7 @@ namespace SequelNet.Migrations
 
                     if (migration.Migration is MigrationAsync ma)
                     {
-                        await ma.DownAsync();
+                        await ma.DownAsync().ConfigureAwait(false);
                     }
                     else if (migration.Migration is Migration m)
                     {
@@ -226,7 +226,7 @@ namespace SequelNet.Migrations
                 _State.TargetVersion = to;
             }
 
-            var counter = await MigrateToAsync(_State.TargetVersion);
+            var counter = await MigrateToAsync(_State.TargetVersion).ConfigureAwait(false);
 
             MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.TargetVersion));
 

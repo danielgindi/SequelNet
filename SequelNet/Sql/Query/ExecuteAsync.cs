@@ -98,7 +98,7 @@ namespace SequelNet
                 object retValue = null;
 
                 using (var cmd = BuildDbCommand(connection))
-                    retValue = await connection.ExecuteScalarAsync(cmd, cancellationToken);
+                    retValue = await connection.ExecuteScalarAsync(cmd, cancellationToken).ConfigureAwait(false);
 
                 if (retValue is DBNull) retValue = null;
                 else if (retValue is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)retValue).IsNull) retValue = null;
@@ -142,7 +142,7 @@ namespace SequelNet
         public async Task<Nullable<T>> ExecuteScalarOrNullAsync<T>(ConnectorBase connection = null, CancellationToken? cancellationToken = null) where T : struct, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
-            var scalar = await ExecuteScalarAsync(connection, cancellationToken);
+            var scalar = await ExecuteScalarAsync(connection, cancellationToken).ConfigureAwait(false);
 
             if (scalar == null || !(scalar is IConvertible)) return null;
 
@@ -178,7 +178,7 @@ namespace SequelNet
         public async Task<T> ExecuteScalarAsync<T>(ConnectorBase connection = null, CancellationToken? cancellationToken = null) where T : class, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
-            var scalar = await ExecuteScalarAsync(connection, cancellationToken);
+            var scalar = await ExecuteScalarAsync(connection, cancellationToken).ConfigureAwait(false);
 
             if (scalar == null || !(scalar is IConvertible)) return null;
 
@@ -217,14 +217,16 @@ namespace SequelNet
                 int retValue = 0;
 
                 using (var cmd = BuildDbCommand(connection))
-                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken);
+                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken)
+                        .ConfigureAwait(false);
 
                 if (transaction) connection.CommitTransaction();
                 return retValue;
             }
             catch (Exception ex) when (!(ex is OperationCanceledException) && connection.Language.OnExecuteNonQueryException != null)
             {
-                return await connection.Language.OnExecuteNonQueryExceptionAsync(this, connection, ex);
+                return await connection.Language.OnExecuteNonQueryExceptionAsync(this, connection, ex)
+                    .ConfigureAwait(false);
             }
             finally
             {
@@ -287,7 +289,8 @@ namespace SequelNet
                 int retValue = 0;
 
                 using (var cmd = BuildDbCommand(connection))
-                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken);
+                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken)
+                        .ConfigureAwait(false);
 
                 object lastInsertId;
 
@@ -332,7 +335,7 @@ namespace SequelNet
         /// <returns>Array of values. Will never return null.</returns>
         public async Task<T[]> ExecuteScalarArrayAsync<T>(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            return (await ExecuteScalarListAsync<T>(connection, cancellationToken)).ToArray();
+            return (await ExecuteScalarListAsync<T>(connection, cancellationToken).ConfigureAwait(false)).ToArray();
         }
 
         /// <summary>
@@ -354,10 +357,10 @@ namespace SequelNet
         public async Task<List<T>> ExecuteScalarListAsync<T>(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             var list = new List<T>();
-            using (var reader = await ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
                 object value;
-                while (await reader.ReadAsync(cancellationToken))
+                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     value = reader[0];
                     if (value is DBNull) value = null;
@@ -388,9 +391,9 @@ namespace SequelNet
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public async Task<List<object>> ExecuteOneRowToListAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            using (var reader = await ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
-                if (await reader.ReadAsync(cancellationToken))
+                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     var row = new List<object>();
                     int i, c = reader.GetColumnCount();
@@ -431,9 +434,9 @@ namespace SequelNet
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public async Task<Dictionary<string, object>> ExecuteOneRowToDictionaryAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
-            using (var reader = await ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
-                if (await reader.ReadAsync(cancellationToken))
+                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     var row = new Dictionary<string, object>();
                     int i, c = reader.GetColumnCount();
@@ -479,11 +482,11 @@ namespace SequelNet
         public async Task<List<List<object>>> ExecuteListOfListsAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             var results = new List<List<object>>();
-            using (var reader = await ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
                 List<object> row;
                 object value;
-                while (await reader.ReadAsync(cancellationToken))
+                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     row = new List<object>();
                     int i, c = reader.GetColumnCount();
@@ -519,7 +522,7 @@ namespace SequelNet
         public async Task<List<Dictionary<string, object>>> ExecuteListOfDictionariesAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             var results = new List<Dictionary<string, object>>();
-            using (var reader = await ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
                 Dictionary<string, object> row;
                 int i, c = reader.GetColumnCount();
@@ -530,7 +533,7 @@ namespace SequelNet
                     columnNames[i] = reader.GetColumnName(i);
                 }
 
-                while (await reader.ReadAsync(cancellationToken))
+                while (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     row = new Dictionary<string, object>();
                     for (i = 0; i < c; i++)
@@ -609,7 +612,7 @@ namespace SequelNet
                 list.Add(new SelectColumn(aggregate));
                 _ListSelect = list;
 
-                object ret = await ExecuteScalarAsync(connection, cancellationToken);
+                object ret = await ExecuteScalarAsync(connection, cancellationToken).ConfigureAwait(false);
 
                 _ListSelect = oldSelectList;
                 IsDistinct = oldIsDistinct;

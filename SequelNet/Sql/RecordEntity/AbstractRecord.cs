@@ -364,14 +364,14 @@ namespace SequelNet
 
             if (IsCompoundPrimaryKey())
             {
-                await qry.ExecuteAsync(conn, cancellationToken);
+                await qry.ExecuteAsync(conn, cancellationToken).ConfigureAwait(false);
 
                 MarkOld();
                 MarkAllColumnsNotMutated();
             }
             else
             {
-                var results = await qry.ExecuteWithLastInsertIdAsync(conn, cancellationToken);
+                var results = await qry.ExecuteWithLastInsertIdAsync(conn, cancellationToken).ConfigureAwait(false);
 
                 if (results.updates > 0)
                 {
@@ -406,7 +406,7 @@ namespace SequelNet
 
             if (qry.HasInsertsOrUpdates)
             {
-                await qry.ExecuteAsync(conn, cancellationToken);
+                await qry.ExecuteAsync(conn, cancellationToken).ConfigureAwait(false);
             }
 
             MarkAllColumnsNotMutated();
@@ -895,9 +895,9 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
-                if (await reader.ReadAsync(cancellationToken))
+                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                     return FromReader(reader);
             }
             return null;
@@ -1016,9 +1016,9 @@ namespace SequelNet
                 qry.Where((string)columnName, value);
             }
 
-            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken))
+            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
             {
-                if (await reader.ReadAsync(cancellationToken))
+                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     Read(reader);
                     MarkOld();

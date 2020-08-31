@@ -170,11 +170,12 @@ namespace SequelNet.Connector
         public virtual async Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open)
-                await Connection.OpenAsync();
+                await Connection.OpenAsync().ConfigureAwait(false);
 
             command.Connection = Connection;
             command.Transaction = Transaction;
-            return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+            return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None)
+                .ConfigureAwait(false);
         }
 
         public virtual object ExecuteScalar(DbCommand command)
@@ -188,11 +189,11 @@ namespace SequelNet.Connector
         public virtual async Task<object> ExecuteScalarAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open)
-                await Connection.OpenAsync();
+                await Connection.OpenAsync().ConfigureAwait(false);
 
             command.Connection = Connection;
             command.Transaction = Transaction;
-            return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+            return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None).ConfigureAwait(false);
         }
 
         internal virtual DataReader ExecuteReader(
@@ -244,12 +245,13 @@ namespace SequelNet.Connector
             try
             {
                 if (Connection.State != ConnectionState.Open) 
-                    await Connection.OpenAsync();
+                    await Connection.OpenAsync().ConfigureAwait(false);
 
                 command.Connection = Connection;
                 command.Transaction = Transaction;
 
-                var baseReader = await command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None);
+                var baseReader = await command.ExecuteReaderAsync(commandBehavior, cancellationToken ?? CancellationToken.None)
+                    .ConfigureAwait(false);
 
                 return new DataReader(
                     baseReader,
@@ -310,11 +312,12 @@ namespace SequelNet.Connector
         public virtual async Task<int> ExecuteNonQueryAsync(string querySql, CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open)
-                await Connection.OpenAsync();
+                await Connection.OpenAsync().ConfigureAwait(false);
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
-                return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None);
+                return await command.ExecuteNonQueryAsync(cancellationToken ?? CancellationToken.None)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -331,11 +334,12 @@ namespace SequelNet.Connector
         public virtual async Task<object> ExecuteScalarAsync(string querySql, CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open) 
-                await Connection.OpenAsync();
+                await Connection.OpenAsync().ConfigureAwait(false);
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
-                return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None);
+                return await command.ExecuteScalarAsync(cancellationToken ?? CancellationToken.None)
+                    .ConfigureAwait(false);
             }
         }
 
@@ -353,14 +357,15 @@ namespace SequelNet.Connector
             CancellationToken? cancellationToken = null)
         {
             if (Connection.State != ConnectionState.Open)
-                await Connection.OpenAsync();
+                await Connection.OpenAsync().ConfigureAwait(false);
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
             return await ExecuteReaderAsync(
                 command, 
                 true, 
                 commandBehavior | CommandBehavior.CloseConnection, 
-                cancellationToken);
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         public Task<DataReader> ExecuteReaderAsync(
