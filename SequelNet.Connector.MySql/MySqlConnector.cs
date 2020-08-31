@@ -70,16 +70,20 @@ namespace SequelNet.Connector
 
         public override int ExecuteScript(string querySql)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State == System.Data.ConnectionState.Closed) 
+                Connection.Open();
+
             MySqlScript script = new MySqlScript((MySqlConnection)Connection, querySql);
             return script.Execute();
         }
 
-        public override Task<int> ExecuteScriptAsync(string querySql, CancellationToken? cancellationToken = null)
+        public override async Task<int> ExecuteScriptAsync(string querySql, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
+            if (Connection.State == System.Data.ConnectionState.Closed)
+                await Connection.OpenAsync();
+
             MySqlScript script = new MySqlScript((MySqlConnection)Connection, querySql);
-            return script.ExecuteAsync(cancellationToken ?? CancellationToken.None);
+            return await script.ExecuteAsync(cancellationToken ?? CancellationToken.None);
         }
 
         #endregion
@@ -163,8 +167,12 @@ namespace SequelNet.Connector
 
         public override bool CheckIfTableExists(string tableName)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SHOW TABLES LIKE " + Language.PrepareValue(tableName)) != null;
+        }
+
+        public override async Task<bool> CheckIfTableExistsAsync(string tableName)
+        {
+            return await ExecuteScalarAsync(@"SHOW TABLES LIKE " + Language.PrepareValue(tableName)) != null;
         }
 
         #endregion

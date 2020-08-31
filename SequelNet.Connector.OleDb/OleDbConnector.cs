@@ -75,10 +75,14 @@ namespace SequelNet.Connector
             return ExecuteScalar("SELECT @@identity AS id");
         }
 
-        public override bool CheckIfTableExists(string TableName)
+        public override bool CheckIfTableExists(string tableName)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            return ExecuteScalar($"SELECT name FROM MSysObjects WHERE name like {Language.PrepareValue(TableName)}") != null;
+            return ExecuteScalar($"SELECT name FROM MSysObjects WHERE name like {Language.PrepareValue(tableName)}") != null;
+        }
+
+        public override async Task<bool> CheckIfTableExistsAsync(string tableName)
+        {
+            return await ExecuteScalarAsync($"SELECT name FROM MSysObjects WHERE name like {Language.PrepareValue(tableName)}") != null;
         }
 
         #endregion

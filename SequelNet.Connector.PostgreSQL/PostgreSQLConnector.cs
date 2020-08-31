@@ -157,15 +157,19 @@ namespace SequelNet.Connector
             return ExecuteScalar("select lastval() AS id");
         }
 
-        public override void SetIdentityInsert(string TableName, bool Enabled)
+        public override void SetIdentityInsert(string tableName, bool enabled)
         {
             // Nothing to do. In PostgreSQL IDENTITY_INSERT is always allowed
         }
 
-        public override bool CheckIfTableExists(string TableName)
+        public override bool CheckIfTableExists(string tableName)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            return ExecuteScalar($"select * from information_schema.tables where table_name= {Language.PrepareValue(TableName)}") != null;
+            return ExecuteScalar($"select * from information_schema.tables where table_name= {Language.PrepareValue(tableName)}") != null;
+        }
+
+        public override async Task<bool> CheckIfTableExistsAsync(string tableName)
+        {
+            return await ExecuteScalarAsync($"select * from information_schema.tables where table_name= {Language.PrepareValue(tableName)}") != null;
         }
 
         #endregion

@@ -154,17 +154,21 @@ namespace SequelNet.Connector
             return ExecuteScalar(@"SELECT @@identity AS id");
         }
 
-        public override void SetIdentityInsert(string TableName, bool Enabled)
+        public override void SetIdentityInsert(string tableName, bool enabled)
         {
             string sql = string.Format(@"SET IDENTITY_INSERT {0} {1}",
-                Language.WrapFieldName(TableName), Enabled ? @"ON" : @"OFF");
+                Language.WrapFieldName(tableName), enabled ? @"ON" : @"OFF");
             ExecuteNonQuery(sql);
         }
 
-        public override bool CheckIfTableExists(string TableName)
+        public override bool CheckIfTableExists(string tableName)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
-            return ExecuteScalar(@"SELECT name FROM sysObjects WHERE name like " + Language.PrepareValue(TableName)) != null;
+            return ExecuteScalar(@"SELECT name FROM sysObjects WHERE name like " + Language.PrepareValue(tableName)) != null;
+        }
+
+        public override async Task<bool> CheckIfTableExistsAsync(string tableName)
+        {
+            return await ExecuteScalarAsync(@"SELECT name FROM sysObjects WHERE name like " + Language.PrepareValue(tableName)) != null;
         }
 
         #endregion

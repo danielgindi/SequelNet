@@ -159,8 +159,12 @@ namespace SequelNet.Connector
 
         public override bool CheckIfTableExists(string tableName)
         {
-            if (Connection.State != System.Data.ConnectionState.Open) Connection.Open();
             return ExecuteScalar(@"SHOW TABLES LIKE " + Language.PrepareValue(tableName)) != null;
+        }
+
+        public override async Task<bool> CheckIfTableExistsAsync(string tableName)
+        {
+            return await ExecuteScalarAsync(@"SHOW TABLES LIKE " + Language.PrepareValue(tableName)) != null;
         }
 
         #endregion

@@ -161,7 +161,9 @@ namespace SequelNet.Connector
 
         public virtual int ExecuteNonQuery(DbCommand command)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
+
             command.Connection = Connection;
             command.Transaction = Transaction;
             return command.ExecuteNonQuery();
@@ -169,7 +171,7 @@ namespace SequelNet.Connector
 
         public virtual async Task<int> ExecuteNonQueryAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open)
+            if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync().ConfigureAwait(false);
 
             command.Connection = Connection;
@@ -180,7 +182,9 @@ namespace SequelNet.Connector
 
         public virtual object ExecuteScalar(DbCommand command)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
+
             command.Connection = Connection;
             command.Transaction = Transaction;
             return command.ExecuteScalar();
@@ -188,7 +192,7 @@ namespace SequelNet.Connector
 
         public virtual async Task<object> ExecuteScalarAsync(DbCommand command, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open)
+            if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync().ConfigureAwait(false);
 
             command.Connection = Connection;
@@ -205,7 +209,8 @@ namespace SequelNet.Connector
 
             try
             {
-                if (Connection.State != ConnectionState.Open) Connection.Open();
+                if (Connection.State == ConnectionState.Closed) 
+                    Connection.Open();
 
                 command.Connection = Connection;
                 command.Transaction = Transaction;
@@ -244,7 +249,7 @@ namespace SequelNet.Connector
 
             try
             {
-                if (Connection.State != ConnectionState.Open) 
+                if (Connection.State == ConnectionState.Closed) 
                     await Connection.OpenAsync().ConfigureAwait(false);
 
                 command.Connection = Connection;
@@ -285,7 +290,9 @@ namespace SequelNet.Connector
 
         public virtual DataSet ExecuteDataSet(DbCommand command)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
+
             command.Connection = Connection;
             command.Transaction = Transaction;
 
@@ -301,7 +308,8 @@ namespace SequelNet.Connector
 
         public virtual int ExecuteNonQuery(string querySql)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -311,7 +319,7 @@ namespace SequelNet.Connector
 
         public virtual async Task<int> ExecuteNonQueryAsync(string querySql, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open)
+            if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync().ConfigureAwait(false);
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
@@ -323,7 +331,8 @@ namespace SequelNet.Connector
 
         public virtual object ExecuteScalar(string querySql)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -333,7 +342,7 @@ namespace SequelNet.Connector
 
         public virtual async Task<object> ExecuteScalarAsync(string querySql, CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open) 
+            if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync().ConfigureAwait(false);
 
             using (var command = Factory.NewCommand(querySql, Connection, Transaction))
@@ -345,7 +354,8 @@ namespace SequelNet.Connector
 
         public virtual DataReader ExecuteReader(string querySql, CommandBehavior commandBehavior = CommandBehavior.Default)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
             return ExecuteReader(command, true, commandBehavior);
@@ -356,7 +366,7 @@ namespace SequelNet.Connector
             CommandBehavior commandBehavior = CommandBehavior.Default,
             CancellationToken? cancellationToken = null)
         {
-            if (Connection.State != ConnectionState.Open)
+            if (Connection.State == ConnectionState.Closed)
                 await Connection.OpenAsync().ConfigureAwait(false);
 
             var command = Factory.NewCommand(querySql, Connection, Transaction);
@@ -377,7 +387,8 @@ namespace SequelNet.Connector
 
         public virtual DataSet ExecuteDataSet(string querySql)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (Connection.State == ConnectionState.Closed) 
+                Connection.Open();
 
             using (var cmd = Factory.NewCommand(querySql, Connection, Transaction))
             {
@@ -409,6 +420,8 @@ namespace SequelNet.Connector
 
         abstract public bool CheckIfTableExists(string tableName);
 
+        abstract public Task<bool> CheckIfTableExistsAsync(string tableName);
+
         /// <summary>
         /// Synonym for Language.EscapeLike(expression)
         /// </summary>
@@ -430,7 +443,9 @@ namespace SequelNet.Connector
         {
             try
             {
-                if (_Connection.State != ConnectionState.Open) _Connection.Open();
+                if (_Connection.State == ConnectionState.Closed) 
+                    _Connection.Open();
+
                 _Transaction = _Connection.BeginTransaction();
                 if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
                 _Transactions.Push(_Transaction);
@@ -444,7 +459,9 @@ namespace SequelNet.Connector
         {
             try
             {
-                if (_Connection.State != ConnectionState.Open) _Connection.Open();
+                if (_Connection.State == ConnectionState.Closed)
+                    _Connection.Open();
+
                 _Transaction = _Connection.BeginTransaction(IsolationLevel);
                 if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
                 _Transactions.Push(_Transaction);
