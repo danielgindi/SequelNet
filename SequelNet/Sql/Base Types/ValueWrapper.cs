@@ -288,7 +288,9 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
         public static explicit operator ValueWrapper(UInt64 value)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
