@@ -62,13 +62,6 @@ namespace SequelNet
             return this;
         }
 
-        public WhereList Where(string literalExpression)
-        {
-            this.Clear();
-            this.Add(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparison.None, null, ValueObjectType.Literal));
-            return this;
-        }
-
         public WhereList Where(IPhrase phrase)
         {
             this.Clear();
@@ -97,20 +90,12 @@ namespace SequelNet
             return this;
         }
 
-        public WhereList Where(string tableName, string columnName, object betweenValue, object andValue)
+        public WhereList Where(
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
-            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            where.FirstTableName = tableName;
-            this.Clear();
-            this.Add(where);
-            return this;
-        }
-
-        public WhereList Where(string columnName, object betweenValue, object andValue)
-        {
-            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            this.Clear();
-            this.Add(where);
+            this.Add(new Where(WhereCondition.AND, aValue, aType, betweenValue, betweenType, andValue, andType));
             return this;
         }
 
@@ -129,12 +114,6 @@ namespace SequelNet
         public WhereList AND(string columnName, WhereComparison comparison, object columnValue)
         {
             this.Add(new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList AND(string literalExpression)
-        {
-            this.Add(new Where(WhereCondition.AND, literalExpression, ValueObjectType.Literal, WhereComparison.None, null, ValueObjectType.Literal));
             return this;
         }
 
@@ -182,18 +161,12 @@ namespace SequelNet
             return this;
         }
 
-        public WhereList AND(string tableName, string columnName, object betweenValue, object andValue)
+        public WhereList AND(
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
-            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            where.FirstTableName = tableName;
-            this.Add(where);
-            return this;
-        }
-
-        public WhereList AND(string columnName, object betweenValue, object andValue)
-        {
-            Where where = new Where(WhereCondition.AND, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            this.Add(where);
+            this.Add(new Where(WhereCondition.AND, aValue, aType, betweenValue, betweenType, andValue, andType));
             return this;
         }
 
@@ -212,12 +185,6 @@ namespace SequelNet
         public WhereList OR(string columnName, WhereComparison comparison, object columnValue)
         {
             this.Add(new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, comparison, columnValue, ValueObjectType.Value));
-            return this;
-        }
-
-        public WhereList OR(string literalExpression)
-        {
-            this.Add(new Where(WhereCondition.OR, literalExpression, ValueObjectType.Literal, WhereComparison.None, null, ValueObjectType.Literal));
             return this;
         }
 
@@ -265,18 +232,12 @@ namespace SequelNet
             return this;
         }
 
-        public WhereList OR(string tableName, string columnName, object betweenValue, object andValue)
+        public WhereList OR(
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
-            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            where.FirstTableName = tableName;
-            this.Add(where);
-            return this;
-        }
-
-        public WhereList OR(string columnName, object betweenValue, object andValue)
-        {
-            Where where = new Where(WhereCondition.OR, columnName, ValueObjectType.ColumnName, betweenValue, ValueObjectType.Value, andValue, ValueObjectType.Value);
-            this.Add(where);
+            this.Add(new Where(WhereCondition.OR, aValue, aType, betweenValue, betweenType, andValue, andType));
             return this;
         }
 

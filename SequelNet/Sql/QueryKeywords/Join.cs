@@ -28,20 +28,6 @@ namespace SequelNet
             this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
         }
 
-        public JoinColumnPair(object value, bool literalValue, string rightColumn)
-        {
-            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
-        }
-
-        public JoinColumnPair(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
-        {
-            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
-        }
-
         public JoinColumnPair AND(TableSchema leftTableSchema, string leftColumn, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, leftTableSchema.Name, leftColumn, WhereComparison.EqualsTo, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn));
@@ -57,22 +43,6 @@ namespace SequelNet
         public JoinColumnPair AND(object value, string rightColumn)
         {
             this.Add(new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
-            return this;
-        }
-
-        public JoinColumnPair AND(object value, bool literalValue, string rightColumn)
-        {
-            Where w = new Where(WhereCondition.AND, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
-            return this;
-        }
-
-        public JoinColumnPair AND(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
-        {
-            Where w = new Where(WhereCondition.AND, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
             return this;
         }
 
@@ -139,22 +109,6 @@ namespace SequelNet
         public JoinColumnPair OR(object value, string rightColumn)
         {
             this.Add(new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value));
-            return this;
-        }
-
-        public JoinColumnPair OR(object value, bool literalValue, string rightColumn)
-        {
-            Where w = new Where(WhereCondition.OR, RIGHT_TABLE_PLACEHOLDER_ID, rightColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
-            return this;
-        }
-
-        public JoinColumnPair OR(string leftTableNameOrAlias, string leftColumn, object value, bool literalValue)
-        {
-            Where w = new Where(WhereCondition.OR, leftTableNameOrAlias, leftColumn, WhereComparison.EqualsTo, value);
-            if (literalValue) w.SecondType = ValueObjectType.Literal;
-            this.Add(w);
             return this;
         }
 

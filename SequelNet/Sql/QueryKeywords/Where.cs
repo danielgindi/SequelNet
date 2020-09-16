@@ -103,17 +103,17 @@ namespace SequelNet
             SecondType = thatObjectType;
         }
 
-        public Where(object thisObject, ValueObjectType thisObjectType,
-            object betweenThisObject, ValueObjectType betweenThisObjectType,
-            object andThatObject, ValueObjectType andThatObjectType)
+        public Where(object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
             Comparison = WhereComparison.Between;
-            First = thisObject;
-            FirstType = thisObjectType;
-            Second = betweenThisObject;
-            SecondType = betweenThisObjectType;
-            Third = andThatObject;
-            ThirdType = andThatObjectType;
+            First = aValue;
+            FirstType = aType;
+            Second = betweenValue;
+            SecondType = betweenType;
+            Third = andValue;
+            ThirdType = andType;
         }
 
         public Where(string tableName, string columnName,
@@ -191,18 +191,18 @@ namespace SequelNet
         }
 
         public Where(WhereCondition condition,
-            object thisObject, ValueObjectType thisObjectType,
-            object betweenThisObject, ValueObjectType betweenThisObjectType,
-            object andThatObject, ValueObjectType andThatObjectType)
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
             Condition = condition;
             Comparison = WhereComparison.Between;
-            First = thisObject;
-            FirstType = thisObjectType;
-            Second = betweenThisObject;
-            SecondType = betweenThisObjectType;
-            Third = andThatObject;
-            ThirdType = andThatObjectType;
+            First = aValue;
+            FirstType = aType;
+            Second = betweenValue;
+            SecondType = betweenType;
+            Third = andValue;
+            ThirdType = andType;
         }
 
         public Where(WhereCondition condition,
@@ -564,13 +564,6 @@ namespace SequelNet
             return wl.AND(columnName, comparison, columnValue);
         }
 
-        public WhereList AND(string literalExpression)
-        {
-            var wl = new WhereList();
-            wl.Add(this);
-            return wl.AND(literalExpression);
-        }
-
         public WhereList AND(IPhrase phrase)
         {
             var wl = new WhereList();
@@ -620,18 +613,14 @@ namespace SequelNet
             return wl.AND(tableName, columnName, comparison, otherTableName, otherColumnName);
         }
 
-        public WhereList AND(string tableName, string columnName, object betweenValue, object andValue)
+        public WhereList AND(
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
             var wl = new WhereList();
             wl.Add(this);
-            return wl.AND(tableName, columnName, betweenValue, andValue);
-        }
-
-        public WhereList AND(string columnName, object betweenValue, object andValue)
-        {
-            var wl = new WhereList();
-            wl.Add(this);
-            return wl.AND(columnName, betweenValue, andValue);
+            return wl.AND(aValue, aType, betweenValue, betweenType, andValue, andType);
         }
 
         public WhereList OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
@@ -653,13 +642,6 @@ namespace SequelNet
             var wl = new WhereList();
             wl.Add(this);
             return wl.OR(columnName, comparison, columnValue);
-        }
-
-        public WhereList OR(string literalExpression)
-        {
-            var wl = new WhereList();
-            wl.Add(this);
-            return wl.OR(literalExpression);
         }
 
         public WhereList OR(IPhrase phrase)
@@ -711,18 +693,14 @@ namespace SequelNet
             return wl.OR(tableName, columnName, comparison, otherTableName, otherColumnName);
         }
 
-        public WhereList OR(string tableName, string columnName, object betweenValue, object andValue)
+        public WhereList OR(
+            object aValue, ValueObjectType aType,
+            object betweenValue, ValueObjectType betweenType,
+            object andValue, ValueObjectType andType)
         {
             var wl = new WhereList();
             wl.Add(this);
-            return wl.OR(tableName, columnName, betweenValue, andValue);
-        }
-
-        public WhereList OR(string columnName, object betweenValue, object andValue)
-        {
-            var wl = new WhereList();
-            wl.Add(this);
-            return wl.OR(columnName, betweenValue, andValue);
+            return wl.OR(aValue, aType, betweenValue, betweenType, andValue, andType);
         }
 
         #endregion
