@@ -29,14 +29,14 @@ namespace SequelNet.Phrases
 
         public JsonExtract(object value, ValueObjectType valueType, string path, bool unquote = true)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.Path = path;
             this.Unquote = unquote;
         }
 
         public JsonExtract(string tableName, string columnName, string path, bool unquote = true)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
             this.Path = path;
             this.Unquote = unquote;
         }

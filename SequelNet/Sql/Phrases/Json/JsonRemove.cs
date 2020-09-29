@@ -33,7 +33,7 @@ namespace SequelNet.Phrases
         public JsonRemove(
             object doc, ValueObjectType docType,
             params string[] paths)
-            : this(ValueWrapper.From(doc, docType), paths)
+            : this(ValueWrapper.Make(doc, docType), paths)
         {
         }
 

@@ -19,8 +19,8 @@ namespace SequelNet.Phrases
             string tableName1, string columnName1,
             string tableName2, string columnName2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(tableName2, columnName2))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.Column(tableName2, columnName2))
         {
         }
 
@@ -28,8 +28,8 @@ namespace SequelNet.Phrases
             string tableName1, string columnName1,
             object value2, ValueObjectType valueType2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, valueType2))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.Make(value2, valueType2))
         {
         }
 
@@ -37,8 +37,8 @@ namespace SequelNet.Phrases
             object value1, ValueObjectType valueType1,
             string tableName2, string columnName2)
             : this(
-                  new ValueWrapper(value1, valueType1),
-                  new ValueWrapper(tableName2, columnName2))
+                  ValueWrapper.Make(value1, valueType1),
+                  ValueWrapper.Column(tableName2, columnName2))
         {
         }
 
@@ -46,78 +46,78 @@ namespace SequelNet.Phrases
             object value1, ValueObjectType valueType1,
             object value2, ValueObjectType valueType2)
             : this(
-                  new ValueWrapper(value1, valueType1),
-                  new ValueWrapper(value2, valueType2))
+                  ValueWrapper.Make(value1, valueType1),
+                  ValueWrapper.Make(value2, valueType2))
         {
         }
 
         public Add(string tableName1, string columnName1, Int32 value2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string tableName1, string columnName1, Int64 value2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string tableName1, string columnName1, decimal value2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string tableName1, string columnName1, double value2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string tableName1, string columnName1, float value2)
             : this(
-                  new ValueWrapper(tableName1, columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(tableName1, columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string columnName1, Int32 value2)
             : this(
-                  new ValueWrapper(columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string columnName1, Int64 value2)
             : this(
-                  new ValueWrapper(columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string columnName1, decimal value2)
             : this(
-                  new ValueWrapper(columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string columnName1, double value2)
             : this(
-                  new ValueWrapper(columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 
         public Add(string columnName1, float value2)
             : this(
-                  new ValueWrapper(columnName1),
-                  new ValueWrapper(value2, ValueObjectType.Value))
+                  ValueWrapper.Column(columnName1),
+                  ValueWrapper.From(value2))
         {
         }
 

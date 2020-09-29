@@ -25,8 +25,8 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(doc, docType);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
+            this.Document = ValueWrapper.Make(doc, docType);
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.Make(value, valueType)));
         }
 
         public JsonArrayInsert(
@@ -35,8 +35,8 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(docTableName, docColumnName);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
+            this.Document = ValueWrapper.Column(docTableName, docColumnName);
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.Make(value, valueType)));
         }
 
         public JsonArrayInsert(
@@ -53,8 +53,8 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
+            this.Document = ValueWrapper.From(doc);
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.Make(value, valueType)));
         }
 
         public JsonArrayInsert(
@@ -63,8 +63,8 @@ namespace SequelNet.Phrases
             IPhrase value)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value)));
+            this.Document = ValueWrapper.From(doc);
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.From(value)));
         }
 
         #endregion

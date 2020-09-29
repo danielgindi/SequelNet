@@ -30,22 +30,22 @@ namespace SequelNet.Phrases
 
         public Case(Where condition)
         {
-            this.Value = new ValueWrapper(condition, ValueObjectType.Value);
+            this.Value = ValueWrapper.From(condition);
         }
 
         public Case(WhereList condition)
         {
-            this.Value = new ValueWrapper(condition, ValueObjectType.Value);
+            this.Value = ValueWrapper.From(condition);
         }
 
         public Case(string tableName, string columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
         public Case(object value, ValueObjectType valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
         }
 
         #endregion
@@ -64,27 +64,27 @@ namespace SequelNet.Phrases
 
         public Case When(Where condition)
         {
-            return When(new ValueWrapper(condition, ValueObjectType.Value));
+            return When(ValueWrapper.From(condition));
         }
 
         public Case When(WhereList condition)
         {
-            return When(new ValueWrapper(condition, ValueObjectType.Value));
+            return When(ValueWrapper.From(condition));
         }
 
         public Case When(string tableName, string columnName)
         {
-            return When(new ValueWrapper(tableName, columnName));
+            return When(ValueWrapper.Column(tableName, columnName));
         }
 
         public Case When(object value, ValueObjectType valueType)
         {
-            return When(new ValueWrapper(value, valueType));
+            return When(ValueWrapper.Make(value, valueType));
         }
 
         public Case When(IPhrase value)
         {
-            return When(new ValueWrapper(value));
+            return When(ValueWrapper.From(value));
         }
 
         public Case Then(ValueWrapper value)
@@ -104,17 +104,17 @@ namespace SequelNet.Phrases
 
         public Case Then(string tableName, string columnName)
         {
-            return Then(new ValueWrapper(tableName, columnName));
+            return Then(ValueWrapper.Column(tableName, columnName));
         }
 
         public Case Then(object value, ValueObjectType valueType)
         {
-            return Then(new ValueWrapper(value, valueType));
+            return Then(ValueWrapper.Make(value, valueType));
         }
 
         public Case Then(IPhrase value)
         {
-            return Then(new ValueWrapper(value));
+            return Then(ValueWrapper.From(value));
         }
 
         public Case Else(ValueWrapper value)
@@ -125,17 +125,17 @@ namespace SequelNet.Phrases
 
         public Case Else(string tableName, string columnName)
         {
-            return Else(new ValueWrapper(tableName, columnName));
+            return Else(ValueWrapper.Column(tableName, columnName));
         }
 
         public Case Else(object value, ValueObjectType valueType)
         {
-            return Else(new ValueWrapper(value, valueType));
+            return Else(ValueWrapper.Make(value, valueType));
         }
 
         public Case Else(IPhrase value)
         {
-            return Else(new ValueWrapper(value));
+            return Else(ValueWrapper.From(value));
         }
 
         #endregion

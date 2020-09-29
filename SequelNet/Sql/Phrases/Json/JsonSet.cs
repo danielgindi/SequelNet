@@ -26,14 +26,14 @@ namespace SequelNet.Phrases
             : this()
         {
             this.Document = doc;
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value, valueType)));
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.Make(value, valueType)));
         }
 
         public JsonSet(
             object doc, ValueObjectType docType,
             string path,
             object value, ValueObjectType valueType)
-            : this(ValueWrapper.From(doc, docType), path, value, valueType)
+            : this(ValueWrapper.Make(doc, docType), path, value, valueType)
         {
         }
 
@@ -68,7 +68,7 @@ namespace SequelNet.Phrases
             : this()
         {
             this.Document = ValueWrapper.From(doc);
-            this.Values.Add(JsonPathValue.From(path, new ValueWrapper(value)));
+            this.Values.Add(JsonPathValue.From(path, ValueWrapper.From(value)));
         }
 
         public JsonSet(

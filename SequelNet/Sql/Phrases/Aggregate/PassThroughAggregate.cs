@@ -11,7 +11,7 @@ namespace SequelNet.Phrases
 
         public PassThroughAggregate(string aggregateType, string tableName, string columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
             this.AggregateType = aggregateType;
         }
 
@@ -22,7 +22,7 @@ namespace SequelNet.Phrases
 
         public PassThroughAggregate(string aggregateType, object value, ValueObjectType valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.AggregateType = aggregateType;
         }
 

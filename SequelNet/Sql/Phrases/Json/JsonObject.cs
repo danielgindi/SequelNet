@@ -33,7 +33,7 @@ namespace SequelNet.Phrases
             {
                 foreach (var pair in values)
                 {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value, ValueObjectType.Value));
+                    Values.Add(pair.Key, ValueWrapper.Make(pair.Value, ValueObjectType.Value));
                 }
             }
         }
@@ -45,7 +45,7 @@ namespace SequelNet.Phrases
             {
                 foreach (var pair in values)
                 {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value, ValueObjectType.Value));
+                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
                 }
             }
         }
@@ -57,7 +57,7 @@ namespace SequelNet.Phrases
             {
                 foreach (var pair in values)
                 {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value, ValueObjectType.Value));
+                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
                 }
             }
         }
@@ -69,7 +69,7 @@ namespace SequelNet.Phrases
             {
                 foreach (var pair in values)
                 {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value, ValueObjectType.Value));
+                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
                 }
             }
         }

@@ -14,12 +14,12 @@ namespace SequelNet.Phrases
         
         public JsonLength(object value, ValueObjectType valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
         }
 
         public JsonLength(string tableName, string columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
         public JsonLength(string columnName)

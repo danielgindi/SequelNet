@@ -26,62 +26,62 @@ namespace SequelNet.Phrases
             object fromValue, ValueObjectType fromValueType,
             object toValue, ValueObjectType toValueType)
         {
-            this.From = ValueWrapper.From(fromValue, fromValueType);
-            this.To = ValueWrapper.From(toValue, toValueType);
+            this.From = ValueWrapper.Make(fromValue, fromValueType);
+            this.To = ValueWrapper.Make(toValue, toValueType);
         }
 
         public GeographyDistance(
             object fromValue, ValueObjectType fromValueType,
             string toColumnName)
         {
-            this.From = ValueWrapper.From(fromValue, fromValueType);
-            this.To = ValueWrapper.From(toColumnName, ValueObjectType.ColumnName);
+            this.From = ValueWrapper.Make(fromValue, fromValueType);
+            this.To = ValueWrapper.Column(toColumnName);
         }
 
         public GeographyDistance(
             object fromValue, ValueObjectType fromValueType,
             string toTableName, string toColumnName)
         {
-            this.From = ValueWrapper.From(fromValue, fromValueType);
-            this.To = ValueWrapper.From(toTableName, toColumnName);
+            this.From = ValueWrapper.Make(fromValue, fromValueType);
+            this.To = ValueWrapper.Column(toTableName, toColumnName);
         }
 
         public GeographyDistance(
             Geometry fromValue,
             string toColumnName)
         {
-            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
-            this.To = ValueWrapper.From(toColumnName, ValueObjectType.ColumnName);
+            this.From = ValueWrapper.From(fromValue);
+            this.To = ValueWrapper.Column(toColumnName);
         }
 
         public GeographyDistance(
             Geometry fromValue,
             string toTableName, string toColumnName)
         {
-            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
-            this.To = ValueWrapper.From(toTableName, toColumnName);
+            this.From = ValueWrapper.From(fromValue);
+            this.To = ValueWrapper.Column(toTableName, toColumnName);
         }
 
         public GeographyDistance(Geometry fromValue, Geometry toValue)
         {
-            this.From = ValueWrapper.From(fromValue, ValueObjectType.Value);
-            this.To = ValueWrapper.From(toValue, ValueObjectType.Value);
+            this.From = ValueWrapper.From(fromValue);
+            this.To = ValueWrapper.From(toValue);
         }
 
         public GeographyDistance(
             string fromColumnName,
             Geometry toObject)
         {
-            this.From = ValueWrapper.From(fromColumnName, ValueObjectType.ColumnName);
-            this.To = ValueWrapper.From(toObject, ValueObjectType.Value);
+            this.From = ValueWrapper.Column(fromColumnName);
+            this.To = ValueWrapper.From(toObject);
         }
 
         public GeographyDistance(
             string fromTableName, string fromColumnName,
             Geometry toObject)
         {
-            this.From = ValueWrapper.From(fromTableName, fromColumnName);
-            this.To = ValueWrapper.From(toObject, ValueObjectType.Value);
+            this.From = ValueWrapper.Column(fromTableName, fromColumnName);
+            this.To = ValueWrapper.From(toObject);
         }
 
         #endregion

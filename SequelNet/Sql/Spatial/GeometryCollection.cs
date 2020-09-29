@@ -58,9 +58,9 @@ namespace SequelNet
                 }
             }
 
-            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("GEOMETRYCOLLECTION(", ValueObjectType.Value);
-            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
-            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",", ValueObjectType.Value);
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("GEOMETRYCOLLECTION(");
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")");
+            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",");
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {

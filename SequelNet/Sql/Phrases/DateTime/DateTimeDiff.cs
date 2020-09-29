@@ -15,8 +15,8 @@ namespace SequelNet.Phrases
         public DateTimeDiff(DateTimeUnit unit, object value1, ValueObjectType value1Type, object value2, ValueObjectType value2Type)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(value1, value1Type);
-            this.Value2 = new ValueWrapper(value2, value2Type);
+            this.Value1 = ValueWrapper.Make(value1, value1Type);
+            this.Value2 = ValueWrapper.Make(value2, value2Type);
         }
 
         public DateTimeDiff(DateTimeUnit unit, object value1, ValueObjectType value1Type, DateTime value2)
@@ -32,29 +32,29 @@ namespace SequelNet.Phrases
         public DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, DateTime value2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(tableName1, columnName1, ValueObjectType.ColumnName);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
+            this.Value1 = ValueWrapper.Column(tableName1, columnName1);
+            this.Value2 = ValueWrapper.From(value2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, DateTime value1, string tableName2, string columnName2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(value1, ValueObjectType.Value);
-            this.Value2 = new ValueWrapper(tableName2, columnName2, ValueObjectType.ColumnName);
+            this.Value1 = ValueWrapper.From(value1);
+            this.Value2 = ValueWrapper.Column(tableName2, columnName2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, string tableName2, string columnName2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(tableName1, columnName1, ValueObjectType.ColumnName);
-            this.Value2 = new ValueWrapper(tableName2, columnName2, ValueObjectType.ColumnName);
+            this.Value1 = ValueWrapper.Column(tableName1, columnName1);
+            this.Value2 = ValueWrapper.Column(tableName2, columnName2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, string columnName1, string columnName2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(null, columnName1, ValueObjectType.ColumnName);
-            this.Value2 = new ValueWrapper(null, columnName2, ValueObjectType.ColumnName);
+            this.Value1 = ValueWrapper.Column(columnName1);
+            this.Value2 = ValueWrapper.Column(columnName2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, IPhrase phrase2)
@@ -85,29 +85,29 @@ namespace SequelNet.Phrases
         public DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, string tableName2, string columnName2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(phrase1, ValueObjectType.Value);
-            this.Value2 = new ValueWrapper(tableName2, columnName2, ValueObjectType.ColumnName);
+            this.Value1 = ValueWrapper.From(phrase1);
+            this.Value2 = ValueWrapper.Column(tableName2, columnName2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, string tableName1, string columnName1, IPhrase phrase2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(tableName1, columnName1, ValueObjectType.ColumnName);
-            this.Value2 = new ValueWrapper(phrase2, ValueObjectType.Value);
+            this.Value1 = ValueWrapper.Column(tableName1, columnName1);
+            this.Value2 = ValueWrapper.From(phrase2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, IPhrase phrase1, string columnName2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(null, phrase1, ValueObjectType.Value);
-            this.Value2 = new ValueWrapper(null, columnName2, ValueObjectType.ColumnName);
+            this.Value1 = ValueWrapper.From(phrase1);
+            this.Value2 = ValueWrapper.Column(columnName2);
         }
 
         public DateTimeDiff(DateTimeUnit unit, string columnName1, IPhrase phrase2)
         {
             this.Unit = unit;
-            this.Value1 = new ValueWrapper(null, columnName1, ValueObjectType.ColumnName);
-            this.Value2 = new ValueWrapper(null, phrase2, ValueObjectType.Value);
+            this.Value1 = ValueWrapper.Column(columnName1);
+            this.Value2 = ValueWrapper.From(phrase2);
         }
 
         #endregion

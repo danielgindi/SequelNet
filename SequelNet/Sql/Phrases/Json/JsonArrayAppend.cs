@@ -26,9 +26,9 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(doc, docType);
+            this.Document = ValueWrapper.Make(doc, docType);
             this.Path = path;
-            this.Values.Add(new ValueWrapper(value, valueType));
+            this.Values.Add(ValueWrapper.Make(value, valueType));
         }
 
         public JsonArrayAppend(
@@ -37,9 +37,9 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(docTableName, docColumnName);
+            this.Document = ValueWrapper.Column(docTableName, docColumnName);
             this.Path = path;
-            this.Values.Add(new ValueWrapper(value, valueType));
+            this.Values.Add(ValueWrapper.Make(value, valueType));
         }
 
         public JsonArrayAppend(
@@ -56,9 +56,9 @@ namespace SequelNet.Phrases
             object value, ValueObjectType valueType)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
+            this.Document = ValueWrapper.From(doc);
             this.Path = path;
-            this.Values.Add(new ValueWrapper(value, valueType));
+            this.Values.Add(ValueWrapper.Make(value, valueType));
         }
 
         public JsonArrayAppend(
@@ -67,9 +67,9 @@ namespace SequelNet.Phrases
             IPhrase value)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
+            this.Document = ValueWrapper.From(doc);
             this.Path = path;
-            this.Values.Add(new ValueWrapper(value));
+            this.Values.Add(ValueWrapper.From(value));
         }
 
         public JsonArrayAppend(
@@ -78,7 +78,7 @@ namespace SequelNet.Phrases
             params ValueWrapper[] values)
             : this()
         {
-            this.Document = new ValueWrapper(doc);
+            this.Document = ValueWrapper.From(doc);
             this.Path = path;
             this.Values.AddRange(values);
         }

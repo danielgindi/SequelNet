@@ -33,28 +33,28 @@ namespace SequelNet.Phrases
         {
             this.Values = new List<ValueWrapper>(values.Length);
             foreach (var val in values)
-                this.Values.Add(ValueWrapper.From(val, ValueObjectType.Value));
+                this.Values.Add(ValueWrapper.Make(val, ValueObjectType.Value));
         }
 
         public JsonArray(params string[] values)
         {
             this.Values = new List<ValueWrapper>(values.Length);
             foreach (var val in values)
-                this.Values.Add(ValueWrapper.From(val, ValueObjectType.Value));
+                this.Values.Add(ValueWrapper.From(val));
         }
 
         public JsonArray(params Int64[] values)
         {
             this.Values = new List<ValueWrapper>(values.Length);
             foreach (var val in values)
-                this.Values.Add(ValueWrapper.From(val, ValueObjectType.Value));
+                this.Values.Add(ValueWrapper.From(val));
         }
 
         public JsonArray(params Int32[] values)
         {
             this.Values = new List<ValueWrapper>(values.Length);
             foreach (var val in values)
-                this.Values.Add(ValueWrapper.From(val, ValueObjectType.Value));
+                this.Values.Add(ValueWrapper.From(val));
         }
 
         #endregion

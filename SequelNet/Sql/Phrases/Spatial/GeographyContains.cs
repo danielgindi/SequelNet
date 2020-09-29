@@ -26,62 +26,62 @@ namespace SequelNet.Phrases
             object outerValue, ValueObjectType outerValueType,
             object innerValue, ValueObjectType innerValueType)
         {
-            this.Outer = ValueWrapper.From(outerValue, outerValueType);
-            this.Inner = ValueWrapper.From(innerValue, innerValueType);
+            this.Outer = ValueWrapper.Make(outerValue, outerValueType);
+            this.Inner = ValueWrapper.Make(innerValue, innerValueType);
         }
 
         public GeographyContains(
             object outerValue, ValueObjectType outerValueType,
             string innerColumnName)
         {
-            this.Outer = ValueWrapper.From(outerValue, outerValueType);
-            this.Inner = ValueWrapper.From(innerColumnName, ValueObjectType.ColumnName);
+            this.Outer = ValueWrapper.Make(outerValue, outerValueType);
+            this.Inner = ValueWrapper.Column(innerColumnName);
         }
 
         public GeographyContains(
             object outerValue, ValueObjectType outerValueType,
             string innerTableName, string innerColumnName)
         {
-            this.Outer = ValueWrapper.From(outerValue, outerValueType);
-            this.Inner = ValueWrapper.From(innerTableName, innerColumnName);
+            this.Outer = ValueWrapper.Make(outerValue, outerValueType);
+            this.Inner = ValueWrapper.Column(innerTableName, innerColumnName);
         }
 
         public GeographyContains(
             Geometry outerValue,
             string innerColumnName)
         {
-            this.Outer = ValueWrapper.From(outerValue, ValueObjectType.Value);
-            this.Inner = ValueWrapper.From(innerColumnName, ValueObjectType.ColumnName);
+            this.Outer = ValueWrapper.From(outerValue);
+            this.Inner = ValueWrapper.Column(innerColumnName);
         }
 
         public GeographyContains(
             Geometry outerValue,
             string innerTableName, string innerColumnName)
         {
-            this.Outer = ValueWrapper.From(outerValue, ValueObjectType.Value);
-            this.Inner = ValueWrapper.From(innerTableName, innerColumnName);
+            this.Outer = ValueWrapper.From(outerValue);
+            this.Inner = ValueWrapper.Column(innerTableName, innerColumnName);
         }
 
         public GeographyContains(Geometry outerValue, Geometry innerValue)
         {
-            this.Outer = ValueWrapper.From(outerValue, ValueObjectType.Value);
-            this.Inner = ValueWrapper.From(innerValue, ValueObjectType.Value);
+            this.Outer = ValueWrapper.From(outerValue);
+            this.Inner = ValueWrapper.From(innerValue);
         }
 
         public GeographyContains(
             string outerColumnName,
             Geometry innerObject)
         {
-            this.Outer = ValueWrapper.From(outerColumnName, ValueObjectType.ColumnName);
-            this.Inner = ValueWrapper.From(innerObject, ValueObjectType.Value);
+            this.Outer = ValueWrapper.Column(outerColumnName);
+            this.Inner = ValueWrapper.From(innerObject);
         }
 
         public GeographyContains(
             string outerTableName, string outerColumnName,
             Geometry innerObject)
         {
-            this.Outer = ValueWrapper.From(outerTableName, outerColumnName);
-            this.Inner = ValueWrapper.From(innerObject, ValueObjectType.Value);
+            this.Outer = ValueWrapper.Column(outerTableName, outerColumnName);
+            this.Inner = ValueWrapper.From(innerObject);
         }
 
         #endregion

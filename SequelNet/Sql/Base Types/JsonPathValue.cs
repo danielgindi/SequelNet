@@ -17,25 +17,25 @@ namespace SequelNet
         public JsonPathValue(string path, string tableName, string columnName)
         {
             this.Path = path;
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
         public JsonPathValue(string path, string column)
         {
             this.Path = path;
-            this.Value = new ValueWrapper(column);
+            this.Value = ValueWrapper.Column(column);
         }
 
         public JsonPathValue(string path, object value, ValueObjectType type)
         {
             this.Path = path;
-            this.Value = new ValueWrapper(value, type);
+            this.Value = ValueWrapper.Make(value, type);
         }
 
         public JsonPathValue(string path, IPhrase value)
         {
             this.Path = path;
-            this.Value = new ValueWrapper(value);
+            this.Value = ValueWrapper.From(value);
         }
 
         public JsonPathValue(string path, ValueWrapper value)

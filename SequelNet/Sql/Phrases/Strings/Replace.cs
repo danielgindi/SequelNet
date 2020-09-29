@@ -15,9 +15,9 @@ namespace SequelNet.Phrases
             string searchTableName, string searchColumn,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
-            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
-            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = ValueWrapper.Column(searchTableName, searchColumn);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -25,9 +25,9 @@ namespace SequelNet.Phrases
             string searchTableName, string searchColumn,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = new ValueWrapper(source, sourceType);
-            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
-            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
+            this.SourceValue = ValueWrapper.Make(source, sourceType);
+            this.SearchValue = ValueWrapper.Column(searchTableName, searchColumn);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -35,9 +35,9 @@ namespace SequelNet.Phrases
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
-            this.SearchValue = new ValueWrapper(search, searchType);
-            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -45,9 +45,9 @@ namespace SequelNet.Phrases
             string searchTableName, string searchColumn,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
-            this.SearchValue = new ValueWrapper(searchTableName, searchColumn);
-            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = ValueWrapper.Column(searchTableName, searchColumn);
+            this.ReplaceWithValue = ValueWrapper.Make(replace, replaceWithType);
         }
 
         public Replace(
@@ -55,9 +55,9 @@ namespace SequelNet.Phrases
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
-            this.SourceValue = new ValueWrapper(source, sourceType);
-            this.SearchValue = new ValueWrapper(search, searchType);
-            this.ReplaceWithValue = new ValueWrapper(replaceWithTableName, replaceWithColumn);
+            this.SourceValue = ValueWrapper.Make(source, sourceType);
+            this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
         public Replace(
@@ -65,9 +65,9 @@ namespace SequelNet.Phrases
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceValue = new ValueWrapper(sourceTableName, sourceColumn);
-            this.SearchValue = new ValueWrapper(search, searchType);
-            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Make(replace, replaceWithType);
         }
 
         public Replace(
@@ -75,9 +75,9 @@ namespace SequelNet.Phrases
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
         {
-            this.SourceValue = new ValueWrapper(source, sourceType);
-            this.SearchValue = new ValueWrapper(search, searchType);
-            this.ReplaceWithValue = new ValueWrapper(replace, replaceWithType);
+            this.SourceValue = ValueWrapper.Make(source, sourceType);
+            this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Make(replace, replaceWithType);
         }
         
         #endregion

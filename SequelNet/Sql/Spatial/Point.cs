@@ -80,9 +80,9 @@ namespace SequelNet
                 }
             }
 
-            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POINT(", ValueObjectType.Value);
-            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")", ValueObjectType.Value);
-            private static ValueWrapper SPACE_STRING_VALUE = ValueWrapper.From(" ", ValueObjectType.Value);
+            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POINT(");
+            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")");
+            private static ValueWrapper SPACE_STRING_VALUE = ValueWrapper.From(" ");
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {

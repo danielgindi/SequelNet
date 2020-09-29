@@ -11,13 +11,13 @@ namespace SequelNet.Phrases
 
         public SHA1(object value, ValueObjectType valueType, bool binary = false)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.Binary = binary;
         }
 
         public SHA1(string tableName, string columnName, bool binary = false)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
             this.Binary = binary;
         }
 

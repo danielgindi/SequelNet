@@ -12,14 +12,14 @@ namespace SequelNet.Phrases
 
         public Substring(object value, ValueObjectType valueType, int from, int? length = null)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.From = ValueWrapper.From(from);
             this.Length = length != null ? ValueWrapper.From(length.Value) : (ValueWrapper?)null;
         }
 
         public Substring(object value, ValueObjectType valueType, ValueWrapper from, ValueWrapper? length = null)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.From = from;
             this.Length = length;
         }
@@ -33,7 +33,7 @@ namespace SequelNet.Phrases
 
         public Substring(string tableName, string columnName, int from, int? length = null)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
             this.From = ValueWrapper.From(from);
             this.Length = length != null ? ValueWrapper.From(length.Value) : (ValueWrapper?)null;
         }

@@ -14,44 +14,44 @@ namespace SequelNet.Phrases
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
-            this.Value1 = new ValueWrapper(value, valueType);
+            this.Value1 = ValueWrapper.Make(value, valueType);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
+            this.Value2 = ValueWrapper.From(interval);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, Int64 interval)
         {
-            this.Value1 = new ValueWrapper(tableName, columnName);
+            this.Value1 = ValueWrapper.Column(tableName, columnName);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(interval, ValueObjectType.Value);
+            this.Value2 = ValueWrapper.From(interval);
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, string addTableName, string addColumnName)
         {
-            this.Value1 = new ValueWrapper(value, valueType);
+            this.Value1 = ValueWrapper.Make(value, valueType);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(addTableName, addColumnName);
+            this.Value2 = ValueWrapper.Column(addTableName, addColumnName);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addTableName, string addColumnName)
         {
-            this.Value1 = new ValueWrapper(tableName, columnName);
+            this.Value1 = ValueWrapper.Column(tableName, columnName);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(addTableName, addColumnName);
+            this.Value2 = ValueWrapper.Column(addTableName, addColumnName);
         }
 
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, string addColumnName)
         {
-            this.Value1 = new ValueWrapper(value, valueType);
+            this.Value1 = ValueWrapper.Make(value, valueType);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(addColumnName);
+            this.Value2 = ValueWrapper.Column(addColumnName);
         }
 
         public DateTimeAdd(string tableName, string columnName, DateTimeUnit unit, string addColumnName)
         {
-            this.Value1 = new ValueWrapper(tableName, columnName);
+            this.Value1 = ValueWrapper.Column(tableName, columnName);
             this.Unit = unit;
-            this.Value2 = new ValueWrapper(addColumnName);
+            this.Value2 = ValueWrapper.Column(addColumnName);
         }
 
         public DateTimeAdd(string columnName, DateTimeUnit unit, Int64 interval)

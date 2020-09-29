@@ -10,12 +10,12 @@ namespace SequelNet.Phrases
 
         public Lower(object value, ValueObjectType valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
         }
 
         public Lower(string tableName, string columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
         public Lower(string columnName)

@@ -14,8 +14,8 @@ namespace SequelNet.Phrases
             object value2, ValueObjectType valueType2
             )
         {
-            this.Value1 = new ValueWrapper(value1, valueType1);
-            this.Value2 = new ValueWrapper(value2, valueType2);
+            this.Value1 = ValueWrapper.Make(value1, valueType1);
+            this.Value2 = ValueWrapper.Make(value2, valueType2);
         }
 
         public Least(
@@ -23,8 +23,8 @@ namespace SequelNet.Phrases
             string tableName2, string column2
             )
         {
-            this.Value1 = new ValueWrapper(tableName1, column1);
-            this.Value2 = new ValueWrapper(tableName2, column2);
+            this.Value1 = ValueWrapper.Column(tableName1, column1);
+            this.Value2 = ValueWrapper.Column(tableName2, column2);
         }
 
         public Least(
@@ -32,8 +32,8 @@ namespace SequelNet.Phrases
             object value2, ValueObjectType valueType2
             )
         {
-            this.Value1 = new ValueWrapper(tableName1, column1);
-            this.Value2 = new ValueWrapper(value2, valueType2);
+            this.Value1 = ValueWrapper.Column(tableName1, column1);
+            this.Value2 = ValueWrapper.Make(value2, valueType2);
         }
 
         public Least(
@@ -41,8 +41,8 @@ namespace SequelNet.Phrases
             object value2
             )
         {
-            this.Value1 = new ValueWrapper(tableName1, column1);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
+            this.Value1 = ValueWrapper.Column(tableName1, column1);
+            this.Value2 = ValueWrapper.Make(value2, ValueObjectType.Value);
         }
 
         public Least(
@@ -50,8 +50,8 @@ namespace SequelNet.Phrases
             string tableName2, string column2
             )
         {
-            this.Value1 = new ValueWrapper(value1, valueType1);
-            this.Value2 = new ValueWrapper(tableName2, column2);
+            this.Value1 = ValueWrapper.Make(value1, valueType1);
+            this.Value2 = ValueWrapper.Column(tableName2, column2);
         }
 
         public Least(
@@ -59,8 +59,8 @@ namespace SequelNet.Phrases
             string tableName2, string column2
             )
         {
-            this.Value1 = new ValueWrapper(value1, ValueObjectType.Value);
-            this.Value2 = new ValueWrapper(tableName2, column2);
+            this.Value1 = ValueWrapper.Make(value1, ValueObjectType.Value);
+            this.Value2 = ValueWrapper.Column(tableName2, column2);
         }
 
         public Least(
@@ -68,8 +68,8 @@ namespace SequelNet.Phrases
             object value2
             )
         {
-            this.Value1 = new ValueWrapper(value1, ValueObjectType.Value);
-            this.Value2 = new ValueWrapper(value2, ValueObjectType.Value);
+            this.Value1 = ValueWrapper.Make(value1, ValueObjectType.Value);
+            this.Value2 = ValueWrapper.Make(value2, ValueObjectType.Value);
         }
 
         #endregion

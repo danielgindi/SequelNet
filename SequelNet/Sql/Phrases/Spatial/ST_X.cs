@@ -10,12 +10,12 @@ namespace SequelNet.Phrases
         
         public ST_X(IPhrase phrase)
         {
-            this.Value = new ValueWrapper(phrase);
+            this.Value = ValueWrapper.From(phrase);
         }
 
         public ST_X(string tableName, string column)
         {
-            this.Value = new ValueWrapper(tableName, column);
+            this.Value = ValueWrapper.Column(tableName, column);
         }
 
         public ST_X(ValueWrapper value)

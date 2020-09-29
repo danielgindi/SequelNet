@@ -10,12 +10,12 @@ namespace SequelNet
 
         public BaseAggregatePhrase()
         {
-            this.Value = new ValueWrapper("*", ValueObjectType.Literal);
+            this.Value = ValueWrapper.Literal("*");
         }
 
         public BaseAggregatePhrase(string tableName, string columnName)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
         public BaseAggregatePhrase(string columnName)
@@ -25,7 +25,7 @@ namespace SequelNet
 
         public BaseAggregatePhrase(object value, ValueObjectType valueType)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
         }
 
         public BaseAggregatePhrase(IPhrase phrase)

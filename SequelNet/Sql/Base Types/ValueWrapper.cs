@@ -28,13 +28,6 @@ namespace SequelNet
             this.Type = ValueObjectType.ColumnName;
         }
 
-        public ValueWrapper(string column)
-        {
-            this.TableName = null;
-            this.Value = column;
-            this.Type = ValueObjectType.ColumnName;
-        }
-
         public ValueWrapper(object value, ValueObjectType type)
         {
             this.TableName = null;
@@ -61,19 +54,13 @@ namespace SequelNet
         #region Convenience
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ValueWrapper From(string tableName, object value, ValueObjectType type)
+        public static ValueWrapper Make(string tableName, object value, ValueObjectType type)
         {
             return new ValueWrapper(tableName, value, type);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ValueWrapper From(string tableName, string column)
-        {
-            return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ValueWrapper From(object value, ValueObjectType type)
+        public static ValueWrapper Make(object value, ValueObjectType type)
         {
             return new ValueWrapper(value, type);
         }
@@ -81,13 +68,31 @@ namespace SequelNet
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(IPhrase phrase)
         {
-            return new ValueWrapper(phrase);
+            return new ValueWrapper(phrase, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(Query query)
+        {
+            return new ValueWrapper(query, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(ValueWrapper value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(Where where)
         {
-            return new ValueWrapper(where);
+            return new ValueWrapper(where, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(WhereList whereList)
+        {
+            return new ValueWrapper(whereList, ValueObjectType.Value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -160,6 +165,24 @@ namespace SequelNet
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(decimal value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(string value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(DateTime value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(Geometry value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }

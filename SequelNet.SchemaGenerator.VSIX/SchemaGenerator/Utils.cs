@@ -20,7 +20,7 @@ namespace SequelNet.SchemaGenerator
 
         private static string ProcessComputedColumn(string computed)
         {
-            return "new ValueWrapper(" + computed + ")";
+            return "ValueWrapper.From(" + computed + ")";
         }
 
         public static string StripColumnName(string columnName)

@@ -13,32 +13,32 @@ namespace SequelNet.Phrases
             string firstTableName, string firstColumnName,
             string secondTableName, string secondColumnName)
         {
-            this.Value1 = new ValueWrapper(firstTableName, firstColumnName);
-            this.Value2 = new ValueWrapper(secondTableName, secondColumnName);
+            this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
+            this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
         }
 
         public IfNull(
              object firstValue, ValueObjectType firstValueType,
              object secondValue, ValueObjectType secondValueType)
         {
-            this.Value1 = new ValueWrapper(firstValue, firstValueType);
-            this.Value2 = new ValueWrapper(secondValue, secondValueType);
+            this.Value1 = ValueWrapper.Make(firstValue, firstValueType);
+            this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
         }
 
         public IfNull(
              string firstTableName, string firstColumnName,
              object secondValue, ValueObjectType secondValueType)
         {
-            this.Value1 = new ValueWrapper(firstTableName, firstColumnName);
-            this.Value2 = new ValueWrapper(secondValue, secondValueType);
+            this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
+            this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
         }
 
         public IfNull(
              object firstValue, ValueObjectType firstValueType,
              string secondTableName, string secondColumnName)
         {
-            this.Value1 = new ValueWrapper(firstValue, firstValueType);
-            this.Value2 = new ValueWrapper(secondTableName, secondColumnName);
+            this.Value1 = ValueWrapper.Make(firstValue, firstValueType);
+            this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
         }
 
         #endregion

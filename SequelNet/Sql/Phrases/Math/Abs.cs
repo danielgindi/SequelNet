@@ -11,13 +11,13 @@ namespace SequelNet.Phrases
         
         public Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
         {
-            this.Value = new ValueWrapper(value, valueType);
+            this.Value = ValueWrapper.Make(value, valueType);
             this.DecimalPlaces = decimalPlaces;
         }
 
         public Abs(string tableName, string columnName, int decimalPlaces = 0)
         {
-            this.Value = new ValueWrapper(tableName, columnName);
+            this.Value = ValueWrapper.Column(tableName, columnName);
             this.DecimalPlaces = decimalPlaces;
         }
 
