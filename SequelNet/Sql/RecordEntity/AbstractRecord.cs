@@ -859,9 +859,21 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            using (DataReader reader = qry.ExecuteReader(connection))
+            return FetchByQuery(qry);
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by passing a cooked query.
+        /// </summary>
+        /// <param name="qry">A query to execute. You should probably .</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static T FetchByQuery(Query qry, ConnectorBase connection = null)
+        {
+            using (var reader = qry.ExecuteReader(connection))
             {
-                if (reader.Read()) return FromReader(reader);
+                if (reader.Read())
+                    return FromReader(reader);
             }
             return null;
         }
@@ -873,7 +885,7 @@ namespace SequelNet
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A record (marked as "old") or null.</returns>
-        public static async Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        public static Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             Query qry = new Query(Schema).LimitRows(1);
 
@@ -895,12 +907,7 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
-            {
-                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
-                    return FromReader(reader);
-            }
-            return null;
+            return FetchByQueryAsync(qry, connection, cancellationToken);
         }
 
         /// <summary>
@@ -912,6 +919,34 @@ namespace SequelNet
         public static Task<T> FetchByIdAsync(object primaryKeyValue, CancellationToken? cancellationToken)
         {
             return FetchByIdAsync(primaryKeyValue, null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by passing a cooked query.
+        /// </summary>
+        /// <param name="qry">A query to execute. You should probably .</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static async Task<T> FetchByQueryAsync(Query qry, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
+            {
+                if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+                    return FromReader(reader);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by passing a cooked query.
+        /// </summary>
+        /// <param name="qry">A query to execute. You should probably .</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static Task<T> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken = null)
+        {
+            return FetchByQueryAsync(qry, null, cancellationToken);
         }
 
         /// <summary>
@@ -981,7 +1016,6 @@ namespace SequelNet
                 if (reader.Read())
                 {
                     Read(reader);
-                    MarkOld();
                 }
             }
         }
@@ -1021,7 +1055,6 @@ namespace SequelNet
                 if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
                 {
                     Read(reader);
-                    MarkOld();
                 }
             }
         }
