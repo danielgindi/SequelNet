@@ -116,6 +116,22 @@ namespace SequelNet
             ThirdType = andType;
         }
 
+        public Where(string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            Comparison = WhereComparison.Between;
+            FirstTableName = aSchema;
+            First = aValue;
+            FirstType = aType;
+            SecondTableName = betweenSchema;
+            Second = betweenValue;
+            SecondType = betweenType;
+            ThirdTableName = andSchema;
+            Third = andValue;
+            ThirdType = andType;
+        }
+
         public Where(string tableName, string columnName,
             WhereComparison comparedBy, object value)
         {
@@ -201,6 +217,24 @@ namespace SequelNet
             FirstType = aType;
             Second = betweenValue;
             SecondType = betweenType;
+            Third = andValue;
+            ThirdType = andType;
+        }
+
+        public Where(WhereCondition condition,
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            Condition = condition;
+            Comparison = WhereComparison.Between;
+            FirstTableName = aSchema;
+            First = aValue;
+            FirstType = aType;
+            SecondTableName = betweenSchema;
+            Second = betweenValue;
+            SecondType = betweenType;
+            ThirdTableName = andSchema;
             Third = andValue;
             ThirdType = andType;
         }
@@ -623,6 +657,16 @@ namespace SequelNet
             return wl.AND(aValue, aType, betweenValue, betweenType, andValue, andType);
         }
 
+        public WhereList AND(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(aSchema, aValue, aType, betweenSchema, betweenValue, betweenType, andSchema, andValue, andType);
+        }
+
         public WhereList OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             var wl = new WhereList();
@@ -701,6 +745,16 @@ namespace SequelNet
             var wl = new WhereList();
             wl.Add(this);
             return wl.OR(aValue, aType, betweenValue, betweenType, andValue, andType);
+        }
+
+        public WhereList OR(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(aSchema, aValue, aType, betweenSchema, betweenValue, betweenType, andSchema, andValue, andType);
         }
 
         #endregion

@@ -83,6 +83,14 @@
             return Where(new Where(WhereCondition.AND, aValue, aType, betweenValue, betweenType, andValue, andType));
         }
 
+        public Query Where(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            return Where(new Where(WhereCondition.AND, aSchema, aValue, aType, betweenSchema, betweenValue, betweenType, andSchema, andValue, andType));
+        }
+
         public Query AND(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Where(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -146,6 +154,14 @@
             return Where(new Where(WhereCondition.AND, aValue, aType, betweenValue, betweenType, andValue, andType));
         }
 
+        public Query AND(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            return Where(new Where(WhereCondition.AND, aSchema, aValue, aType, betweenSchema, betweenValue, betweenType, andSchema, andValue, andType));
+        }
+
         public Query OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             return Where(new Where(WhereCondition.OR, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -207,6 +223,14 @@
             object andValue, ValueObjectType andType)
         {
             return Where(new Where(WhereCondition.OR, aValue, aType, betweenValue, betweenType, andValue, andType));
+        }
+
+        public Query OR(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            return Where(new Where(WhereCondition.OR, aSchema, aValue, aType, betweenSchema, betweenValue, betweenType, andSchema, andValue, andType));
         }
 
         public Query AddFromList(WhereList whereList)

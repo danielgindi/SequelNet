@@ -99,6 +99,18 @@ namespace SequelNet
             return this;
         }
 
+        public WhereList Where(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            this.Add(new Where(WhereCondition.AND,
+                aSchema, aValue, aType,
+                betweenSchema, betweenValue, betweenType,
+                andSchema, andValue, andType));
+            return this;
+        }
+
         public WhereList AND(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             this.Add(new Where(WhereCondition.AND, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -170,6 +182,18 @@ namespace SequelNet
             return this;
         }
 
+        public WhereList AND(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            this.Add(new Where(WhereCondition.AND,
+                aSchema, aValue, aType,
+                betweenSchema, betweenValue, betweenType,
+                andSchema, andValue, andType));
+            return this;
+        }
+
         public WhereList OR(object thisObject, ValueObjectType thisObjectType, WhereComparison comparison, object thatObject, ValueObjectType thatObjectType)
         {
             this.Add(new Where(WhereCondition.OR, thisObject, thisObjectType, comparison, thatObject, thatObjectType));
@@ -238,6 +262,18 @@ namespace SequelNet
             object andValue, ValueObjectType andType)
         {
             this.Add(new Where(WhereCondition.OR, aValue, aType, betweenValue, betweenType, andValue, andType));
+            return this;
+        }
+
+        public WhereList OR(
+            string aSchema, object aValue, ValueObjectType aType,
+            string betweenSchema, object betweenValue, ValueObjectType betweenType,
+            string andSchema, object andValue, ValueObjectType andType)
+        {
+            this.Add(new Where(WhereCondition.OR, 
+                aSchema, aValue, aType, 
+                betweenSchema, betweenValue, betweenType,
+                andSchema, andValue, andType));
             return this;
         }
 
