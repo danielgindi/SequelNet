@@ -395,6 +395,9 @@ namespace SequelNet
                             case WhereComparison.Like:
                                 outputBuilder.Append(@" LIKE ");
                                 break;
+                            case WhereComparison.NotLike:
+                                outputBuilder.Append(@" NOT LIKE ");
+                                break;
                             case WhereComparison.Between:
                                 outputBuilder.Append(@" BETWEEN ");
                                 break;
@@ -418,7 +421,7 @@ namespace SequelNet
                                 FirstTableName, First, FirstType,
                                 context);
                         }
-                        else if (Comparison == WhereComparison.Like)
+                        else if (Comparison == WhereComparison.Like || Comparison == WhereComparison.NotLike)
                         {
                             outputBuilder.Append(' ');
                             outputBuilder.Append(context.Conn.Language.LikeEscapingStatement);

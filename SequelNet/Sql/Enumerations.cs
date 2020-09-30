@@ -63,6 +63,7 @@
         NotIn = 12,
         NullSafeEqualsTo = 13,
         NullSafeNotEqualsTo = 14,
+        NotLike = 15,
     }
 
     public enum JoinType
