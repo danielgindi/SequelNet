@@ -96,6 +96,12 @@ namespace SequelNet
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper From(bool value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ValueWrapper From(byte value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
