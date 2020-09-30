@@ -211,6 +211,12 @@ namespace SequelNet
             return new ValueWrapper(null, literal, ValueObjectType.Literal);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static ValueWrapper Null()
+        {
+            return new ValueWrapper(null, ValueObjectType.Value);
+        }
+
         #endregion
 
         #region Builders
