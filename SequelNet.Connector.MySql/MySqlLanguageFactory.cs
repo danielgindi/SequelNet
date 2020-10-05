@@ -107,7 +107,7 @@ namespace SequelNet.Connector
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => false;
 
-        public override bool GroupBySupportsOrdering => true;
+        public override bool GroupBySupportsOrdering => _MySqlMode.Version.CompareTo("8.0.13") < 0;
 
         public override bool DeleteSupportsIgnore => true;
         public override bool InsertSupportsIgnore => true;
