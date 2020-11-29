@@ -944,7 +944,7 @@ namespace SequelNet
         /// <param name="qry">A query to execute. You should probably .</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A record (marked as "old") or null.</returns>
-        public static Task<T> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken = null)
+        public static Task<T> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
         {
             return FetchByQueryAsync(qry, null, cancellationToken);
         }
