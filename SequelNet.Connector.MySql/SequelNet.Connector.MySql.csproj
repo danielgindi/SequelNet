@@ -68,7 +68,7 @@
     <None Include="strongName.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.21" />
+    <PackageReference Include="MySql.Data" Version="8.0.22" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SequelNet\SequelNet.csproj" />

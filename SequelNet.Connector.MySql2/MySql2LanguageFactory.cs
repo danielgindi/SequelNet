@@ -1,7 +1,7 @@
-﻿using SequelNet.Sql.Spatial;
-using System;
+﻿using System;
 using System.Text;
 using System.Linq;
+using SequelNet.Sql.Spatial;
 
 namespace SequelNet.Connector
 {
@@ -52,7 +52,7 @@ namespace SequelNet.Connector
 
         public override Func<Query, ConnectorBase, Exception, int> OnExecuteNonQueryException => (qry, conn, ex) =>
         {
-            if (ex is MySql.Data.MySqlClient.MySqlException myex &&
+            if (ex is MySqlConnector.MySqlException myex &&
                 myex.Number == 1054 &&
                 qry.QueryMode == QueryMode.AlterTable &&
                 qry.AlterTableSteps.Any(x =>
@@ -79,7 +79,7 @@ namespace SequelNet.Connector
 
         public override Func<Query, ConnectorBase, Exception, System.Threading.Tasks.Task<int>> OnExecuteNonQueryExceptionAsync => (qry, conn, ex) =>
         {
-            if (ex is MySql.Data.MySqlClient.MySqlException myex &&
+            if (ex is MySqlConnector.MySqlException myex &&
                 myex.Number == 1054 &&
                 qry.QueryMode == QueryMode.AlterTable &&
                 qry.AlterTableSteps.Any(x =>

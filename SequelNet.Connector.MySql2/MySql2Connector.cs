@@ -1,9 +1,9 @@
 ﻿using System;
-using MySql.Data.MySqlClient;
 using System.Globalization;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using System.Threading;
+using MySqlConnector;
 
 [assembly: CLSCompliant(true)]
 
