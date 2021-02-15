@@ -20,10 +20,10 @@ namespace SequelNet
             {
                 var language = connection.Language;
 
-                bool bFirst = true;
+                bool first = true;
                 foreach (SelectColumn sel in _ListSelect)
                 {
-                    if (bFirst) bFirst = false;
+                    if (first) first = false;
                     else sb.Append(',');
 
                     if (sel.ObjectType == ValueObjectType.Value)
@@ -216,10 +216,10 @@ namespace SequelNet
             if (_ListGroupBy != null && _ListGroupBy.Count > 0)
             {
                 sb.Append(@" GROUP BY ");
-                bool bFirst = true;
+                bool first = true;
                 foreach (GroupBy groupBy in _ListGroupBy)
                 {
-                    if (bFirst) bFirst = false;
+                    if (first) first = false;
                     else sb.Append(',');
 
                     if (groupBy.ColumnName is IPhrase)
@@ -347,7 +347,7 @@ namespace SequelNet
             {
                 var language = connection.Language;
 
-                bool bFirst;
+                bool first;
 
                 if (this.QueryMode != QueryMode.None)
                 {
@@ -414,75 +414,63 @@ namespace SequelNet
                             break;
                         case QueryMode.Insert:
                             {
-                                sb.Append("INSERT ");
-
-                                if (IgnoreErrors && language.InsertSupportsIgnore)
+                                if (OnConflictDoUpdate != null && language.InsertSupportsMerge && !language.InsertSupportsOnConflictDoUpdate)
                                 {
-                                    sb.Append("IGNORE ");
-                                }
-
-                                sb.Append("INTO ");
-
-                                language.BuildTableName(this, connection, sb, false);
-
-                                sb.Append(@" (");
-                                bFirst = true;
-                                foreach (AssignmentColumn ins in _ListInsertUpdate)
-                                {
-                                    if (bFirst) bFirst = false;
-                                    else sb.Append(',');
-                                    sb.Append(language.WrapFieldName(ins.ColumnName));
-                                }
-                                if (InsertExpression != null)
-                                {
-                                    sb.Append(@") ");
-                                    sb.Append(InsertExpression);
+                                    // MERGE INTO ... USING ... ON ... WHEN NOT MATCHED UPDATE ... WHEN MATCHED INSERT ...
+                                    language.BuildOnConflictSetMerge(sb, connection, OnConflictDoUpdate, _ListInsertUpdate, this);
                                 }
                                 else
                                 {
-                                    sb.Append(@") VALUES (");
-                                    bFirst = true;
+                                    // INSERT [IGNORE] INTO (...) VALUES (...) [ON CONFLICT (...) DO NOTHING] [ON CONFLICT (...) DO UPDATE SET ...]
+
+                                    sb.Append("INSERT ");
+
+                                    if (OnConflictDoNothing != null && language.InsertSupportsIgnore && !language.InsertSupportsOnConflictDoNothing)
+                                    {
+                                        sb.Append("IGNORE ");
+                                    }
+
+                                    sb.Append("INTO ");
+
+                                    language.BuildTableName(this, connection, sb, false);
+
+                                    sb.Append(@" (");
+                                    first = true;
                                     foreach (AssignmentColumn ins in _ListInsertUpdate)
                                     {
-                                        if (bFirst) bFirst = false;
+                                        if (first) first = false;
                                         else sb.Append(',');
-                                        if (ins.SecondType == ValueObjectType.Literal)
-                                        {
-                                            sb.Append(ins.Second);
-                                        }
-                                        else if (ins.SecondType == ValueObjectType.Value)
-                                        {
-                                            if (ins.Second is Query)
-                                            {
-                                                sb.Append('(');
-                                                sb.Append(((Query)ins.Second).BuildCommand(connection));
-                                                sb.Append(')');
-                                            }
-                                            else
-                                            {
-                                                Query.PrepareColumnValue(Schema.Columns.Find(ins.ColumnName), ins.Second, sb, connection, this);
-                                            }
-                                        }
-                                        else if (ins.SecondType == ValueObjectType.ColumnName)
-                                        {
-                                            if (ins.SecondTableName != null)
-                                            {
-                                                sb.Append(language.WrapFieldName(ins.SecondTableName));
-                                                sb.Append(@".");
-                                            }
-                                            sb.Append(language.WrapFieldName(ins.Second.ToString()));
-                                        }
+                                        sb.Append(language.WrapFieldName(ins.ColumnName));
                                     }
-                                    sb.Append(@")");
-
-                                    if (_ListWhere != null && _ListWhere.Count > 0)
+                                    if (InsertExpression != null)
                                     {
-                                        sb.Append(@" WHERE ");
-                                        _ListWhere.BuildCommand(sb, new Where.BuildContext
+                                        sb.Append(@") ");
+                                        sb.Append(InsertExpression);
+                                    }
+                                    else
+                                    {
+                                        sb.Append(") VALUES (");
+                                        first = true;
+                                        foreach (AssignmentColumn ins in _ListInsertUpdate)
                                         {
-                                            Conn = connection,
-                                            RelatedQuery = this,
-                                        });
+                                            if (first) first = false;
+                                            else sb.Append(',');
+
+                                            ins.BuildSecond(sb, connection, this);
+                                        }
+                                        sb.Append(")");
+                                    }
+
+                                    if (OnConflictDoNothing != null && !language.InsertSupportsIgnore && language.InsertSupportsOnConflictDoNothing)
+                                    {
+                                        sb.Append(" ");
+                                        language.BuildOnConflictDoNothing(sb, connection, OnConflictDoNothing, this);
+                                    }
+
+                                    if (OnConflictDoUpdate != null && language.InsertSupportsOnConflictDoUpdate)
+                                    {
+                                        sb.Append(" ");
+                                        language.BuildOnConflictDoUpdate(sb, connection, OnConflictDoUpdate, this);
                                     }
                                 }
                             }
@@ -509,13 +497,13 @@ namespace SequelNet
                                     BuildJoin(sb, connection);
                                 }
 
-                                bFirst = true;
+                                first = true;
                                 foreach (AssignmentColumn upd in _ListInsertUpdate)
                                 {
-                                    if (bFirst)
+                                    if (first)
                                     {
                                         sb.Append(@" SET ");
-                                        bFirst = false;
+                                        first = false;
                                     }
                                     else sb.Append(',');
 
@@ -675,10 +663,10 @@ namespace SequelNet
                                     language.BuildTableName(this, connection, sb, false);
 
                                     sb.Append(@" (");
-                                    bFirst = true;
+                                    first = true;
                                     foreach (AssignmentColumn ins in _ListInsertUpdate)
                                     {
-                                        if (bFirst) bFirst = false;
+                                        if (first) first = false;
                                         else sb.Append(',');
                                         sb.Append(language.WrapFieldName(ins.ColumnName));
                                     }
@@ -690,10 +678,10 @@ namespace SequelNet
                                     else
                                     {
                                         sb.Append(@") VALUES (");
-                                        bFirst = true;
+                                        first = true;
                                         foreach (AssignmentColumn ins in _ListInsertUpdate)
                                         {
-                                            if (bFirst) bFirst = false;
+                                            if (first) first = false;
                                             else sb.Append(',');
                                             if (ins.SecondType == ValueObjectType.Literal)
                                             {

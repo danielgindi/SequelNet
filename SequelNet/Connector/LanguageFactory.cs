@@ -20,6 +20,9 @@ namespace SequelNet.Connector
 
         public virtual bool DeleteSupportsIgnore => false;
         public virtual bool InsertSupportsIgnore => false;
+        public virtual bool InsertSupportsOnConflictDoNothing => false;
+        public virtual bool InsertSupportsOnConflictDoUpdate => false;
+        public virtual bool InsertSupportsMerge => false;
 
         public virtual bool SupportsColumnComment => false;
         public virtual ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.InType;
@@ -145,6 +148,23 @@ namespace SequelNet.Connector
         public virtual string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
             throw new NotImplementedException("ST_GeogFromText has not been implemented for this connector");
+        }
+
+        public virtual void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict,
+            AssignmentColumnList inserts,
+            Query relatedQuery = null)
+        {
+            throw new NotImplementedException("BuildOnConflictSetMerge has not been implemented for this connector");
+        }
+
+        public virtual void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        {
+            throw new NotImplementedException("BuildOnConflictSet has not been implemented for this connector");
+        }
+
+        public virtual void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        {
+            throw new NotImplementedException("BuildOnConflictIgnore has not been implemented for this connector");
         }
 
         public virtual void BuildNullSafeEqualsTo(

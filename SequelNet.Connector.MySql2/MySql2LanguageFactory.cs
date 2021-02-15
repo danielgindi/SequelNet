@@ -2,6 +2,7 @@
 using System.Text;
 using System.Linq;
 using SequelNet.Sql.Spatial;
+using System.Collections.Generic;
 
 namespace SequelNet.Connector
 {
@@ -111,6 +112,7 @@ namespace SequelNet.Connector
 
         public override bool DeleteSupportsIgnore => true;
         public override bool InsertSupportsIgnore => true;
+        public override bool InsertSupportsOnConflictDoUpdate => true;
 
         public override bool SupportsColumnComment => true;
         public override ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.AfterNullability;
@@ -203,6 +205,30 @@ namespace SequelNet.Connector
         public override string ST_GeogFromText(string text, string srid = null, bool literalText = false)
         {
             return ST_GeomFromText(text, srid, literalText);
+        }
+
+        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        {
+            outputBuilder.Append(" ON DUPLICATE KEY UPDATE ");
+
+            bool first = true;
+            foreach (var set in conflict.Sets)
+            {
+                if (first) first = false;
+                else outputBuilder.Append(",");
+
+                outputBuilder.Append(conn.Language.WrapFieldName(set.ColumnName));
+                outputBuilder.Append("=");
+
+                if (set.Second is ConflictColumn cc)
+                {
+                    outputBuilder.Append("VALUES(" + WrapFieldName(cc.Column) + ")");
+                }
+                else
+                {
+                    set.BuildSecond(outputBuilder, conn, relatedQuery);
+                }
+            }
         }
 
         public override void BuildNullSafeEqualsTo(

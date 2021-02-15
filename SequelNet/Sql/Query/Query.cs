@@ -209,13 +209,35 @@ namespace SequelNet
         }
 
         /// <summary>
-        /// Ignore constraint errors (INSERT IGNORE etc.).
-        /// Caution: Not supported by most RDBMS.
+        /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
+        /// Caution: Supported only by some RDBMS.
         /// </summary>
         /// <param name="ignoreErrors">Should ignore?</param>
         public Query SetIgnoreErrors(bool ignoreErrors)
         {
             IgnoreErrors = ignoreErrors;
+            return this;
+        }
+
+        /// <summary>
+        /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
+        /// Caution: Supported only by some RDBMS.
+        /// </summary>
+        /// <param name="onConflictDoNothing">On conflict rule</param>
+        public Query SetOnConflictDoNothing(OnConflict onConflictDoNothing)
+        {
+            OnConflictDoNothing = onConflictDoNothing;
+            return this;
+        }
+
+        /// <summary>
+        /// Perform an update constraint errors (ON DUPLICATE KEY UPDATE / ON CONFLICT DO UPDATE etc.)
+        /// Caution: Supported only by some RDBMS.
+        /// </summary>
+        /// <param name="onConflictDoNothing">On conflict rule</param>
+        public Query SetOnConflictDoUpdate(OnConflict onConflictDoUpdate)
+        {
+            OnConflictDoUpdate = onConflictDoUpdate;
             return this;
         }
 
@@ -592,11 +614,55 @@ namespace SequelNet
         /// </summary>
         public int? CommandTimeout { get; set; } = null;
 
+        private OnConflict _OnConflictDoNothing = null;
+        private OnConflict _OnConflictDoUpdate = null;
+
         /// <summary>
-        /// Ignore constraint errors (INSERT IGNORE etc.)
-        /// Caution: Not supported by most RDBMS.
+        /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
+        /// Caution: Supported only by some RDBMS.
         /// </summary>
-        public bool IgnoreErrors { get; set; } = false;
+        public bool IgnoreErrors
+        {
+            get { return _OnConflictDoNothing != null; }
+            set
+            {
+                if (value == false)
+                {
+                    _OnConflictDoNothing = null;
+                }
+                else
+                {
+                    if (_OnConflictDoNothing == null)
+                        _OnConflictDoNothing = new OnConflict();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
+        /// Caution: Supported only by some RDBMS.
+        /// </summary>
+        public OnConflict OnConflictDoNothing
+        {
+            get { return _OnConflictDoNothing; }
+            set
+            {
+                _OnConflictDoNothing = value;
+            }
+        }
+
+        /// <summary>
+        /// Perform an update constraint errors (ON DUPLICATE KEY UPDATE / ON CONFLICT DO UPDATE etc.)
+        /// Caution: Supported only by some RDBMS.
+        /// </summary>
+        public OnConflict OnConflictDoUpdate
+        {
+            get { return _OnConflictDoUpdate; }
+            set
+            {
+                _OnConflictDoUpdate = value;
+            }
+        }
 
         /// <summary>
         /// List of alter table steps in a big ALTER TABLE statement.

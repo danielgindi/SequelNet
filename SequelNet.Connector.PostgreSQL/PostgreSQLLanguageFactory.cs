@@ -1,5 +1,6 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace SequelNet.Connector
@@ -21,6 +22,9 @@ namespace SequelNet.Connector
 
         public override bool UpdateFromInsteadOfJoin => true;
         public override bool UpdateJoinRequiresFromLeftTable => false;
+
+        public override bool InsertSupportsOnConflictDoNothing => true;
+        public override bool InsertSupportsOnConflictDoUpdate => true;
 
         public override bool HasSeparateRenameColumn => true;
         public override Func<TableSchema.Index, bool> HasSeparateCreateIndex => (index) => index.Mode != TableSchema.IndexMode.PrimaryKey;
@@ -121,6 +125,81 @@ namespace SequelNet.Connector
                 text = PrepareValue(text);
 
             return "ST_GeogFromText(" + text + ")";
+        }
+
+        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        {
+            outputBuilder.Append(" ON CONFLICT ");
+
+            if (conflict.OnColumn != null)
+            {
+                outputBuilder.Append($" ({conn.Language.WrapFieldName(conflict.OnColumn)}) ");
+            }
+            else if (conflict.OnConstraint != null)
+            {
+                outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(conflict.OnConstraint)}) ");
+            }
+            else
+            {
+                var idx = relatedQuery.Schema.Indexes.Find(x => x.Mode == TableSchema.IndexMode.PrimaryKey);
+                if (idx != null)
+                {
+                    outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(idx.Name)}) ");
+                }
+                else
+                {
+                    outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(relatedQuery.SchemaName + "_pkey")}) ");
+                }
+            }
+
+            outputBuilder.Append(") DO UPDATE SET ");
+
+            bool first = true;
+            foreach (var set in conflict.Sets)
+            {
+                if (first) first = false;
+                else outputBuilder.Append(",");
+
+                outputBuilder.Append(conn.Language.WrapFieldName(set.ColumnName));
+                outputBuilder.Append("=");
+
+                if (set.Second is ConflictColumn cc)
+                {
+                    outputBuilder.Append("EXCLUDED." + WrapFieldName(cc.Column));
+                }
+                else
+                {
+                    set.BuildSecond(outputBuilder, conn, relatedQuery);
+                }
+            }
+        }
+
+        public override void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        {
+            outputBuilder.Append(" ON CONFLICT ");
+
+            if (conflict.OnColumn != null)
+            {
+                outputBuilder.Append($" ({conn.Language.WrapFieldName(conflict.OnColumn)}) ");
+            }
+            else if (conflict.OnConstraint != null)
+            {
+                outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(conflict.OnConstraint)}) ");
+            }
+            else
+            {
+                var idx = relatedQuery.Schema.Indexes.Find(x => x.Mode == TableSchema.IndexMode.PrimaryKey);
+                if (idx != null)
+                {
+                    outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(idx.Name)}) ");
+                }
+                else
+                {
+                    outputBuilder.Append($" ON CONSTRAINT ({conn.Language.WrapFieldName(relatedQuery.SchemaName + "_pkey")}) ");
+                }
+            }
+
+            outputBuilder.Append(") DO NOTHING");
         }
 
         public override void BuildNullSafeEqualsTo(

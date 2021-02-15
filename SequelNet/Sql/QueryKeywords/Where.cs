@@ -765,7 +765,7 @@ namespace SequelNet
         public class BuildContext
         {
             public ConnectorBase Conn;
-            internal Query RelatedQuery;
+            public Query RelatedQuery;
             internal TableSchema RightTableSchema;
             internal string RightTableName;
         }

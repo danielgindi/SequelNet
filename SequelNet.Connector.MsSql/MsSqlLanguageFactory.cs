@@ -1,5 +1,7 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SequelNet.Connector
@@ -21,6 +23,8 @@ namespace SequelNet.Connector
 
         public override bool UpdateFromInsteadOfJoin => false;
         public override bool UpdateJoinRequiresFromLeftTable => true;
+
+        public override bool InsertSupportsMerge => true;
 
         public override bool HasSeparateRenameColumn => true;
         public override Func<TableSchema.Index, bool> HasSeparateCreateIndex => (index) => index.Mode != TableSchema.IndexMode.PrimaryKey;
@@ -143,6 +147,108 @@ namespace SequelNet.Connector
                 text = PrepareValue(text);
 
             return "geography::STGeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
+        }
+
+        public override void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict, 
+            AssignmentColumnList inserts, 
+            Query relatedQuery = null)
+        {
+            var language = conn.Language;
+
+            sb.Append("MERGE INTO ");
+            sb.Append(language.WrapFieldName(relatedQuery.SchemaName));
+
+            if (relatedQuery.SchemaAlias != null)
+            {
+                sb.Append(" AS ");
+                sb.Append(language.WrapFieldName(relatedQuery.SchemaAlias));
+            }
+
+            sb.Append(" ON (");
+
+            var schema = relatedQuery.Schema;
+            bool first = false;
+            var cols = new HashSet<string>(schema.Indexes
+                .Where(x => x.Mode == TableSchema.IndexMode.PrimaryKey || x.Mode == TableSchema.IndexMode.Unique)
+                .SelectMany(x => x.ColumnNames)
+                .Concat(schema.Columns.Where(x => x.IsPrimaryKey).Select(x => x.Name))
+                );
+            foreach (var col in cols)
+            {
+                var assignemnt = inserts.FirstOrDefault(x => x.ColumnName == col);
+                if (assignemnt == null) continue;
+
+                if (first) first = false;
+                else sb.Append(" AND ");
+
+                if (relatedQuery.SchemaAlias != null)
+                {
+                    sb.Append(language.WrapFieldName(relatedQuery.SchemaAlias));
+                }
+                else
+                {
+                    sb.Append(language.WrapFieldName(relatedQuery.SchemaName));
+                }
+
+                sb.Append(".");
+                sb.Append(language.WrapFieldName(col));
+
+                if (assignemnt.Second == null)
+                    sb.Append(" IS ");
+                else sb.Append("=");
+                assignemnt.BuildSecond(sb, conn, relatedQuery);
+            }
+
+            sb.Append(") ");
+            sb.Append("WHEN MATCHED THEN UPDATE SET ");
+
+            first = true;
+            foreach (var set in conflict.Sets)
+            {
+                if (first) first = false;
+                else sb.Append(",");
+
+                sb.Append(language.WrapFieldName(set.ColumnName));
+                sb.Append("=");
+
+                if (set.Second is ConflictColumn cc)
+                {
+                    var assignemnt = inserts.FirstOrDefault(x => x.ColumnName == cc.Column);
+                    if (assignemnt != null)
+                    {
+                        assignemnt.BuildSecond(sb, conn, relatedQuery);
+                    }
+                    else
+                    {
+                        sb.Append(
+                            language.PrepareValue(conn, schema.Columns.Find(cc.Column).Default, relatedQuery));
+                    }
+                }
+                else
+                {
+                    set.BuildSecond(sb, conn, relatedQuery);
+                }
+            }
+
+            sb.Append(" WHEN NOT MATCHED THEN INSERT (");
+            first = true;
+            foreach (AssignmentColumn ins in inserts)
+            {
+                if (first) first = false;
+                else sb.Append(',');
+                sb.Append(language.WrapFieldName(ins.ColumnName));
+            }
+
+            sb.Append(") VALUES (");
+            first = true;
+            foreach (AssignmentColumn ins in inserts)
+            {
+                if (first) first = false;
+                else sb.Append(',');
+
+                ins.BuildSecond(sb, conn, relatedQuery);
+            }
+            sb.Append(")");
         }
 
         public override void BuildLimitOffset(
