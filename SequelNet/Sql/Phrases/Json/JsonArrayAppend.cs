@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -85,32 +86,28 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        ret += "JSON_ARRAY_APPEND(";
-                        ret += Document.Build(conn, relatedQuery);
+                        sb.Append("JSON_ARRAY_APPEND(");
+                        sb.Append(Document.Build(conn, relatedQuery));
                         for (int i = 0, len = Values.Count; i < len; i++)
                         {
-                            ret += ", ";
-                            ret += conn.Language.PrepareValue(Path);
-                            ret += ", ";
-                            ret += Values[i].Build(conn, relatedQuery);
+                            sb.Append(", ");
+                            sb.Append(conn.Language.PrepareValue(Path));
+                            sb.Append(", ");
+                            sb.Append(Values[i].Build(conn, relatedQuery));
                         }
-                        ret += ")";
+                        sb.Append(")");
                     }
                     break;
 
                 default:
                     throw new NotSupportedException("JsonArrayAppend is not supported by current DB type");
             }
-
-            return ret;
         }
     }
 }

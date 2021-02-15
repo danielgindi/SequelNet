@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -38,13 +39,11 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
-            ret += Value.Build(conn, relatedQuery);
-
-            return Binary ? conn.Language.Md5Binary(ret) : conn.Language.Md5Hex(ret);
+            sb.Append(Binary 
+                ? conn.Language.Md5Binary(Value.Build(conn, relatedQuery)) 
+                : conn.Language.Md5Hex(Value.Build(conn, relatedQuery)));
         }
     }
 }

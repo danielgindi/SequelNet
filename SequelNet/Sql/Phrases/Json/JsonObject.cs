@@ -76,13 +76,12 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        var sb = new StringBuilder();
                         sb.Append("JSON_OBJECT(");
 
                         bool first = true;
@@ -97,13 +96,11 @@ namespace SequelNet.Phrases
                         }
 
                         sb.Append(")");
-
-                        return sb.ToString();
                     }
+                    break;
 
                 case ConnectorBase.SqlServiceType.POSTGRESQL:
                     {
-                        var sb = new StringBuilder();
                         sb.Append("json_build_object(");
 
                         bool first = true;
@@ -118,9 +115,8 @@ namespace SequelNet.Phrases
                         }
 
                         sb.Append(")");
-
-                        return sb.ToString();
                     }
+                    break;
 
                 default:
                     throw new NotSupportedException("JsonExtract is not supported by current DB type");

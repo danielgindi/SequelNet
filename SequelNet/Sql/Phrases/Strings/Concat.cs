@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -23,11 +24,11 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             if (Values.Count == 0)
             {
-                return conn.Language.PrepareValue("");
+                sb.Append(conn.Language.PrepareValue(""));
             }
             else
             {
@@ -37,17 +38,13 @@ namespace SequelNet.Phrases
                 {
                     // PostgreSQL does not ignore NULL values in || operator, like CONCAT in other sql languages
 
-                    string ret = "";
-
                     foreach (var value in Values)
                     {
                         if (first) first = false;
-                        else ret += " || ";
+                        else sb.Append(" || ");
 
-                        ret += value.Build(conn, relatedQuery);
+                        sb.Append(value.Build(conn, relatedQuery));
                     }
-
-                    return ret;
                 }
                 else
                 {
@@ -55,28 +52,26 @@ namespace SequelNet.Phrases
 
                     bool coalesce = IgnoreNulls && conn.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL;
                     
-                    string ret = "CONCAT(";
+                    sb.Append("CONCAT(");
 
                     foreach (var value in Values)
                     {
                         if (first) first = false;
-                        else ret += ",";
+                        else sb.Append(",");
 
                         if (coalesce)
                         {
-                            ret += "COALESCE(";
-                            ret += value.Build(conn, relatedQuery);
-                            ret += ",'')";
+                            sb.Append("COALESCE(");
+                            sb.Append(value.Build(conn, relatedQuery));
+                            sb.Append(",'')");
                         }
                         else
                         {
-                            ret += value.Build(conn, relatedQuery);
+                            sb.Append(value.Build(conn, relatedQuery));
                         }
                     }
 
-                    ret += ")";
-
-                    return ret;
+                    sb.Append(")");
                 }
             }
         }

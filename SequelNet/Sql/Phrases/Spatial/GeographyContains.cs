@@ -86,11 +86,11 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            return conn.Language.ST_Distance_Sphere(
+            sb.Append(conn.Language.ST_Distance_Sphere(
                 Outer.Build(conn, relatedQuery),
-                Inner.Build(conn, relatedQuery));
+                Inner.Build(conn, relatedQuery)));
         }
     }
 }

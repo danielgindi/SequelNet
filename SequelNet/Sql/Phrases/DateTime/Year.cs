@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -35,13 +36,9 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
-            ret += Value.Build(conn, relatedQuery);
-
-            return conn.Language.YearPartOfDate(ret);
+            sb.Append(conn.Language.YearPartOfDate(Value.Build(conn, relatedQuery)));
         }
     }
 }

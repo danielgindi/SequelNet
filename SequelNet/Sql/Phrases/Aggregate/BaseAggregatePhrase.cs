@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet
@@ -45,7 +46,7 @@ namespace SequelNet
 
         #endregion
 
-        public virtual string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public virtual void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             throw new NotImplementedException();
         }

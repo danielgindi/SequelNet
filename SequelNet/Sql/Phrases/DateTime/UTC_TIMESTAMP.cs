@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -8,9 +9,9 @@ namespace SequelNet.Phrases
         {
         }
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            return conn.Language.UtcNow();
+            sb.Append(conn.Language.UtcNow());
         }
     }
 }

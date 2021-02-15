@@ -180,17 +180,17 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             string rawOrderBy = null;
             if (OrderBy != null && OrderBy.Count > 0)
             {
-                var sb = new StringBuilder();
-                OrderBy.BuildCommand(sb, conn, relatedQuery, false);
-                rawOrderBy = sb.ToString();
+                var sb2 = new StringBuilder();
+                OrderBy.BuildCommand(sb2, conn, relatedQuery, false);
+                rawOrderBy = sb2.ToString();
             }
 
-            return conn.Language.GroupConcat(Distinct, Value.Build(conn, relatedQuery), rawOrderBy, Separator);
+            sb.Append(conn.Language.GroupConcat(Distinct, Value.Build(conn, relatedQuery), rawOrderBy, Separator));
         }
     }
 }

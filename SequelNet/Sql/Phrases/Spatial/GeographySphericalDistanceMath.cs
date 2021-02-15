@@ -32,14 +32,13 @@ namespace SequelNet.Phrases
             this.ToLongitude = toLng;
         }
         
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             var fx = FromLatitude.Build(conn, relatedQuery);
             var fy = FromLongitude.Build(conn, relatedQuery);
             var tx = ToLatitude.Build(conn, relatedQuery);
             var ty = ToLongitude.Build(conn, relatedQuery);
             
-            var sb = new StringBuilder();
             sb.Append(@"12742.0 * ASIN(SQRT(POWER(SIN(((");
             sb.Append(fx);
             sb.Append(@")-(");
@@ -54,8 +53,6 @@ namespace SequelNet.Phrases
             sb.Append(ty);
             sb.Append(@") * PI()/360.0), 2)))");
             sb.Append(@" * 1000.0"); // Return in meters
-
-            return sb.ToString();
         }
     }
 }

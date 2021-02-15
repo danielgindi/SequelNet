@@ -13,9 +13,8 @@ namespace SequelNet.Phrases
             Queries = queries;
         }
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            StringBuilder sb = new StringBuilder();
             bool first = true;
             sb.Append("(");
             foreach (Query qry in Queries)
@@ -24,7 +23,6 @@ namespace SequelNet.Phrases
                 sb.Append(qry.BuildCommand(conn));
             }
             sb.Append(")");
-            return sb.ToString();
         }
     }
 }

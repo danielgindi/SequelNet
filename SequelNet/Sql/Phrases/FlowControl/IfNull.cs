@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -43,22 +44,19 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret;
             if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL || conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                ret = @"IFNULL(";
-            else ret = @"ISNULL(";
+                sb.Append("IFNULL(");
+            else sb.Append("ISNULL(");
 
-            ret += Value1.Build(conn, relatedQuery);
+            sb.Append(Value1.Build(conn, relatedQuery));
 
-            ret += ", ";
+            sb.Append(", ");
 
-            ret += Value2.Build(conn, relatedQuery);
+            sb.Append(Value2.Build(conn, relatedQuery));
 
-            ret += ")";
-
-            return ret;
+            sb.Append(")");
         }
     }
 }

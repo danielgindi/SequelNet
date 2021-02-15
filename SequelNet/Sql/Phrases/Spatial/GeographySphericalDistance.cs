@@ -86,22 +86,22 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             try
             {
-                return conn.Language.ST_Distance_Sphere(
+                sb.Append(conn.Language.ST_Distance_Sphere(
                     From.Build(conn, relatedQuery), 
-                    To.Build(conn, relatedQuery));
+                    To.Build(conn, relatedQuery)));
             }
             catch (NotImplementedException)
             {
-                return new GeographySphericalDistanceMath(
+                new GeographySphericalDistanceMath(
                     ValueWrapper.From(new ST_X(From)),
                     ValueWrapper.From(new ST_Y(From)),
                     ValueWrapper.From(new ST_X(To)),
                     ValueWrapper.From(new ST_Y(To))
-                ).BuildPhrase(conn, relatedQuery);
+                ).Build(sb, conn, relatedQuery);
             }
         }
     }

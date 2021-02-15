@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -123,20 +124,17 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
             bool first = true;
 
             foreach (var value in Values)
             {
                 if (first) first = false;
-                else ret += " + ";
+                else sb.Append(" + ");
 
-                ret += value.Build(conn, relatedQuery);
+                sb.Append(value.Build(conn, relatedQuery));
             }
-
-            return ret;
         }
     }
 }

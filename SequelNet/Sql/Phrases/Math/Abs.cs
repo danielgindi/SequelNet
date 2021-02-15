@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -38,22 +39,18 @@ namespace SequelNet.Phrases
         
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret;
+            sb.Append("ABS(");
 
-            ret = @"ABS(";
-
-            ret += Value.Build(conn, relatedQuery);
+            sb.Append(Value.Build(conn, relatedQuery));
 
             if (DecimalPlaces != 0)
             {
-                ret += ',';
-                ret += DecimalPlaces;
+                sb.Append(',');
+                sb.Append(DecimalPlaces);
             }
-            ret += ')';
-
-            return ret;
+            sb.Append(')');
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -58,10 +59,8 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
@@ -69,21 +68,24 @@ namespace SequelNet.Phrases
                         var phrase = $"JSON_EXTRACT({Value.Build(conn, relatedQuery)}, {conn.Language.PrepareValue(Path)})";
 
                         if (Unquote)
-                            ret += 
+                        {
+                            sb.Append(
                                 $"(CASE WHEN JSON_TYPE({phrase}) = 'NULL' THEN NULL" +
                                 $" WHEN JSON_TYPE({phrase}) = 'STRING' THEN JSON_UNQUOTE({phrase})" +
-                                $" ELSE {phrase} END)";
-                        else ret += phrase;
+                                $" ELSE {phrase} END)"
+                            );
+                        }
+                        else sb.Append(phrase);
                     }
                     break;
 
                 case ConnectorBase.SqlServiceType.MSSQL:
                     {
-                        ret += "JSON_VALUE(";
-                        ret += Value.Build(conn, relatedQuery);
-                        ret += ", ";
-                        ret += conn.Language.PrepareValue(Path);
-                        ret += ")";
+                        sb.Append("JSON_VALUE(");
+                        sb.Append(Value.Build(conn, relatedQuery));
+                        sb.Append(", ");
+                        sb.Append(conn.Language.PrepareValue(Path));
+                        sb.Append(")");
                     }
                     break;
 
@@ -96,21 +98,19 @@ namespace SequelNet.Phrases
                             parts.RemoveAt(0);
                         }
 
-                        ret += "json_extract_path_text(";
-                        ret += Value.Build(conn, relatedQuery);
+                        sb.Append("json_extract_path_text(");
+                        sb.Append(Value.Build(conn, relatedQuery));
                         foreach (var part in parts)
                         {
-                            ret += ", " + conn.Language.PrepareValue(part);
+                            sb.Append(", " + conn.Language.PrepareValue(part));
                         }
-                        ret += ")";
+                        sb.Append(")");
                     }
                     break;
 
                 default:
                     throw new NotSupportedException("JsonExtract is not supported by current DB type");
             }
-
-            return ret;
         }
     }
 }

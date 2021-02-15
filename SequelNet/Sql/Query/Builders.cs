@@ -149,7 +149,7 @@ namespace SequelNet
                         }
                         else if (join.RightTableSql is IPhrase)
                         {
-                            sb.Append(((IPhrase)join.RightTableSql).BuildPhrase(connection));
+                            ((IPhrase)join.RightTableSql).Build(sb, connection);
                         }
                         else
                         {
@@ -224,7 +224,7 @@ namespace SequelNet
 
                     if (groupBy.ColumnName is IPhrase)
                     {
-                        sb.Append(((IPhrase)groupBy.ColumnName).BuildPhrase(connection, this));
+                        ((IPhrase)groupBy.ColumnName).Build(sb, connection, this);
                     }
                     else if (groupBy.ColumnName is Where)
                     {
@@ -585,7 +585,7 @@ namespace SequelNet
                                                 }
                                                 else if (join.RightTableSql is IPhrase)
                                                 {
-                                                    sb.Append(((IPhrase)join.RightTableSql).BuildPhrase(connection));
+                                                    ((IPhrase)join.RightTableSql).Build(sb, connection);
                                                 }
                                                 else
                                                 {

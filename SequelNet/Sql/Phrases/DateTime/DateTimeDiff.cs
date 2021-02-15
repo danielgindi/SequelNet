@@ -112,10 +112,8 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            StringBuilder sb = new StringBuilder();
-
             if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
             {
                 sb.Append(@"TIMESTAMPDIFF(");
@@ -268,8 +266,6 @@ namespace SequelNet.Phrases
                 sb.Append(Value1.Build(conn, relatedQuery));
                 sb.Append(')');
             }
-
-            return sb.ToString();
         }
     }
 }

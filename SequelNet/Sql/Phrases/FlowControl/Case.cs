@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -140,29 +141,27 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "CASE";
+            sb.Append("CASE");
 
             if (Value != null)
             {
-                ret += " " + Value?.Build(conn, relatedQuery);
+                sb.Append(" " + Value?.Build(conn, relatedQuery));
             }
 
             foreach (var when in Conditions)
             {
-                ret += " WHEN " + (when.When == null ? "NULL" : when.When?.Build(conn, relatedQuery));
-                ret += " THEN " + (when.Then == null ? "NULL" : when.Then?.Build(conn, relatedQuery));
+                sb.Append(" WHEN " + (when.When == null ? "NULL" : when.When?.Build(conn, relatedQuery)));
+                sb.Append(" THEN " + (when.Then == null ? "NULL" : when.Then?.Build(conn, relatedQuery)));
             }
 
             if (ElseValue != null)
             {
-                ret += " ELSE " + ElseValue?.Build(conn, relatedQuery);
+                sb.Append(" ELSE " + ElseValue?.Build(conn, relatedQuery));
             }
 
-            ret += " END";
-
-            return ret;
+            sb.Append(" END");
         }
     }
 }

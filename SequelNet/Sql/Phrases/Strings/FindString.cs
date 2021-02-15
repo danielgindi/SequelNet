@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -32,9 +33,9 @@ namespace SequelNet.Phrases
         
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            return conn.Language.BuildFindString(conn, Needle, Haystack, StartAt, relatedQuery);
+            sb.Append(conn.Language.BuildFindString(conn, Needle, Haystack, StartAt, relatedQuery));
         }
     }
 }

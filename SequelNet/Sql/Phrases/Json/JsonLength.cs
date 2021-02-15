@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -39,33 +40,29 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        ret += "JSON_LENGTH(";
-                        ret += Value.Build(conn, relatedQuery);
-                        ret += ")";
+                        sb.Append("JSON_LENGTH(");
+                        sb.Append(Value.Build(conn, relatedQuery));
+                        sb.Append(")");
                     }
                     break;
 
                 case ConnectorBase.SqlServiceType.POSTGRESQL:
                     {
-                        ret += "json_array_length(";
-                        ret += Value.Build(conn, relatedQuery);
-                        ret += ")";
+                        sb.Append("json_array_length(");
+                        sb.Append(Value.Build(conn, relatedQuery));
+                        sb.Append(")");
                     }
                     break;
 
                 default:
                     throw new NotSupportedException("JsonLength is not supported by current DB type");
             }
-
-            return ret;
         }
     }
 }

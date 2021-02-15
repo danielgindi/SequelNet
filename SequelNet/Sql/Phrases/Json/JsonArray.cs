@@ -59,13 +59,12 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        var sb = new StringBuilder();
                         sb.Append("JSON_ARRAY(");
                         bool first = true;
                         foreach (var val in Values)
@@ -75,13 +74,11 @@ namespace SequelNet.Phrases
                             sb.Append(val.Build(conn, relatedQuery));
                         }
                         sb.Append(")");
-
-                        return sb.ToString();
                     }
+                    break;
 
                 case ConnectorBase.SqlServiceType.POSTGRESQL:
                     {
-                        var sb = new StringBuilder();
                         sb.Append("json_build_array(");
                         bool first = true;
                         foreach (var val in Values)
@@ -91,9 +88,8 @@ namespace SequelNet.Phrases
                             sb.Append(val.Build(conn, relatedQuery));
                         }
                         sb.Append(")");
-
-                        return sb.ToString();
                     }
+                    break;
 
                 default:
                     throw new NotSupportedException("JsonArray is not supported by current DB type");

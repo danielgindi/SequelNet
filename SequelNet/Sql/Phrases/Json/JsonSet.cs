@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using SequelNet.Connector;
 
 namespace SequelNet.Phrases
@@ -91,32 +92,28 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret = "";
-
             switch (conn.TYPE)
             {
                 case ConnectorBase.SqlServiceType.MYSQL:
                     {
-                        ret += "JSON_SET(";
-                        ret += Document.Build(conn, relatedQuery);
+                        sb.Append("JSON_SET(");
+                        sb.Append(Document.Build(conn, relatedQuery));
                         foreach (var pair in Values)
                         {
-                            ret += ", ";
-                            ret += conn.Language.PrepareValue(pair.Path);
-                            ret += ", ";
-                            ret += pair.Value.Build(conn, relatedQuery);
+                            sb.Append(", ");
+                            sb.Append(conn.Language.PrepareValue(pair.Path));
+                            sb.Append(", ");
+                            sb.Append(pair.Value.Build(conn, relatedQuery));
                         }
-                        ret += ")";
+                        sb.Append(")");
                     }
                     break;
 
                 default:
                     throw new NotSupportedException("JsonSet is not supported by current DB type");
             }
-
-            return ret;
         }
     }
 }

@@ -211,7 +211,7 @@ namespace SequelNet.Connector
 
                 if (qry.FromExpression is IPhrase)
                 {
-                    sb.Append(((IPhrase)qry.FromExpression).BuildPhrase(conn, qry));
+                    ((IPhrase)qry.FromExpression).Build(sb, conn, qry);
                 }
                 else sb.Append(qry.FromExpression);
 
@@ -519,7 +519,9 @@ namespace SequelNet.Connector
             }
             else if (value is IPhrase)
             {
-                return ((IPhrase)value).BuildPhrase(conn, relatedQuery);
+                var sb = new StringBuilder();
+                ((IPhrase)value).Build(sb, conn, relatedQuery);
+                return sb.ToString();
             }
             else if (value is ValueWrapper)
             {

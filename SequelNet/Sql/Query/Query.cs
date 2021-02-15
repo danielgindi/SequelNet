@@ -299,7 +299,7 @@ namespace SequelNet
             {
                 // Output the complete phrase
 
-                outputBuilder.Append(((IPhrase)value).BuildPhrase(connection, relatedQuery));
+                ((IPhrase)value).Build(outputBuilder, connection, relatedQuery);
 
                 return;
             }

@@ -253,34 +253,34 @@ namespace SequelNet
             return ret;
         }
 
-        public void Build(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             if (Type == ValueObjectType.ColumnName)
             {
                 if (TableName != null && TableName.Length > 0)
                 {
-                    outputBuilder.Append(conn.Language.WrapFieldName(TableName));
-                    outputBuilder.Append(".");
+                    sb.Append(conn.Language.WrapFieldName(TableName));
+                    sb.Append(".");
                 }
 
-                outputBuilder.Append(conn.Language.WrapFieldName(Value.ToString()));
+                sb.Append(conn.Language.WrapFieldName(Value.ToString()));
             }
             else if (Type == ValueObjectType.Value)
             {
                 if (Value is Where)
                 {
-                    outputBuilder.Append("(");
-                    ((Where)Value).BuildCommand(outputBuilder, true, new Where.BuildContext { Conn = conn, RelatedQuery = relatedQuery });
-                    outputBuilder.Append(")");
+                    sb.Append("(");
+                    ((Where)Value).BuildCommand(sb, true, new Where.BuildContext { Conn = conn, RelatedQuery = relatedQuery });
+                    sb.Append(")");
                 }
                 else
                 {
-                    outputBuilder.Append("(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")");
+                    sb.Append("(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")");
                 }
             }
             else
             {
-                outputBuilder.Append(Value.ToString());
+                sb.Append(Value.ToString());
             }
         }
 
@@ -360,6 +360,10 @@ namespace SequelNet
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
+
+        #endregion
+
+        #region IEquatable
 
         public override bool Equals(object obj)
         {

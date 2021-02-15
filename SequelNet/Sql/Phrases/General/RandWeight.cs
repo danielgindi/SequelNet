@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -35,19 +36,16 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret;
             if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-                ret = @"RAND(CAST(NEWID() AS VARBINARY)) * ";
+                sb.Append("RAND(CAST(NEWID() AS VARBINARY)) * ");
             else if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-                ret = @"RAND() * ";
+                sb.Append("RAND() * ");
             else // if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-                ret = @"RANDOM() * ";
+                sb.Append("RANDOM() * ");
 
-            ret += Value.Build(conn, relatedQuery);
-
-            return ret;
+            sb.Append(Value.Build(conn, relatedQuery));
         }
     }
 }

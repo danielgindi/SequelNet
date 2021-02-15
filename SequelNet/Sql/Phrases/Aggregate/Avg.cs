@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System.Text;
 
 namespace SequelNet.Phrases
 {
@@ -36,17 +37,11 @@ namespace SequelNet.Phrases
 
         #endregion
 
-        public override string BuildPhrase(ConnectorBase conn, Query relatedQuery = null)
+        public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            string ret;
-
-            ret = "AVG(";
-
-            ret += Value.Build(conn, relatedQuery);
-
-            ret += ")";
-
-            return ret;
+            sb.Append("AVG(");
+            sb.Append(Value.Build(conn, relatedQuery));
+            sb.Append(")");
         }
     }
 }
