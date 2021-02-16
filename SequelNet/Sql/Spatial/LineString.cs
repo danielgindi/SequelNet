@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
-using System.Globalization;
 
 namespace SequelNet
 {

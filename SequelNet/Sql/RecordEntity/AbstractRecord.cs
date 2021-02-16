@@ -6,7 +6,6 @@ using System.Collections;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
 
 namespace SequelNet
 {
@@ -241,13 +240,11 @@ namespace SequelNet
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MarkOld()
         {
             IsNewRecord = false;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void MarkNew()
         {
             IsNewRecord = true;

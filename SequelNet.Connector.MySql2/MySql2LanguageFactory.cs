@@ -2,7 +2,6 @@
 using System.Text;
 using System.Linq;
 using SequelNet.Sql.Spatial;
-using System.Collections.Generic;
 
 namespace SequelNet.Connector
 {

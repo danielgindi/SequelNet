@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using System.Collections;
 using SequelNet.Connector;
-using System.Runtime.CompilerServices;
 
 namespace SequelNet
 {
@@ -432,7 +431,6 @@ namespace SequelNet
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BuildSingleValueFirst(
             StringBuilder outputBuilder, BuildContext context)
         {
@@ -443,7 +441,6 @@ namespace SequelNet
                 context);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void BuildSingleValueSecond(
             StringBuilder outputBuilder, BuildContext context)
         {
