@@ -206,7 +206,14 @@ namespace SequelNet.Connector
             return ST_GeomFromText(text, srid, literalText);
         }
 
-        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        public override void BuildConflictColumnUpdate(
+            StringBuilder sb, ConnectorBase conn,
+            ConflictColumn column, Query relatedQuery)
+        {
+            sb.Append("VALUES(" + WrapFieldName(column.Column) + ")");
+        }
+
+        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             outputBuilder.Append(" ON DUPLICATE KEY UPDATE ");
 
@@ -219,14 +226,7 @@ namespace SequelNet.Connector
                 outputBuilder.Append(conn.Language.WrapFieldName(set.ColumnName));
                 outputBuilder.Append("=");
 
-                if (set.Second is ConflictColumn cc)
-                {
-                    outputBuilder.Append("VALUES(" + WrapFieldName(cc.Column) + ")");
-                }
-                else
-                {
-                    set.BuildSecond(outputBuilder, conn, relatedQuery);
-                }
+                set.BuildSecond(outputBuilder, conn, relatedQuery);
             }
         }
 

@@ -561,6 +561,11 @@ namespace SequelNet
             }
         }
 
+        public AssignmentColumnList GetInsertUpdateList()
+        {
+            return _ListInsertUpdate;
+        }
+
         /// <summary>
         /// LIMIT for query results.
         /// </summary>

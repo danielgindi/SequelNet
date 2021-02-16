@@ -22,7 +22,7 @@ namespace SequelNet
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-
+            conn.Language.BuildConflictColumnUpdate(sb, conn, this, relatedQuery);
         }
 
         #endregion

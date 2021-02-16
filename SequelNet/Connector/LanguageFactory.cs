@@ -150,19 +150,24 @@ namespace SequelNet.Connector
             throw new NotImplementedException("ST_GeogFromText has not been implemented for this connector");
         }
 
-        public virtual void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict,
-            AssignmentColumnList inserts,
-            Query relatedQuery = null)
+        public virtual void BuildConflictColumnUpdate(
+            StringBuilder sb, ConnectorBase conn,
+            ConflictColumn column, Query relatedQuery)
+        {
+            throw new NotImplementedException("BuildConflictColumnUpdate has not been implemented for this connector");
+        }
+
+        public virtual void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             throw new NotImplementedException("BuildOnConflictSetMerge has not been implemented for this connector");
         }
 
-        public virtual void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        public virtual void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             throw new NotImplementedException("BuildOnConflictSet has not been implemented for this connector");
         }
 
-        public virtual void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        public virtual void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             throw new NotImplementedException("BuildOnConflictIgnore has not been implemented for this connector");
         }

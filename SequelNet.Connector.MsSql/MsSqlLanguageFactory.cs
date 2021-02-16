@@ -149,11 +149,25 @@ namespace SequelNet.Connector
             return "geography::STGeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
 
-        public override void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict, 
-            AssignmentColumnList inserts, 
-            Query relatedQuery = null)
+        public override void BuildConflictColumnUpdate(
+            StringBuilder sb, ConnectorBase conn,
+            ConflictColumn column, Query relatedQuery)
+        {
+            var assignemnt = relatedQuery.GetInsertUpdateList().FirstOrDefault(x => x.ColumnName == column.Column);
+            if (assignemnt != null)
+            {
+                assignemnt.BuildSecond(sb, conn, relatedQuery);
+            }
+            else
+            {
+                sb.Append(PrepareValue(conn, relatedQuery.Schema.Columns.Find(column.Column).Default, relatedQuery));
+            }
+        }
+
+        public override void BuildOnConflictSetMerge(StringBuilder sb, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             var language = conn.Language;
+            var inserts = relatedQuery.GetInsertUpdateList();
 
             sb.Append("MERGE INTO ");
             sb.Append(language.WrapFieldName(relatedQuery.SchemaName));
@@ -211,23 +225,7 @@ namespace SequelNet.Connector
                 sb.Append(language.WrapFieldName(set.ColumnName));
                 sb.Append("=");
 
-                if (set.Second is ConflictColumn cc)
-                {
-                    var assignemnt = inserts.FirstOrDefault(x => x.ColumnName == cc.Column);
-                    if (assignemnt != null)
-                    {
-                        assignemnt.BuildSecond(sb, conn, relatedQuery);
-                    }
-                    else
-                    {
-                        sb.Append(
-                            language.PrepareValue(conn, schema.Columns.Find(cc.Column).Default, relatedQuery));
-                    }
-                }
-                else
-                {
-                    set.BuildSecond(sb, conn, relatedQuery);
-                }
+                set.BuildSecond(sb, conn, relatedQuery);
             }
 
             sb.Append(" WHEN NOT MATCHED THEN INSERT (");

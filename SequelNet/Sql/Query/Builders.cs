@@ -416,7 +416,7 @@ namespace SequelNet
                                 if (OnConflictDoUpdate != null && language.InsertSupportsMerge && !language.InsertSupportsOnConflictDoUpdate)
                                 {
                                     // MERGE INTO ... USING ... ON ... WHEN NOT MATCHED UPDATE ... WHEN MATCHED INSERT ...
-                                    language.BuildOnConflictSetMerge(sb, connection, OnConflictDoUpdate, _ListInsertUpdate, this);
+                                    language.BuildOnConflictSetMerge(sb, connection, OnConflictDoUpdate, this);
                                 }
                                 else
                                 {

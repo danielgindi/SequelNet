@@ -126,7 +126,14 @@ namespace SequelNet.Connector
             return "ST_GeogFromText(" + text + ")";
         }
 
-        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        public override void BuildConflictColumnUpdate(
+            StringBuilder sb, ConnectorBase conn,
+            ConflictColumn column, Query relatedQuery)
+        {
+            sb.Append("EXCLUDED." + WrapFieldName(column.Column));
+        }
+
+        public override void BuildOnConflictDoUpdate(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             outputBuilder.Append(" ON CONFLICT ");
 
@@ -162,18 +169,11 @@ namespace SequelNet.Connector
                 outputBuilder.Append(conn.Language.WrapFieldName(set.ColumnName));
                 outputBuilder.Append("=");
 
-                if (set.Second is ConflictColumn cc)
-                {
-                    outputBuilder.Append("EXCLUDED." + WrapFieldName(cc.Column));
-                }
-                else
-                {
-                    set.BuildSecond(outputBuilder, conn, relatedQuery);
-                }
+                set.BuildSecond(outputBuilder, conn, relatedQuery);
             }
         }
 
-        public override void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery = null)
+        public override void BuildOnConflictDoNothing(StringBuilder outputBuilder, ConnectorBase conn, OnConflict conflict, Query relatedQuery)
         {
             outputBuilder.Append(" ON CONFLICT ");
 
