@@ -155,7 +155,7 @@ namespace SequelNet.Connector
             outputBuilder.Append(") DO UPDATE SET ");
 
             bool first = true;
-            foreach (var set in conflict.Sets)
+            foreach (var set in conflict.Updates)
             {
                 if (first) first = false;
                 else outputBuilder.Append(",");

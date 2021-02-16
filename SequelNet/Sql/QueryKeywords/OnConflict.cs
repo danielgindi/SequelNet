@@ -1,8 +1,4 @@
-﻿using SequelNet.Connector;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SequelNet
+﻿namespace SequelNet
 {
     public class OnConflict
     {
@@ -12,6 +8,16 @@ namespace SequelNet
 
         public string OnColumn;
         public string OnConstraint;
-        public AssignmentColumnList Sets = new AssignmentColumnList();
+        public AssignmentColumnList Updates = new AssignmentColumnList();
+
+        #region Updates
+
+        public OnConflict Update(string columnName, object value)
+        {
+            Updates.Add(new AssignmentColumn(null, columnName, null, value, ValueObjectType.Value));
+            return this;
+        }
+
+        #endregion
     }
 }

@@ -30,7 +30,6 @@ namespace SequelNet
 
         #region Casts
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static explicit operator ConflictColumn(string column)
         {
             return new ConflictColumn(column);
