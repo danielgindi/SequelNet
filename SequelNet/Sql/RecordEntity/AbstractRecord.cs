@@ -94,7 +94,7 @@ namespace SequelNet
 
             __PRIMARY_KEY_MULTI = keyNames.Count > 1;
 
-            if (!__PRIMARY_KEY_MULTI)
+            if (!__PRIMARY_KEY_MULTI && keyNames.Count > 0)
             {
                 var classType = typeof(AbstractRecord<T>);
                 var propInfo = classType.GetProperty(keyNames[0]);
