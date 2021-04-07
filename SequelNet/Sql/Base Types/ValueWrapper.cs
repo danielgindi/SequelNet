@@ -313,9 +313,19 @@ namespace SequelNet
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
+        public static explicit operator ValueWrapper(float? value)
+        {
+            return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
+        }
+
         public static explicit operator ValueWrapper(double value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static explicit operator ValueWrapper(double? value)
+        {
+            return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
         }
 
         public static explicit operator ValueWrapper(decimal value)
