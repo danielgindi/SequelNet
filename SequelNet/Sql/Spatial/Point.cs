@@ -24,6 +24,13 @@ namespace SequelNet
                 this.Y = (ValueWrapper)y;
             }
 
+            public Point(double x, double y, int srid)
+            {
+                this.X = (ValueWrapper)x;
+                this.Y = (ValueWrapper)y;
+                this.SRID = srid;
+            }
+
             public Point(double x, double y, double? z = null, double? m = null)
             {
                 this.X = (ValueWrapper)x;
