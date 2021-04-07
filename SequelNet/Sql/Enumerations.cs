@@ -8,9 +8,9 @@
 
     public enum ValueObjectType
     {
-        Literal = 0,
-        Value = 1,
-        ColumnName = 2
+        Value = 0,
+        ColumnName = 1,
+        Literal = 2,
     }
 
     public enum SortDirection
