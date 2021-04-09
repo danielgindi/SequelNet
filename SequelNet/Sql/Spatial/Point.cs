@@ -93,11 +93,11 @@ namespace SequelNet
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                string geom = BuildValueText(conn).Build(conn);
+                var geom = BuildValueText(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false)
-                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false));
+                    ? conn.Language.ST_GeogFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal)
+                    : conn.Language.ST_GeomFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal));
             }
 
             static HashSet<Type> NumericTypes = new HashSet<Type>
@@ -120,21 +120,15 @@ namespace SequelNet
                 var x = X;
                 var y = Y;
 
-                if (x.Type == ValueObjectType.Value &&
-                    y.Type == ValueObjectType.Value)
-                {
-                    while (x.Value is ValueWrapper xx)
-                        x = xx;
-                    while (y.Value is ValueWrapper yy)
-                        y = yy;
-                }
+                while (x.Type == ValueObjectType.Value && x.Value is ValueWrapper xx)
+                    x = xx;
+                while (y.Type == ValueObjectType.Value && y.Value is ValueWrapper yy)
+                    y = yy;
 
                 if (x.Type == ValueObjectType.Value &&
                     y.Type == ValueObjectType.Value &&
-                    x.Value != null &&
-                    y.Value != null &&
-                    NumericTypes.Contains(x.GetType()) &&
-                    NumericTypes.Contains(y.GetType()))
+                    x.Value.IsOfNumericType() &&
+                    y.Value.IsOfNumericType())
                 {
                     var geom = $"POINT({conn.Language.PrepareValue(conn, x)} {conn.Language.PrepareValue(conn, y)})";
                     return ValueWrapper.Literal(geom);

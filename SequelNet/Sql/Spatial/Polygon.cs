@@ -81,11 +81,11 @@ namespace SequelNet
 
             public override void BuildValue(StringBuilder sb, ConnectorBase conn)
             {
-                string geom = BuildValueText(conn).Build(conn);
+                var geom = BuildValueText(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false)
-                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false));
+                    ? conn.Language.ST_GeogFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal)
+                    : conn.Language.ST_GeomFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal));
             }
 
             public override ValueWrapper BuildValueText(ConnectorBase conn)
