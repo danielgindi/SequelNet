@@ -130,7 +130,7 @@ namespace SequelNet
                     x.Value.IsOfNumericType() &&
                     y.Value.IsOfNumericType())
                 {
-                    var geom = $"POINT({conn.Language.PrepareValue(conn, x)} {conn.Language.PrepareValue(conn, y)})";
+                    var geom = $"POINT({conn.Language.PrepareValue(conn, x.Value)} {conn.Language.PrepareValue(conn, y.Value)})";
                     return ValueWrapper.Literal(geom);
                 }
                 else
