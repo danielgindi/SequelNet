@@ -84,8 +84,8 @@ namespace SequelNet
                 string geom = BuildValueText(conn).Build(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
-                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false));
             }
 
             public override ValueWrapper BuildValueText(ConnectorBase conn)

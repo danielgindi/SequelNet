@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
@@ -95,16 +96,47 @@ namespace SequelNet
                 string geom = BuildValueText(conn).Build(conn);
 
                 sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true)
-                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), true));
+                    ? conn.Language.ST_GeogFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false)
+                    : conn.Language.ST_GeomFromText(geom, SRID == null ? "" : SRID.Value.ToString(), false));
             }
+
+            static HashSet<Type> NumericTypes = new HashSet<Type>
+            {
+                typeof(float),
+                typeof(double),
+                typeof(decimal),
+                typeof(Byte),
+                typeof(SByte),
+                typeof(UInt16),
+                typeof(Int16),
+                typeof(UInt32),
+                typeof(Int32),
+                typeof(UInt64),
+                typeof(Int64),
+            };
 
             public override ValueWrapper BuildValueText(ConnectorBase conn)
             {
-                if (X.Type == ValueObjectType.Value &&
-                    Y.Type == ValueObjectType.Value)
+                var x = X;
+                var y = Y;
+
+                if (x.Type == ValueObjectType.Value &&
+                    y.Type == ValueObjectType.Value)
                 {
-                    var geom = $"POINT({X.Build(conn)} {Y.Build(conn)})";
+                    while (x.Value is ValueWrapper xx)
+                        x = xx;
+                    while (y.Value is ValueWrapper yy)
+                        y = yy;
+                }
+
+                if (x.Type == ValueObjectType.Value &&
+                    y.Type == ValueObjectType.Value &&
+                    x.Value != null &&
+                    y.Value != null &&
+                    NumericTypes.Contains(x.GetType()) &&
+                    NumericTypes.Contains(y.GetType()))
+                {
+                    var geom = $"POINT({conn.Language.PrepareValue(conn, x)} {conn.Language.PrepareValue(conn, y)})";
                     return ValueWrapper.Literal(geom);
                 }
                 else
