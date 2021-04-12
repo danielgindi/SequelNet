@@ -299,6 +299,24 @@ namespace SequelNet.Connector
             throw new NotImplementedException("BuildColumnPropertiesDataType has not been implemented for this connector");
         }
 
+        public virtual void BuildCollate(
+            ValueWrapper value,
+            string collation,
+            SortDirection direction,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
+        {
+            sb.Append("(");
+            value.Build(sb, connection, relatedQuery);
+            sb.Append(" COLLATE ");
+            sb.Append(collation);
+
+            // COLLATE ASC/DESC not supported in most RDBMSes
+
+            sb.Append(")");
+        }
+
         public virtual void BuildLimitOffset(
             Query query,
             bool top,

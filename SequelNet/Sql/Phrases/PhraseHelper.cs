@@ -725,6 +725,31 @@ namespace SequelNet
 
         #region General
 
+        public static Collate Collate(ValueWrapper value, string collation, SortDirection direction = SortDirection.ASC)
+        {
+            return new Collate(value, collation, direction);
+        }
+
+        public static Collate Collate(object value, ValueObjectType valueType, string collation, SortDirection direction = SortDirection.ASC)
+        {
+            return new Collate(value, valueType, collation, direction);
+        }
+
+        public static Collate Collate(string tableName, string columnName, string collation, SortDirection direction = SortDirection.ASC)
+        {
+            return new Collate(tableName, columnName, collation, direction);
+        }
+
+        public static Collate Collate(string columnName, string collation, SortDirection direction = SortDirection.ASC)
+        {
+            return new Collate(columnName, collation, direction);
+        }
+
+        public static Collate Collate(IPhrase phrase, string collation, SortDirection direction = SortDirection.ASC)
+        {
+            return new Collate(phrase, collation, direction);
+        }
+
         public static RandWeight RandWeight(object value, ValueObjectType valueType)
         {
             return new RandWeight(value, valueType);

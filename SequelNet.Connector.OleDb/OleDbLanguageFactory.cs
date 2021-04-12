@@ -238,6 +238,33 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildCollate(
+            ValueWrapper value,
+            string collation,
+            SortDirection direction,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
+        {
+            sb.Append("(");
+            value.Build(sb, connection, relatedQuery);
+            sb.Append(" COLLATE ");
+            sb.Append(collation);
+
+            switch (direction)
+            {
+                case SortDirection.ASC:
+                    sb.Append(" ASC");
+                    break;
+
+                case SortDirection.DESC:
+                    sb.Append(" DESC");
+                    break;
+            }
+
+            sb.Append(")");
+        }
+
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             if (seedValue != null)

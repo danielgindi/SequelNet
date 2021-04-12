@@ -610,6 +610,24 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildCollate(
+            ValueWrapper value,
+            string collation,
+            SortDirection direction,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
+        {
+            sb.Append("(");
+            value.Build(sb, connection, relatedQuery);
+            sb.Append(" COLLATE ");
+            sb.Append(collation);
+
+            // COLLATE ASC/DESC not supported in MySQL
+
+            sb.Append(")");
+        }
+
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"RAND()");

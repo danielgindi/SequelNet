@@ -521,6 +521,24 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildCollate(
+            ValueWrapper value,
+            string collation,
+            SortDirection direction,
+            StringBuilder sb,
+            ConnectorBase connection,
+            Query relatedQuery)
+        {
+            sb.Append("(");
+            value.Build(sb, connection, relatedQuery);
+            sb.Append(" COLLATE ");
+            sb.Append(PrepareValue(collation));
+
+            // COLLATE ASC/DESC not supported in PG
+
+            sb.Append(")");
+        }
+
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"RANDOM()");
