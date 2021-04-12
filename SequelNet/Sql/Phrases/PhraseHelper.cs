@@ -750,6 +750,11 @@ namespace SequelNet
             return new Collate(phrase, collation, direction);
         }
 
+        public static Literal Literal(Literal.BuilderDelegate builder)
+        {
+            return new Literal(builder);
+        }
+
         public static RandWeight RandWeight(object value, ValueObjectType valueType)
         {
             return new RandWeight(value, valueType);
