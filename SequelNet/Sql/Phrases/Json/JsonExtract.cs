@@ -61,56 +61,7 @@ namespace SequelNet.Phrases
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            switch (conn.TYPE)
-            {
-                case ConnectorBase.SqlServiceType.MYSQL:
-                    {
-                        var phrase = $"JSON_EXTRACT({Value.Build(conn, relatedQuery)}, {conn.Language.PrepareValue(Path)})";
-
-                        if (Unquote)
-                        {
-                            sb.Append(
-                                $"(CASE WHEN JSON_TYPE({phrase}) = 'NULL' THEN NULL" +
-                                $" WHEN JSON_TYPE({phrase}) = 'STRING' THEN JSON_UNQUOTE({phrase})" +
-                                $" ELSE {phrase} END)"
-                            );
-                        }
-                        else sb.Append(phrase);
-                    }
-                    break;
-
-                case ConnectorBase.SqlServiceType.MSSQL:
-                    {
-                        sb.Append("JSON_VALUE(");
-                        sb.Append(Value.Build(conn, relatedQuery));
-                        sb.Append(", ");
-                        sb.Append(conn.Language.PrepareValue(Path));
-                        sb.Append(")");
-                    }
-                    break;
-
-                case ConnectorBase.SqlServiceType.POSTGRESQL:
-                    { // No support for returning "self". Postgres works with actual json Objects.
-                        var parts = JsonPathValue.PathParts(Path);
-
-                        if (parts.Count > 0 && parts[0] == "$")
-                        {
-                            parts.RemoveAt(0);
-                        }
-
-                        sb.Append("json_extract_path_text(");
-                        sb.Append(Value.Build(conn, relatedQuery));
-                        foreach (var part in parts)
-                        {
-                            sb.Append(", " + conn.Language.PrepareValue(part));
-                        }
-                        sb.Append(")");
-                    }
-                    break;
-
-                default:
-                    throw new NotSupportedException("JsonExtract is not supported by current DB type");
-            }
+            conn.Language.BuildJsonExtract(Value, Path, Unquote, sb, conn, relatedQuery);
         }
     }
 }

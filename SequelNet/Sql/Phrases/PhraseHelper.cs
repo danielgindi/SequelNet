@@ -459,6 +459,51 @@ namespace SequelNet
             return new JsonExtract(where, path, unquote);
         }
 
+        static public JsonValue JsonValue(object value, ValueObjectType valueType, string path,
+            DataTypeDef? returnType = null,
+            JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+            JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+        {
+            return new JsonValue(value, valueType, path,
+                returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+        }
+
+        static public JsonValue JsonValue(string tableName, string columnName, string path,
+            DataTypeDef? returnType = null,
+            JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+            JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+        {
+            return new JsonValue(tableName, columnName, path,
+                returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+        }
+
+        static public JsonValue JsonValue(string columnName, string path,
+            DataTypeDef? returnType = null,
+            JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+            JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+        {
+            return new JsonValue(columnName, path,
+                returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+        }
+
+        static public JsonValue JsonValue(IPhrase phrase, string path,
+            DataTypeDef? returnType = null,
+            JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+            JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+        {
+            return new JsonValue(phrase, path,
+                returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+        }
+
+        static public JsonValue JsonValue(Where where, string path,
+            DataTypeDef? returnType = null,
+            JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+            JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+        {
+            return new JsonValue(where, path,
+                returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+        }
+
         static public JsonInsert JsonInsert(
             object doc, ValueObjectType docType,
             string path,

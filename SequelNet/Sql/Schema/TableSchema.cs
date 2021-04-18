@@ -94,7 +94,7 @@ namespace SequelNet
         public void AddColumn(
             string name, Type type,
             int maxLength, 
-            int numberPrecision, int numberScale, 
+            short numberPrecision, short numberScale, 
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
@@ -113,8 +113,8 @@ namespace SequelNet
 
         public void AddColumn(
             string name, Type type, 
-            int maxLength, string literalType, 
-            int numberPrecision, int numberScale, 
+            int maxLength, string literalType,
+            short numberPrecision, short numberScale, 
             bool autoIncrement, bool isPrimaryKey,
             bool nullable, object defaultValue)
         {
@@ -136,7 +136,7 @@ namespace SequelNet
         public void AddColumn(
             string name, Type type, DataType dataType, 
             int maxLength,
-            int numberPrecision, int numberScale,
+            short numberPrecision, short numberScale,
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
@@ -158,7 +158,7 @@ namespace SequelNet
         public void AddColumn(
             string name, Type type, DataType dataType,
             int maxLength, string literalType,
-            int numberPrecision, int numberScale,
+            short numberPrecision, short numberScale,
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue)
         {
@@ -181,7 +181,7 @@ namespace SequelNet
         public void AddColumn(
             string name, Type type,
             int maxLength,
-            int numberPrecision, int numberScale,
+            short numberPrecision, short numberScale,
             bool autoIncrement, bool isPrimaryKey,
             bool nullable, object defaultValue,
             string charset, string collate)
@@ -204,8 +204,8 @@ namespace SequelNet
 
         public void AddColumn(
             string name, Type type,
-            int maxLength, string literalType, 
-            int numberPrecision, int numberScale, 
+            int maxLength, string literalType,
+            short numberPrecision, short numberScale, 
             bool autoIncrement, bool isPrimaryKey,
             bool nullable, object defaultValue, 
             string charset, string collate)
@@ -230,7 +230,7 @@ namespace SequelNet
         public void AddColumn(
             string name, Type type, DataType dataType, 
             int maxLength,
-            int numberPrecision, int numberScale, 
+            short numberPrecision, short numberScale, 
             bool autoIncrement, bool isPrimaryKey,
             bool nullable, object defaultValue,
             string charset, string collate)
@@ -254,8 +254,8 @@ namespace SequelNet
 
         public void AddColumn(
             string name, Type type, DataType dataType, 
-            int maxLength, string literalType, 
-            int numberPrecision, int numberScale,
+            int maxLength, string literalType,
+            short numberPrecision, short numberScale,
             bool autoIncrement, bool isPrimaryKey, 
             bool nullable, object defaultValue,
             string charset, string collate)

@@ -299,6 +299,11 @@ namespace SequelNet.Connector
             throw new NotImplementedException("BuildColumnPropertiesDataType has not been implemented for this connector");
         }
 
+        public virtual (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        {
+            throw new NotImplementedException("BuildDataTypeDef has not been implemented for this connector");
+        }
+
         public virtual void BuildCollate(
             ValueWrapper value,
             string collation,
@@ -393,6 +398,23 @@ namespace SequelNet.Connector
         public virtual void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"RAND()");
+        }
+
+        public virtual void BuildJsonExtract(
+            ValueWrapper value, string path, bool unquote,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("JSON_EXTRACT has not been implemented for this connector");
+        }
+
+        public virtual void BuildJsonExtractValue(
+            ValueWrapper value, string path, 
+            DataTypeDef? returnType,
+            Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
+            Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("JSON_VALUE has not been implemented for this connector");
         }
 
         public virtual string Aggregate_Some(string rawExpression)

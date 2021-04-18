@@ -31,8 +31,8 @@ namespace SequelNet
             public bool Nullable;
             public bool IsPrimaryKey;
             private int _MaxLength;
-            public int NumberPrecision;
-            public int NumberScale;
+            public short NumberPrecision;
+            public short NumberScale;
             public string Charset;
             public string Collate;
             public ValueWrapper? ComputedColumn;

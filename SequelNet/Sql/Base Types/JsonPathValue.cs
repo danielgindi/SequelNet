@@ -77,7 +77,7 @@ namespace SequelNet
 
         #region Utility
 
-        internal static List<string> PathParts(string path)
+        public static List<string> GetPathParts(string path)
         {
             List<string> parts = new List<string>();
 

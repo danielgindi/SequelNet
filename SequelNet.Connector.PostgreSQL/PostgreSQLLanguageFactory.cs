@@ -313,180 +313,29 @@ namespace SequelNet.Connector
             DataType dataType = column.ActualDataType;
             if (!column.AutoIncrement)
             {
-                if (dataType == DataType.VarChar)
+                DataTypeDef dataTypeDef = new DataTypeDef { Type = dataType };
+                if (column.SRID != null)
                 {
-                    if (column.MaxLength < 0)
-                    {
-                        sb.Append("VARCHAR");
-                        sb.AppendFormat(@"({0})", VarCharMaxLength);
-                    }
-                    else if (column.MaxLength == 0)
-                        sb.Append("TEXT");
-                    else if (column.MaxLength <= VarCharMaxLength)
-                    {
-                        sb.Append("VARCHAR");
-                        sb.AppendFormat(@"({0})", column.MaxLength);
-                    }
-                    else if (column.MaxLength < 65536)
-                        sb.Append("TEXT");
-                    else if (column.MaxLength < 16777215)
-                        sb.Append("TEXT");
-                    else
-                        sb.Append("TEXT");
+                    dataTypeDef.SRID = column.SRID;
                 }
-                else if (dataType == DataType.Char)
+                else if (column.MaxLength != 0)
                 {
-                    if (column.MaxLength < 0)
-                    {
-                        sb.Append("VARCHAR");
-                        sb.AppendFormat(@"({0})", VarCharMaxLength);
-                    }
-                    else if (column.MaxLength == 0 || column.MaxLength >= VarCharMaxLength)
-                    {
-                        sb.Append("VARCHAR");
-                        sb.AppendFormat(@"({0})", VarCharMaxLength);
-                    }
-                    else
-                    {
-                        sb.Append("VARCHAR");
-                        sb.AppendFormat(@"({0})", column.MaxLength);
-                    }
+                    dataTypeDef.MaxLength = column.MaxLength;
                 }
-                else if (dataType == DataType.Text)
-                    sb.Append("TEXT");
-                else if (dataType == DataType.MediumText)
-                    sb.Append("TEXT");
-                else if (dataType == DataType.LongText)
-                    sb.Append("TEXT");
-                else if (dataType == DataType.Boolean)
-                    sb.Append("BOOLEAN");
-                else if (dataType == DataType.DateTime)
-                    sb.Append("TIMESTAMP");
-                else if (dataType == DataType.Date)
-                    sb.Append("DATE");
-                else if (dataType == DataType.Time)
-                    sb.Append("TIME");
-                else if (dataType == DataType.Numeric)
+                else if (column.NumberPrecision != 0 || column.NumberScale != 0)
                 {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append("NUMERIC");
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append("NUMERIC");
-                    }
+                    dataTypeDef.Precision = (short)column.NumberPrecision;
+                    dataTypeDef.Scale = (short)column.NumberScale;
                 }
-                else if (dataType == DataType.Float)
-                    sb.Append("FLOAT4");
-                else if (dataType == DataType.Double)
-                    sb.Append("FLOAT8");
-                else if (dataType == DataType.Decimal)
+
+                var (dataTypeString, isDefaultAllowedResult) = BuildDataTypeDef(dataTypeDef);
+
+                if (string.IsNullOrEmpty(dataTypeString))
                 {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append("DECIMAL");
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append("DECIMAL");
-                    }
+                    throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
                 }
-                else if (dataType == DataType.Money)
-                {
-                    if (column.NumberPrecision > 0)
-                    {
-                        sb.Append("DECIMAL");
-                        sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                    }
-                    else
-                    {
-                        sb.Append("DECIMAL");
-                    }
-                }
-                else if (dataType == DataType.TinyInt)
-                    sb.Append("SMALLINT");
-                else if (dataType == DataType.UnsignedTinyInt)
-                    sb.Append("SMALLINT");
-                else if (dataType == DataType.SmallInt)
-                    sb.Append("SMALLINT");
-                else if (dataType == DataType.UnsignedSmallInt)
-                    sb.Append("SMALLINT");
-                else if (dataType == DataType.Int)
-                    sb.Append("INTEGER");
-                else if (dataType == DataType.UnsignedInt)
-                    sb.Append("INTEGER");
-                else if (dataType == DataType.BigInt)
-                    sb.Append("BIGINT");
-                else if (dataType == DataType.UnsignedBigInt)
-                    sb.Append("BIGINT");
-                else if (dataType == DataType.Json)
-                    sb.Append("JSON");
-                else if (dataType == DataType.JsonBinary)
-                    sb.Append("JSONB");
-                else if (dataType == DataType.Blob)
-                    sb.Append("BYTEA");
-                else if (dataType == DataType.Guid)
-                    sb.Append("UUID");
-                else if (dataType == DataType.Geometry)
-                    sb.Append(GeometryType("GEOMETRY", column.SRID));
-                else if (dataType == DataType.GeometryCollection)
-                    sb.Append(GeometryType("GEOMETRYCOLLECTION", column.SRID));
-                else if (dataType == DataType.Point)
-                    sb.Append(GeometryType("POINT", column.SRID));
-                else if (dataType == DataType.LineString)
-                    sb.Append(GeometryType("LINESTRING", column.SRID));
-                else if (dataType == DataType.Polygon)
-                    sb.Append(GeometryType("POLYGON", column.SRID));
-                else if (dataType == DataType.Line)
-                    sb.Append(GeometryType("LINE", column.SRID));
-                else if (dataType == DataType.Curve)
-                    sb.Append(GeometryType("CURVE", column.SRID));
-                else if (dataType == DataType.Surface)
-                    sb.Append(GeometryType("SURFACE", column.SRID));
-                else if (dataType == DataType.LinearRing)
-                    sb.Append(GeometryType("LINEARRING", column.SRID));
-                else if (dataType == DataType.MultiPoint)
-                    sb.Append(GeometryType("MULTIPOINT", column.SRID));
-                else if (dataType == DataType.MultiLineString)
-                    sb.Append(GeometryType("MULTILINESTRING", column.SRID));
-                else if (dataType == DataType.MultiPolygon)
-                    sb.Append(GeometryType("MULTIPOLYGON", column.SRID));
-                else if (dataType == DataType.MultiCurve)
-                    sb.Append(GeometryType("MULTICURVE", column.SRID));
-                else if (dataType == DataType.MultiSurface)
-                    sb.Append(GeometryType("MULTISURFACE", column.SRID));
-                else if (dataType == DataType.Geographic)
-                    sb.Append(GeometryType("GEOMETRY"));
-                else if (dataType == DataType.GeographicCollection)
-                    sb.Append(GeometryType("GEOMETRYCOLLECTION"));
-                else if (dataType == DataType.GeographicPoint)
-                    sb.Append(GeometryType("POINT"));
-                else if (dataType == DataType.GeographicLineString)
-                    sb.Append(GeometryType("LINESTRING"));
-                else if (dataType == DataType.GeographicPolygon)
-                    sb.Append(GeometryType("POLYGON"));
-                else if (dataType == DataType.GeographicLine)
-                    sb.Append(GeometryType("LINE"));
-                else if (dataType == DataType.GeographicCurve)
-                    sb.Append(GeometryType("CURVE"));
-                else if (dataType == DataType.GeographicSurface)
-                    sb.Append(GeometryType("SURFACE"));
-                else if (dataType == DataType.GeographicLinearRing)
-                    sb.Append(GeometryType("LINEARRING"));
-                else if (dataType == DataType.GeographicMultiPoint)
-                    sb.Append(GeometryType("MULTIPOINT"));
-                else if (dataType == DataType.GeographicMultiLineString)
-                    sb.Append(GeometryType("MULTILINESTRING"));
-                else if (dataType == DataType.GeographicMultiPolygon)
-                    sb.Append(GeometryType("MULTIPOLYGON"));
-                else if (dataType == DataType.GeographicMultiCurve)
-                    sb.Append(GeometryType("MULTICURVE"));
-                else if (dataType == DataType.GeographicMultiSurface)
-                    sb.Append(GeometryType("MULTISURFACE"));
-                else throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+
+                isDefaultAllowed = isDefaultAllowedResult;
             }
             else
             {
@@ -521,6 +370,202 @@ namespace SequelNet.Connector
             }
         }
 
+        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        {
+            string typeString = null;
+            bool isDefaultAllowed = true;
+
+            switch (typeDef.Type)
+            {
+                case DataType.VarChar:
+                    if (typeDef.MaxLength < 0)
+                        typeString = $"VARCHAR({VarCharMaxLength})";
+                    else if (typeDef.MaxLength == 0)
+                        typeString = "TEXT";
+                    else if (typeDef.MaxLength <= VarCharMaxLength)
+                        typeString = $"VARCHAR({typeDef.MaxLength})";
+                    else if (typeDef.MaxLength < 65536)
+                        typeString = "TEXT";
+                    else if (typeDef.MaxLength < 16777215)
+                        typeString = "TEXT";
+                    else
+                        typeString = "TEXT";
+                    break;
+                case DataType.Char:
+                    if (typeDef.MaxLength < 0)
+                        typeString = $"VARCHAR({VarCharMaxLength})";
+                    else if (typeDef.MaxLength == 0 || typeDef.MaxLength >= VarCharMaxLength)
+                        typeString = $"VARCHAR({VarCharMaxLength})";
+                    else
+                        typeString = $"VARCHAR({typeDef.MaxLength})";
+                    break;
+                case DataType.Text:
+                    typeString = "TEXT";
+                    break;
+                case DataType.MediumText:
+                    typeString = "TEXT";
+                    break;
+                case DataType.LongText:
+                    typeString = "TEXT";
+                    break;
+                case DataType.Boolean:
+                    typeString = "BOOLEAN";
+                    break;
+                case DataType.DateTime:
+                    typeString = "TIMESTAMP";
+                    break;
+                case DataType.Date:
+                    typeString = "DATE";
+                    break;
+                case DataType.Time:
+                    typeString = "TIME";
+                    break;
+                case DataType.Numeric:
+                    if (typeDef.Precision > 0)
+                        typeString = $"NUMERIC({typeDef.Precision}, {typeDef.Scale})";
+                    else
+                        typeString = "NUMERIC";
+                    break;
+                case DataType.Float:
+                    typeString = "FLOAT4";
+                    break;
+                case DataType.Double:
+                    typeString = "FLOAT8";
+                    break;
+                case DataType.Decimal:
+                    if (typeDef.Precision > 0)
+                        typeString = $"DECIMAL({typeDef.Precision}, {typeDef.Scale})";
+                    else
+                        typeString = "DECIMAL";
+                    break;
+                case DataType.Money:
+                    typeString = "MONEY";
+                    break;
+                case DataType.TinyInt:
+                    typeString = "SMALLINT";
+                    break;
+                case DataType.UnsignedTinyInt:
+                    typeString = "SMALLINT";
+                    break;
+                case DataType.SmallInt:
+                    typeString = "SMALLINT";
+                    break;
+                case DataType.UnsignedSmallInt:
+                    typeString = "SMALLINT";
+                    break;
+                case DataType.Int:
+                    typeString = "INTEGER";
+                    break;
+                case DataType.UnsignedInt:
+                    typeString = "INTEGER";
+                    break;
+                case DataType.BigInt:
+                    typeString = "BIGINT";
+                    break;
+                case DataType.UnsignedBigInt:
+                    typeString = "BIGINT";
+                    break;
+                case DataType.Json:
+                    typeString = "JSON";
+                    break;
+                case DataType.JsonBinary:
+                    typeString = "JSONB";
+                    break;
+                case DataType.Blob:
+                    typeString = "BYTEA";
+                    break;
+                case DataType.Guid:
+                    typeString = "UUID";
+                    break;
+                case DataType.Geometry:
+                    typeString = GeometryType("GEOMETRY", typeDef.SRID);
+                    break;
+                case DataType.GeometryCollection:
+                    typeString = GeometryType("GEOMETRYCOLLECTION", typeDef.SRID);
+                    break;
+                case DataType.Point:
+                    typeString = GeometryType("POINT", typeDef.SRID);
+                    break;
+                case DataType.LineString:
+                    typeString = GeometryType("LINESTRING", typeDef.SRID);
+                    break;
+                case DataType.Polygon:
+                    typeString = GeometryType("POLYGON", typeDef.SRID);
+                    break;
+                case DataType.Line:
+                    typeString = GeometryType("LINE", typeDef.SRID);
+                    break;
+                case DataType.Curve:
+                    typeString = GeometryType("CURVE", typeDef.SRID);
+                    break;
+                case DataType.Surface:
+                    typeString = GeometryType("SURFACE", typeDef.SRID);
+                    break;
+                case DataType.LinearRing:
+                    typeString = GeometryType("LINEARRING", typeDef.SRID);
+                    break;
+                case DataType.MultiPoint:
+                    typeString = GeometryType("MULTIPOINT", typeDef.SRID);
+                    break;
+                case DataType.MultiLineString:
+                    typeString = GeometryType("MULTILINESTRING", typeDef.SRID);
+                    break;
+                case DataType.MultiPolygon:
+                    typeString = GeometryType("MULTIPOLYGON", typeDef.SRID);
+                    break;
+                case DataType.MultiCurve:
+                    typeString = GeometryType("MULTICURVE", typeDef.SRID);
+                    break;
+                case DataType.MultiSurface:
+                    typeString = GeometryType("MULTISURFACE", typeDef.SRID);
+                    break;
+                case DataType.Geographic:
+                    typeString = GeometryType("GEOMETRY");
+                    break;
+                case DataType.GeographicCollection:
+                    typeString = GeometryType("GEOMETRYCOLLECTION");
+                    break;
+                case DataType.GeographicPoint:
+                    typeString = GeometryType("POINT");
+                    break;
+                case DataType.GeographicLineString:
+                    typeString = GeometryType("LINESTRING");
+                    break;
+                case DataType.GeographicPolygon:
+                    typeString = GeometryType("POLYGON");
+                    break;
+                case DataType.GeographicLine:
+                    typeString = GeometryType("LINE");
+                    break;
+                case DataType.GeographicCurve:
+                    typeString = GeometryType("CURVE");
+                    break;
+                case DataType.GeographicSurface:
+                    typeString = GeometryType("SURFACE");
+                    break;
+                case DataType.GeographicLinearRing:
+                    typeString = GeometryType("LINEARRING");
+                    break;
+                case DataType.GeographicMultiPoint:
+                    typeString = GeometryType("MULTIPOINT");
+                    break;
+                case DataType.GeographicMultiLineString:
+                    typeString = GeometryType("MULTILINESTRING");
+                    break;
+                case DataType.GeographicMultiPolygon:
+                    typeString = GeometryType("MULTIPOLYGON");
+                    break;
+                case DataType.GeographicMultiCurve:
+                    typeString = GeometryType("MULTICURVE");
+                    break;
+                case DataType.GeographicMultiSurface:
+                    typeString = GeometryType("MULTISURFACE");
+                    break;
+            }
+
+            return (typeString, isDefaultAllowed);
+        }
+
         public override void BuildCollate(
             ValueWrapper value,
             string collation,
@@ -542,6 +587,72 @@ namespace SequelNet.Connector
         public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"RANDOM()");
+        }
+
+        public override void BuildJsonExtract(
+            ValueWrapper value, string path, bool unquote,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            // No support for returning "self". Postgres works with actual json Objects.
+            var parts = JsonPathValue.GetPathParts(path);
+            if (parts.Count > 0 && parts[0] == "$")
+            {
+                parts.RemoveAt(0);
+            }
+
+            var pgPath = "";
+            foreach (var part in parts)
+            {
+                if (pgPath.Length > 0)
+                    pgPath += $", {PrepareValue(part)}";
+                else pgPath += PrepareValue(part);
+            }
+
+            sb.Append("json_extract_path_text(");
+            sb.Append(value.Build(conn, relatedQuery));
+            sb.Append($", {pgPath}");
+            sb.Append(")");
+        }
+
+        public override void BuildJsonExtractValue(
+            ValueWrapper value, string path,
+            DataTypeDef? returnType,
+            Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
+            Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            // No support for returning "self". Postgres works with actual json Objects.
+            var parts = JsonPathValue.GetPathParts(path);
+            if (parts.Count > 0 && parts[0] == "$")
+            {
+                parts.RemoveAt(0);
+            }
+
+            var pgPath = "";
+            foreach (var part in parts)
+            {
+                if (pgPath.Length > 0)
+                    pgPath += ", " + PrepareValue(part);
+                else pgPath += PrepareValue(part);
+            }
+
+            if (returnType != null)
+            {
+                var (typeString, _) = BuildDataTypeDef(returnType.Value);
+                if (typeString != null)
+                {
+                    sb.Append("json_extract_path_text(");
+                    sb.Append(value.Build(conn, relatedQuery));
+                    sb.Append($", {pgPath}");
+                    sb.Append($")::{typeString}");
+                    return;
+                }
+            }
+
+            sb.Append("json_extract_path_text(");
+            sb.Append(value.Build(conn, relatedQuery));
+            sb.Append($", {pgPath}");
+            sb.Append($")");
         }
 
         public override string Aggregate_Some(string rawExpression)

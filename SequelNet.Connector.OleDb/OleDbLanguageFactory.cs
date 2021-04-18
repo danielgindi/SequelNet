@@ -115,102 +115,29 @@ namespace SequelNet.Connector
             }
 
             DataType dataType = column.ActualDataType;
-            if (dataType == DataType.VarChar)
+            DataTypeDef dataTypeDef = new DataTypeDef { Type = dataType };
+            if (column.SRID != null)
             {
-                if (column.MaxLength < 0)
-                {
-                    sb.Append("VARCHAR");
-                    sb.Append(@"(MAX)");
-                }
-                else if (column.MaxLength == 0)
-                    sb.Append("TEXT");
-                else if (column.MaxLength <= VarCharMaxLength)
-                {
-                    sb.Append("VARCHAR");
-                    sb.AppendFormat(@"({0})", column.MaxLength);
-                }
-                else if (column.MaxLength < 65536)
-                    sb.Append("TEXT");
-                else if (column.MaxLength < 16777215)
-                    sb.Append("TEXT");
-                else
-                    sb.Append("TEXT");
+                dataTypeDef.SRID = column.SRID;
             }
-            else if (dataType == DataType.Char)
+            else if (column.MaxLength != 0)
             {
-                if (column.MaxLength < 0)
-                {
-                    sb.Append("VARCHAR");
-                    sb.Append(@"(MAX)");
-                }
-                else if (column.MaxLength == 0 || column.MaxLength >= VarCharMaxLength)
-                {
-                    sb.Append("VARCHAR");
-                    sb.AppendFormat(@"({0})", VarCharMaxLength);
-                }
-                else
-                {
-                    sb.Append("VARCHAR");
-                    sb.AppendFormat(@"({0})", column.MaxLength);
-                }
+                dataTypeDef.MaxLength = column.MaxLength;
             }
-            else if (dataType == DataType.Text)
-                sb.Append("TEXT");
-            else if (dataType == DataType.MediumText)
-                sb.Append("TEXT");
-            else if (dataType == DataType.LongText)
-                sb.Append("TEXT");
-            else if (dataType == DataType.Boolean)
-                sb.Append("BIT");
-            else if (dataType == DataType.DateTime)
-                sb.Append("DATETIME");
-            else if (dataType == DataType.Date)
-                sb.Append("DATE");
-            else if (dataType == DataType.Time)
-                sb.Append("TIME");
-            else if (dataType == DataType.Numeric)
+            else if (column.NumberPrecision != 0 || column.NumberScale != 0)
             {
-                if (column.NumberPrecision > 0)
-                {
-                    sb.Append("NUMERIC");
-                    sb.AppendFormat(@"({0}, {1})", column.NumberPrecision, column.NumberScale);
-                }
-                else
-                    sb.Append("NUMERIC");
+                dataTypeDef.Precision = (short)column.NumberPrecision;
+                dataTypeDef.Scale = (short)column.NumberScale;
             }
-            else if (dataType == DataType.Float)
-                sb.Append("SINGLE");
-            else if (dataType == DataType.Double)
-                sb.Append("DOUBLE");
-            else if (dataType == DataType.Decimal)
-                sb.Append("DECIMAL");
-            else if (dataType == DataType.Money)
-                sb.Append("DECIMAL");
-            else if (dataType == DataType.TinyInt)
-                sb.Append("BYTE");
-            else if (dataType == DataType.UnsignedTinyInt)
-                sb.Append("TINYINT");
-            else if (dataType == DataType.SmallInt)
-                sb.Append("SHORT");
-            else if (dataType == DataType.UnsignedSmallInt)
-                sb.Append("SHORT");
-            else if (dataType == DataType.Int)
-                sb.Append("AUTOINCREMENT");
-            else if (dataType == DataType.UnsignedInt)
-                sb.Append("INT");
-            else if (dataType == DataType.BigInt)
-                sb.Append("AUTOINCREMENT");
-            else if (dataType == DataType.UnsignedBigInt)
-                sb.Append("INT");
-            else if (dataType == DataType.Json)
-                sb.Append("TEXT");
-            else if (dataType == DataType.JsonBinary)
-                sb.Append("TEXT");
-            else if (dataType == DataType.Blob)
-                sb.Append("IMAGE");
-            else if (dataType == DataType.Guid)
-                sb.Append("UNIQUEIDENTIFIER");
-            else throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+
+            var (dataTypeString, isDefaultAllowedResult) = BuildDataTypeDef(dataTypeDef);
+
+            if (string.IsNullOrEmpty(dataTypeString))
+            {
+                throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+            }
+
+            isDefaultAllowed = isDefaultAllowedResult;
 
             if (column.AutoIncrement)
                 sb.Append(" IDENTITY");
@@ -236,6 +163,116 @@ namespace SequelNet.Connector
                 sb.Append(@" CHARACTER SET ");
                 sb.Append(column.Charset);
             }
+        }
+
+        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        {
+            string typeString = null;
+            bool isDefaultAllowed = true;
+
+            switch (typeDef.Type)
+            {
+                case DataType.VarChar:
+                    if (typeDef.MaxLength < 0)
+                        typeString = "VARCHAR(MAX)";
+                    else if (typeDef.MaxLength == 0)
+                        typeString = "TEXT";
+                    else if (typeDef.MaxLength <= VarCharMaxLength)
+                        typeString = $"VARCHAR({typeDef.MaxLength})";
+                    else if (typeDef.MaxLength < 65536)
+                        typeString = "TEXT";
+                    else if (typeDef.MaxLength < 16777215)
+                        typeString = "TEXT";
+                    else
+                        typeString = "TEXT";
+                    break;
+                case DataType.Char:
+                    if (typeDef.MaxLength < 0)
+                        typeString = "VARCHAR(MAX)";
+                    else if (typeDef.MaxLength == 0 || typeDef.MaxLength >= VarCharMaxLength)
+                        typeString = $"VARCHAR({VarCharMaxLength})";
+                    else
+                        typeString = $"VARCHAR({typeDef.MaxLength})";
+                    break;
+                case DataType.Text:
+                    typeString = "TEXT";
+                    break;
+                case DataType.MediumText:
+                    typeString = "TEXT";
+                    break;
+                case DataType.LongText:
+                    typeString = "TEXT";
+                    break;
+                case DataType.Boolean:
+                    typeString = "BIT";
+                    break;
+                case DataType.DateTime:
+                    typeString = "DATETIME";
+                    break;
+                case DataType.Date:
+                    typeString = "DATE";
+                    break;
+                case DataType.Time:
+                    typeString = "TIME";
+                    break;
+                case DataType.Numeric:
+                    if (typeDef.Precision > 0)
+                        typeString = $"NUMERIC({typeDef.Precision}, {typeDef.Scale})";
+                    else
+                        typeString = "NUMERIC";
+                    break;
+                case DataType.Float:
+                    typeString = "SINGLE";
+                    break;
+                case DataType.Double:
+                    typeString = "DOUBLE";
+                    break;
+                case DataType.Decimal:
+                    typeString = "DECIMAL";
+                    break;
+                case DataType.Money:
+                    typeString = "DECIMAL";
+                    break;
+                case DataType.TinyInt:
+                    typeString = "BYTE";
+                    break;
+                case DataType.UnsignedTinyInt:
+                    typeString = "TINYINT";
+                    break;
+                case DataType.SmallInt:
+                    typeString = "SHORT";
+                    break;
+                case DataType.UnsignedSmallInt:
+                    typeString = "SHORT";
+                    break;
+                case DataType.Int:
+                    typeString = "AUTOINCREMENT";
+                    break;
+                case DataType.UnsignedInt:
+                    typeString = "INT";
+                    break;
+                case DataType.BigInt:
+                    typeString = "AUTOINCREMENT";
+                    break;
+                case DataType.UnsignedBigInt:
+                    typeString = "INT";
+                    break;
+                case DataType.Json:
+                    typeString = "TEXT";
+                    break;
+                case DataType.JsonBinary:
+                    typeString = "TEXT";
+                    break;
+                case DataType.Blob:
+                    typeString = "IMAGE";
+                    break;
+                case DataType.Guid:
+                    typeString = "UNIQUEIDENTIFIER";
+                    break;
+            }
+
+
+            return (typeString, isDefaultAllowed);
         }
 
         public override void BuildCollate(
