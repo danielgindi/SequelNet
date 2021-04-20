@@ -114,27 +114,11 @@ namespace SequelNet.Connector
                 return;
             }
 
-            DataType dataType = column.ActualDataType;
-            DataTypeDef dataTypeDef = new DataTypeDef { Type = dataType };
-            if (column.SRID != null)
-            {
-                dataTypeDef.SRID = column.SRID;
-            }
-            else if (column.MaxLength != 0)
-            {
-                dataTypeDef.MaxLength = column.MaxLength;
-            }
-            else if (column.NumberPrecision != 0 || column.NumberScale != 0)
-            {
-                dataTypeDef.Precision = (short)column.NumberPrecision;
-                dataTypeDef.Scale = (short)column.NumberScale;
-            }
-
-            var (dataTypeString, isDefaultAllowedResult) = BuildDataTypeDef(dataTypeDef);
+            var (dataTypeString, isDefaultAllowedResult) = BuildDataTypeDef(column.DataTypeDef);
 
             if (string.IsNullOrEmpty(dataTypeString))
             {
-                throw new NotImplementedException("Unsupprted data type " + dataType.ToString());
+                throw new NotImplementedException("Unsupprted data type " + column.ActualDataType.ToString());
             }
 
             isDefaultAllowed = isDefaultAllowedResult;

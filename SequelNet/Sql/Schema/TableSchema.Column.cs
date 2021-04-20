@@ -66,6 +66,28 @@ namespace SequelNet
                 get { return this._ActualDataType; }
             }
 
+            public DataTypeDef DataTypeDef
+            {
+                get
+                {
+                    DataTypeDef dataTypeDef = new DataTypeDef { Type = ActualDataType };
+                    if (SRID != null)
+                    {
+                        dataTypeDef.SRID = SRID;
+                    }
+                    else if (MaxLength != 0)
+                    {
+                        dataTypeDef.MaxLength = MaxLength;
+                    }
+                    else if (NumberPrecision != 0 || NumberScale != 0)
+                    {
+                        dataTypeDef.Precision = (short)NumberPrecision;
+                        dataTypeDef.Scale = (short)NumberScale;
+                    }
+                    return dataTypeDef;
+                }
+            }
+
             public int MaxLength
             {
                 set { _MaxLength = value; _ActualDataType = GetDataType(); }
