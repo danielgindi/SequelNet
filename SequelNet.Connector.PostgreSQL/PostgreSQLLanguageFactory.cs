@@ -336,6 +336,8 @@ namespace SequelNet.Connector
                 }
 
                 isDefaultAllowed = isDefaultAllowedResult;
+
+                sb.Append(dataTypeString);
             }
             else
             {

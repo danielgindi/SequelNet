@@ -139,6 +139,8 @@ namespace SequelNet.Connector
 
             isDefaultAllowed = isDefaultAllowedResult;
 
+            sb.Append(dataTypeString);
+
             if (column.AutoIncrement)
                 sb.Append(" IDENTITY");
 
