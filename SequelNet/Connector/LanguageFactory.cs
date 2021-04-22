@@ -23,6 +23,7 @@ namespace SequelNet.Connector
         public virtual bool InsertSupportsOnConflictDoNothing => false;
         public virtual bool InsertSupportsOnConflictDoUpdate => false;
         public virtual bool InsertSupportsMerge => false;
+        public virtual bool UpdateSupportsIgnore => false;
 
         public virtual bool SupportsColumnComment => false;
         public virtual ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.InType;

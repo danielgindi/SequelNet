@@ -132,6 +132,7 @@ namespace SequelNet.Connector
         public override bool DeleteSupportsIgnore => true;
         public override bool InsertSupportsIgnore => true;
         public override bool InsertSupportsOnConflictDoUpdate => true;
+        public override bool UpdateSupportsIgnore => true;
 
         public override bool SupportsColumnComment => true;
         public override ColumnSRIDLocationMode ColumnSRIDLocation => ColumnSRIDLocationMode.AfterNullability;

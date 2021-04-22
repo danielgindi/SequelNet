@@ -482,6 +482,11 @@ namespace SequelNet
 
                                 sb.Append(@"UPDATE ");
 
+                                if (OnConflictDoNothing != null && language.UpdateSupportsIgnore)
+                                {
+                                    sb.Append("IGNORE ");
+                                }
+
                                 if (hasJoins && language.UpdateJoinRequiresFromLeftTable && !string.IsNullOrEmpty(_SchemaAlias))
                                 {
                                     sb.Append(language.WrapFieldName(_SchemaAlias));
