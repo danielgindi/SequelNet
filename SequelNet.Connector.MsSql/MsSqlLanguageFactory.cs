@@ -384,7 +384,7 @@ namespace SequelNet.Connector
             }
         }
 
-        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef, bool forCast = false)
         {
             string typeString = null;
             bool isDefaultAllowed = true;

@@ -300,7 +300,7 @@ namespace SequelNet.Connector
             throw new NotImplementedException("BuildColumnPropertiesDataType has not been implemented for this connector");
         }
 
-        public virtual (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        public virtual (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef, bool forCast = false)
         {
             throw new NotImplementedException("BuildDataTypeDef has not been implemented for this connector");
         }

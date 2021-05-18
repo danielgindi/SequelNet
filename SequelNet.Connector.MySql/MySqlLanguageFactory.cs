@@ -425,7 +425,7 @@ namespace SequelNet.Connector
             }
         }
 
-        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef)
+        public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef, bool forCast = false)
         {
             string typeString = null;
             bool isDefaultAllowed = true;
@@ -433,6 +433,12 @@ namespace SequelNet.Connector
             switch (typeDef.Type)
             {
                 case DataType.VarChar:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     if (typeDef.MaxLength < 0)
                     {
                         typeString = $"VARCHAR({VarCharMaxLength})";
@@ -464,6 +470,12 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Char:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     if (typeDef.MaxLength < 0)
                         typeString = $"CHAR({VarCharMaxLength})";
                     else if (typeDef.MaxLength == 0 || typeDef.MaxLength >= VarCharMaxLength)
@@ -473,21 +485,45 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Text:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     typeString = "TEXT";
                     isDefaultAllowed = false;
                     break;
 
                 case DataType.MediumText:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     typeString = "MEDIUMTEXT";
                     isDefaultAllowed = false;
                     break;
 
                 case DataType.LongText:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     typeString = "LONGTEXT";
                     isDefaultAllowed = false;
                     break;
 
                 case DataType.Boolean:
+                    if (forCast)
+                    {
+                        typeString = "SIGNED";
+                        break;
+                    }
+
                     typeString = "BOOLEAN";
                     break;
 
@@ -504,6 +540,12 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Numeric:
+                    if (forCast)
+                    {
+                        typeString = "DECIMAL";
+                        break;
+                    }
+
                     if (typeDef.Precision > 0)
                     {
                         typeString = $"NUMERIC({typeDef.Precision}, {typeDef.Scale})";
@@ -515,7 +557,7 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Float:
-                    if (typeDef.Precision > 0 && !Is8_0_17OrLater())
+                    if (typeDef.Precision > 0 && !Is8_0_17OrLater() && !forCast)
                     {
                         typeString = $"FLOAT({typeDef.Precision}, {typeDef.Scale})";
                     }
@@ -526,7 +568,7 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Double:
-                    if (typeDef.Precision > 0 && !Is8_0_17OrLater())
+                    if (typeDef.Precision > 0 && !Is8_0_17OrLater() && !forCast)
                     {
                         typeString = $"DOUBLE({typeDef.Precision}, {typeDef.Scale})";
                     }
@@ -537,7 +579,7 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Decimal:
-                    if (typeDef.Precision > 0)
+                    if (typeDef.Precision > 0 && !forCast)
                     {
                         typeString = $"DECIMAL({typeDef.Precision}, {typeDef.Scale})";
                     }
@@ -548,7 +590,7 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Money:
-                    if (typeDef.Precision > 0)
+                    if (typeDef.Precision > 0 && !forCast)
                     {
                         typeString = $"DECIMAL({typeDef.Precision}, {typeDef.Scale})";
                     }
@@ -559,34 +601,82 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.TinyInt:
+                    if (forCast)
+                    {
+                        typeString = "SIGNED";
+                        break;
+                    }
+
                     typeString = "TINYINT";
                     break;
 
                 case DataType.UnsignedTinyInt:
+                    if (forCast)
+                    {
+                        typeString = "UNSIGNED";
+                        break;
+                    }
+
                     typeString = "TINYINT UNSIGNED";
                     break;
 
                 case DataType.SmallInt:
+                    if (forCast)
+                    {
+                        typeString = "SIGNED";
+                        break;
+                    }
+
                     typeString = "SMALLINT";
                     break;
 
                 case DataType.UnsignedSmallInt:
+                    if (forCast)
+                    {
+                        typeString = "UNSIGNED";
+                        break;
+                    }
+
                     typeString = "SMALLINT UNSIGNED";
                     break;
 
                 case DataType.Int:
+                    if (forCast)
+                    {
+                        typeString = "SIGNED";
+                        break;
+                    }
+
                     typeString = "INT";
                     break;
 
                 case DataType.UnsignedInt:
+                    if (forCast)
+                    {
+                        typeString = "UNSIGNED";
+                        break;
+                    }
+
                     typeString = "INT UNSIGNED";
                     break;
 
                 case DataType.BigInt:
+                    if (forCast)
+                    {
+                        typeString = "SIGNED";
+                        break;
+                    }
+
                     typeString = "BIGINT";
                     break;
 
                 case DataType.UnsignedBigInt:
+                    if (forCast)
+                    {
+                        typeString = "UNSIGNED";
+                        break;
+                    }
+
                     typeString = "BIGINT UNSIGNED";
                     break;
 
@@ -603,6 +693,12 @@ namespace SequelNet.Connector
                     break;
 
                 case DataType.Guid:
+                    if (forCast)
+                    {
+                        typeString = "CHAR";
+                        break;
+                    }
+
                     typeString = "CHAR(36)";
                     break;
 
@@ -780,7 +876,7 @@ namespace SequelNet.Connector
 
                 if (returnType != null)
                 {
-                    var (typeString, _) = BuildDataTypeDef(returnType.Value);
+                    var (typeString, _) = BuildDataTypeDef(returnType.Value, true);
                     if (typeString != null)
                     {
                         sb.Append($" RETURNING {typeString}");
@@ -817,7 +913,7 @@ namespace SequelNet.Connector
 
                 if (returnType != null)
                 {
-                    var (typeString, _) = BuildDataTypeDef(returnType.Value);
+                    var (typeString, _) = BuildDataTypeDef(returnType.Value, true);
                     if (typeString != null)
                     {
                         if (onEmptyValue != null && onEmptyAction == Phrases.JsonValue.DefaultAction.Value)
