@@ -143,12 +143,6 @@ namespace SequelNet.Connector
                 sb.Append(@" COLLATE ");
                 sb.Append(column.Collate);
             }
-
-            if (!string.IsNullOrEmpty(column.Charset))
-            {
-                sb.Append(@" CHARACTER SET ");
-                sb.Append(column.Charset);
-            }
         }
 
         public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef, bool forCast = false)
@@ -257,6 +251,10 @@ namespace SequelNet.Connector
                     break;
             }
 
+            if (!string.IsNullOrEmpty(typeDef.Charset))
+            {
+                typeString += $" CHARACTER SET ${typeDef.Charset}";
+            }
 
             return (typeString, isDefaultAllowed);
         }

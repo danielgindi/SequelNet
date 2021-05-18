@@ -349,12 +349,6 @@ namespace SequelNet.Connector
                     sb.Append(" STORED");
                 }
             }
-
-            if (!string.IsNullOrEmpty(column.Charset))
-            {
-                sb.Append(@" CHARACTER SET");
-                sb.Append(column.Charset);
-            }
         }
 
         public override (string typeString, bool isDefaultAllowed) BuildDataTypeDef(DataTypeDef typeDef, bool forCast = false)
@@ -548,6 +542,11 @@ namespace SequelNet.Connector
                 case DataType.GeographicMultiSurface:
                     typeString = GeometryType("MULTISURFACE");
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(typeDef.Charset))
+            {
+                typeString += $" CHARACTER SET ${typeDef.Charset}";
             }
 
             return (typeString, isDefaultAllowed);

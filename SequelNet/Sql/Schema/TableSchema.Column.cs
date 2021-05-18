@@ -70,7 +70,8 @@ namespace SequelNet
             {
                 get
                 {
-                    DataTypeDef dataTypeDef = new DataTypeDef { Type = ActualDataType };
+                    DataTypeDef dataTypeDef = new DataTypeDef { Type = ActualDataType, Charset = Charset };
+
                     if (SRID != null)
                     {
                         dataTypeDef.SRID = SRID;

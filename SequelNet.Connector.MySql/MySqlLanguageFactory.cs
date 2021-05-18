@@ -412,12 +412,6 @@ namespace SequelNet.Connector
                 }
             }
 
-            if (!string.IsNullOrEmpty(column.Charset))
-            {
-                sb.Append(@" CHARACTER SET ");
-                sb.Append(column.Charset);
-            }
-
             if (!string.IsNullOrEmpty(column.Collate))
             {
                 sb.Append(@" COLLATE ");
@@ -813,6 +807,11 @@ namespace SequelNet.Connector
                 case DataType.GeographicMultiSurface:
                     typeString = "MULTISURFACE";
                     break;
+            }
+
+            if (!string.IsNullOrEmpty(typeDef.Charset))
+            {
+                typeString += $" CHARACTER SET ${typeDef.Charset}";
             }
 
             return (typeString, isDefaultAllowed);

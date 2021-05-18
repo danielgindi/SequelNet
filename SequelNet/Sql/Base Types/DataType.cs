@@ -310,5 +310,8 @@ namespace SequelNet
 
         [FieldOffset(4)]
         public int? SRID;
+
+        [FieldOffset(8)]
+        public string Charset;
     }
 }
