@@ -410,7 +410,7 @@ namespace SequelNet.Connector
 
         public virtual void BuildJsonExtractValue(
             ValueWrapper value, string path, 
-            DataTypeDef? returnType,
+            DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)

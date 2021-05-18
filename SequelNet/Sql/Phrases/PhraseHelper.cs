@@ -460,7 +460,7 @@ namespace SequelNet
         }
 
         static public JsonValue JsonValue(object value, ValueObjectType valueType, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
             JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
         {
@@ -469,7 +469,7 @@ namespace SequelNet
         }
 
         static public JsonValue JsonValue(string tableName, string columnName, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
             JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
         {
@@ -478,7 +478,7 @@ namespace SequelNet
         }
 
         static public JsonValue JsonValue(string columnName, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
             JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
         {
@@ -487,7 +487,7 @@ namespace SequelNet
         }
 
         static public JsonValue JsonValue(IPhrase phrase, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
             JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
         {
@@ -496,7 +496,7 @@ namespace SequelNet
         }
 
         static public JsonValue JsonValue(Where where, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
             JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
         {

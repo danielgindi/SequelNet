@@ -24,7 +24,7 @@ namespace SequelNet.Phrases
     {
         public ValueWrapper Value;
         public string Path = "$";
-        public DataTypeDef? ReturnType = null;
+        public DataTypeDef ReturnType = null;
         public DefaultAction OnEmptyAction = DefaultAction.Value;
         public object OnEmptyValue = null;
         public DefaultAction OnErrorAction = DefaultAction.Value;
@@ -33,7 +33,7 @@ namespace SequelNet.Phrases
         #region Constructors
 
         public JsonValue(object value, ValueObjectType valueType, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
             DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
         {
@@ -47,7 +47,7 @@ namespace SequelNet.Phrases
         }
 
         public JsonValue(string tableName, string columnName, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
             DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
         {
@@ -61,7 +61,7 @@ namespace SequelNet.Phrases
         }
 
         public JsonValue(string columnName, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
             DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
             : this(null, columnName, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)
@@ -69,7 +69,7 @@ namespace SequelNet.Phrases
         }
 
         public JsonValue(IPhrase phrase, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
             DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
             : this(phrase, ValueObjectType.Value, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)
@@ -77,7 +77,7 @@ namespace SequelNet.Phrases
         }
 
         public JsonValue(Where where, string path,
-            DataTypeDef? returnType = null,
+            DataTypeDef returnType = null,
             DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
             DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
             : this(where, ValueObjectType.Value, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)

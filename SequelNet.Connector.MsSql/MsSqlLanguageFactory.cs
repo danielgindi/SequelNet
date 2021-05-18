@@ -631,14 +631,14 @@ namespace SequelNet.Connector
 
         public override void BuildJsonExtractValue(
             ValueWrapper value, string path,
-            DataTypeDef? returnType,
+            DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             if (returnType != null)
             {
-                var (typeString, _) = BuildDataTypeDef(returnType.Value);
+                var (typeString, _) = BuildDataTypeDef(returnType);
                 if (typeString != null)
                 {
                     sb.Append("CAST(JSON_VALUE(");

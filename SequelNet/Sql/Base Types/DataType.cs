@@ -287,31 +287,23 @@ namespace SequelNet
         GeographicMultiSurface,
     }
 
-    [StructLayout(LayoutKind.Explicit)]
-    public struct DataTypeDef
+    public class DataTypeDef
     {
-        [FieldOffset(0)]
         public DataType Type;
-
-        [FieldOffset(4)]
         public int MaxLength;
 
         /// <summary>
         /// Number of digits in the number (excluding the decimal period)
         /// </summary>
-        [FieldOffset(4)]
         public short Precision;
 
         /// <summary>
         /// Number of digits to the right of the decimal period
         /// </summary>
-        [FieldOffset(6)]
         public short Scale;
 
-        [FieldOffset(4)]
         public int? SRID;
 
-        [FieldOffset(8)]
         public string Charset;
     }
 }

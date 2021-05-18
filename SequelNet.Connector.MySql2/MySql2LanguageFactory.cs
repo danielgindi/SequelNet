@@ -864,7 +864,7 @@ namespace SequelNet.Connector
 
         public override void BuildJsonExtractValue(
             ValueWrapper value, string path,
-            DataTypeDef? returnType,
+            DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
@@ -877,7 +877,7 @@ namespace SequelNet.Connector
 
                 if (returnType != null)
                 {
-                    var (typeString, _) = BuildDataTypeDef(returnType.Value, true);
+                    var (typeString, _) = BuildDataTypeDef(returnType, true);
                     if (typeString != null)
                     {
                         sb.Append($" RETURNING {typeString}");
@@ -914,7 +914,7 @@ namespace SequelNet.Connector
 
                 if (returnType != null)
                 {
-                    var (typeString, _) = BuildDataTypeDef(returnType.Value, true);
+                    var (typeString, _) = BuildDataTypeDef(returnType, true);
                     if (typeString != null)
                     {
                         if (onEmptyValue != null && onEmptyAction == Phrases.JsonValue.DefaultAction.Value)
