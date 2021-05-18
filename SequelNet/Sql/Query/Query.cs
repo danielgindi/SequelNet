@@ -247,18 +247,20 @@ namespace SequelNet
         /// When using an actual TableSchema class, this will allow to reuse it as different table names.
         /// </summary>
         /// <param name="schemaName">A name, or null to default to current schema or alias.</param>
-        public void SetSchemaName(string schemaName)
+        public Query SetSchemaName(string schemaName)
         {
             this.SchemaName = schemaName;
+            return this;
         }
 
         /// <summary>
         /// Setting a schema alias.
         /// </summary>
         /// <param name="alias"></param>
-        public void SetSchemaAlias(string alias)
+        public Query SetSchemaAlias(string alias)
         {
             this.SchemaAlias = alias;
+            return this;
         }
 
         #endregion
