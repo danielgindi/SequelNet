@@ -471,9 +471,11 @@ namespace SequelNet
                     ((WhereList)value).BuildCommand(outputBuilder, context);
                     outputBuilder.Append(')');
                 }
-                else if (value is ICollection)
+                else if (value != null &&
+                    value is IEnumerable && 
+                    !(value is string) && 
+                    value.GetType().IsCollectionType())
                 {
-                    ICollection collIn = value as ICollection;
                     StringBuilder sbIn = new StringBuilder();
                     sbIn.Append('(');
                     bool first = true;
@@ -494,7 +496,7 @@ namespace SequelNet
                         }
                     }
 
-                    foreach (object objIn in collIn)
+                    foreach (object objIn in (IEnumerable)value)
                     {
                         if (first) first = false;
                         else sbIn.Append(',');
