@@ -1393,6 +1393,56 @@ namespace SequelNet
             return new Round(where);
         }
 
+        public static Floor Floor(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        {
+            return new Floor(value, valueType, decimalPlaces);
+        }
+
+        public static Floor Floor(string tableName, string columnName, int decimalPlaces = 0)
+        {
+            return new Floor(tableName, columnName, decimalPlaces);
+        }
+
+        public static Floor Floor(string columnName, int decimalPlaces = 0)
+        {
+            return new Floor(columnName, decimalPlaces);
+        }
+
+        public static Floor Floor(IPhrase phrase, int decimalPlaces = 0)
+        {
+            return new Floor(phrase, decimalPlaces);
+        }
+
+        public static Floor Floor(Where where)
+        {
+            return new Floor(where);
+        }
+
+        public static Ceil Ceil(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        {
+            return new Ceil(value, valueType, decimalPlaces);
+        }
+
+        public static Ceil Ceil(string tableName, string columnName, int decimalPlaces = 0)
+        {
+            return new Ceil(tableName, columnName, decimalPlaces);
+        }
+
+        public static Ceil Ceil(string columnName, int decimalPlaces = 0)
+        {
+            return new Ceil(columnName, decimalPlaces);
+        }
+
+        public static Ceil Ceil(IPhrase phrase, int decimalPlaces = 0)
+        {
+            return new Ceil(phrase, decimalPlaces);
+        }
+
+        public static Ceil Ceil(Where where)
+        {
+            return new Ceil(where);
+        }
+
         #endregion
 
         #region Aggregate
