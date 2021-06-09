@@ -6,29 +6,26 @@ namespace SequelNet.Phrases
     public class Floor : IPhrase
     {
         public ValueWrapper Value;
-        public int DecimalPlaces;
 
         #region Constructors
 
-        public Floor(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        public Floor(object value, ValueObjectType valueType)
         {
             this.Value = ValueWrapper.Make(value, valueType);
-            this.DecimalPlaces = decimalPlaces;
         }
 
-        public Floor(string tableName, string columnName, int decimalPlaces = 0)
+        public Floor(string tableName, string columnName)
         {
             this.Value = ValueWrapper.Column(tableName, columnName);
-            this.DecimalPlaces = decimalPlaces;
         }
 
-        public Floor(string columnName, int decimalPlaces = 0)
-            : this(null, columnName, decimalPlaces)
+        public Floor(string columnName)
+            : this(null, columnName)
         {
         }
 
-        public Floor(IPhrase phrase, int decimalPlaces = 0)
-            : this(phrase, ValueObjectType.Value, decimalPlaces)
+        public Floor(IPhrase phrase)
+            : this(phrase, ValueObjectType.Value)
         {
         }
 
@@ -42,14 +39,7 @@ namespace SequelNet.Phrases
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
             sb.Append("FLOOR(");
-
             sb.Append(Value.Build(conn, relatedQuery));
-
-            if (DecimalPlaces != 0)
-            {
-                sb.Append(',');
-                sb.Append(DecimalPlaces);
-            }
             sb.Append(')');
         }
     }

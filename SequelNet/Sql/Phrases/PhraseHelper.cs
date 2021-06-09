@@ -1393,24 +1393,24 @@ namespace SequelNet
             return new Round(where);
         }
 
-        public static Floor Floor(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        public static Floor Floor(object value, ValueObjectType valueType)
         {
-            return new Floor(value, valueType, decimalPlaces);
+            return new Floor(value, valueType);
         }
 
-        public static Floor Floor(string tableName, string columnName, int decimalPlaces = 0)
+        public static Floor Floor(string tableName, string columnName)
         {
-            return new Floor(tableName, columnName, decimalPlaces);
+            return new Floor(tableName, columnName);
         }
 
-        public static Floor Floor(string columnName, int decimalPlaces = 0)
+        public static Floor Floor(string columnName)
         {
-            return new Floor(columnName, decimalPlaces);
+            return new Floor(columnName);
         }
 
-        public static Floor Floor(IPhrase phrase, int decimalPlaces = 0)
+        public static Floor Floor(IPhrase phrase)
         {
-            return new Floor(phrase, decimalPlaces);
+            return new Floor(phrase);
         }
 
         public static Floor Floor(Where where)
@@ -1418,24 +1418,24 @@ namespace SequelNet
             return new Floor(where);
         }
 
-        public static Ceil Ceil(object value, ValueObjectType valueType, int decimalPlaces = 0)
+        public static Ceil Ceil(object value, ValueObjectType valueType)
         {
-            return new Ceil(value, valueType, decimalPlaces);
+            return new Ceil(value, valueType);
         }
 
-        public static Ceil Ceil(string tableName, string columnName, int decimalPlaces = 0)
+        public static Ceil Ceil(string tableName, string columnName)
         {
-            return new Ceil(tableName, columnName, decimalPlaces);
+            return new Ceil(tableName, columnName);
         }
 
-        public static Ceil Ceil(string columnName, int decimalPlaces = 0)
+        public static Ceil Ceil(string columnName)
         {
-            return new Ceil(columnName, decimalPlaces);
+            return new Ceil(columnName);
         }
 
-        public static Ceil Ceil(IPhrase phrase, int decimalPlaces = 0)
+        public static Ceil Ceil(IPhrase phrase)
         {
-            return new Ceil(phrase, decimalPlaces);
+            return new Ceil(phrase);
         }
 
         public static Ceil Ceil(Where where)
