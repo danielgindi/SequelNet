@@ -1,13 +1,11 @@
 ﻿using SequelNet.Connector;
-using System;
 using System.Text;
 
 namespace SequelNet.Phrases
 {
-    [Obsolete("Use UtcTimestamp instead")]
-    public class UTC_TIMESTAMP : IPhrase
+    public class UtcTimestamp : IPhrase
     {
-        public UTC_TIMESTAMP()
+        public UtcTimestamp()
         {
         }
 
