@@ -37,32 +37,37 @@ namespace SequelNet.Connector
 
         public override string YearPartOfDate(string date)
         {
-            return @"EXTRACT(YEAR FROM " + date + @")";
+            return $"EXTRACT(YEAR FROM {date})";
         }
 
         public override string MonthPartOfDate(string date)
         {
-            return @"EXTRACT(MONTH FROM " + date + @")";
+            return $"EXTRACT(MONTH FROM {date})";
         }
 
         public override string DayPartOfDate(string date)
         {
-            return @"EXTRACT(DAY FROM " + date + @")";
+            return $"EXTRACT(DAY FROM {date})";
         }
 
         public override string HourPartOfDate(string date)
         {
-            return @"EXTRACT(HOUR FROM " + date + @")";
+            return $"EXTRACT(HOUR FROM {date})";
         }
 
         public override string MinutePartOfDate(string date)
         {
-            return @"EXTRACT(MINUTE FROM " + date + @")";
+            return $"EXTRACT(MINUTE FROM {date})";
         }
 
         public override string SecondPartOfDate(string date)
         {
-            return @"EXTRACT(SECOND FROM " + date + @")";
+            return $"EXTRACT(SECOND FROM {date})";
+        }
+
+        public override string ExtractUnixTimestamp(string date)
+        {
+            return $"EXTRACT(epoch FROM {date})";
         }
 
         public override string Md5Hex(string value)

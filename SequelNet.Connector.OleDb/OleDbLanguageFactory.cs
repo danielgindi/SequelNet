@@ -56,6 +56,11 @@ namespace SequelNet.Connector
             return @"DATEPART(second, " + date + ")";
         }
 
+        public override string ExtractUnixTimestamp(string date)
+        {
+            return $"DATEDIFF(second, '1970-01-01 00:00:00', {date})";
+        }
+
         public override void BuildLimitOffset(
             Query query,
             bool top,

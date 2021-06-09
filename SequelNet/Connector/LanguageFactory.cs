@@ -96,6 +96,11 @@ namespace SequelNet.Connector
             return @"SECONDS(" + date + ")";
         }
 
+        public virtual string ExtractUnixTimestamp(string date)
+        {
+            return $"UNIX_TIMESTAMP({date})";
+        }
+
         public virtual string Md5Hex(string value)
         {
             return @"MD5(" + value + ")";
