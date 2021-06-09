@@ -138,9 +138,9 @@ namespace SequelNet
             return new DateTimeDiff(unit, columnName1, phrase2);
         }
 
-        public static UTC_TIMESTAMP UtcTimestamp()
+        public static UtcTimestamp UtcTimestamp()
         {
-            return new UTC_TIMESTAMP();
+            return new UtcTimestamp();
         }
         
         public static Year Year(object value, ValueObjectType valueType)
@@ -242,7 +242,7 @@ namespace SequelNet
         {
             return new Minute(phrase);
         }
-        
+
         public static Second Second(object value, ValueObjectType valueType)
         {
             return new Second(value, valueType);
@@ -261,6 +261,26 @@ namespace SequelNet
         public static Second Second(IPhrase phrase)
         {
             return new Second(phrase);
+        }
+
+        public static UnixTimestamp UnixTimestamp(object value, ValueObjectType valueType)
+        {
+            return new UnixTimestamp(value, valueType);
+        }
+
+        public static UnixTimestamp UnixTimestamp(string tableName, string columnName)
+        {
+            return new UnixTimestamp(tableName, columnName);
+        }
+
+        public static UnixTimestamp UnixTimestamp(string columnName)
+        {
+            return new UnixTimestamp(columnName);
+        }
+
+        public static UnixTimestamp UnixTimestamp(IPhrase phrase)
+        {
+            return new UnixTimestamp(phrase);
         }
 
         #endregion
