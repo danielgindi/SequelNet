@@ -29,9 +29,9 @@ namespace SequelNet.Phrases
         {
         }
 
-        public Year(Where where)
-            : this(where, ValueObjectType.Value)
+        public Year(ValueWrapper value)
         {
+            this.Value = value;
         }
 
         #endregion

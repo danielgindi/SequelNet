@@ -29,9 +29,9 @@ namespace SequelNet.Phrases
         {
         }
 
-        public Hour(Where where)
-            : this(where, ValueObjectType.Value)
+        public Hour(ValueWrapper value)
         {
+            this.Value = value;
         }
 
         #endregion

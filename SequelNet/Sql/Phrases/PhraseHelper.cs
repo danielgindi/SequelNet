@@ -162,7 +162,12 @@ namespace SequelNet
         {
             return new Year(phrase);
         }
-        
+
+        public static Year Year(ValueWrapper value)
+        {
+            return new Year(value);
+        }
+
         public static Month Month(object value, ValueObjectType valueType)
         {
             return new Month(value, valueType);
@@ -182,7 +187,12 @@ namespace SequelNet
         {
             return new Month(phrase);
         }
-        
+
+        public static Month Month(ValueWrapper value)
+        {
+            return new Month(value);
+        }
+
         public static Day Day(object value, ValueObjectType valueType)
         {
             return new Day(value, valueType);
@@ -202,7 +212,12 @@ namespace SequelNet
         {
             return new Day(phrase);
         }
-        
+
+        public static Day Day(ValueWrapper value)
+        {
+            return new Day(value);
+        }
+
         public static Hour Hour(object value, ValueObjectType valueType)
         {
             return new Hour(value, valueType);
@@ -222,7 +237,12 @@ namespace SequelNet
         {
             return new Hour(phrase);
         }
-        
+
+        public static Hour Hour(ValueWrapper value)
+        {
+            return new Hour(value);
+        }
+
         public static Minute Minute(object value, ValueObjectType valueType)
         {
             return new Minute(value, valueType);
@@ -243,6 +263,11 @@ namespace SequelNet
             return new Minute(phrase);
         }
 
+        public static Minute Minute(ValueWrapper value)
+        {
+            return new Minute(value);
+        }
+
         public static Second Second(object value, ValueObjectType valueType)
         {
             return new Second(value, valueType);
@@ -261,6 +286,11 @@ namespace SequelNet
         public static Second Second(IPhrase phrase)
         {
             return new Second(phrase);
+        }
+
+        public static Second Second(ValueWrapper value)
+        {
+            return new Second(value);
         }
 
         public static DateTimeFormat DateTimeFormat(object value, ValueObjectType valueType, DateTimeFormat.FormatOptions format)
