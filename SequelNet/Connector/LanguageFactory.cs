@@ -101,6 +101,11 @@ namespace SequelNet.Connector
             return $"UNIX_TIMESTAMP({date})";
         }
 
+        public virtual string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
+        {
+            throw new NotImplementedException("DateTimeFormat has not been implemented for this connector");
+        }
+
         public virtual string Md5Hex(string value)
         {
             return @"MD5(" + value + ")";

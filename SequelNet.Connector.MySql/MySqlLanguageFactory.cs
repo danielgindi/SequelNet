@@ -161,6 +161,36 @@ namespace SequelNet.Connector
             return @"UTC_TIMESTAMP()";
         }
 
+        public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
+        {
+            switch (format)
+            {
+                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                    return $"DATE_FORMAT({date}, '%Y-%m-%dT%T')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                    return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                    return $"DATE_FORMAT({date}, '%Y-%m-%dT%TZ')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                    return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000Z')";
+
+                case Phrases.DateTimeFormat.FormatOptions.Date:
+                    return $"DATE_FORMAT({date}, '%Y-%m-%d')";
+
+                case Phrases.DateTimeFormat.FormatOptions.Time:
+                    return $"DATE_FORMAT({date}, '%T')";
+
+                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                    return $"DATE_FORMAT({date}, '%T.fff')";
+
+                default:
+                    throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
+            }
+        }
+
         public override string ST_X(string pt)
         {
             if (Is5_7OrLater())

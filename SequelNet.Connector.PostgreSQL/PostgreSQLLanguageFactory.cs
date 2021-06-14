@@ -70,6 +70,36 @@ namespace SequelNet.Connector
             return $"EXTRACT(epoch FROM {date})";
         }
 
+        public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
+        {
+            switch (format)
+            {
+                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                    return $"to_char ({date}, 'YYYY-MM-DD\"T\"HH24:MI:SS')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                    return $"to_char ({date}, 'YYYY-MM-DD\"T\"HH24:MI:SS.MS')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                    return $"to_char ({date}::timestamptz at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                    return $"to_char ({date}::timestamptz at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')";
+
+                case Phrases.DateTimeFormat.FormatOptions.Date:
+                    return $"to_char ({date}, 'YYYY-MM-DD";
+
+                case Phrases.DateTimeFormat.FormatOptions.Time:
+                    return $"to_char ({date}, 'HH24:MI:SS";
+
+                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                    return $"to_char ({date}, 'HH24:MI:SS.MS";
+
+                default:
+                    throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
+            }
+        }
+
         public override string Md5Hex(string value)
         {
             return @"md5(" + value + ")";

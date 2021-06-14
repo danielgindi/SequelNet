@@ -79,6 +79,36 @@ namespace SequelNet.Connector
             return $"DATEDIFF(second, '1970-01-01 00:00:00', {date})";
         }
 
+        public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
+        {
+            switch (format)
+            {
+                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                    return $"CONVERT(nvarchar(19), {date}, 126)";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                    return $"CONVERT(nvarchar(23), {date}, 126)";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                    return $"CONCAT(CONVERT(nvarchar(19), {date}, 127), 'Z')";
+
+                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                    return $"CONCAT(CONVERT(nvarchar(23), {date}, 127), 'Z')";
+
+                case Phrases.DateTimeFormat.FormatOptions.Date:
+                    return $"CONVERT(nvarchar(10), {date}, 23)";
+
+                case Phrases.DateTimeFormat.FormatOptions.Time:
+                    return $"CONVERT(nvarchar(10), {date}, 114)";
+
+                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                    return $"CONVERT(nvarchar(14), {date}, 114)";
+
+                default:
+                    throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
+            }
+        }
+
         public override string Md5Hex(string value)
         {
             if (_MsSqlVersion.MajorVersion < 10)

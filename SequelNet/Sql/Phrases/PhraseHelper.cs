@@ -263,6 +263,31 @@ namespace SequelNet
             return new Second(phrase);
         }
 
+        public static DateTimeFormat DateTimeFormat(object value, ValueObjectType valueType, DateTimeFormat.FormatOptions format)
+        {
+            return new DateTimeFormat(value, valueType, format);
+        }
+
+        public static DateTimeFormat DateTimeFormat(string tableName, string columnName, DateTimeFormat.FormatOptions format)
+        {
+            return new DateTimeFormat(tableName, columnName, format);
+        }
+
+        public static DateTimeFormat DateTimeFormat(string columnName, DateTimeFormat.FormatOptions format)
+        {
+            return new DateTimeFormat(columnName, format);
+        }
+
+        public static DateTimeFormat DateTimeFormat(IPhrase phrase, DateTimeFormat.FormatOptions format)
+        {
+            return new DateTimeFormat(phrase, format);
+        }
+
+        public static DateTimeFormat DateTimeFormat(ValueWrapper value, DateTimeFormat.FormatOptions format)
+        {
+            return new DateTimeFormat(value, format);
+        }
+
         public static UnixTimestamp UnixTimestamp(object value, ValueObjectType valueType)
         {
             return new UnixTimestamp(value, valueType);
