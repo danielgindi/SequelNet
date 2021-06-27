@@ -4,10 +4,19 @@
     {
         public Query Update(string columnName, object value)
         {
-            return Update(columnName, value, false);
+            return Update(null, columnName, value, false);
+        }
+        public Query Update(string tableName, string columnName, object value)
+        {
+            return Update(tableName, columnName, value, false);
         }
 
         public Query Update(string columnName, object value, bool columnValueIsLiteral)
+        {
+            return Update(null, columnName, value, columnValueIsLiteral);
+        }
+
+        public Query Update(string tableName, string columnName, object value, bool columnValueIsLiteral)
         {
             var prevMode = this.QueryMode;
 
@@ -24,7 +33,7 @@
             }
 
             if (_ListInsertUpdate == null) _ListInsertUpdate = new AssignmentColumnList();
-            _ListInsertUpdate.Add(new AssignmentColumn(null, columnName, null, value, columnValueIsLiteral ? ValueObjectType.Literal : ValueObjectType.Value));
+            _ListInsertUpdate.Add(new AssignmentColumn(tableName, columnName, null, value, columnValueIsLiteral ? ValueObjectType.Literal : ValueObjectType.Value));
             return this;
         }
 
