@@ -83,26 +83,29 @@ namespace SequelNet.Connector
         {
             switch (format)
             {
-                case Phrases.DateTimeFormat.FormatOptions.DateTime:
-                    return $"CONVERT(nvarchar(19), {date}, 126)";
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
+                    return $"FORMAT({date}, 'yyyy-MM-dd\"T\"HH:mm:ss')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
-                    return $"CONVERT(nvarchar(23), {date}, 126)";
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
+                    return $"FORMAT({date}, 'yyyy-MM-dd\"T\"HH:mm:ss.fff')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
-                    return $"CONCAT(CONVERT(nvarchar(19), {date}, 127), 'Z')";
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
+                    return $"FORMAT({date}, 'yyyy-MM-dd\"T\"HH:mm:ss\"Z\"')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
-                    return $"CONCAT(CONVERT(nvarchar(23), {date}, 127), 'Z')";
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
+                    return $"FORMAT({date}, 'yyyy-MM-dd\"T\"HH:mm:ss.fff\"Z\"')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Date:
-                    return $"CONVERT(nvarchar(10), {date}, 23)";
+                case Phrases.DateTimeFormat.FormatOptions.IsoDate:
+                    return $"FORMAT({date}, 'yyyy-MM-dd')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Time:
-                    return $"CONVERT(nvarchar(10), {date}, 114)";
+                case Phrases.DateTimeFormat.FormatOptions.IsoTime:
+                    return $"FORMAT({date}, 'HH:mm:ss')";
 
-                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
-                    return $"CONVERT(nvarchar(14), {date}, 114)";
+                case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
+                    return $"FORMAT({date}, 'HH:mm:ss.fff')";
+
+                case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
+                    return $"to_char ({date}, 'yyyy-MM";
 
                 default:
                     throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");

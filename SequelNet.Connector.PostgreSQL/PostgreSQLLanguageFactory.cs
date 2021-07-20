@@ -74,26 +74,29 @@ namespace SequelNet.Connector
         {
             switch (format)
             {
-                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
                     return $"to_char ({date}, 'YYYY-MM-DD\"T\"HH24:MI:SS')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
                     return $"to_char ({date}, 'YYYY-MM-DD\"T\"HH24:MI:SS.MS')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
                     return $"to_char ({date}::timestamptz at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS\"Z\"')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
                     return $"to_char ({date}::timestamptz at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Date:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDate:
                     return $"to_char ({date}, 'YYYY-MM-DD";
 
-                case Phrases.DateTimeFormat.FormatOptions.Time:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTime:
                     return $"to_char ({date}, 'HH24:MI:SS";
 
-                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
                     return $"to_char ({date}, 'HH24:MI:SS.MS";
+
+                case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
+                    return $"to_char ({date}, 'YYYY-MM";
 
                 default:
                     throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");

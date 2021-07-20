@@ -1,4 +1,5 @@
 ﻿using SequelNet.Connector;
+using System;
 using System.Text;
 
 namespace SequelNet.Phrases
@@ -42,13 +43,29 @@ namespace SequelNet.Phrases
 
         public enum FormatOptions
         {
-            Date,
-            DateTime,
-            DateTimeFFF,
-            DateTimeZ,
-            DateTimeFFFZ,
-            Time,
-            TimeFFF,
+            IsoDate,
+            IsoDateTime,
+            IsoDateTimeFFF,
+            IsoDateTimeZ,
+            IsoDateTimeFFFZ,
+            IsoTime,
+            IsoTimeFFF,
+            IsoYearMonth,
+
+            [Obsolete("Use FormatOptions.IsoDate")]
+            Date = IsoDate,
+            [Obsolete("Use FormatOptions.IsoDateTime")]
+            DateTime = IsoDateTime,
+            [Obsolete("Use FormatOptions.IsoDateTimeFFF")]
+            DateTimeFFF = IsoDateTimeFFF,
+            [Obsolete("Use FormatOptions.IsoDateTimeZ")]
+            DateTimeZ = IsoDateTimeZ,
+            [Obsolete("Use FormatOptions.IsoDateTimeFFFZ")]
+            DateTimeFFFZ = IsoDateTimeFFFZ,
+            [Obsolete("Use FormatOptions.IsoTime")]
+            Time = IsoTime,
+            [Obsolete("Use FormatOptions.IsoTimeFFF")]
+            TimeFFF = IsoTimeFFF,
         }
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)

@@ -65,26 +65,29 @@ namespace SequelNet.Connector
         {
             switch (format)
             {
-                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
                     return $"CONVERT(nvarchar(19), {date}, 126)";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
                     return $"CONVERT(nvarchar(23), {date}, 126)";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
                     return $"CONCAT(CONVERT(nvarchar(19), {date}, 127), 'Z')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
                     return $"CONCAT(CONVERT(nvarchar(23), {date}, 127), 'Z')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Date:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDate:
                     return $"CONVERT(nvarchar(10), {date}, 23)";
 
-                case Phrases.DateTimeFormat.FormatOptions.Time:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTime:
                     return $"CONVERT(nvarchar(10), {date}, 114)";
 
-                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
                     return $"CONVERT(nvarchar(14), {date}, 114)";
+
+                case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
+                    return $"CONVERT(nvarchar(7), {date}, 127)";
 
                 default:
                     throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");

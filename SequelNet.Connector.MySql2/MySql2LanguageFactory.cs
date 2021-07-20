@@ -165,26 +165,29 @@ namespace SequelNet.Connector
         {
             switch (format)
             {
-                case Phrases.DateTimeFormat.FormatOptions.DateTime:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
                     return $"DATE_FORMAT({date}, '%Y-%m-%dT%T')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
                     return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
                     return $"DATE_FORMAT({date}, '%Y-%m-%dT%TZ')";
 
-                case Phrases.DateTimeFormat.FormatOptions.DateTimeFFFZ:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
                     return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000Z')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Date:
+                case Phrases.DateTimeFormat.FormatOptions.IsoDate:
                     return $"DATE_FORMAT({date}, '%Y-%m-%d')";
 
-                case Phrases.DateTimeFormat.FormatOptions.Time:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTime:
                     return $"DATE_FORMAT({date}, '%T')";
 
-                case Phrases.DateTimeFormat.FormatOptions.TimeFFF:
+                case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
                     return $"DATE_FORMAT({date}, '%T.fff')";
+
+                case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
+                    return $"DATE_FORMAT({date}, '%Y-%m')";
 
                 default:
                     throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
