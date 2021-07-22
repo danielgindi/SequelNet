@@ -844,7 +844,7 @@ namespace SequelNet.Connector
 
             if (!string.IsNullOrEmpty(typeDef.Charset))
             {
-                typeString += $" CHARACTER SET ${typeDef.Charset}";
+                typeString += $" CHARACTER SET {typeDef.Charset}";
             }
 
             return (typeString, isDefaultAllowed);
