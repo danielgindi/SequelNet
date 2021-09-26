@@ -359,76 +359,120 @@ namespace SequelNet
                 }
                 else
                 {
-                    BuildSingleValueFirst(outputBuilder, context);
-
                     if (Comparison != WhereComparison.None)
                     {
                         switch (Comparison)
                         {
                             case WhereComparison.EqualsTo:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 if (First == null || Second == null) outputBuilder.Append(@" IS ");
                                 else outputBuilder.Append(@" = ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.NotEqualsTo:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 if (First == null || Second == null) outputBuilder.Append(@" IS NOT ");
                                 else outputBuilder.Append(@" <> ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.GreaterThan:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" > ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.GreaterThanOrEqual:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" >= ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.LessThan:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" < ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.LessThanOrEqual:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" <= ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.Is:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" IS ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.IsNot:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" IS NOT ");
+                                BuildSingleValueSecond(outputBuilder, context);
                                 break;
                             case WhereComparison.Like:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" LIKE ");
+                                BuildSingleValueSecond(outputBuilder, context);
+                                outputBuilder.Append(' ');
+                                outputBuilder.Append(context.Conn.Language.LikeEscapingStatement);
+                                outputBuilder.Append(' ');
                                 break;
                             case WhereComparison.NotLike:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" NOT LIKE ");
+                                BuildSingleValueSecond(outputBuilder, context);
+                                outputBuilder.Append(' ');
+                                outputBuilder.Append(context.Conn.Language.LikeEscapingStatement);
+                                outputBuilder.Append(' ');
                                 break;
                             case WhereComparison.Between:
+                                BuildSingleValueFirst(outputBuilder, context);
                                 outputBuilder.Append(@" BETWEEN ");
+                                BuildSingleValueSecond(outputBuilder, context);
+
+                                outputBuilder.Append(@" AND ");
+
+                                BuildSingleValue(
+                                    outputBuilder,
+                                    ThirdTableName, Third, ThirdType,
+                                    FirstTableName, First, FirstType,
+                                    context);
                                 break;
                             case WhereComparison.In:
-                                outputBuilder.Append(@" IN ");
+                                if (SecondType == ValueObjectType.Value &&
+                                    IsEmptyCollection(Second))
+                                {
+                                    outputBuilder.Append(@" 0 ");
+                                }
+                                else
+                                {
+                                    BuildSingleValueFirst(outputBuilder, context);
+                                    outputBuilder.Append(@" IN ");
+                                    BuildSingleValueSecond(outputBuilder, context);
+                                }
                                 break;
                             case WhereComparison.NotIn:
-                                outputBuilder.Append(@" NOT IN ");
+                                if (SecondType == ValueObjectType.Value &&
+                                    IsEmptyCollection(Second))
+                                {
+                                    outputBuilder.Append(@" 1 ");
+                                }
+                                else
+                                {
+                                    BuildSingleValueFirst(outputBuilder, context);
+                                    outputBuilder.Append(@" NOT IN ");
+                                    BuildSingleValueSecond(outputBuilder, context);
+                                }
                                 break;
-                        }
-
-                        BuildSingleValueSecond(outputBuilder, context);
-
-                        if (Comparison == WhereComparison.Between)
-                        {
-                            outputBuilder.Append(@" AND ");
-
-                            BuildSingleValue(
-                                outputBuilder,
-                                ThirdTableName, Third, ThirdType,
-                                FirstTableName, First, FirstType,
-                                context);
-                        }
-                        else if (Comparison == WhereComparison.Like || Comparison == WhereComparison.NotLike)
-                        {
-                            outputBuilder.Append(' ');
-                            outputBuilder.Append(context.Conn.Language.LikeEscapingStatement);
-                            outputBuilder.Append(' ');
-                        }
+                        };
                     }
                 }
             }
+        }
+
+        private static bool IsEmptyCollection(object value)
+        {
+            return value != null &&
+                    value is IEnumerable &&
+                    !(value is string) &&
+                    value.GetType().IsCollectionType() &&
+                    ((IEnumerable)value).GetEnumerator().MoveNext();
         }
 
         public void BuildSingleValueFirst(
