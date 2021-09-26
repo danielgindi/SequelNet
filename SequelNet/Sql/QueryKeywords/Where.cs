@@ -472,7 +472,7 @@ namespace SequelNet
                     value is IEnumerable &&
                     !(value is string) &&
                     value.GetType().IsCollectionType() &&
-                    ((IEnumerable)value).GetEnumerator().MoveNext();
+                    !((IEnumerable)value).GetEnumerator().MoveNext();
         }
 
         public void BuildSingleValueFirst(
