@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
@@ -15,8 +16,8 @@ namespace SequelNet.SchemaGenerator
 
             if (context.SchemaName.Contains("."))
             {
-                context.DatabaseOwner = context.SchemaName.Substring(0, context.SchemaName.IndexOf("."));
-                context.SchemaName = context.SchemaName.Substring(context.SchemaName.IndexOf(".") + 1);
+                context.DatabaseOwner = context.SchemaName.Substring(0, context.SchemaName.IndexOf(".")).Trim();
+                context.SchemaName = context.SchemaName.Substring(context.SchemaName.IndexOf(".") + 1).Trim();
             }
 
             for (int i = 2; i <= (int)scriptLines.Length - 1; i++)
@@ -35,7 +36,7 @@ namespace SequelNet.SchemaGenerator
 
                         if (arg.StartsWith("NAME(", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalIndex.IndexName = arg.Substring(5, arg.IndexOf(")") - 5);
+                            dalIndex.IndexName = arg.Substring(5, arg.IndexOf(")") - 5).Trim();
                         }
                         else if (arg.Equals("UNIQUE", StringComparison.OrdinalIgnoreCase))
                         {
@@ -75,14 +76,18 @@ namespace SequelNet.SchemaGenerator
                         }
                         else if (arg.StartsWith("[", StringComparison.OrdinalIgnoreCase))
                         {
-                            string[] columns = arg
+                            var columns = arg
                                 .Trim(new char[] { ' ', '[', ']', '\t' })
-                                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                .Select(x => x.Trim());
                             foreach (string column in columns)
                             {
                                 if (column.EndsWith(@" ASC") || column.EndsWith(@" DESC"))
                                 {
-                                    dalIndex.Columns.Add(new DalIndexColumn(column.Substring(0, column.LastIndexOf(' ')), column.Substring(column.LastIndexOf(' ') + 1)));
+                                    dalIndex.Columns.Add(new DalIndexColumn(
+                                        column.Substring(0, column.LastIndexOf(' ')).Trim(),
+                                        column.Substring(column.LastIndexOf(' ') + 1).Trim()
+                                    ));
                                 }
                                 else
                                 {
@@ -109,15 +114,15 @@ namespace SequelNet.SchemaGenerator
 
                         if (arg.StartsWith("NAME(", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalForeignKey.ForeignKeyName = arg.Substring(5, arg.IndexOf(")") - 5);
+                            dalForeignKey.ForeignKeyName = arg.Substring(5, arg.IndexOf(")") - 5).Trim();
                         }
                         else if (arg.StartsWith("FOREIGNTABLE(", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalForeignKey.ForeignTable = arg.Substring(13, arg.IndexOf(")") - 13);
+                            dalForeignKey.ForeignTable = arg.Substring(13, arg.IndexOf(")") - 13).Trim();
                         }
                         else if (arg.StartsWith("ONUPDATE(", StringComparison.OrdinalIgnoreCase))
                         {
-                            switch ((arg.Substring(9, arg.IndexOf(")") - 9)).ToUpper())
+                            switch ((arg.Substring(9, arg.IndexOf(")") - 9)).ToUpper().Trim())
                             {
                                 case "RESTRICT":
                                     dalForeignKey.OnUpdate = DalForeignKeyReference.Restrict;
@@ -139,7 +144,7 @@ namespace SequelNet.SchemaGenerator
                         }
                         else if (arg.StartsWith("ONDELETE(", StringComparison.OrdinalIgnoreCase))
                         {
-                            switch ((arg.Substring(9, arg.IndexOf(")") - 9)).ToUpper())
+                            switch ((arg.Substring(9, arg.IndexOf(")") - 9)).ToUpper().Trim())
                             {
                                 case "RESTRICT":
                                     dalForeignKey.OnDelete = DalForeignKeyReference.Restrict;
@@ -165,7 +170,7 @@ namespace SequelNet.SchemaGenerator
                             string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                             for (int k = 0; k < strArrays.Length; k++)
                             {
-                                dalForeignKey.Columns.Add(strArrays[k]);
+                                dalForeignKey.Columns.Add(strArrays[k].Trim());
                             }
                         }
                         else if (arg.StartsWith("FOREIGNCOLUMNS[", StringComparison.OrdinalIgnoreCase))
@@ -174,7 +179,7 @@ namespace SequelNet.SchemaGenerator
                             string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                             for (int k = 0; k < strArrays.Length; k++)
                             {
-                                dalForeignKey.ForeignColumns.Add(strArrays[k]);
+                                dalForeignKey.ForeignColumns.Add(strArrays[k].Trim());
                             }
                         }
                     }
@@ -621,15 +626,15 @@ namespace SequelNet.SchemaGenerator
                         }
                         else if (columnKeyword.StartsWith("Default ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.DefaultValue = columnKeyword.Substring(8);
+                            dalColumn.DefaultValue = columnKeyword.Substring(8).Trim();
                         }
                         else if (columnKeyword.StartsWith("ActualDefault ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.ActualDefaultValue = columnKeyword.Substring(14);
+                            dalColumn.ActualDefaultValue = columnKeyword.Substring(14).Trim();
                         }
                         else if (columnKeyword.StartsWith("ToDB ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.ToDb = columnKeyword.Substring(5);
+                            dalColumn.ToDb = columnKeyword.Substring(5).Trim();
                         }
                         else if (columnKeyword.Equals("VirtualProp", StringComparison.OrdinalIgnoreCase) ||
                             /* deprecated */ columnKeyword.Equals("Virtual", StringComparison.OrdinalIgnoreCase))
@@ -638,15 +643,15 @@ namespace SequelNet.SchemaGenerator
                         }
                         else if (columnKeyword.StartsWith("FromDB ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.FromDb = columnKeyword.Substring(7);
+                            dalColumn.FromDb = columnKeyword.Substring(7).Trim();
                         }
                         else if (columnKeyword.StartsWith("ActualType ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.ActualType = columnKeyword.Substring(11);
+                            dalColumn.ActualType = columnKeyword.Substring(11).Trim();
                         }
                         else if (columnKeyword.StartsWith("Computed ", StringComparison.OrdinalIgnoreCase))
                         {
-                            var computed = columnKeyword.Substring(9);
+                            var computed = columnKeyword.Substring(9).Trim();
                             var isStored = computed.EndsWith(" STORED", StringComparison.OrdinalIgnoreCase);
                             if (isStored)
                             {
@@ -660,11 +665,11 @@ namespace SequelNet.SchemaGenerator
                         else if (columnKeyword.StartsWith("ColumnName ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.HasCustomName = true;
-                            dalColumn.Name = columnKeyword.Substring(11);
+                            dalColumn.Name = columnKeyword.Substring(11).Trim();
                         }
                         else if (columnKeyword.StartsWith("PropertyName ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.PropertyName = columnKeyword.Substring(13);
+                            dalColumn.PropertyName = columnKeyword.Substring(13).Trim();
                         }
                         else if (columnKeyword.Equals("Unique Index", StringComparison.OrdinalIgnoreCase) ||
                             columnKeyword.Equals("Unique", StringComparison.OrdinalIgnoreCase))
@@ -677,27 +682,27 @@ namespace SequelNet.SchemaGenerator
                         else if (columnKeyword.StartsWith("Foreign ", StringComparison.OrdinalIgnoreCase))
                         {
                             DalForeignKey dalFk = new DalForeignKey();
-                            string str30 = columnKeyword.Substring(8);
-                            dalFk.ForeignTable = str30.Substring(0, str30.IndexOf("."));
-                            dalFk.ForeignColumns.Add(str30.Substring(str30.IndexOf(".") + 1));
+                            string str30 = columnKeyword.Substring(8).Trim();
+                            dalFk.ForeignTable = str30.Substring(0, str30.IndexOf(".")).Trim();
+                            dalFk.ForeignColumns.Add(str30.Substring(str30.IndexOf(".") + 1).Trim());
                             dalFk.Columns.Add(dalColumn.Name);
                             context.ForeignKeys.Add(dalFk);
                         }
                         else if (columnKeyword.StartsWith("IsMutatedProperty ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.IsMutatedProperty = columnKeyword.Substring(18);
+                            dalColumn.IsMutatedProperty = columnKeyword.Substring(18).Trim();
                         }
                         else if (columnKeyword.StartsWith("Charset ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.Charset = columnKeyword.Substring(8);
+                            dalColumn.Charset = columnKeyword.Substring(8).Trim();
                         }
                         else if (columnKeyword.StartsWith("Collate ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.Collate = columnKeyword.Substring(8);
+                            dalColumn.Collate = columnKeyword.Substring(8).Trim();
                         }
                         else if (columnKeyword.StartsWith("SRID ", StringComparison.OrdinalIgnoreCase))
                         {
-                            dalColumn.SRID = Convert.ToInt32(columnKeyword.Substring(5));
+                            dalColumn.SRID = Convert.ToInt32(columnKeyword.Substring(5).Trim());
                         }
                     }
                     if (dalColumn.IsPrimaryKey & dalColumn.Type == DalColumnType.TInt)
