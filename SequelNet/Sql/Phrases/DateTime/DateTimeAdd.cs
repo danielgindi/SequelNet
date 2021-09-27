@@ -12,6 +12,32 @@ namespace SequelNet.Phrases
 
         #region Constructors
 
+        public DateTimeAdd()
+        {
+        }
+
+        public DateTimeAdd(ValueWrapper to, DateTimeUnit unit, ValueWrapper add)
+        {
+            this.Value1 = to;
+            this.Unit = unit;
+            this.Value2 = add;
+        }
+
+        public DateTimeAdd(IPhrase to, DateTimeUnit unit, ValueWrapper add)
+            : this(ValueWrapper.From(to), unit, add)
+        {
+        }
+
+        public DateTimeAdd(IPhrase to, DateTimeUnit unit, IPhrase add)
+            : this(ValueWrapper.From(to), unit, ValueWrapper.From(add))
+        {
+        }
+
+        public DateTimeAdd(ValueWrapper to, DateTimeUnit unit, IPhrase add)
+            : this(to, unit, ValueWrapper.From(add))
+        {
+        }
+
         public DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
             this.Value1 = ValueWrapper.Make(value, valueType);

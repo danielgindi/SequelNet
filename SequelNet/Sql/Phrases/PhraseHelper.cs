@@ -8,6 +8,26 @@ namespace SequelNet
     {
         #region DateTime
 
+        public static DateTimeAdd DateTimeAdd(ValueWrapper to, DateTimeUnit unit, ValueWrapper add)
+        {
+            return new DateTimeAdd(to, unit, add);
+        }
+
+        public static DateTimeAdd DateTimeAdd(IPhrase to, DateTimeUnit unit, ValueWrapper add)
+        {
+            return new DateTimeAdd(to, unit, add);
+        }
+
+        public static DateTimeAdd DateTimeAdd(IPhrase to, DateTimeUnit unit, IPhrase add)
+        {
+            return new DateTimeAdd(to, unit, add);
+        }
+
+        public static DateTimeAdd DateTimeAdd(ValueWrapper to, DateTimeUnit unit, IPhrase add)
+        {
+            return new DateTimeAdd(to, unit, add);
+        }
+
         public static DateTimeAdd DateTimeAdd(object value, ValueObjectType valueType, DateTimeUnit unit, Int64 interval)
         {
             return new DateTimeAdd(value, valueType, unit, interval);
