@@ -460,6 +460,10 @@ namespace SequelNet
                                     BuildSingleValueSecond(outputBuilder, context);
                                 }
                                 break;
+
+                            case WhereComparison.None:
+                                BuildSingleValueFirst(outputBuilder, context);
+                                break;
                         };
                     }
                 }
