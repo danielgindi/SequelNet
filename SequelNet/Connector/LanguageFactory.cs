@@ -629,7 +629,7 @@ namespace SequelNet.Connector
                 });
                 return sb.ToString();
             }
-            else if (value.GetType().BaseType.Name == "Enum")
+            else if (value is Enum)
             {
                 var underlyingValue = Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()));
                 if (underlyingValue is string || underlyingValue is char)
