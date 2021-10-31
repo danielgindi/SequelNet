@@ -6,6 +6,11 @@ using SequelNet.Connector;
 
 namespace SequelNet
 {
+    /// <summary>
+    /// Provides a base class for a record collection class - which will few utility functions for operating on a collection
+    /// </summary>
+    /// <typeparam name="TItemType">The name of the record class</typeparam>
+    /// <typeparam name="TListType">The name of the collection class</typeparam>
     [Serializable]
     public abstract class AbstractRecordList<TItemType, TListType> 
         : List<TItemType>, IRecordList<TListType>

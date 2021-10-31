@@ -4,6 +4,10 @@ using System.Threading.Tasks;
 
 namespace SequelNet
 {
+    /// <summary>
+    /// Defines an interface for a record representing class - which will supply a schema and a few utility functions
+    /// </summary>
+    /// <typeparam name="T">The name of the record class</typeparam>
     public interface IRecord
     {
         object GetPrimaryKeyValue();

@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 
 namespace SequelNet
 {
+    /// <summary>
+    /// Provides a base class for a record representing class - which will supply a schema and a few utility functions
+    /// </summary>
+    /// <typeparam name="T">The name of the record class</typeparam>
     [Serializable]
     public abstract class AbstractRecord<T> : IRecord
         where T : AbstractRecord<T>, new()
