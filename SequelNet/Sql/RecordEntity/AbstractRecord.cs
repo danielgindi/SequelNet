@@ -23,10 +23,9 @@ namespace SequelNet
         private static PropertyInfo __PRIMARY_KEY_PROP_INFO = null;
 
         private static bool __FLAGS_RETRIEVED = false;
-        private static bool __HAS_DELETED = false;
-        private static bool __HAS_IS_DELETED = false;
-        private static bool __HAS_CREATED_ON= false;
-        private static bool __HAS_MODIFIED_ON = false;
+        private static string __IS_DELETED_NAME = null;
+        private static string __CREATED_ON_NAME = null;
+        private static string __MODIFIED_ON_NAME = null;
 
         #endregion
 
@@ -96,10 +95,7 @@ namespace SequelNet
 
             if (!__PRIMARY_KEY_MULTI && keyNames.Count > 0)
             {
-                var classType = typeof(AbstractRecord<T>);
-                var propInfo = classType.GetProperty(keyNames[0]);
-                if (propInfo == null) propInfo = classType.GetProperty(keyNames[0] + @"X");
-                __PRIMARY_KEY_PROP_INFO = propInfo;
+                __PRIMARY_KEY_PROP_INFO = GetColumnPropInfo(typeof(AbstractRecord<T>), keyNames[0]);
             }
 
             __LOOKED_FOR_PRIMARY_KEY_NAME = true;
@@ -175,10 +171,7 @@ namespace SequelNet
 
                 if (!__PRIMARY_KEY_MULTI)
                 {
-                    var classType = typeof(AbstractRecord<T>);
-                    var propInfo = classType.GetProperty(__PRIMARY_KEY_NAME as string);
-                    if (propInfo == null) propInfo = classType.GetProperty(__PRIMARY_KEY_NAME as string + @"X");
-                    __PRIMARY_KEY_PROP_INFO = propInfo;
+                    __PRIMARY_KEY_PROP_INFO = GetColumnPropInfo(typeof(AbstractRecord<T>), __PRIMARY_KEY_NAME as string);
                 }
 
                 __LOOKED_FOR_PRIMARY_KEY_NAME = true;
@@ -187,10 +180,9 @@ namespace SequelNet
 
         private static void RetrieveFlags()
         {
-            __HAS_DELETED = Schema.Columns.Find(@"Deleted") != null;
-            __HAS_IS_DELETED = Schema.Columns.Find(@"IsDeleted") != null;
-            __HAS_CREATED_ON = Schema.Columns.Find(@"CreatedOn") != null;
-            __HAS_MODIFIED_ON = Schema.Columns.Find(@"ModifiedOn") != null;
+            __IS_DELETED_NAME = Schema.Columns.Find(x => x.Name == "IsDeleted" || x.Name == "is_deleted" || x.Name == "Deleted" || x.Name == "deleted")?.Name;
+            __CREATED_ON_NAME = Schema.Columns.Find(x => x.Name == "CreatedOn" || x.Name == "created_on")?.Name;
+            __MODIFIED_ON_NAME = Schema.Columns.Find(x => x.Name == "ModifiedOn" || x.Name == "modified_on")?.Name;
             __FLAGS_RETRIEVED = true;
         }
 
@@ -279,18 +271,14 @@ namespace SequelNet
 
             foreach (var column in Schema.Columns)
             {
-                var propInfo = __CLASS_TYPE.GetProperty(column.Name);
-
-                if (propInfo == null)
-                    propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
-
+                var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
                     qry.Insert(column.Name, propInfo.GetValue(this, null));
             }
 
-            if (__HAS_CREATED_ON)
+            if (__CREATED_ON_NAME != null)
             {
-                qry.Insert(@"CreatedOn", DateTime.UtcNow);
+                qry.Insert(__CREATED_ON_NAME, DateTime.UtcNow);
             }
 
             return qry;
@@ -314,8 +302,7 @@ namespace SequelNet
                 if ((isPrimaryKeyNullOrString && column.Name == (string)primaryKey) ||
                     (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, column.Name))) continue;
 
-                var propInfo = __CLASS_TYPE.GetProperty(column.Name);
-                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
+                var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
                 {
                     if (_AtomicUpdates && !IsColumnMutated(column.Name)) continue;
@@ -326,9 +313,9 @@ namespace SequelNet
 
             if (!_AtomicUpdates || qry.HasInsertsOrUpdates)
             {
-                if (__HAS_MODIFIED_ON)
+                if (__MODIFIED_ON_NAME != null)
                 {
-                    qry.Update(@"ModifiedOn", DateTime.UtcNow);
+                    qry.Update(__MODIFIED_ON_NAME, DateTime.UtcNow);
                 }
             }
 
@@ -419,11 +406,9 @@ namespace SequelNet
             if (__CLASS_TYPE == null)
                 __CLASS_TYPE = this.GetType();
 
-            PropertyInfo propInfo;
             foreach (var column in Schema.Columns)
             {
-                propInfo = __CLASS_TYPE.GetProperty(column.Name);
-                if (propInfo == null) propInfo = __CLASS_TYPE.GetProperty(column.Name + @"X");
+                var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
                 {
                     propInfo.SetValue(this, Convert.ChangeType(reader[column.Name], column.Type), null);
@@ -579,13 +564,12 @@ namespace SequelNet
                 RetrieveFlags();
             }
 
-            if (__HAS_DELETED || __HAS_IS_DELETED)
+            if (__IS_DELETED_NAME != null)
             {
                 Query qry = new Query(Schema);
 
-                if (__HAS_DELETED) qry.Update(@"Deleted", true);
-                if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
-                if (__HAS_MODIFIED_ON) qry.Update(@"ModifiedOn", DateTime.UtcNow);
+                if (__IS_DELETED_NAME != null) qry.Update(__IS_DELETED_NAME, true);
+                if (__MODIFIED_ON_NAME != null) qry.Update(__MODIFIED_ON_NAME, DateTime.UtcNow);
 
                 if (columnName is ICollection)
                 {
@@ -625,13 +609,12 @@ namespace SequelNet
                 RetrieveFlags();
             }
 
-            if (__HAS_DELETED || __HAS_IS_DELETED)
+            if (__IS_DELETED_NAME != null)
             {
                 Query qry = new Query(Schema);
 
-                if (__HAS_DELETED) qry.Update(@"Deleted", true);
-                if (__HAS_IS_DELETED) qry.Update(@"IsDeleted", true);
-                if (__HAS_MODIFIED_ON) qry.Update(@"ModifiedOn", DateTime.UtcNow);
+                if (__IS_DELETED_NAME != null) qry.Update(__IS_DELETED_NAME, true);
+                if (__MODIFIED_ON_NAME != null) qry.Update(__MODIFIED_ON_NAME, DateTime.UtcNow);
 
                 if (columnName is ICollection)
                 {
@@ -823,7 +806,29 @@ namespace SequelNet
         #endregion
 
         #region Column utilities
-        
+
+        private static PropertyInfo GetColumnPropInfo(Type classType, string name)
+        {
+            var propInfo = classType.GetProperty(name as string);
+            if (propInfo == null) propInfo = classType.GetProperty(name as string + "X");
+            if (propInfo == null) propInfo = classType.GetProperty(UnSnakeCase(name as string));
+            if (propInfo == null) propInfo = classType.GetProperty(UnSnakeCase(name as string) + "X");
+            return propInfo;
+        }
+
+        private static string UnSnakeCase(string value)
+        {
+            var parts = value.Split('_');
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+                if (part.Length > 0)
+                    parts[i] = part.Substring(0, 1).ToUpperInvariant() + part.Remove(0, 1);
+            }
+
+            return string.Join("", parts);
+        }
+
         #endregion
 
         #region Loading utilities
