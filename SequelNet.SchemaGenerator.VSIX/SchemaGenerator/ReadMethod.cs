@@ -136,7 +136,14 @@ namespace SequelNet.SchemaGenerator
 
                 if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
                 {
-                    fromDb = "(" + dalCol.EnumTypeName + ")" + fromDb;
+                    if (dalCol.IsNullable)
+                    {
+                        fromDb = $"reader.IsDBNull(Columns.{dalCol.PropertyName}) ? ({dalCol.EnumTypeName}?)null : ({dalCol.EnumTypeName}){fromDb}";
+                    }
+                    else
+                    {
+                        fromDb = $"({dalCol.EnumTypeName}){fromDb}";
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(dalCol.FromDb))
