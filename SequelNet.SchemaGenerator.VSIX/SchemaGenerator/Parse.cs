@@ -20,9 +20,15 @@ namespace SequelNet.SchemaGenerator
                 context.SchemaName = context.SchemaName.Substring(context.SchemaName.IndexOf(".") + 1).Trim();
             }
 
-            for (int i = 2; i <= (int)scriptLines.Length - 1; i++)
+            for (int i = 2; i < scriptLines.Length; i++)
             {
                 string currentLine = scriptLines[i];
+                while (currentLine.EndsWith("\\") && i + 1 < scriptLines.Length)
+                {
+                    i++;
+                    currentLine = currentLine.Substring(0, currentLine.Length - 1).Trim(new char[] { ' ', '*', '\t' }) + scriptLines[i].Trim(new char[] { ' ', '*', '\t' });
+                }
+
                 string currentLineTrimmed = currentLine.Trim(new char[] { ' ', '*', '\t' });
 
                 if (currentLineTrimmed.StartsWith("@Index:", StringComparison.OrdinalIgnoreCase))
