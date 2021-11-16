@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SequelNet.Connector</RootNamespace>
     <AssemblyName>SequelNet.Connector.MySql</AssemblyName>
-  <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strongName.pfx</AssemblyOriginatorKeyFile>
@@ -69,7 +69,7 @@
     <None Include="strongName.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="MySql.Data" Version="8.0.25" />
+    <PackageReference Include="MySql.Data" Version="8.0.27" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SequelNet\SequelNet.csproj" />

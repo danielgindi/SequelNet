@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SequelNet.Connector</RootNamespace>
     <AssemblyName>SequelNet.Connector.PostgreSQL</AssemblyName>
-  <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>strongKey.pfx</AssemblyOriginatorKeyFile>
@@ -68,7 +68,7 @@
     <None Include="strongKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="5.0.5" />
+    <PackageReference Include="Npgsql" Version="6.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SequelNet\SequelNet.csproj" />
