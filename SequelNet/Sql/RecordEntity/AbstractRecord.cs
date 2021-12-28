@@ -36,6 +36,7 @@ namespace SequelNet
         #region Private variables
 
         private static bool _AtomicUpdates = false;
+        private bool _IsAtomicUpdatesDisabled = false;
         private HashSet<string> _MutatedColumns = null;
 
         #endregion
@@ -202,6 +203,12 @@ namespace SequelNet
             set { _AtomicUpdates = value; }
         }
 
+        public bool IsAtomicUpdatesDisabled
+        {
+            get { return _IsAtomicUpdatesDisabled; }
+            set { _IsAtomicUpdatesDisabled = value; }
+        }
+
         public virtual void MarkColumnMutated(string column)
         {
             if (_MutatedColumns == null)
@@ -234,6 +241,22 @@ namespace SequelNet
         public virtual bool HasMutatedColumns()
         {
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
+        }
+
+        /// <summary>
+        /// Atomic updates are enabled by default
+        /// </summary>
+        public virtual void EnableAtomicUpdates()
+        {
+            IsAtomicUpdatesDisabled = false;
+        }
+
+        /// <summary>
+        /// Atomic updates are enabled by default
+        /// </summary>
+        public virtual void DisableAtomicUpdates()
+        {
+            IsAtomicUpdatesDisabled = true;
         }
 
         public void MarkOld()
@@ -309,7 +332,7 @@ namespace SequelNet
                 var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
                 {
-                    if (_AtomicUpdates && !IsColumnMutated(column.Name)) continue;
+                    if (_AtomicUpdates && !IsAtomicUpdatesDisabled && !IsColumnMutated(column.Name)) continue;
 
                     qry.Update(column.Name, propInfo.GetValue(this, null));
                 }

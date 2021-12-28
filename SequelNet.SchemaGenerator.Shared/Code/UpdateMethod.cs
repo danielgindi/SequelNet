@@ -49,7 +49,7 @@ namespace SequelNet.SchemaGenerator
 
                 if (context.AtomicUpdates)
                 {
-                    stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1})){0}{{{0}", "\r\n", dalCol.PropertyName);
+                    stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1}) || IsAtomicUpdatesDisabled){0}{{{0}", "\r\n", dalCol.PropertyName);
                 }
 
                 stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol));
