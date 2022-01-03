@@ -413,7 +413,7 @@ namespace SequelNet.Connector
         /// <returns>The value of the specified column.</returns>
         public object GetValue(int ordinal)
         {
-            return UnderlyingReader.GetValue(ordinal);
+            return UnderlyingReader.IsDBNull(ordinal) ? null : UnderlyingReader.GetValue(ordinal);
         }
 
         /// <summary>
@@ -768,7 +768,7 @@ namespace SequelNet.Connector
         public object GetValue(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
-            return UnderlyingReader.GetValue(ordinal);
+            return UnderlyingReader.IsDBNull(ordinal) ? null : UnderlyingReader.GetValue(ordinal);
         }
 
         #endregion
