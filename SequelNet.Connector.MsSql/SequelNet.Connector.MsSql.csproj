@@ -56,7 +56,7 @@
     <DocumentationFile>..\_Debug\SequelNet.Connector.MsSql.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\_Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
