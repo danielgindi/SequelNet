@@ -175,11 +175,41 @@ namespace SequelNet.Connector
         {
             object sqlLock = ExecuteScalar(
                 string.Format("SELECT GET_LOCK({0}, {1})",
-                Language.PrepareValue(lockName), 
+                Language.PrepareValue(lockName),
                 (timeout == TimeSpan.MaxValue ? "-1" : timeout.TotalSeconds.ToString(CultureInfo.InvariantCulture))));
 
-            if (sqlLock == null || 
-                sqlLock == DBNull.Value || 
+            if (sqlLock == null ||
+                sqlLock == DBNull.Value ||
+                (sqlLock is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)sqlLock).IsNull) ||
+                Convert.ToInt32(sqlLock) != 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public override bool IsLockUsed(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            object sqlLock = ExecuteScalar($"SELECT IS_USED_LOCK({Language.PrepareValue(lockName)})");
+
+            if (sqlLock == null ||
+                sqlLock == DBNull.Value ||
+                (sqlLock is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)sqlLock).IsNull) ||
+                Convert.ToInt32(sqlLock) != 1)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public override bool IsLockFree(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            object sqlLock = ExecuteScalar($"SELECT IS_FREE_LOCK({Language.PrepareValue(lockName)})");
+
+            if (sqlLock == null ||
+                sqlLock == DBNull.Value ||
                 (sqlLock is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)sqlLock).IsNull) ||
                 Convert.ToInt32(sqlLock) != 1)
             {

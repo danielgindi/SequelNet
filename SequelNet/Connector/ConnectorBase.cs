@@ -557,6 +557,30 @@ namespace SequelNet.Connector
         }
 
         /// <summary>
+        /// Tests whether a mutext is in use.
+        /// </summary>
+        /// <param name="lockName">Unique name for the lock</param>
+        /// <param name="owner">The owner of the lock. Partial support in different db servers.</param>
+        /// <param name="dbPrincipal">The user that has permissions to the lock.</param>
+        /// <returns><value>true</value> if the lock is used, <value>false</value> if it's free of there was an invalid argument.</returns>
+        public virtual bool IsLockUsed(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            throw new NotImplementedException(@"GetLock");
+        }
+
+        /// <summary>
+        /// Tests whether a mutext is free.
+        /// </summary>
+        /// <param name="lockName">Unique name for the lock</param>
+        /// <param name="owner">The owner of the lock. Partial support in different db servers.</param>
+        /// <param name="dbPrincipal">The user that has permissions to the lock.</param>
+        /// <returns><value>true</value> if the lock is free, <value>false</value> if it's used of there was an invalid argument.</returns>
+        public virtual bool IsLockFree(string lockName, SqlMutexOwner owner = SqlMutexOwner.Session, string dbPrincipal = null)
+        {
+            throw new NotImplementedException(@"GetLock");
+        }
+
+        /// <summary>
         /// Releases a mutex on the DB server.
         /// </summary>
         /// <param name="lockName">Unique name for the lock</param>
