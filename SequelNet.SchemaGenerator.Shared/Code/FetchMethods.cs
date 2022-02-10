@@ -50,7 +50,7 @@ namespace SequelNet.SchemaGenerator
                     sbParamsCall.AppendFormat("{0}", FirstLetterLowerCase(dalCol.PropertyName));
                 }
 
-                // FetchByID(..., ConnectorBase conn = null) function
+                // FetchById(..., ConnectorBase conn = null) function
                 stringBuilder.AppendFormat("public static {1} FetchById({2}, ConnectorBase conn = null){0}{{{0}", "\r\n",
                     context.ClassName, sbParams);
                 stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
