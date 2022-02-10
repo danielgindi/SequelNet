@@ -441,6 +441,36 @@ namespace SequelNet
             return new JsonArray(values);
         }
 
+        static public JsonArrayAggregate JsonArrayAggregate(ValueWrapper value, bool binary = false)
+        {
+            return new JsonArrayAggregate(value, binary);
+        }
+
+        static public JsonArrayAggregate JsonArrayAggregate(object value, ValueObjectType valueType, bool binary = false)
+        {
+            return new JsonArrayAggregate(value, valueType, binary);
+        }
+
+        static public JsonArrayAggregate JsonArrayAggregate(string tableName, string columnName, bool binary = false)
+        {
+            return new JsonArrayAggregate(tableName, columnName, binary);
+        }
+
+        static public JsonArrayAggregate JsonArrayAggregate(string columnName, bool binary = false)
+        {
+            return new JsonArrayAggregate(columnName, binary);
+        }
+
+        static public JsonArrayAggregate JsonArrayAggregate(IPhrase phrase, bool binary = false)
+        {
+            return new JsonArrayAggregate(phrase, binary);
+        }
+
+        static public JsonArrayAggregate JsonArrayAggregate(Where where, bool binary = false)
+        {
+            return new JsonArrayAggregate(where, binary);
+        }
+
         static public JsonArrayAppend JsonArrayAppend(
             object doc, ValueObjectType docType,
             string path,
@@ -692,6 +722,26 @@ namespace SequelNet
         public static JsonObject JsonObject(Dictionary<string, Int32> values)
         {
             return new JsonObject(values);
+        }
+
+        public static JsonObjectAggregate JsonObjectAggregate(
+            ValueWrapper key, ValueWrapper value,
+            bool binary = false)
+        {
+            return new JsonObjectAggregate(key, value, binary);
+        }
+
+        public static JsonObjectAggregate JsonObjectAggregate(
+            object key, ValueObjectType keyType,
+            object value, ValueObjectType valueType,
+            bool binary = false)
+        {
+            return new JsonObjectAggregate(key, keyType, value, valueType, binary);
+        }
+
+        public static JsonObjectAggregate JsonObjectAggregate(ValueWrapper key, IPhrase value, bool binary = false)
+        {
+            return new JsonObjectAggregate(key, value, binary);
         }
 
         static public JsonSet JsonSet(

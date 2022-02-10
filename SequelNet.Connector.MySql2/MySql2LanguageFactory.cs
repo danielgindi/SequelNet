@@ -985,6 +985,26 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildJsonArrayAggregate(
+            ValueWrapper value, bool isBinary,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("JSON_ARRAYAGG(");
+            sb.Append(value.Build(conn, relatedQuery));
+            sb.Append(")");
+        }
+
+        public override void BuildJsonObjectAggregate(
+            ValueWrapper key, ValueWrapper value, bool isBinary,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("JSON_OBJECTAGG(");
+            sb.Append(key.Build(conn, relatedQuery));
+            sb.Append(",");
+            sb.Append(value.Build(conn, relatedQuery));
+            sb.Append(")");
+        }
+
         public override string Aggregate_Some(string rawExpression)
         {
             return $"(SUM({rawExpression}) > 0)";

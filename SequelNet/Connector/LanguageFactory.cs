@@ -428,6 +428,20 @@ namespace SequelNet.Connector
             throw new NotImplementedException("JSON_VALUE has not been implemented for this connector");
         }
 
+        public virtual void BuildJsonArrayAggregate(
+            ValueWrapper value, bool isBinary,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("JSON_ARRAYAGG has not been implemented for this connector");
+        }
+
+        public virtual void BuildJsonObjectAggregate(
+            ValueWrapper key, ValueWrapper value, bool isBinary,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("JSON_OBJECTAGG has not been implemented for this connector");
+        }
+
         public virtual string Aggregate_Some(string rawExpression)
         {
             throw new NotImplementedException("SOME has not been implemented for this connector");
