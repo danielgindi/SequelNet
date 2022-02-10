@@ -51,17 +51,17 @@ namespace SequelNet.SchemaGenerator
                 }
 
                 // FetchByID(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static {1} FetchByID({2}, ConnectorBase conn = null){0}{{{0}", "\r\n",
+                stringBuilder.AppendFormat("public static {1} FetchById({2}, ConnectorBase conn = null){0}{{{0}", "\r\n",
                     context.ClassName, sbParams);
                 stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("using (var reader = qry.ExecuteReader(conn)){0}{{{0}if (reader.Read()){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat("return FetchByQuery(qry, conn);{0}}}{0}{0}", "\r\n");
 
                 // FetchByIdAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
-                stringBuilder.AppendFormat("public static async System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}", "\r\n",
+                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}", "\r\n",
                     context.ClassName, sbParams);
                 stringBuilder.AppendFormat(", ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
                 stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false)){0}{{{0}if (await reader.ReadAsync(cancellationToken).ConfigureAwait(false)){0}{{{0}{1} item = new {1}();{0}item.Read(reader);{0}return item;{0}}}{0}}}{0}return null;{0}}}{0}{0}", "\r\n", context.ClassName);
+                stringBuilder.AppendFormat("return FetchByQueryAsync(qry, conn, cancellationToken);{0}}}{0}{0}", "\r\n");
 
                 // FetchByIdAsync(..., CancellationToken? cancellationToken) function
                 stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
