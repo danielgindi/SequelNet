@@ -864,9 +864,10 @@ namespace SequelNet
         /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
         /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="includeDeleted">Should logical deletions be included in the query?</param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <returns>A record (marked as "old") or null.</returns>
-        public static T FetchById(object primaryKeyValue, ConnectorBase connection = null)
+        public static T FetchById(object primaryKeyValue, bool includeDeleted = false, ConnectorBase connection = null)
         {
             Query qry = new Query(Schema).LimitRows(1);
 
@@ -888,7 +889,24 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
-            return FetchByQuery(qry);
+            if (!includeDeleted)
+            {
+                if (!__FLAGS_RETRIEVED) RetrieveFlags();
+                if (__IS_DELETED_NAME != null) qry.AND(__IS_DELETED_NAME, false);
+            }
+
+            return FetchByQuery(qry, connection);
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static T FetchById(object primaryKeyValue, ConnectorBase connection = null)
+        {
+            return FetchById(primaryKeyValue, false, connection);
         }
 
         /// <summary>
@@ -911,10 +929,11 @@ namespace SequelNet
         /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
         /// </summary>
         /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="includeDeleted">Should logical deletions be included in the query?</param>
         /// <param name="connection">An optional db connection to use when executing the query.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>A record (marked as "old") or null.</returns>
-        public static Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        public static Task<T> FetchByIdAsync(object primaryKeyValue, bool includeDeleted = false, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
         {
             Query qry = new Query(Schema).LimitRows(1);
 
@@ -936,7 +955,37 @@ namespace SequelNet
                 qry.Where((string)primaryKey, primaryKeyValue);
             }
 
+            if (!includeDeleted)
+            {
+                if (!__FLAGS_RETRIEVED) RetrieveFlags();
+                if (__IS_DELETED_NAME != null) qry.AND(__IS_DELETED_NAME, false);
+            }
+
             return FetchByQueryAsync(qry, connection, cancellationToken);
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="connection">An optional db connection to use when executing the query.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection, CancellationToken? cancellationToken = null)
+        {
+            return FetchByIdAsync(primaryKeyValue, false, connection, cancellationToken);
+        }
+
+        /// <summary>
+        /// Fetches a record from the db, by matching the Primary Key to <paramref name="primaryKeyValue"/>.
+        /// </summary>
+        /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
+        /// <param name="includeDeleted">Should logical deletions be included in the query?</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A record (marked as "old") or null.</returns>
+        public static Task<T> FetchByIdAsync(object primaryKeyValue, bool includeDeleted, CancellationToken? cancellationToken)
+        {
+            return FetchByIdAsync(primaryKeyValue, includeDeleted, null, cancellationToken);
         }
 
         /// <summary>
@@ -947,7 +996,7 @@ namespace SequelNet
         /// <returns>A record (marked as "old") or null.</returns>
         public static Task<T> FetchByIdAsync(object primaryKeyValue, CancellationToken? cancellationToken)
         {
-            return FetchByIdAsync(primaryKeyValue, null, cancellationToken);
+            return FetchByIdAsync(primaryKeyValue, false, null, cancellationToken);
         }
 
         /// <summary>
