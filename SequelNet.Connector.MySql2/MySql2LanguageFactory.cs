@@ -1187,7 +1187,7 @@ namespace SequelNet.Connector
 
         public override string EscapeLike(string expression)
         {
-            return expression.Replace("%", "\x10%");
+            return expression.Replace("\x10", "\x10\x10").Replace("%", "\x10%").Replace("_", "\x10_");
         }
 
         public override string LikeEscapingStatement => "ESCAPE('\x10')";
