@@ -28,7 +28,7 @@ namespace SequelNet.Connector
 
         private DbConnection _Connection = null;
 
-        static ConcurrentDictionary<string, Type> s_ConnectorTypeMap = null;
+        static ConcurrentDictionary<string, Type> s_ConnectorTypeMap = new ConcurrentDictionary<string, Type>();
         static Type s_DefaultConnectorType = null;
         static string s_DefaultConnectorTypeName;
         static string s_DefaultConnectionString;
