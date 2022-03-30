@@ -12,26 +12,30 @@ namespace SequelNet.Connector
     {
         #region Instancing
 
+        private PostgreSQLFactory _Factory;
+
         public override SqlServiceType TYPE
         {
             get { return SqlServiceType.POSTGRESQL; }
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
-        public static NpgsqlConnection CreateSqlConnection(string connectionStringKey)
+        public static NpgsqlConnection CreateSqlConnection(string connectionString)
 #pragma warning restore CS3002 // Return type is not CLS-compliant
         {
-            return new NpgsqlConnection(FindConnectionString(connectionStringKey));
-        }
-        
-        public PostgreSQLConnector()
-        {
-            Connection = CreateSqlConnection(null);
+            return new NpgsqlConnection(connectionString);
         }
 
-        public PostgreSQLConnector(string connectionStringKey)
+        public PostgreSQLConnector(PostgreSQLFactory factory)
         {
-            Connection = CreateSqlConnection(connectionStringKey);
+            _Factory = factory;
+            Connection = CreateSqlConnection(_Factory.ConnectionString);
+        }
+
+        public PostgreSQLConnector(string connectionString)
+        {
+            _Factory = PostgreSQLFactory.Shared;
+            Connection = CreateSqlConnection(connectionString);
         }
 
         ~PostgreSQLConnector()
@@ -39,7 +43,7 @@ namespace SequelNet.Connector
             Dispose(false);
         }
 
-        public override IConnectorFactory Factory => PostgreSQLFactory.Instance;
+        public override IConnectorFactory Factory => _Factory;
 
         private static ConcurrentDictionary<PostgreSQLMode, PostgreSQLLanguageFactory> _LanguageFactories = new ConcurrentDictionary<PostgreSQLMode, PostgreSQLLanguageFactory>();
         private PostgreSQLLanguageFactory _LanguageFactory = null;

@@ -11,24 +11,28 @@ namespace SequelNet.Connector
     {
         #region Instancing
 
+        private OleDbFactory _Factory;
+
         public override SqlServiceType TYPE
         {
             get { return SqlServiceType.MSACCESS; }
         }
 
-        public static OleDbConnection CreateSqlConnection(string connectionStringKey)
+        public static OleDbConnection CreateSqlConnection(string connectionString)
         {
-            return new OleDbConnection(FindConnectionString(connectionStringKey));
+            return new OleDbConnection(connectionString);
         }
 
-        public OleDbConnector()
+        public OleDbConnector(OleDbFactory factory)
         {
-            Connection = CreateSqlConnection(null);
+            _Factory = factory;
+            Connection = CreateSqlConnection(_Factory.ConnectionString);
         }
 
-        public OleDbConnector(string connectionStringKey)
+        public OleDbConnector(string connectionString)
         {
-            Connection = CreateSqlConnection(connectionStringKey);
+            _Factory = OleDbFactory.Shared;
+            Connection = CreateSqlConnection(connectionString);
         }
 
         ~OleDbConnector()
@@ -36,7 +40,7 @@ namespace SequelNet.Connector
             Dispose(false);
         }
 
-        public override IConnectorFactory Factory => OleDbFactory.Instance;
+        public override IConnectorFactory Factory => _Factory;
 
         private static OleDbLanguageFactory _LanguageFactory = new OleDbLanguageFactory();
 

@@ -13,7 +13,7 @@ namespace SequelNet
             bool ownsConn = context.Conn == null;
             if (ownsConn)
             {
-                context.Conn = ConnectorBase.NewInstance();
+                context.Conn = ConnectorBase.Create();
             }
 
             try

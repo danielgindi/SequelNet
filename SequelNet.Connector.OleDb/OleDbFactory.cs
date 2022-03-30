@@ -6,11 +6,23 @@ namespace SequelNet.Connector
 {
     public class OleDbFactory : IConnectorFactory
     {
-        internal static OleDbFactory Instance = new OleDbFactory();
+        internal static OleDbFactory Shared = new OleDbFactory(null);
+
+        public string ConnectionString { get; set; }
+
+        public OleDbFactory(string connectionString)
+        {
+            this.ConnectionString = connectionString;
+        }
 
         public DbParameter NewParameter(string name, object value)
         {
             return new OleDbParameter(name, value);
+        }
+
+        public ConnectorBase Connector()
+        {
+            return new OleDbConnector(this);
         }
 
         public DbParameter NewParameter(string name, DbType type, object value)

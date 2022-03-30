@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+		<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<LangVersion>10.0</LangVersion>
+		<RootNamespace>SequelNet</RootNamespace>
+		<AssemblyName>SequelNet.Extensions.DependencyInjection</AssemblyName>
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>strongKey.pfx</AssemblyOriginatorKeyFile>
+		<PublishUrl>publish\</PublishUrl>
+		<Version>3.0.91</Version>
+		<Company />
+		<Product>SequelNet Hosting Extensions</Product>
+		<Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2022</Copyright>
+		<PackageId>SequelNet.Extensions.DependencyInjection</PackageId>
+		<Authors>Daniel Cohen Gindi</Authors>
+		<RepositoryUrl>https://github.com/danielgindi/SequelNet</RepositoryUrl>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>full</DebugType>
+		<Optimize>false</Optimize>
+		<OutputPath>..\_Debug\</OutputPath>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+		<Prefer32Bit>false</Prefer32Bit>
+		<DocumentationFile>..\_Debug\SequelNet.Extensions.Hosting.xml</DocumentationFile>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<DebugType>portable</DebugType>
+		<Optimize>true</Optimize>
+		<OutputPath>..\_Release\</OutputPath>
+		<DefineConstants>TRACE</DefineConstants>
+		<ErrorReport>prompt</ErrorReport>
+		<WarningLevel>4</WarningLevel>
+		<NoWarn>
+		</NoWarn>
+		<AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+		<CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+		<Prefer32Bit>false</Prefer32Bit>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Include="strongKey.pfx" />
+	</ItemGroup>
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\SequelNet\SequelNet.csproj" />
+	</ItemGroup>
+</Project>

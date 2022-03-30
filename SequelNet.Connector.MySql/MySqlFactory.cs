@@ -6,8 +6,19 @@ namespace SequelNet.Connector
 {
     public class MySqlFactory : IConnectorFactory
     {
-        internal static MySqlFactory Instance = new MySqlFactory();
+        internal static MySqlFactory Shared = new MySqlFactory(null);
 
+        public string ConnectionString { get; set; }
+
+        public MySqlFactory(string connectionString)
+        {
+            this.ConnectionString = connectionString;
+        }
+
+        public ConnectorBase Connector()
+        {
+            return new MySqlConnector(this);
+        }
         public DbParameter NewParameter(string name, object value)
         {
             return new MySqlParameter(name, value);

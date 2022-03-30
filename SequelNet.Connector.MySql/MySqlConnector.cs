@@ -13,26 +13,30 @@ namespace SequelNet.Connector
     {
         #region Instancing
 
+        private MySqlFactory _Factory;
+
         public override SqlServiceType TYPE
         {
             get { return SqlServiceType.MYSQL; }
         }
 
 #pragma warning disable CS3002 // Return type is not CLS-compliant
-        public static MySqlConnection CreateSqlConnection(string connectionStringKey)
+        public static MySqlConnection CreateSqlConnection(string connectionString)
 #pragma warning restore CS3002 // Return type is not CLS-compliant
         {
-            return new MySqlConnection(FindConnectionString(connectionStringKey));
+            return new MySqlConnection(connectionString);
         }
 
-        public MySqlConnector()
+        public MySqlConnector(MySqlFactory factory)
         {
-            Connection = CreateSqlConnection(null);
+            _Factory = factory;
+            Connection = CreateSqlConnection(_Factory.ConnectionString);
         }
 
-        public MySqlConnector(string connectionStringKey)
+        public MySqlConnector(string connectionString)
         {
-            Connection = CreateSqlConnection(connectionStringKey);
+            _Factory = MySqlFactory.Shared;
+            Connection = CreateSqlConnection(connectionString);
         }
 
         ~MySqlConnector()
@@ -40,7 +44,7 @@ namespace SequelNet.Connector
             Dispose(false);
         }
 
-        public override IConnectorFactory Factory => MySqlFactory.Instance;
+        public override IConnectorFactory Factory => _Factory;
 
         private static ConcurrentDictionary<MySqlMode, MySqlLanguageFactory> _LanguageFactories = new ConcurrentDictionary<MySqlMode, MySqlLanguageFactory>();
         private MySqlLanguageFactory _LanguageFactory = null;

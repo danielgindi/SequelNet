@@ -23,7 +23,7 @@ namespace SequelNet
             bool ownsTransaction = false;
             try
             {
-                if (conn == null) conn = ConnectorBase.NewInstance();
+                if (conn == null) conn = ConnectorBase.Create();
                 if (withTransaction && !conn.HasTransaction)
                 {
                     ownsTransaction = true;
@@ -50,13 +50,18 @@ namespace SequelNet
             }
         }
 
+        public virtual void SaveAll(IConnectorFactory factory, bool withTransaction = false)
+        {
+            SaveAll(factory.Connector(), withTransaction);
+        }
+
         public virtual async Task SaveAllAsync(ConnectorBase conn = null, bool withTransaction = false, CancellationToken? cancellationToken = null)
         {
             bool ownsConnection = conn == null;
             bool ownsTransaction = false;
             try
             {
-                if (conn == null) conn = ConnectorBase.NewInstance();
+                if (conn == null) conn = ConnectorBase.Create();
                 if (withTransaction && !conn.HasTransaction)
                 {
                     ownsTransaction = true;
@@ -83,24 +88,34 @@ namespace SequelNet
             }
         }
 
+        public virtual Task SaveAllAsync(IConnectorFactory factory, bool withTransaction = false, CancellationToken? cancellationToken = null)
+        {
+            return SaveAllAsync(factory.Connector(), withTransaction, cancellationToken);
+        }
+
         public Task SaveAllAsync(ConnectorBase conn, CancellationToken? cancellationToken)
         {
             return SaveAllAsync(conn, false, cancellationToken);
         }
 
+        public Task SaveAllAsync(IConnectorFactory factory, CancellationToken? cancellationToken)
+        {
+            return SaveAllAsync(factory.Connector(), false, cancellationToken);
+        }
+
         public void SaveAll(bool withTransaction)
         {
-            SaveAll(null, withTransaction);
+            SaveAll((ConnectorBase)null, withTransaction);
         }
 
         public Task SaveAllAsync(bool withTransaction, CancellationToken? cancellationToken = null)
         {
-            return SaveAllAsync(null, withTransaction, cancellationToken);
+            return SaveAllAsync((ConnectorBase)null, withTransaction, cancellationToken);
         }
 
         public Task SaveAllAsync(CancellationToken? cancellationToken)
         {
-            return SaveAllAsync(null, false, cancellationToken);
+            return SaveAllAsync((ConnectorBase)null, false, cancellationToken);
         }
 
         public static TListType FromReader(DataReader reader)
@@ -129,6 +144,14 @@ namespace SequelNet
             }
         }
 
+        public static TListType FetchAll(IConnectorFactory factory)
+        {
+            using (var reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(factory.Connector()))
+            {
+                return FromReader(reader);
+            }
+        }
+
         public static async Task<TListType> FetchAllAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
             using (var reader = await new Query(AbstractRecord<TItemType>.Schema).ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
@@ -137,9 +160,14 @@ namespace SequelNet
             }
         }
 
+        public static Task<TListType> FetchAllAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return FetchAllAsync(factory.Connector(), cancellationToken);
+        }
+
         public static Task<TListType> FetchAllAsync(CancellationToken? cancellationToken)
         {
-            return FetchAllAsync(null, cancellationToken);
+            return FetchAllAsync((ConnectorBase)null, cancellationToken);
         }
 
         public static TListType Where(string columnName, object columnValue)
@@ -155,15 +183,26 @@ namespace SequelNet
                 return FromReader(reader);
         }
 
+        public static TListType FetchByQuery(Query qry, IConnectorFactory factory)
+        {
+            using (var reader = qry.ExecuteReader(factory.Connector()))
+                return FromReader(reader);
+        }
+
         public static async Task<TListType> FetchByQueryAsync(Query qry, ConnectorBase conn = null, CancellationToken? cancellationToken = null)
         {
             using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
                 return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
         }
 
+        public static Task<TListType> FetchByQueryAsync(Query qry, IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return FetchByQueryAsync(qry, factory.Connector(), cancellationToken);
+        }
+
         public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
         {
-            using (var reader = await qry.ExecuteReaderAsync(null, cancellationToken).ConfigureAwait(false))
+            using (var reader = await qry.ExecuteReaderAsync((ConnectorBase)null, cancellationToken).ConfigureAwait(false))
                 return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
         }
 

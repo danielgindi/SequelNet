@@ -340,7 +340,7 @@ namespace SequelNet
             if (connection == null)
             {
                 ownsConnection = true;
-                connection = ConnectorBase.NewInstance();
+                connection = ConnectorBase.Create();
             }
             try
             {

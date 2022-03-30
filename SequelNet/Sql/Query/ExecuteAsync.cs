@@ -26,7 +26,7 @@ namespace SequelNet
             {
                 if (needsDispose)
                 {
-                    connection = ConnectorBase.NewInstance();
+                    connection = ConnectorBase.Create();
                     commandBehavior |= CommandBehavior.CloseConnection;
                 }
 
@@ -57,11 +57,39 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query returning a <typeparamref name="DataReader"/> object.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="commandBehavior">Command behavior</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><typeparamref name="DataReader"/> object</returns>
+        public Task<DataReader> ExecuteReaderAsync(
+            IConnectorFactory factory,
+            CommandBehavior commandBehavior = CommandBehavior.Default,
+            CancellationToken? cancellationToken = null)
+        {
+            return ExecuteReaderAsync(factory.Connector(), commandBehavior, cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns><typeparamref name="DataReader"/> object</returns>
+        public Task<DataReader> ExecuteReaderAsync(
+            IConnectorFactory factory,
+            CancellationToken? cancellationToken)
+        {
+            return ExecuteReaderAsync(factory.Connector(), CommandBehavior.Default, cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns><typeparamref name="DataReader"/> object</returns>
         public Task<DataReader> ExecuteReaderAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteReaderAsync(null, CommandBehavior.Default, cancellationToken);
+            return ExecuteReaderAsync((ConnectorBase)null, CommandBehavior.Default, cancellationToken);
         }
 
         /// <summary>
@@ -71,7 +99,7 @@ namespace SequelNet
         /// <returns><typeparamref name="DataReader"/> object</returns>
         public Task<DataReader> ExecuteReaderAsync(CommandBehavior commandBehavior)
         {
-            return ExecuteReaderAsync(null, commandBehavior, null);
+            return ExecuteReaderAsync((ConnectorBase)null, commandBehavior, null);
         }
 
         /// <summary>
@@ -86,7 +114,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction)
@@ -122,12 +150,26 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query returning the first value of the first row.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>an object</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public Task<object> ExecuteScalarAsync(
+            IConnectorFactory factory,
+            CancellationToken? cancellationToken = null)
+        {
+            return ExecuteScalarAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>an object</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public Task<object> ExecuteScalarAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteScalarAsync(null, cancellationToken);
+            return ExecuteScalarAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -156,6 +198,23 @@ namespace SequelNet
         /// Will execute the query returning the first value of the first row.
         /// </summary>
         /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
+        public Task<Nullable<T>> ExecuteScalarOrNullAsync<T>(
+            IConnectorFactory factory,
+            CancellationToken? cancellationToken = null) where T : struct, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
+        {
+            return ExecuteScalarOrNullAsync<T>(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
@@ -163,7 +222,7 @@ namespace SequelNet
         public Task<Nullable<T>> ExecuteScalarOrNullAsync<T>(CancellationToken? cancellationToken) where T : struct, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
-            return ExecuteScalarOrNullAsync<T>(null, cancellationToken);
+            return ExecuteScalarOrNullAsync<T>((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -184,6 +243,22 @@ namespace SequelNet
 
             return Convert.ChangeType(scalar, typeof(T)) as T;
         }
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
+        public Task<T> ExecuteScalarAsync<T>(
+            IConnectorFactory factory,
+            CancellationToken? cancellationToken = null) where T : class, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
+        {
+            return ExecuteScalarAsync<T>(factory.Connector(), cancellationToken);
+        }
 
         /// <summary>
         /// Will execute the query returning the first value of the first row.
@@ -196,7 +271,7 @@ namespace SequelNet
         public Task<T> ExecuteScalarAsync<T>(CancellationToken? cancellationToken) where T : class, IConvertible
 #pragma warning restore CS3024 // Constraint type is not CLS-compliant
         {
-            return ExecuteScalarAsync<T>(null, cancellationToken);
+            return ExecuteScalarAsync<T>((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -210,7 +285,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
@@ -240,11 +315,22 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query without reading any results.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Number of affected rows</returns>
+        public Task<int> ExecuteNonQueryAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteNonQueryAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query without reading any results.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows</returns>
         public Task<int> ExecuteNonQueryAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteNonQueryAsync(null, cancellationToken);
+            return ExecuteNonQueryAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -263,11 +349,23 @@ namespace SequelNet
         /// Will execute the query without reading any results.
         /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Number of affected rows</returns>
+        public Task<int> ExecuteAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query without reading any results.
+        /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows</returns>
         public Task<int> ExecuteAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteNonQueryAsync(null, cancellationToken);
+            return ExecuteNonQueryAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -281,7 +379,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
@@ -320,11 +418,22 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query, and fetch the last inserted ROWID.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Number of affected rows - and the lastInserId</returns>
+        public Task<(int updates, object lastInsertId)> ExecuteWithLastInsertIdAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteWithLastInsertIdAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Will execute the query, and fetch the last inserted ROWID.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Number of affected rows - and the lastInserId</returns>
         public Task<(int updates, object lastInsertId)> ExecuteWithLastInsertIdAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteWithLastInsertIdAsync(null, cancellationToken);
+            return ExecuteWithLastInsertIdAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -341,11 +450,22 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first value of each row.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Array of values. Will never return null.</returns>
+        public Task<T[]> ExecuteScalarArrayAsync<T>(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteScalarArrayAsync<T>(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first value of each row.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Array of values. Will never return null.</returns>
         public Task<T[]> ExecuteScalarArrayAsync<T>(CancellationToken? cancellationToken)
         {
-            return ExecuteScalarArrayAsync<T>(null, cancellationToken);
+            return ExecuteScalarArrayAsync<T>((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -375,11 +495,22 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first value of each row.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>List of values. Will never return null.</returns>
+        public Task<List<T>> ExecuteScalarListAsync<T>(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteScalarListAsync<T>(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first value of each row.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>List of values. Will never return null.</returns>
         public Task<List<T>> ExecuteScalarListAsync<T>(CancellationToken? cancellationToken)
         {
-            return ExecuteScalarListAsync<T>(null, cancellationToken);
+            return ExecuteScalarListAsync<T>((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -417,12 +548,24 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first row only into a list.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>List of values by the SELECT order. null if no results were returned by the query.</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public Task<List<object>> ExecuteOneRowToListAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteOneRowToListAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only into a list.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>List of values by the SELECT order. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public Task<List<object>> ExecuteOneRowToListAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteOneRowToListAsync(null, cancellationToken);
+            return ExecuteOneRowToListAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -465,12 +608,24 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first row only into a dictionary.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public Task<Dictionary<string, object>> ExecuteOneRowToDictionaryAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteOneRowToDictionaryAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only into a dictionary.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
         public Task<Dictionary<string, object>> ExecuteOneRowToDictionaryAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteOneRowToDictionaryAsync(null, cancellationToken);
+            return ExecuteOneRowToDictionaryAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -506,11 +661,22 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads all rows into a list of lists.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Each item in the list is a list of values by the SELECT order. Will never return null.</returns>
+        public Task<List<List<object>>> ExecuteListOfListsAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteListOfListsAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads all rows into a list of lists.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Each item in the list is a list of values by the SELECT order. Will never return null.</returns>
         public Task<List<List<object>>> ExecuteListOfListsAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteListOfListsAsync(null, cancellationToken);
+            return ExecuteListOfListsAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -552,11 +718,22 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first row only.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        public Task<List<Dictionary<string, object>>> ExecuteListOfDictionariesAsync(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteListOfDictionariesAsync(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         public Task<List<Dictionary<string, object>>> ExecuteListOfDictionariesAsync(CancellationToken? cancellationToken)
         {
-            return ExecuteListOfDictionariesAsync(null, cancellationToken);
+            return ExecuteListOfDictionariesAsync((ConnectorBase)null, cancellationToken);
         }
 
         /// <summary>
@@ -575,20 +752,33 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first row only.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        public Task<L> ExecuteCollectionAsync<R, L>(IConnectorFactory factory, CancellationToken? cancellationToken = null)
+            where R : AbstractRecord<R>, new()
+            where L : AbstractRecordList<R, L>, new()
+        {
+            return ExecuteCollectionAsync<R, L>(factory.Connector(), cancellationToken);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only.
+        /// </summary>
         /// <param name="cancellationToken">Cancellation token</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         public Task<L> ExecuteCollectionAsync<R, L>(CancellationToken? cancellationToken)
             where R : AbstractRecord<R>, new()
             where L : AbstractRecordList<R, L>, new()
         {
-            return ExecuteCollectionAsync<R, L>(null, cancellationToken);
+            return ExecuteCollectionAsync<R, L>((ConnectorBase)null, cancellationToken);
         }
 
         public Task<object> ExecuteAggregateAsync(
             BaseAggregatePhrase aggregate,
             CancellationToken? cancellationToken = null)
         {
-            return ExecuteAggregateAsync(aggregate, null, cancellationToken);
+            return ExecuteAggregateAsync(aggregate, (ConnectorBase)null, cancellationToken);
         }
 
         public async Task<object> ExecuteAggregateAsync(
@@ -600,7 +790,7 @@ namespace SequelNet
             if (connection == null)
             {
                 ownsConnection = true;
-                connection = ConnectorBase.NewInstance();
+                connection = ConnectorBase.Create();
             }
             try
             {
@@ -628,6 +818,17 @@ namespace SequelNet
                     connection = null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Will execute the query, and fetch the last inserted ROWID.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Number of affected rows - and the lastInserId</returns>
+        public Task<object> ExecuteAggregateAsync(BaseAggregatePhrase aggregate, IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return ExecuteAggregateAsync(aggregate, factory.Connector(), cancellationToken);
         }
     }
 }

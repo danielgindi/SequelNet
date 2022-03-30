@@ -17,7 +17,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
                 using (var cmd = BuildDbCommand(connection))
                     return connection.ExecuteDataSet(cmd);
             }
@@ -42,7 +42,7 @@ namespace SequelNet
             {
                 if (needsDispose)
                 {
-                    connection = ConnectorBase.NewInstance();
+                    connection = ConnectorBase.Create();
                     commandBehavior |= CommandBehavior.CloseConnection;
                 }
 
@@ -60,6 +60,16 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns><typeparamref name="DataReader"/> object</returns>
+        public DataReader ExecuteReader(IConnectorFactory factory, CommandBehavior commandBehavior = CommandBehavior.Default)
+        {
+            return ExecuteReader(factory.Connector(), commandBehavior);
+        }
+
+        /// <summary>
         /// Will execute the query returning the first value of the first row.
         /// </summary>
         /// <param name="connection">An existing connection to use.</param>
@@ -70,7 +80,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction)
@@ -105,6 +115,17 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query returning the first value of the first row.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>an object</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public object ExecuteScalar(IConnectorFactory factory)
+        {
+            return ExecuteScalar(factory.Connector());
+        }
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
         /// <typeparam name="T">Type to convert to</typeparam>
         /// <param name="connection">An existing connection to use.</param>
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
@@ -127,6 +148,20 @@ namespace SequelNet
         /// Will execute the query returning the first value of the first row.
         /// </summary>
         /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
+        public Nullable<T> ExecuteScalarOrNull<T>(IConnectorFactory factory) where T : struct, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
+        {
+            return ExecuteScalarOrNull<T>(factory.Connector());
+        }
+
+        /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
         /// <param name="connection">An existing connection to use.</param>
         /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
         /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
@@ -142,6 +177,20 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Will execute the query returning the first value of the first row.
+        /// </summary>
+        /// <typeparam name="T">Type to convert to</typeparam>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>a value of the required type, or null if the returned value was null or could not be converted to specified type</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+#pragma warning disable CS3024 // Constraint type is not CLS-compliant
+        public T ExecuteScalar<T>(IConnectorFactory factory) where T : class, IConvertible
+#pragma warning restore CS3024 // Constraint type is not CLS-compliant
+        {
+            return ExecuteScalar<T>(factory.Connector());
+        }
+
+        /// <summary>
         /// Will execute the query without reading any results.
         /// </summary>
         /// <param name="connection">An existing connection to use.</param>
@@ -151,7 +200,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
@@ -175,7 +224,18 @@ namespace SequelNet
                 }
             }
         }
-        
+
+
+        /// <summary>
+        /// Will execute the query without reading any results.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Number of affected rows</returns>
+        public int ExecuteNonQuery(IConnectorFactory factory)
+        {
+            return ExecuteNonQuery(factory.Connector());
+        }
+
         /// <summary>
         /// Will execute the query without reading any results.
         /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
@@ -185,6 +245,17 @@ namespace SequelNet
         public int Execute(ConnectorBase connection = null)
         {
             return ExecuteNonQuery(connection);
+        }
+
+        /// <summary>
+        /// Will execute the query without reading any results.
+        /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Number of affected rows</returns>
+        public int Execute(IConnectorFactory factory)
+        {
+            return Execute(factory.Connector());
         }
 
         /// <summary>
@@ -198,7 +269,7 @@ namespace SequelNet
             bool needsDispose = connection == null;
             try
             {
-                if (needsDispose) connection = ConnectorBase.NewInstance();
+                if (needsDispose) connection = ConnectorBase.Create();
 
                 bool transaction = false;
                 if (NeedTransaction && !connection.HasTransaction) connection.BeginTransaction();
@@ -233,6 +304,17 @@ namespace SequelNet
         /// <summary>
         /// Will execute the query, and fetch the last inserted ROWID.
         /// </summary>
+        /// <param name="lastInsertId">Where to put the last inserted ROWID</param>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Number of affected rows</returns>
+        public int Execute(out object lastInsertId, IConnectorFactory factory)
+        {
+            return Execute(out lastInsertId, factory.Connector());
+        }
+
+        /// <summary>
+        /// Will execute the query, and fetch the last inserted ROWID.
+        /// </summary>
         /// <param name="connection">An existing connection to use.</param>
         /// <param name="lastInsertId">Where to put the last inserted ROWID</param>
         /// <returns>Number of affected rows</returns>
@@ -251,7 +333,17 @@ namespace SequelNet
         {
             return ExecuteScalarList<T>(connection).ToArray();
         }
-        
+
+        /// <summary>
+        /// Executes the query and reads the first value of each row.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Array of values. Will never return null.</returns>
+        public T[] ExecuteScalarArray<T>(IConnectorFactory factory)
+        {
+            return ExecuteScalarArray<T>(factory.Connector());
+        }
+
         /// <summary>
         /// Executes the query and reads the first value of each row.
         /// </summary>
@@ -274,7 +366,17 @@ namespace SequelNet
             }
             return list;
         }
-        
+
+        /// <summary>
+        /// Executes the query and reads the first value of each row.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>List of values. Will never return null.</returns>
+        public List<T> ExecuteScalarList<T>(IConnectorFactory factory)
+        {
+            return ExecuteScalarList<T>(factory.Connector());
+        }
+
         /// <summary>
         /// Executes the query and reads the first row only into a list.
         /// </summary>
@@ -305,7 +407,18 @@ namespace SequelNet
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Executes the query and reads the first row only into a list.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>List of values by the SELECT order. null if no results were returned by the query.</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public List<object> ExecuteOneRowToList(IConnectorFactory factory)
+        {
+            return ExecuteOneRowToList(factory.Connector());
+        }
+
         /// <summary>
         /// Executes the query and reads the first row only into a dictionary.
         /// </summary>
@@ -341,7 +454,18 @@ namespace SequelNet
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Executes the query and reads the first row only into a dictionary.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        /// <remarks>You might want to limit the query return rows, to optimize the query.</remarks>
+        public Dictionary<string, object> ExecuteOneRowToDictionary(IConnectorFactory factory)
+        {
+            return ExecuteOneRowToDictionary(factory.Connector());
+        }
+
         /// <summary>
         /// Executes the query and reads all rows into a list of lists.
         /// </summary>
@@ -370,7 +494,17 @@ namespace SequelNet
             }
             return results;
         }
-        
+
+        /// <summary>
+        /// Executes the query and reads all rows into a list of lists.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Each item in the list is a list of values by the SELECT order. Will never return null.</returns>
+        public List<List<object>> ExecuteListOfLists(IConnectorFactory factory)
+        {
+            return ExecuteListOfLists(factory.Connector());
+        }
+
         /// <summary>
         /// Executes the query and reads the first row only.
         /// </summary>
@@ -408,6 +542,16 @@ namespace SequelNet
         /// <summary>
         /// Executes the query and reads the first row only.
         /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        public List<Dictionary<string, object>> ExecuteListOfDictionaries(IConnectorFactory factory)
+        {
+            return ExecuteListOfDictionaries(factory.Connector());
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only.
+        /// </summary>
         /// <param name="connection">An existing connection to use.</param>
         /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
         public L ExecuteCollection<R, L>(ConnectorBase connection = null)
@@ -415,6 +559,18 @@ namespace SequelNet
             where L : AbstractRecordList<R, L>, new()
         {
             return AbstractRecordList<R, L>.FetchByQuery(this, connection);
+        }
+
+        /// <summary>
+        /// Executes the query and reads the first row only.
+        /// </summary>
+        /// <param name="factory">A connector factory.</param>
+        /// <returns>Dictionary of values by the SELECT order, where the key is the column name. null if no results were returned by the query.</returns>
+        public L ExecuteCollection<R, L>(IConnectorFactory factory)
+            where R : AbstractRecord<R>, new()
+            where L : AbstractRecordList<R, L>, new()
+        {
+            return ExecuteCollection<R, L>(factory.Connector());
         }
 
         private SelectColumnList GenerateAggregateSelectList(
@@ -462,6 +618,11 @@ namespace SequelNet
             return ExecuteAggregate(null, columnName, aggregateFunction, isDistinctQuery, connection);
         }
 
+        public object ExecuteAggregate(string columnName, string aggregateFunction, bool isDistinctQuery, IConnectorFactory factory)
+        {
+            return ExecuteAggregate(columnName, aggregateFunction, isDistinctQuery, factory.Connector());
+        }
+
         public object ExecuteAggregate(
             string schemaName, string columnName, string aggregateFunction, 
             bool isDistinctQuery,
@@ -471,7 +632,7 @@ namespace SequelNet
             if (connection == null)
             {
                 ownsConnection = true;
-                connection = ConnectorBase.NewInstance();
+                connection = ConnectorBase.Create();
             }
             try
             {
@@ -499,13 +660,21 @@ namespace SequelNet
             }
         }
 
+        public object ExecuteAggregate(
+            string schemaName, string columnName, string aggregateFunction,
+            bool isDistinctQuery,
+            IConnectorFactory factory)
+        {
+            return ExecuteAggregate(schemaName, columnName, aggregateFunction, isDistinctQuery, factory.Connector());
+        }
+
         public object ExecuteAggregate(BaseAggregatePhrase aggregate, ConnectorBase connection = null)
         {
             bool ownsConnection = false;
             if (connection == null)
             {
                 ownsConnection = true;
-                connection = ConnectorBase.NewInstance();
+                connection = ConnectorBase.Create();
             }
             try
             {
@@ -533,6 +702,11 @@ namespace SequelNet
                     connection = null;
                 }
             }
+        }
+
+        public object ExecuteAggregate(BaseAggregatePhrase aggregate, IConnectorFactory factory)
+        {
+            return ExecuteAggregate(aggregate, factory.Connector());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Data;
 using System.Configuration;
@@ -27,23 +28,71 @@ namespace SequelNet.Connector
 
         private DbConnection _Connection = null;
 
-        static Type s_ConnectorType = null;
-        static public ConnectorBase NewInstance()
+        static ConcurrentDictionary<string, Type> s_ConnectorTypeMap = null;
+        static Type s_DefaultConnectorType = null;
+        static string s_DefaultConnectorTypeName;
+        static string s_DefaultConnectionString;
+
+        private static Type GetConnectorType(string typeName)
         {
-            if (s_ConnectorType == null)
+            if (s_ConnectorTypeMap.TryGetValue(typeName, out var type))
             {
-                s_ConnectorType = FindConnectorType();
+                return type;
             }
-            return (ConnectorBase)Activator.CreateInstance(s_ConnectorType);
+
+            try
+            {
+                Assembly asm = Assembly.Load($"SequelNet.Connector.{typeName}");
+                type = asm.GetType($"SequelNet.Connector.{typeName}Connector");
+                s_ConnectorTypeMap[typeName] = type;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"SequelNet.ConnectorBase.GetConnectorType error: {ex}");
+            }
+
+            return type;
         }
 
+        /// <summary>
+        /// Instantiate a connector from the default type (set through <see cref="SetDefaultConnectorType"/> or <see cref="SetDefaultConnectorTypeByName"/>),
+        /// With the specified connection string or the default one (set through <see cref="SetDefaultConnectionString"/>).
+        /// 
+        /// If you need to use dependency injection, you can <see cref="AddSingleton"/> an <see cref="IConnectorFactory"/> (i.e <see cref="MySql2Factory"/>) set with the connection string.  
+        /// Or import `SequelNet.Extensions.Hosting` and call `UseSequelNet`.
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <returns></returns>
+        public static ConnectorBase Create(string connectionString = null)
+        {
+            if (s_DefaultConnectorType == null)
+            {
+                s_DefaultConnectorType = DetectNetFrameworkConnectorType();
+            }
+            if (connectionString == null && s_DefaultConnectionString == null)
+            {
+                s_DefaultConnectionString = DetectNetFrameworkConnectionString(null);
+            }
+
+            return (ConnectorBase)Activator.CreateInstance(s_DefaultConnectorType, 
+                new string[] { connectionString ?? s_DefaultConnectionString });
+        }
+
+        [Obsolete("Use ConnectorBase.Create() or migrate to using an IConnectorFactory")]
+        public static ConnectorBase NewInstance()
+        {
+            return Create(null);
+        }
+
+        [Obsolete("Use ConnectorBase.Create(connectionString) and pass a connection string instead of a key, or migrate to using an IConnectorFactory")]
         static public ConnectorBase NewInstance(string connectionStringKey)
         {
-            if (s_ConnectorType == null)
+            if (s_DefaultConnectorType == null)
             {
-                s_ConnectorType = FindConnectorType();
+                s_DefaultConnectorType = DetectNetFrameworkConnectorType();
             }
-            return (ConnectorBase)Activator.CreateInstance(s_ConnectorType, new string[] { connectionStringKey });
+
+            return (ConnectorBase)Activator.CreateInstance(s_DefaultConnectorType, new string[] { DetectNetFrameworkConnectionString(connectionStringKey) });
         }
 
         virtual public SqlServiceType TYPE
@@ -51,17 +100,14 @@ namespace SequelNet.Connector
             get { return SqlServiceType.UNKNOWN; }
         }
 
-        static private Type FindConnectorType()
+        private static Type DetectNetFrameworkConnectorType()
         {
-            Type type = null;
-
             try
             {
-                string connector = ConfigurationManager.AppSettings[@"SequelNet.Connector"];
+                string connector = ConfigurationManager.AppSettings["SequelNet.Connector"];
                 if (!string.IsNullOrEmpty(connector))
                 {
-                    Assembly asm = Assembly.Load(@"SequelNet.Connector." + connector);
-                    type = asm.GetType(@"SequelNet.Connector." + connector + @"Connector");
+                    return GetConnectorType(connector);
                 }
             }
             catch (Exception ex)
@@ -69,10 +115,10 @@ namespace SequelNet.Connector
                 Debug.WriteLine(string.Format(@"SequelNet.ConnectorBase.FindConnectorType error: {0}", ex));
             }
 
-            return type;
+            return null;
         }
 
-        public static string FindConnectionString(string connectionStringKey)
+        private static string DetectNetFrameworkConnectionString(string connectionStringKey)
         {
             ConnectionStringSettings connString = null;
 
@@ -82,22 +128,49 @@ namespace SequelNet.Connector
                 if (connString != null) return connString.ConnectionString;
             }
 
-            string appConnString = ConfigurationManager.AppSettings[@"SequelNet::ConnectionStringKey"];
+            string appConnString = ConfigurationManager.AppSettings["SequelNet::ConnectionStringKey"];
             if (appConnString != null && appConnString.Length > 0) connString = ConfigurationManager.ConnectionStrings[appConnString];
             if (connString != null) return connString.ConnectionString;
 
-            appConnString = ConfigurationManager.AppSettings[@"SequelNet::ConnectionString"];
+            appConnString = ConfigurationManager.AppSettings["SequelNet::ConnectionString"];
             if (appConnString != null && appConnString.Length > 0) return appConnString;
 
-            connString = ConfigurationManager.ConnectionStrings[@"SequelNet"];
+            connString = ConfigurationManager.ConnectionStrings["SequelNet"];
             if (connString != null) return connString.ConnectionString;
 
             return ConfigurationManager.ConnectionStrings[0].ConnectionString;
         }
 
-        public static string FindConnectionString()
+        public static void SetDefaultConnectorTypeByName(string typeName)
         {
-            return FindConnectionString(null);
+            s_DefaultConnectorTypeName = typeName;
+            s_DefaultConnectorType = typeName == null ? null : GetConnectorType(typeName);
+        }
+
+        public static string GetDefaultConnectorTypeByName()
+        {
+            return s_DefaultConnectorTypeName;
+        }
+
+        public static void SetDefaultConnectorType(Type type)
+        {
+            s_DefaultConnectorTypeName = type?.Name;
+            s_DefaultConnectorType = type;
+        }
+
+        public static Type GetDefaultConnectorType()
+        {
+            return s_DefaultConnectorType;
+        }
+
+        public static void SetDefaultConnectionString(string connectionString)
+        {
+            s_DefaultConnectionString = connectionString;
+        }
+
+        public static string GetDefaultConnectionString()
+        {
+            return s_DefaultConnectionString;
         }
 
         abstract public IConnectorFactory Factory

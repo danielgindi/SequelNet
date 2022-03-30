@@ -6,7 +6,19 @@ namespace SequelNet.Connector
 {
     public class PostgreSQLFactory : IConnectorFactory
     {
-        internal static PostgreSQLFactory Instance = new PostgreSQLFactory();
+        internal static PostgreSQLFactory Shared = new PostgreSQLFactory(null);
+
+        public string ConnectionString { get; set; }
+
+        public PostgreSQLFactory(string connectionString)
+        {
+            this.ConnectionString = connectionString;
+        }
+
+        public ConnectorBase Connector()
+        {
+            return new PostgreSQLConnector(this);
+        }
 
         public DbParameter NewParameter(string name, object value)
         {

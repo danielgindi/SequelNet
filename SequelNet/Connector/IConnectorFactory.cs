@@ -5,6 +5,10 @@ namespace SequelNet.Connector
 {
     public interface IConnectorFactory
     {
+        string ConnectionString { get; }
+
+        ConnectorBase Connector();
+
         DbParameter NewParameter(string name, object value);
 
         DbParameter NewParameter(string name, DbType type, object value);

@@ -6,8 +6,19 @@ namespace SequelNet.Connector
 {
     public class MsSqlFactory : IConnectorFactory
     {
-        internal static MsSqlFactory Instance = new MsSqlFactory();
+        internal static MsSqlFactory Shared = new MsSqlFactory(null);
 
+        public string ConnectionString { get; set; }
+
+        public MsSqlFactory(string connectionString)
+        {
+            this.ConnectionString = connectionString;
+        }
+
+        public ConnectorBase Connector()
+        {
+            return new MsSqlConnector(this);
+        }
         public DbParameter NewParameter(string name, object value)
         {
             return new SqlParameter(name, value);

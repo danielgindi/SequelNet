@@ -10,27 +10,31 @@ using System.Threading.Tasks;
 namespace SequelNet.Connector
 {
     public class MsSqlConnector : ConnectorBase
-    {        
+    {
         #region Instancing
+
+        private MsSqlFactory _Factory;
 
         public override SqlServiceType TYPE
         {
             get { return SqlServiceType.MSSQL; }
         }
 
-        public static SqlConnection CreateSqlConnection(string connectionStringKey)
+        public static SqlConnection CreateSqlConnection(string connectionString)
         {
-            return new SqlConnection(FindConnectionString(connectionStringKey));
+            return new SqlConnection(connectionString);
         }
 
-        public MsSqlConnector()
+        public MsSqlConnector(MsSqlFactory factory)
         {
-            Connection = CreateSqlConnection(null);
+            _Factory = factory;
+            Connection = CreateSqlConnection(_Factory.ConnectionString);
         }
 
-        public MsSqlConnector(string connectionStringKey)
+        public MsSqlConnector(string connectionString)
         {
-            Connection = CreateSqlConnection(connectionStringKey);
+            _Factory = MsSqlFactory.Shared;
+            Connection = CreateSqlConnection(connectionString);
         }
 
         ~MsSqlConnector()
@@ -38,7 +42,7 @@ namespace SequelNet.Connector
             Dispose(false);
         }
 
-        public override IConnectorFactory Factory => MsSqlFactory.Instance;
+        public override IConnectorFactory Factory => _Factory;
 
         private static ConcurrentDictionary<MsSqlVersion, MsSqlLanguageFactory> _LanguageFactories = new ConcurrentDictionary<MsSqlVersion, MsSqlLanguageFactory>();
         private MsSqlLanguageFactory _LanguageFactory = null;

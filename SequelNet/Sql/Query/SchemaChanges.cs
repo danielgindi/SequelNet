@@ -1,5 +1,6 @@
 ﻿using SequelNet.Connector;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace SequelNet
 {
@@ -321,13 +322,92 @@ namespace SequelNet
         /// Drops a table (immediately executes!)
         /// </summary>
         /// <param name="tableName">Table to drop</param>
-        public static void DropTable(string tableName)
+        /// <param name="connection">An existing connection to use.</param>
+        public static void DropTable(string tableName, ConnectorBase connection = null)
         {
-            using (ConnectorBase connection = ConnectorBase.NewInstance())
+            bool ownsConnection = false;
+            if (connection == null)
+            {
+                ownsConnection = true;
+                connection = ConnectorBase.Create();
+            }
+
+            try
             {
                 string sql = string.Format(@"DROP TABLE {0}", connection.Language.WrapFieldName(tableName));
                 connection.ExecuteNonQuery(sql);
             }
+            finally
+            {
+                if (ownsConnection && connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                    connection = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Drops a table (immediately executes!)
+        /// </summary>
+        /// <param name="tableName">Table to drop</param>
+        /// <param name="factory">A connector factory.</param>
+        public static void DropTable(string tableName, IConnectorFactory factory )
+        {
+            DropTable(tableName, factory.Connector());
+        }
+
+        /// <summary>
+        /// Drops a table (immediately executes!)
+        /// </summary>
+        /// <param name="tableName">Table to drop</param>
+        /// <param name="connection">An existing connection to use.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public static async System.Threading.Tasks.Task DropTableAsync(string tableName, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+        {
+            bool ownsConnection = false;
+            if (connection == null)
+            {
+                ownsConnection = true;
+                connection = ConnectorBase.Create();
+            }
+
+            try
+            {
+                string sql = string.Format(@"DROP TABLE {0}", connection.Language.WrapFieldName(tableName));
+                await connection.ExecuteNonQueryAsync(sql, cancellationToken);
+            }
+            finally
+            {
+                if (ownsConnection && connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                    connection = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Drops a table (immediately executes!)
+        /// </summary>
+        /// <param name="tableName">Table to drop</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public static System.Threading.Tasks.Task DropTableAsync(string tableName, CancellationToken? cancellationToken)
+        {
+            return DropTableAsync(tableName, (ConnectorBase)null, cancellationToken);
+        }
+
+        /// <summary>
+        /// Drops a table (immediately executes!)
+        /// </summary>
+        /// <param name="tableName">Table to drop</param>
+        /// <param name="factory">A connector factory.</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        public static System.Threading.Tasks.Task DropTableAsync(string tableName, IConnectorFactory factory, CancellationToken? cancellationToken = null)
+        {
+            return DropTableAsync(tableName, factory.Connector(), cancellationToken);
         }
     }
 }
