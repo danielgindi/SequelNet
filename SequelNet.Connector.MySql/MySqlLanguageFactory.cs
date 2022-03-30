@@ -893,6 +893,36 @@ namespace SequelNet.Connector
             }
         }
 
+        public override void BuildJsonContains(
+            ValueWrapper target, ValueWrapper candidate, string path,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("JSON_CONTAINS(");
+            target.Build(sb, conn, relatedQuery);
+            sb.Append(", ");
+            candidate.Build(sb, conn, relatedQuery);
+
+            if (!string.IsNullOrEmpty(path))
+                sb.Append($", {PrepareValue(path)}");
+
+            sb.Append(")");
+        }
+
+        public override void BuildMemberOfJsonArray(
+            ValueWrapper value, ValueWrapper array,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("(");
+
+            value.Build(sb, conn, relatedQuery);
+
+            sb.Append("MEMBER OF(");
+            array.Build(sb, conn, relatedQuery);
+            sb.Append(")");
+
+            sb.Append(")");
+        }
+
         public override void BuildJsonExtractValue(
             ValueWrapper value, string path,
             DataTypeDef returnType,

@@ -418,6 +418,20 @@ namespace SequelNet.Connector
             throw new NotImplementedException("JSON_EXTRACT has not been implemented for this connector");
         }
 
+        public virtual void BuildJsonContains(
+            ValueWrapper target, ValueWrapper candidate, string path,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("JSON_CONTAINS has not been implemented for this connector");
+        }
+
+        public virtual void BuildMemberOfJsonArray(
+            ValueWrapper value, ValueWrapper array,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            throw new NotImplementedException("MEMBER OF has not been implemented for this connector");
+        }
+
         public virtual void BuildJsonExtractValue(
             ValueWrapper value, string path, 
             DataTypeDef returnType,

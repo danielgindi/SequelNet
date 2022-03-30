@@ -559,6 +559,26 @@ namespace SequelNet
             return new JsonArrayInsert(doc, path, value);
         }
 
+        public static JsonContains JsonContains(ValueWrapper target, ValueWrapper candidate, string path = null)
+        {
+            return new JsonContains(target, candidate, path);
+        }
+
+        public static JsonContains JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, string path = null)
+        {
+            return new JsonContains(target, targetType, candidate, candidateType, path);
+        }
+
+        public static JsonContains JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, string path = null)
+        {
+            return new JsonContains(targetTableName, targetColumnName, candidate, candidateType, path);
+        }
+
+        public static JsonContains JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string path = null)
+        {
+            return new JsonContains(target, candidate, candidateType, path);
+        }
+
         public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path, bool unquote = true)
         {
             return new JsonExtract(value, valueType, path, unquote);
@@ -839,6 +859,26 @@ namespace SequelNet
             params string[] paths)
         {
             return new JsonRemove(doc, paths);
+        }
+
+        static public MemberOfJsonArray MemberOfJsonArray(ValueWrapper value, ValueWrapper jsonArray)
+        {
+            return new MemberOfJsonArray(value, jsonArray);
+        }
+
+        static public MemberOfJsonArray MemberOfJsonArray(object value, ValueObjectType valueType, object jsonArray, ValueObjectType jsonArrayType)
+        {
+            return new MemberOfJsonArray(value, valueType, jsonArray, jsonArrayType);
+        }
+
+        static public MemberOfJsonArray MemberOfJsonArray(IPhrase value, ValueWrapper jsonArray)
+        {
+            return new MemberOfJsonArray(value, jsonArray);
+        }
+
+        static public MemberOfJsonArray MemberOfJsonArray(ValueWrapper value, IPhrase jsonArray)
+        {
+            return new MemberOfJsonArray(value, jsonArray);
         }
 
         #endregion

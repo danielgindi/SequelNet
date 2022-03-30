@@ -633,8 +633,49 @@ namespace SequelNet.Connector
             }
 
             sb.Append("json_extract_path_text(");
-            sb.Append(value.Build(conn, relatedQuery));
+            value.Build(sb, conn, relatedQuery);
             sb.Append($", {pgPath}");
+            sb.Append(")");
+        }
+
+        public override void BuildJsonContains(
+            ValueWrapper target, ValueWrapper candidate, string path,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("(");
+
+            bool hasPath = false;
+
+            if (!string.IsNullOrEmpty(path))
+            {
+                var parts = JsonPathValue.GetPathParts(path);
+                if (parts.Count > 0 && parts[0] == "$")
+                {
+                    parts.RemoveAt(0);
+
+                    var pgPath = "";
+                    foreach (var part in parts)
+                    {
+                        if (pgPath.Length > 0)
+                            pgPath += $", {PrepareValue(part)}";
+                        else pgPath += PrepareValue(part);
+                    }
+
+                    sb.Append("json_extract_path(");
+                    target.Build(sb, conn, relatedQuery);
+                    sb.Append($", {pgPath}");
+                    sb.Append(")");
+
+                    hasPath = true;
+                }
+            }
+
+            if (!hasPath)
+                target.Build(sb, conn, relatedQuery);
+
+            sb.Append(" @> ");
+
+            candidate.Build(sb, conn, relatedQuery);
             sb.Append(")");
         }
 
