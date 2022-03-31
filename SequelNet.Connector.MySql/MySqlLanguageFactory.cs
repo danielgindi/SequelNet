@@ -916,7 +916,7 @@ namespace SequelNet.Connector
 
             value.Build(sb, conn, relatedQuery);
 
-            sb.Append("MEMBER OF(");
+            sb.Append(" MEMBER OF(");
             array.Build(sb, conn, relatedQuery);
             sb.Append(")");
 
