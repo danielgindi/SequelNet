@@ -72,7 +72,7 @@ namespace SequelNet
                             : obj is IPhrase
                             ? ValueWrapper.From((IPhrase)obj)
                             : (ValueWrapper)obj,
-                            Length = 0,
+                            Length = null,
                             Sort = SortDirection.ASC
                         });
                     }
