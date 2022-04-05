@@ -41,6 +41,9 @@ namespace SequelNet.SchemaGenerator
                 primaryKeyColumns.Add(dalCol);
             }
 
+            if (primaryKeyColumns.Count > 0)
+                return primaryKeyColumns;
+
             foreach (var dalIx in Indices)
             {
                 if (dalIx.IndexMode != DalIndexIndexMode.PrimaryKey) continue;
