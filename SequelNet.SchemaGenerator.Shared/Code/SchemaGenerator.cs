@@ -24,6 +24,8 @@ namespace SequelNet.SchemaGenerator
             {
                 foreach (var column in dalIx.Columns)
                 {
+                    if (column.Literal) continue;
+
                     if (context.Columns.Find(x => x.Name.Equals(column.Name)) == null && context.Columns.Find(x => x.PropertyName.Equals(column.Name)) == null)
                     {
                         MessageBox.Show(@"Column " + column.Name + @" not found in index " + (dalIx.IndexName ?? ""));
