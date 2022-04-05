@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace SequelNet
 {
@@ -291,12 +292,9 @@ namespace SequelNet
                 {
                     index.Name = @"IX_";
                 }
-                index.Name += Name + @"_";
-                for (int idx = 0; idx < index.ColumnNames.Length; idx++)
-                {
-                    if (idx > 0) index.Name += @"_";
-                    index.Name += index.ColumnNames[idx];
-                }
+
+                index.Name += Name + "_" + 
+                    string.Join("_", index.Columns.Where(x => x.Target.Type == ValueObjectType.ColumnName).Select(x => (string)x.Target.Value).ToArray());
             }
             Indexes.Add(index);
         }

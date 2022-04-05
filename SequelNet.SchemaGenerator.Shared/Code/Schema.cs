@@ -608,14 +608,21 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("{0}, TableSchema.ClusterMode.{1}, TableSchema.IndexMode.{2}, TableSchema.IndexType.{3}", formatArgs);
             foreach (DalIndexColumn indexColumn in dalIx.Columns)
             {
-                DalColumn dalCol = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.PropertyName == indexColumn.Name);
-                string col = (dalCol == null ? string.Format("\"{0}\"", indexColumn.Name) : string.Format("Columns.{0}", dalCol.PropertyName));
-                stringBuilder.AppendFormat(", {0}", col);
-                if (string.IsNullOrEmpty(indexColumn.SortDirection))
+                if (indexColumn.Literal)
                 {
-                    continue;
+                    stringBuilder.AppendFormat(", {0}", indexColumn.Name);
                 }
-                stringBuilder.AppendFormat(", SortDirection.{0}", indexColumn.SortDirection);
+                else
+                {
+                    DalColumn dalCol = context.Columns.Find((DalColumn c) => c.Name == indexColumn.Name || c.PropertyName == indexColumn.Name);
+                    string col = (dalCol == null ? $"\"{indexColumn.Name}\"" : $"Columns.{dalCol.PropertyName}");
+                    stringBuilder.AppendFormat(", {0}", col);
+                }
+
+                if (!string.IsNullOrEmpty(indexColumn.SortDirection))
+                {
+                    stringBuilder.AppendFormat(", SortDirection.{0}", indexColumn.SortDirection);
+                }
             }
         }
 

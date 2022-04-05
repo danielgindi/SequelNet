@@ -54,6 +54,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Codenet.Text" Version="1.0.2" />
     <PackageReference Include="PresentationFramework" Version="4.6.0" />
   </ItemGroup>
   <ItemGroup>

@@ -6,18 +6,15 @@ namespace SequelNet.SchemaGenerator
         {
         }
 
-        public DalIndexColumn(string name, string sortDirection)
+        public DalIndexColumn(string name, bool literal, string sortDirection)
         {
             this.Name = name;
             this.SortDirection = sortDirection;
-        }
-
-        public DalIndexColumn(string name)
-        {
-            this.Name = name;
+            this.Literal = literal;
         }
 
         public string Name;
 		public string SortDirection;
+		public bool Literal;
 	}
 }

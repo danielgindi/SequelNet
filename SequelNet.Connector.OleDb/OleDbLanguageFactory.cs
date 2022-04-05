@@ -128,11 +128,13 @@ namespace SequelNet.Connector
                 outputBuilder.Append(@" ");
             }
             outputBuilder.Append(@"(");
-            for (int i = 0; i < index.ColumnNames.Length; i++)
+            for (int i = 0; i < index.Columns.Length; i++)
             {
                 if (i > 0) outputBuilder.Append(",");
-                outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
-                outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                var column = index.Columns[i];
+                column.Target.Build(outputBuilder, conn, qry);
+                outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
             }
             outputBuilder.Append(@")");
         }

@@ -385,12 +385,14 @@ namespace SequelNet.Connector
             }
 
             outputBuilder.Append(@"(");
-            for (int i = 0; i < index.ColumnNames.Length; i++)
+            for (int i = 0; i < index.Columns.Length; i++)
             {
                 if (i > 0) outputBuilder.Append(",");
-                outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
-                if (index.ColumnLength[i] > 0) outputBuilder.AppendFormat("({0})", index.ColumnLength[i]);
-                outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                var column = index.Columns[i];
+                column.Target.Build(outputBuilder, conn, qry);
+                if (column.Length != null) outputBuilder.AppendFormat("({0})", column.Length.Value);
+                outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
             }
             outputBuilder.Append(@")");
         }

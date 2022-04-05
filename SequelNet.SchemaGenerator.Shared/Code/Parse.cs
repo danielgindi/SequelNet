@@ -1,3 +1,4 @@
+using Codenet.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,11 @@ namespace SequelNet.SchemaGenerator
 
                 if (currentLineTrimmed.StartsWith("@Index:", StringComparison.OrdinalIgnoreCase))
                 {
-                    string[] indexArguments = currentLineTrimmed.Substring(7).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] indexArguments = currentLineTrimmed.Substring(7)
+                        .SplitWithEscape(';', '\\')
+                        .Select(x => x?.Trim())
+                        .Where(x => !string.IsNullOrEmpty(x))
+                        .ToArray();
 
                     DalIndex dalIndex = new DalIndex();
                     for (int j = 0; j <= (int)indexArguments.Length - 1; j++)
@@ -84,21 +89,26 @@ namespace SequelNet.SchemaGenerator
                         {
                             var columns = arg
                                 .Trim(new char[] { ' ', '[', ']', '\t' })
-                                .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                                .Select(x => x.Trim());
+                                .SplitWithEscape(',', '\\')
+                                .Select(x => x?.Trim())
+                                .Where(x => !string.IsNullOrEmpty(x))
+                                .ToArray();
+
                             foreach (string column in columns)
                             {
-                                if (column.EndsWith(@" ASC") || column.EndsWith(@" DESC"))
+                                string columnName = column;
+                                string direction = null;
+
+                                if (column.EndsWith(" ASC") || column.EndsWith(" DESC"))
                                 {
-                                    dalIndex.Columns.Add(new DalIndexColumn(
-                                        column.Substring(0, column.LastIndexOf(' ')).Trim(),
-                                        column.Substring(column.LastIndexOf(' ') + 1).Trim()
-                                    ));
+                                    direction = column.Substring(column.LastIndexOf(' ') + 1);
+                                    columnName = column.Substring(0, column.LastIndexOf(' ')).Trim();
                                 }
-                                else
-                                {
-                                    dalIndex.Columns.Add(new DalIndexColumn(column));
-                                }
+
+                                dalIndex.Columns.Add(new DalIndexColumn(
+                                    columnName,
+                                    columnName.Contains("."),
+                                    direction));
                             }
                         }
                     }
@@ -681,7 +691,7 @@ namespace SequelNet.SchemaGenerator
                             columnKeyword.Equals("Unique", StringComparison.OrdinalIgnoreCase))
                         {
                             DalIndex dalIx = new DalIndex();
-                            dalIx.Columns.Add(new DalIndexColumn(dalColumn.Name));
+                            dalIx.Columns.Add(new DalIndexColumn(dalColumn.Name, false, null));
                             dalIx.IndexMode = DalIndexIndexMode.Unique;
                             context.Indices.Add(dalIx);
                         }

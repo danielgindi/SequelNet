@@ -220,14 +220,20 @@ namespace SequelNet.Connector
 
             var schema = relatedQuery.Schema;
             bool first = false;
-            var cols = new HashSet<string>(schema.Indexes
+            var cols = new HashSet<ValueWrapper>(schema.Indexes
                 .Where(x => x.Mode == TableSchema.IndexMode.PrimaryKey || x.Mode == TableSchema.IndexMode.Unique)
-                .SelectMany(x => x.ColumnNames)
-                .Concat(schema.Columns.Where(x => x.IsPrimaryKey).Select(x => x.Name))
-                );
+                .SelectMany(x => x.Columns.Select(c => c.Target))
+                .Concat(schema.Columns.Where(x => x.IsPrimaryKey).Select(x => ValueWrapper.Column(x.Name)))
+            );
+
+            if (cols.Any(x => x.Type != ValueObjectType.ColumnName))
+            {
+                throw new NotSupportedException("MSSQL's MERGE INTO is not supported with functional indices");
+            }
+
             foreach (var col in cols)
             {
-                var assignemnt = inserts.FirstOrDefault(x => x.ColumnName == col);
+                var assignemnt = inserts.FirstOrDefault(x => x.ColumnName == (string)col.Value);
                 if (assignemnt == null) continue;
 
                 if (first) first = false;
@@ -243,7 +249,7 @@ namespace SequelNet.Connector
                 }
 
                 sb.Append(".");
-                sb.Append(language.WrapFieldName(col));
+                sb.Append(language.WrapFieldName((string)col.Value));
 
                 if (assignemnt.Second == null)
                     sb.Append(" IS ");
@@ -336,11 +342,13 @@ namespace SequelNet.Connector
                 else if (index.Cluster == TableSchema.ClusterMode.NonClustered) outputBuilder.Append(@"NONCLUSTERED ");
 
                 outputBuilder.Append(@"(");
-                for (int i = 0; i < index.ColumnNames.Length; i++)
+                for (int i = 0; i < index.Columns.Length; i++)
                 {
                     if (i > 0) outputBuilder.Append(",");
-                    outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
-                    outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                    var column = index.Columns[i];
+                    column.Target.Build(outputBuilder, conn, qry);
+                    outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
                 }
                 outputBuilder.Append(@")");
             }
@@ -360,11 +368,13 @@ namespace SequelNet.Connector
                 BuildTableName(qry, conn, outputBuilder, false);
 
                 outputBuilder.Append(@"(");
-                for (int i = 0; i < index.ColumnNames.Length; i++)
+                for (int i = 0; i < index.Columns.Length; i++)
                 {
                     if (i > 0) outputBuilder.Append(",");
-                    outputBuilder.Append(WrapFieldName(index.ColumnNames[i]));
-                    outputBuilder.Append(index.ColumnSort[i] == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                    var column = index.Columns[i];
+                    column.Target.Build(outputBuilder, conn, qry);
+                    outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
                 }
                 outputBuilder.Append(@");");
             }

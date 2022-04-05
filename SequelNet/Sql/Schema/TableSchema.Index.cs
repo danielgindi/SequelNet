@@ -17,6 +17,7 @@ namespace SequelNet
                 return null;
             }
         }
+
         public enum IndexMode
         {
             None,
@@ -25,6 +26,8 @@ namespace SequelNet
             Spatial, // MySQL Only
             PrimaryKey
         }
+
+
         public enum IndexType // MySQL Only
         {
             None,
@@ -38,52 +41,59 @@ namespace SequelNet
             NonClustered,
             Clustered
         }
+
         public class Index
         {
             public string Name;
             public ClusterMode Cluster;
             public IndexMode Mode;
             public IndexType Type;
-            public string[] ColumnNames;
-            public int[] ColumnLength;
-            public SortDirection[] ColumnSort;
+            public Column[] Columns;
 
             public Index() { }
-            public Index(string Name, ClusterMode Cluster, IndexMode Mode, IndexType Type, params object[] Columns)
+
+            public Index(string name, ClusterMode cluster, IndexMode mode, IndexType type, params object[] columns)
             {
-                this.Name = Name;
-                this.Cluster = Cluster;
-                this.Mode = Mode;
-                this.Type = Type;
-                List<string> ColumnNames = new List<string>();
-                List<int> ColumnLength = new List<int>();
-                List<SortDirection> ColumnSort = new List<SortDirection>();
+                this.Name = name;
+                this.Cluster = cluster;
+                this.Mode = mode;
+                this.Type = type;
 
-                foreach (object obj in Columns)
+                var generatedColumns = new List<Column>();
+
+                foreach (object obj in columns)
                 {
-                    if (obj is string)
+                    if (obj is string || obj is ValueWrapper || obj is IPhrase)
                     {
-                        if (ColumnLength.Count < ColumnNames.Count) ColumnLength.Add(0);
-                        if (ColumnSort.Count < ColumnNames.Count) ColumnSort.Add(SortDirection.ASC);
-
-                        ColumnNames.Add((string)obj);
+                        generatedColumns.Add(new Column
+                        {
+                            Target = obj is string
+                            ? ValueWrapper.Column((string)obj)
+                            : obj is IPhrase
+                            ? ValueWrapper.From((IPhrase)obj)
+                            : (ValueWrapper)obj,
+                            Length = 0,
+                            Sort = SortDirection.ASC
+                        });
                     }
                     else if (obj is int)
                     {
-                        if (ColumnLength.Count < ColumnNames.Count) ColumnLength.Add((int)obj);
+                        generatedColumns[generatedColumns.Count - 1].Length = (int)obj;
                     }
                     else if (obj is SortDirection)
                     {
-                        if (ColumnSort.Count < ColumnNames.Count) ColumnSort.Add((SortDirection)obj);
+                        generatedColumns[generatedColumns.Count - 1].Sort = (SortDirection)obj;
                     }
                 }
 
-                if (ColumnLength.Count < ColumnNames.Count) ColumnLength.Add(0);
-                if (ColumnSort.Count < ColumnNames.Count) ColumnSort.Add(SortDirection.ASC);
+                this.Columns = generatedColumns.ToArray();
+            }
 
-                this.ColumnNames = ColumnNames.ToArray();
-                this.ColumnLength = ColumnLength.ToArray();
-                this.ColumnSort = ColumnSort.ToArray();
+            public class Column
+            {
+                public ValueWrapper Target;
+                public int? Length;
+                public SortDirection Sort;
             }
         }
     }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace SequelNet
 {
@@ -81,7 +82,10 @@ namespace SequelNet
                 {
                     if (idx.Mode == TableSchema.IndexMode.PrimaryKey)
                     {
-                        keyNames.AddRange(idx.ColumnNames);
+                        keyNames.AddRange(
+                            idx.Columns
+                                .Where(x => x.Target.Type == ValueObjectType.ColumnName)
+                                .Select(x => (string)x.Target.Value));
                         break;
                     }
                 }
