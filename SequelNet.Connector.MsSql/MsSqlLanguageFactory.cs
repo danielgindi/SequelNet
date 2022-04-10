@@ -348,7 +348,9 @@ namespace SequelNet.Connector
 
                     var column = index.Columns[i];
                     column.Target.Build(outputBuilder, conn, qry);
-                    outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                    if (column.Sort != null)
+                        outputBuilder.Append(column.Sort == SortDirection.ASC ? " ASC" : " DESC");
                 }
                 outputBuilder.Append(@")");
             }
@@ -374,7 +376,9 @@ namespace SequelNet.Connector
 
                     var column = index.Columns[i];
                     column.Target.Build(outputBuilder, conn, qry);
-                    outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                    if (column.Sort != null)
+                        outputBuilder.Append(column.Sort == SortDirection.ASC ? " ASC" : " DESC");
                 }
                 outputBuilder.Append(@");");
             }

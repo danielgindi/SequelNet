@@ -73,7 +73,7 @@ namespace SequelNet
                             ? ValueWrapper.From((IPhrase)obj)
                             : (ValueWrapper)obj,
                             Length = null,
-                            Sort = SortDirection.ASC
+                            Sort = obj is string ? SortDirection.ASC : SortDirection.DESC,
                         });
                     }
                     else if (obj is int)
@@ -93,7 +93,7 @@ namespace SequelNet
             {
                 public ValueWrapper Target;
                 public int? Length;
-                public SortDirection Sort;
+                public SortDirection? Sort;
             }
         }
     }

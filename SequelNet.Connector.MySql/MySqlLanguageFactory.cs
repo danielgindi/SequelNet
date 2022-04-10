@@ -392,7 +392,9 @@ namespace SequelNet.Connector
                 var column = index.Columns[i];
                 column.Target.Build(outputBuilder, conn, qry);
                 if (column.Length != null) outputBuilder.AppendFormat("({0})", column.Length.Value);
-                outputBuilder.Append(column.Sort == SortDirection.ASC ? @" ASC" : @" DESC");
+
+                if (column.Sort != null)
+                    outputBuilder.Append(column.Sort == SortDirection.ASC ? " ASC" : " DESC");
             }
             outputBuilder.Append(@")");
         }
