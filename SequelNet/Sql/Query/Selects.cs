@@ -95,6 +95,15 @@
             return this;
         }
 
+        public Query Select(ValueWrapper value, string alias = null)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(value, alias));
+
+            return this;
+        }
+
         public Query Select(Query query, string alias = null)
         {
             this.QueryMode = QueryMode.Select;

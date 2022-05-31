@@ -76,6 +76,30 @@ namespace SequelNet
             return this;
         }
 
+        public new JoinColumnPair AND(ValueWrapper value)
+        {
+            base.AND(value);
+            return this;
+        }
+
+        public new JoinColumnPair AND(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            base.AND(value, comparison, otherValue);
+            return this;
+        }
+
+        public new JoinColumnPair AND(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            base.AND(value, comparison, otherValue, valueType);
+            return this;
+        }
+
+        public new JoinColumnPair AND(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            base.AND(value, comparison, tableName, columnName);
+            return this;
+        }
+
         public new JoinColumnPair AND(WhereList whereList)
         {
             base.AND(whereList);
@@ -145,6 +169,30 @@ namespace SequelNet
         public new JoinColumnPair OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
         {
             base.OR(phrase, comparison, tableName, columnName);
+            return this;
+        }
+
+        public new JoinColumnPair OR(ValueWrapper value)
+        {
+            base.OR(value);
+            return this;
+        }
+
+        public new JoinColumnPair OR(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            base.OR(value, comparison, otherValue);
+            return this;
+        }
+
+        public new JoinColumnPair OR(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            base.OR(value, comparison, otherValue, valueType);
+            return this;
+        }
+
+        public new JoinColumnPair OR(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            base.OR(value, comparison, tableName, columnName);
             return this;
         }
 

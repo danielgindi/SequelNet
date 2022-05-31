@@ -50,6 +50,13 @@ namespace SequelNet
             ObjectType = ValueObjectType.Value;
         }
 
+        public SelectColumn(ValueWrapper value, string alias = null)
+        {
+            Value = value;
+            Alias = alias;
+            ObjectType = ValueObjectType.Value;
+        }
+
         public SelectColumn(Query query, string alias = null)
         {
             Value = query;

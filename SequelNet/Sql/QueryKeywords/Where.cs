@@ -189,6 +189,41 @@ namespace SequelNet
             SecondType = ValueObjectType.ColumnName;
         }
 
+        public Where(ValueWrapper value)
+        {
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = WhereComparison.None;
+        }
+
+        public Where(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = value;
+            SecondType = ValueObjectType.Value;
+        }
+
+        public Where(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = otherValue;
+            SecondType = valueType;
+        }
+
+        public Where(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            SecondTableName = tableName;
+            Second = columnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+
         public Where(WhereCondition condition, WhereList whereList)
         {
             Condition = condition;
@@ -287,6 +322,35 @@ namespace SequelNet
         {
             Condition = condition;
             First = phrase;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            SecondTableName = tableName;
+            Second = columnName;
+            SecondType = ValueObjectType.ColumnName;
+        }
+        
+        public Where(WhereCondition condition, ValueWrapper value)
+        {
+            Condition = condition;
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = WhereComparison.None;
+        }
+        
+        public Where(WhereCondition condition, ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            Condition = condition;
+            First = value;
+            FirstType = ValueObjectType.Value;
+            Comparison = comparison;
+            Second = otherValue;
+            SecondType = valueType;
+        }
+
+        public Where(WhereCondition condition, ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            Condition = condition;
+            First = value;
             FirstType = ValueObjectType.Value;
             Comparison = comparison;
             SecondTableName = tableName;
@@ -673,6 +737,34 @@ namespace SequelNet
             return wl.AND(phrase, comparison, tableName, columnName);
         }
 
+        public WhereList AND(ValueWrapper value)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(value);
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(value, comparison, otherValue);
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(value, comparison, otherValue, valueType);
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.AND(value, comparison, tableName, columnName);
+        }
+
         public WhereList AND(WhereList whereList)
         {
             var wl = new WhereList();
@@ -761,6 +853,34 @@ namespace SequelNet
             var wl = new WhereList();
             wl.Add(this);
             return wl.OR(phrase, comparison, tableName, columnName);
+        }
+
+        public WhereList OR(ValueWrapper value)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(value);
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(value, comparison, otherValue);
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(value, comparison, otherValue, valueType);
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            var wl = new WhereList();
+            wl.Add(this);
+            return wl.OR(value, comparison, tableName, columnName);
         }
 
         public WhereList OR(WhereList whereList)

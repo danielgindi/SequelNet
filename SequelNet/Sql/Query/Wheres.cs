@@ -37,7 +37,12 @@
 
         public Query Where(IPhrase phrase)
         {
-            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
+        }
+
+        public Query Where(ValueWrapper value)
+        {
+            return Where(new Where(WhereCondition.AND, value, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
         }
 
         public Query Where(WhereList whereList)
@@ -63,6 +68,16 @@
         public Query Where(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
         {
             return Where(new Where(WhereCondition.AND, phrase, comparison, value, valueType));
+        }
+
+        public Query Where(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, value, comparison, tableName, columnName));
+        }
+
+        public Query Where(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, value, comparison, otherValue, valueType));
         }
 
         public Query Where(Query query, WhereComparison comparison, string tableName, string columnName)
@@ -108,7 +123,12 @@
 
         public Query AND(IPhrase phrase)
         {
-            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            return Where(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
+        }
+
+        public Query AND(ValueWrapper value)
+        {
+            return Where(new Where(WhereCondition.AND, value, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
         }
 
         public Query AND(WhereList whereList)
@@ -134,6 +154,16 @@
         public Query AND(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
         {
             return Where(new Where(WhereCondition.AND, phrase, comparison, value, valueType));
+        }
+
+        public Query AND(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.AND, value, comparison, tableName, columnName));
+        }
+
+        public Query AND(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.AND, value, comparison, otherValue, valueType));
         }
 
         public Query AND(Query query, WhereComparison comparison, string tableName, string columnName)
@@ -179,7 +209,12 @@
 
         public Query OR(IPhrase phrase)
         {
-            return Where(new Where(WhereCondition.OR, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            return Where(new Where(WhereCondition.OR, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
+        }
+
+        public Query OR(ValueWrapper value)
+        {
+            return Where(new Where(WhereCondition.OR, value, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
         }
 
         public Query OR(WhereList whereList)
@@ -205,6 +240,16 @@
         public Query OR(IPhrase phrase, WhereComparison comparison, object value, ValueObjectType valueType = ValueObjectType.Value)
         {
             return Where(new Where(WhereCondition.OR, phrase, comparison, value, valueType));
+        }
+
+        public Query OR(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            return Where(new Where(WhereCondition.OR, value, comparison, tableName, columnName));
+        }
+
+        public Query OR(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType = ValueObjectType.Value)
+        {
+            return Where(new Where(WhereCondition.OR, value, comparison, otherValue, valueType));
         }
 
         public Query OR(Query query, WhereComparison comparison, string tableName, string columnName)

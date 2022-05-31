@@ -65,7 +65,14 @@ namespace SequelNet
         public WhereList Where(IPhrase phrase)
         {
             this.Clear();
-            this.Add(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Literal));
+            this.Add(new Where(WhereCondition.AND, phrase, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
+            return this;
+        }
+
+        public WhereList Where(ValueWrapper value)
+        {
+            this.Clear();
+            this.Add(new Where(WhereCondition.AND, value, ValueObjectType.Value, WhereComparison.None, null, ValueObjectType.Value));
             return this;
         }
 
@@ -155,6 +162,32 @@ namespace SequelNet
             return this;
         }
 
+        public WhereList AND(ValueWrapper value)
+        {
+            this.Add(new Where(WhereCondition.AND, value));
+            return this;
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            this.Add(new Where(WhereCondition.AND, value, comparison, otherValue));
+            return this;
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            this.Add(new Where(WhereCondition.AND, value, comparison, otherValue, valueType));
+            return this;
+        }
+
+        public WhereList AND(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            var w = new Where(WhereCondition.AND, value, comparison, tableName, columnName);
+            w.SecondTableName = tableName;
+            this.Add(w);
+            return this;
+        }
+
         public WhereList AND(WhereList whereList)
         {
             this.Add(new Where(WhereCondition.AND, whereList));
@@ -233,6 +266,32 @@ namespace SequelNet
         public WhereList OR(IPhrase phrase, WhereComparison comparison, string tableName, string columnName)
         {
             var w = new Where(WhereCondition.OR, phrase, comparison, tableName, columnName);
+            w.SecondTableName = tableName;
+            this.Add(w);
+            return this;
+        }
+
+        public WhereList OR(ValueWrapper value)
+        {
+            this.Add(new Where(WhereCondition.OR, value));
+            return this;
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, object otherValue)
+        {
+            this.Add(new Where(WhereCondition.OR, value, comparison, otherValue));
+            return this;
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, object otherValue, ValueObjectType valueType)
+        {
+            this.Add(new Where(WhereCondition.OR, value, comparison, otherValue, valueType));
+            return this;
+        }
+
+        public WhereList OR(ValueWrapper value, WhereComparison comparison, string tableName, string columnName)
+        {
+            var w = new Where(WhereCondition.OR, value, comparison, tableName, columnName);
             w.SecondTableName = tableName;
             this.Add(w);
             return this;
