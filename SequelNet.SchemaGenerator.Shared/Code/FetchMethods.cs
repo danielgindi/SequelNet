@@ -59,8 +59,7 @@ namespace SequelNet.SchemaGenerator
                     stringBuilder.AppendFormat("public static {1} FetchById({2}, bool includeDeleted = false, ConnectorBase conn = null){0}{{{0}", "\r\n",
                         context.ClassName, sbParams);
                     stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                    if (colIsDeleted != null)
-                        stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
+                    stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
                     stringBuilder.AppendFormat("return FetchByQuery(qry, conn);{0}}}{0}{0}", "\r\n");
 
                     // FetchById(..., ConnectorBase conn = null) function
@@ -72,8 +71,7 @@ namespace SequelNet.SchemaGenerator
                         context.ClassName, sbParams);
                     stringBuilder.AppendFormat(", bool includeDeleted = false, ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
                     stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                    if (colIsDeleted != null)
-                        stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
+                    stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
                     stringBuilder.AppendFormat("return FetchByQueryAsync(qry, conn, cancellationToken);{0}}}{0}{0}", "\r\n");
 
                     // FetchByIdAsync(..., ConnectorBase conn, CancellationToken? cancellationToken = null) function
@@ -89,7 +87,7 @@ namespace SequelNet.SchemaGenerator
                     // FetchByIdAsync(..., CancellationToken? cancellationToken) function
                     stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
                         context.ClassName, sbParams);
-                    stringBuilder.AppendFormat("return FetchByIdAsync({1}, includeDeleted, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
+                    stringBuilder.AppendFormat("return FetchByIdAsync({1}, false, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
                 }
                 else
                 {
@@ -97,8 +95,6 @@ namespace SequelNet.SchemaGenerator
                     stringBuilder.AppendFormat("public static {1} FetchById({2}, ConnectorBase conn = null){0}{{{0}", "\r\n",
                         context.ClassName, sbParams);
                     stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                    if (colIsDeleted != null)
-                        stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
                     stringBuilder.AppendFormat("return FetchByQuery(qry, conn);{0}}}{0}{0}", "\r\n");
 
                     // FetchByIdAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
@@ -106,8 +102,6 @@ namespace SequelNet.SchemaGenerator
                         context.ClassName, sbParams);
                     stringBuilder.AppendFormat(", ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
                     stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                    if (colIsDeleted != null)
-                        stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
                     stringBuilder.AppendFormat("return FetchByQueryAsync(qry, conn, cancellationToken);{0}}}{0}{0}", "\r\n");
 
                     // FetchByIdAsync(..., CancellationToken? cancellationToken) function
