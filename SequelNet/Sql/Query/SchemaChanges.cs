@@ -299,6 +299,31 @@ namespace SequelNet
 
             return this;
         }
+        
+        /// <summary>
+        /// Drops the primary key
+        /// </summary>
+        /// <returns>Current <typeparamref name="Query"/> object</returns>
+        public Query DropPrimaryKey()
+        {
+            ClearSelect();
+            ClearOrderBy();
+            ClearGroupBy();
+            ClearInsertAndUpdate();
+            ClearStoredProcedureParameters();
+
+            this.QueryMode = QueryMode.AlterTable;
+
+            if (this.AlterTableSteps == null)
+                this.AlterTableSteps = new List<AlterTableQueryData>();
+
+            this.AlterTableSteps.Add(new AlterTableQueryData
+            {
+                Type = AlterTableType.DropPrimaryKey,
+            });
+
+            return this;
+        }
 
         /// <summary>
         /// Drops current table

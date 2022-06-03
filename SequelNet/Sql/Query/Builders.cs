@@ -993,6 +993,14 @@ namespace SequelNet
                                             }
                                             break;
 
+                                        case AlterTableType.DropPrimaryKey:
+                                            {
+                                                addAlter();
+
+                                                language.BuildDropPrimaryKey(step, sb, connection, this);
+                                            }
+                                            break;
+
                                         case AlterTableType.CreateForeignKey:
                                             {
                                                 addAlter();

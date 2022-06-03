@@ -44,6 +44,7 @@
         DropIndex,
         CreateForeignKey,
         DropForeignKey,
+        DropPrimaryKey,
     }
 
     public enum WhereComparison

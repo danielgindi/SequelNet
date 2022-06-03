@@ -1106,6 +1106,11 @@ namespace SequelNet.Connector
             else if (!alterData.IgnoreColumnPosition) sb.AppendFormat(@"AFTER {0} ", WrapFieldName(relatedQuery.Schema.Columns[idx - 1].Name));
         }
 
+        public override void BuildDropPrimaryKey(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append($"DROP PRIMARY KEY");
+        }
+
         public override string BuildFindString(
             ConnectorBase conn,
             ValueWrapper needle,

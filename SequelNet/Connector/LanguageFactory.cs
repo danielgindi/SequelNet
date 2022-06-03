@@ -490,6 +490,15 @@ namespace SequelNet.Connector
             BuildColumnProperties(alterData.Column, false, sb, conn, relatedQuery);
         }
 
+        public virtual void BuildDropPrimaryKey(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            var pk = relatedQuery.Schema.Indexes.Find(x => x.Mode == TableSchema.IndexMode.PrimaryKey);
+            if (pk == null)
+                throw new InvalidOperationException("No primary key found in schema. This dialect requires the primary key name to be specified.");
+            
+            sb.Append($"DROP CONSTRAINT {pk.Name}");
+        }
+
         public virtual string BuildFindString(
             ConnectorBase conn,
             ValueWrapper needle,
