@@ -496,7 +496,7 @@ namespace SequelNet.Connector
             if (pk == null)
                 throw new InvalidOperationException("No primary key found in schema. This dialect requires the primary key name to be specified.");
             
-            sb.Append($"DROP CONSTRAINT {pk.Name}");
+            sb.Append($"DROP CONSTRAINT {WrapFieldName(pk.Name)}");
         }
 
         public virtual string BuildFindString(
