@@ -141,10 +141,15 @@ namespace SequelNet
                     }
                     else
                     {
-                        sb.Append('(');
                         if (join.RightTableSql is Query)
                         {
                             sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
+                        }
+                        else if (join.RightTableSql is Phrases.Union)
+                        {
+                            sb.Append('(');
+                            ((IPhrase)join.RightTableSql).Build(sb, connection);
+                            sb.Append(')');
                         }
                         else if (join.RightTableSql is IPhrase)
                         {
@@ -154,7 +159,6 @@ namespace SequelNet
                         {
                             sb.Append(join.RightTableSql.ToString());
                         }
-                        sb.Append(')');
                     }
 
                     sb.Append(' ');
