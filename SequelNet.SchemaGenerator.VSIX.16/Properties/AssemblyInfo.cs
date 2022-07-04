@@ -15,5 +15,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: NeutralResourcesLanguage("en-US")]
-[assembly: AssemblyVersion("3.0.101")]
-[assembly: AssemblyFileVersion("3.0.101")]
+[assembly: AssemblyVersion("3.0.102")]
+[assembly: AssemblyFileVersion("3.0.102")]
