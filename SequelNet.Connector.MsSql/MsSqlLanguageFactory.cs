@@ -790,6 +790,36 @@ namespace SequelNet.Connector
             return ret;
         }
 
+        public override void BuildIndexHints(
+            IndexHintList hints,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            if ((hints?.Count ?? 0) == 0)
+                return;
+            
+            sb.Append(" WITH(");
+            
+            var isFirstHint = true;
+            foreach (var hint in hints)
+            {
+                if (!isFirstHint) sb.Append(",");
+                else isFirstHint = false;
+
+                sb.Append("INDEX(");
+                var isFirstIndex = true;
+                foreach (var index in hint.IndexNames)
+                {
+                    if (!isFirstIndex) sb.Append(",");
+                    else isFirstIndex = false;
+
+                    sb.Append(WrapFieldName(index));
+                }
+                sb.Append(")");
+            }
+
+            sb.Append(")");
+        }
+
         #endregion
 
         #region Reading values from SQL

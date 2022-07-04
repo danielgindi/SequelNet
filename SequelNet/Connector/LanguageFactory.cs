@@ -532,6 +532,13 @@ namespace SequelNet.Connector
             return ret;
         }
 
+        public virtual void BuildIndexHints(
+            IndexHintList hints,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            // Not supported in most databases, do not make a fuss about it
+        }
+
         #endregion
 
         #region Reading values from SQL

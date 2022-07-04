@@ -19,6 +19,7 @@ namespace SequelNet
         private AssignmentColumnList _ListInsertUpdate;
         private WhereList _ListWhere;
         private JoinList _ListJoin;
+        private IndexHintList _ListIndexHint;
         private string _StoredProcedureName;
         private List<DbParameterWrapper> _StoredProcedureParameters = null;
         internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();

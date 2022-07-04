@@ -1137,6 +1137,41 @@ namespace SequelNet.Connector
             return ret;
         }
 
+        public override void BuildIndexHints(
+            IndexHintList hints,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            foreach (var hint in hints)
+            {
+                switch (hint.Hint)
+                {
+                    default:
+                    case IndexHintMode.Use:
+                        sb.Append(" USE INDEX ");
+                        break;
+
+                    case IndexHintMode.Ignore:
+                        sb.Append(" IGNORE INDEX ");
+                        break;
+
+                    case IndexHintMode.Force:
+                        sb.Append(" FORCE INDEX ");
+                        break;
+                }
+
+                sb.Append("(");
+                var isFirst = true;
+                foreach (var index in hint.IndexNames)
+                {
+                    if (!isFirst) sb.Append(",");
+                    else isFirst = false;
+                    
+                    sb.Append(WrapFieldName(index));
+                }
+                sb.Append(")");
+            }
+        }
+
         #endregion
 
         #region Reading values from SQL
