@@ -370,6 +370,11 @@ namespace SequelNet
 
                                 language.BuildTableName(this, connection, sb, true);
 
+                                if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                {
+                                    language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                }
+
                                 BuildJoin(sb, connection);
 
                                 if (_ListWhere != null && _ListWhere.Count > 0)
@@ -498,6 +503,11 @@ namespace SequelNet
                                 else
                                 {
                                     language.BuildTableName(this, connection, sb, true);
+
+                                    if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                    {
+                                        language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                    }
                                 }
 
                                 if (hasJoins && !language.UpdateJoinRequiresFromLeftTable && !language.UpdateFromInsteadOfJoin)
@@ -552,12 +562,22 @@ namespace SequelNet
 
                                         language.BuildTableName(this, connection, sb, true);
 
+                                        if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                        {
+                                            language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                        }
+
                                         BuildJoin(sb, connection);
                                     }
                                     else if (language.UpdateFromInsteadOfJoin)
                                     {
                                         sb.Append(" FROM ");
                                         language.BuildTableName(this, connection, sb, true);
+
+                                        if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                        {
+                                            language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                        }
 
                                         foreach (var join in _ListJoin)
                                         {
@@ -778,6 +798,11 @@ namespace SequelNet
                                 sb.Append(@" FROM ");
 
                                 language.BuildTableName(this, connection, sb, false);
+
+                                if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                {
+                                    language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                }
 
                                 BuildJoin(sb, connection);
                                 if (_ListWhere != null && _ListWhere.Count > 0)
