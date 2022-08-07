@@ -19,6 +19,7 @@ namespace SequelNet.SchemaGenerator
 		public int Scale;
 		public string DefaultValue;
 		public string ActualDefaultValue;
+		public bool HasDefault = false;
 		public string Comment;
 		public string ActualType;
 		public bool IsCustomType;

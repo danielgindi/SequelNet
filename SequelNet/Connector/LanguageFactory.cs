@@ -290,10 +290,17 @@ namespace SequelNet.Connector
 
             if (column.ComputedColumn == null)
             {
-                if (!noDefault && column.Default != null && isDefaultAllowed)
+                if (!noDefault && (column.Default != null || column.HasDefault) && (isDefaultAllowed || column.Default == null))
                 {
-                    sb.Append(@" DEFAULT ");
-                    Query.PrepareColumnValue(column, column.Default, sb, conn, relatedQuery);
+                    if (column.Default == null)
+                    {
+                        sb.Append(@" DEFAULT NULL");
+                    }
+                    else
+                    {
+                        sb.Append(@" DEFAULT ");
+                        Query.PrepareColumnValue(column, column.Default, sb, conn, relatedQuery);
+                    }
                 }
             }
 

@@ -28,6 +28,7 @@ namespace SequelNet
             public string LiteralType;
             public bool AutoIncrement;
             public object Default;
+            public bool HasDefault;
             public bool Nullable;
             public bool IsPrimaryKey;
             private int _MaxLength;

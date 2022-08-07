@@ -241,7 +241,11 @@ namespace SequelNet.SchemaGenerator
                 {
                     context.NoModifiedOn = true;
                 }
-                else if (!currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
+                else if (currentLineTrimmed.StartsWith("@MySqlEngine:", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.MySqlEngineName = currentLineTrimmed.Substring(13).Trim();
+                }
+                else
                 {
                     int startPos = currentLineTrimmed.IndexOf(":");
                     DalColumn dalColumn = new DalColumn();
@@ -643,6 +647,7 @@ namespace SequelNet.SchemaGenerator
                         else if (columnKeyword.StartsWith("Default ", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.DefaultValue = columnKeyword.Substring(8).Trim();
+                            dalColumn.HasDefault = !string.IsNullOrEmpty(dalColumn.DefaultValue);
                         }
                         else if (columnKeyword.StartsWith("ActualDefault ", StringComparison.OrdinalIgnoreCase))
                         {
@@ -726,10 +731,6 @@ namespace SequelNet.SchemaGenerator
                         dalColumn.Type = DalColumnType.TInt64;
                     }
                     context.Columns.Add(dalColumn);
-                }
-                else
-                {
-                    context.MySqlEngineName = currentLineTrimmed.Substring(13).Trim();
                 }
             }
 

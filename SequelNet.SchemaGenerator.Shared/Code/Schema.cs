@@ -554,9 +554,15 @@ namespace SequelNet.SchemaGenerator
                     "true");
             }
 
-            stringBuilder.AppendFormat("{0}Default = {1},",
-                "\r\n",
-                dalCol.DefaultValue);
+            if (dalCol.HasDefault)
+            {
+                stringBuilder.AppendFormat("{0}Default = {1},",
+                    "\r\n",
+                    dalCol.DefaultValue);
+
+                stringBuilder.AppendFormat("{0}HasDefault = true,",
+                    "\r\n");
+            }
 
             if (!string.IsNullOrEmpty(dalCol.Computed))
             {

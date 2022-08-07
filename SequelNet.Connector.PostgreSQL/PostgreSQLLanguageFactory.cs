@@ -829,9 +829,25 @@ namespace SequelNet.Connector
             sb.Append(alterData.Column.Nullable ? " DROP NOT NULL," : " SET NOT NULL,");
 
             // Alter default
-            sb.Append(ChangeColumnCommandName + " " + WrapFieldName(alterData.Column.Name));
-            sb.Append(" SET DEFAULT ");
-            Query.PrepareColumnValue(alterData.Column, alterData.Column.Default, sb, conn, relatedQuery);
+            if (alterData.Column.Default != null || alterData.Column.HasDefault)
+            {
+                sb.Append(ChangeColumnCommandName + " " + WrapFieldName(alterData.Column.Name));
+                sb.Append(" SET DEFAULT ");
+
+                if (alterData.Column.Default == null)
+                {
+                    sb.Append(@" DEFAULT NULL");
+                }
+                else
+                {
+                    sb.Append(@" DEFAULT ");
+                    Query.PrepareColumnValue(alterData.Column, alterData.Column.Default, sb, conn, relatedQuery);
+                }
+            }
+            else
+            {
+                sb.Append(" DROP DEFAULT ");
+            }
         }
 
         public override string BuildFindString(
