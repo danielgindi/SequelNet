@@ -203,15 +203,21 @@ namespace SequelNet.SchemaGenerator
                 }
                 else if (currentLineTrimmed.StartsWith("@BeforeInsert:", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.CustomBeforeInsert = currentLineTrimmed.Substring(14).Trim();
+                    if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
+                        context.CustomBeforeInsert = context.CustomBeforeInsert + "\n";
+                    context.CustomBeforeInsert = (context.CustomBeforeInsert ?? "") + currentLineTrimmed.Substring(14).Trim();
                 }
                 else if (currentLineTrimmed.StartsWith("@BeforeUpdate:", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.CustomBeforeUpdate = currentLineTrimmed.Substring(14).Trim();
+                    if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
+                        context.CustomBeforeUpdate = context.CustomBeforeUpdate + "\n";
+                    context.CustomBeforeUpdate = (context.CustomBeforeUpdate ?? "") + currentLineTrimmed.Substring(14).Trim();
                 }
                 else if (currentLineTrimmed.StartsWith("@AfterRead:", StringComparison.OrdinalIgnoreCase))
                 {
-                    context.CustomAfterRead = currentLineTrimmed.Substring(11).Trim();
+                    if (!string.IsNullOrEmpty(context.CustomAfterRead))
+                        context.CustomAfterRead = context.CustomAfterRead + "\n";
+                    context.CustomAfterRead = (context.CustomAfterRead ?? "") + currentLineTrimmed.Substring(11).Trim();
                 }
                 else if (currentLineTrimmed.StartsWith("@StaticColumns", StringComparison.OrdinalIgnoreCase))
                 {
