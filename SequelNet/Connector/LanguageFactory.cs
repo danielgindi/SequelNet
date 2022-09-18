@@ -622,7 +622,7 @@ namespace SequelNet.Connector
             }
             else if (value is DateTime)
             {
-                return '\'' + FormatDate((DateTime)value) + '\'';
+                return '\'' + FormatDateTime((DateTime)value) + '\'';
             }
             else if (value is Guid)
             {
@@ -693,9 +693,26 @@ namespace SequelNet.Connector
             else return value.ToString();
         }
 
-        public virtual string FormatDate(DateTime dateTime)
+        public virtual string FormatDateTime(DateTime dateTime)
         {
             return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        }
+
+        public virtual string FormatDate(int year, int month, int day)
+        {
+            return "DATE'" +
+                year.ToString().PadLeft(4, '0') + '-' +
+                month.ToString().PadLeft(2, '0') + '-' +
+                day.ToString().PadLeft(2, '0') + "'";
+        }
+
+        public virtual string FormatTime(int hours, int minutes, int seconds, int milliseconds)
+        {
+            return "TIME'" +
+                hours.ToString().PadLeft(2, '0') + ':' +
+                minutes.ToString().PadLeft(2, '0') + ':' +
+                seconds.ToString().PadLeft(2, '0') + '.' +
+                milliseconds.ToString().PadLeft(3, '0') + "'";
         }
 
         public virtual string EscapeLike(string expression)

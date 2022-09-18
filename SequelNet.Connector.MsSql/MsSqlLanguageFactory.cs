@@ -847,13 +847,32 @@ namespace SequelNet.Connector
         {
             return '\'' + value.ToString(@"D") + '\'';
         }
+        
         public override string PrepareValue(string value)
         {
             return @"N'" + EscapeString(value) + '\'';
         }
-        public override string FormatDate(DateTime dateTime)
+        
+        public override string FormatDateTime(DateTime dateTime)
         {
-            return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
+            return "CAST(" + dateTime.ToString(@"yyyy-MM-dd HH:mm:ss.fff") + " AS DATETIME)";
+        }
+        
+        public override string FormatDate(int year, int month, int day)
+        {
+            return "CAST('" +
+                year.ToString().PadLeft(4, '0') + '-' +
+                month.ToString().PadLeft(2, '0') + '-' +
+                day.ToString().PadLeft(2, '0') + "' AS DATE)";
+        }
+        
+        public override string FormatTime(int hours, int minutes, int seconds, int milliseconds)
+        {
+            return "CAST('" +
+                hours.ToString().PadLeft(2, '0') + ':' +
+                minutes.ToString().PadLeft(2, '0') + ':' +
+                seconds.ToString().PadLeft(2, '0') + '.' +
+                milliseconds.ToString().PadLeft(3, '0') + "' AS TIME)";
         }
 
         public override string EscapeLike(string expression)

@@ -1254,7 +1254,7 @@ namespace SequelNet.Connector
             return '\'' + value.ToString(@"D") + '\'';
         }
 
-        public override string FormatDate(DateTime dateTime)
+        public override string FormatDateTime(DateTime dateTime)
         {
             return dateTime.ToString(@"yyyy-MM-dd HH:mm:ss");
         }

@@ -7,6 +7,16 @@ namespace SequelNet
     public static class PhraseHelper
     {
         #region DateTime
+        
+        public static Date Date(int year, int month, int day)
+        {
+            return new Date(year, month, day);
+        }
+        
+        public static Time Time(int hours, int minutes, int seconds, int milliseconds = 0)
+        {
+            return new Time(hours, minutes, seconds, milliseconds);
+        }
 
         public static DateTimeAdd DateTimeAdd(ValueWrapper to, DateTimeUnit unit, ValueWrapper add)
         {
