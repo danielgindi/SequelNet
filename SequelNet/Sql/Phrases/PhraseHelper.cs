@@ -8,14 +8,14 @@ namespace SequelNet
     {
         #region DateTime
         
-        public static Date Date(int year, int month, int day)
+        public static CreateDate CreateDate(int year, int month, int day)
         {
-            return new Date(year, month, day);
+            return new CreateDate(year, month, day);
         }
         
-        public static Time Time(int hours, int minutes, int seconds, int milliseconds = 0)
+        public static CreateTime CreateTime(int hours, int minutes, int seconds, int milliseconds = 0)
         {
-            return new Time(hours, minutes, seconds, milliseconds);
+            return new CreateTime(hours, minutes, seconds, milliseconds);
         }
 
         public static DateTimeAdd DateTimeAdd(ValueWrapper to, DateTimeUnit unit, ValueWrapper add)
@@ -321,6 +321,56 @@ namespace SequelNet
         public static Second Second(ValueWrapper value)
         {
             return new Second(value);
+        }
+
+        public static ExtractDate ExtractDate(object value, ValueObjectType valueType)
+        {
+            return new ExtractDate(value, valueType);
+        }
+
+        public static ExtractDate ExtractDate(string tableName, string columnName)
+        {
+            return new ExtractDate(tableName, columnName);
+        }
+
+        public static ExtractDate ExtractDate(string columnName)
+        {
+            return new ExtractDate(columnName);
+        }
+
+        public static ExtractDate ExtractDate(IPhrase phrase)
+        {
+            return new ExtractDate(phrase);
+        }
+
+        public static ExtractDate ExtractDate(ValueWrapper value)
+        {
+            return new ExtractDate(value);
+        }
+
+        public static ExtractTime ExtractTime(object value, ValueObjectType valueType)
+        {
+            return new ExtractTime(value, valueType);
+        }
+
+        public static ExtractTime ExtractTime(string tableName, string columnName)
+        {
+            return new ExtractTime(tableName, columnName);
+        }
+
+        public static ExtractTime ExtractTime(string columnName)
+        {
+            return new ExtractTime(columnName);
+        }
+
+        public static ExtractTime ExtractTime(IPhrase phrase)
+        {
+            return new ExtractTime(phrase);
+        }
+
+        public static ExtractTime ExtractTime(ValueWrapper value)
+        {
+            return new ExtractTime(value);
         }
 
         public static DateTimeFormat DateTimeFormat(object value, ValueObjectType valueType, DateTimeFormat.FormatOptions format)

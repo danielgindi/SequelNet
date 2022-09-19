@@ -41,17 +41,17 @@ namespace SequelNet.Connector
             return @"LEN(" + value + ")";
         }
 
-        public override string HourPartOfDate(string date)
+        public override string HourPartOfDateOrTime(string date)
         {
             return @"DATEPART(hour, " + date + ")";
         }
 
-        public override string MinutePartOfDate(string date)
+        public override string MinutePartOfDateOrTime(string date)
         {
             return @"DATEPART(minute, " + date + ")";
         }
 
-        public override string SecondPartOfDate(string date)
+        public override string SecondPartOfDateOrTime(string date)
         {
             return @"DATEPART(second, " + date + ")";
         }

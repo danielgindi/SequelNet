@@ -66,34 +66,44 @@ namespace SequelNet.Connector
             return @"LENGTH(" + value + ")";
         }
 
-        public virtual string YearPartOfDate(string date)
+        public virtual string YearPartOfDateTime(string date)
         {
             return @"YEAR(" + date + ")";
         }
 
-        public virtual string MonthPartOfDate(string date)
+        public virtual string MonthPartOfDateTime(string date)
         {
             return @"MONTH(" + date + ")";
         }
 
-        public virtual string DayPartOfDate(string date)
+        public virtual string DayPartOfDateTime(string date)
         {
             return @"DAY(" + date + ")";
         }
 
-        public virtual string HourPartOfDate(string date)
+        public virtual string HourPartOfDateOrTime(string date)
         {
             return @"HOUR(" + date + ")";
         }
 
-        public virtual string MinutePartOfDate(string date)
+        public virtual string MinutePartOfDateOrTime(string date)
         {
             return @"MINUTE(" + date + ")";
         }
 
-        public virtual string SecondPartOfDate(string date)
+        public virtual string SecondPartOfDateOrTime(string date)
         {
             return @"SECONDS(" + date + ")";
+        }
+
+        public virtual string DatePartOfDateTime(string date)
+        {
+            return @"DATE(" + date + ")";
+        }
+
+        public virtual string TimePartOfDateTime(string date)
+        {
+            return @"TIME(" + date + ")";
         }
 
         public virtual string ExtractUnixTimestamp(string date)
@@ -698,7 +708,7 @@ namespace SequelNet.Connector
             return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
-        public virtual string FormatDate(int year, int month, int day)
+        public virtual string FormatCreateDate(int year, int month, int day)
         {
             return "DATE'" +
                 year.ToString().PadLeft(4, '0') + '-' +
@@ -706,7 +716,7 @@ namespace SequelNet.Connector
                 day.ToString().PadLeft(2, '0') + "'";
         }
 
-        public virtual string FormatTime(int hours, int minutes, int seconds, int milliseconds)
+        public virtual string FormatCreateTime(int hours, int minutes, int seconds, int milliseconds)
         {
             return "TIME'" +
                 hours.ToString().PadLeft(2, '0') + ':' +

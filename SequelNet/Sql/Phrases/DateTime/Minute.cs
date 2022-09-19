@@ -38,7 +38,7 @@ namespace SequelNet.Phrases
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            sb.Append(conn.Language.MinutePartOfDate(Value.Build(conn, relatedQuery)));
+            sb.Append(conn.Language.MinutePartOfDateOrTime(Value.Build(conn, relatedQuery)));
         }
     }
 }

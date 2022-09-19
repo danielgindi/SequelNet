@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SequelNet.Phrases
 {
-    public class Time : IPhrase
+    public class CreateTime : IPhrase
     {
         public int Hours;
         public int Minutes;
@@ -12,7 +12,7 @@ namespace SequelNet.Phrases
 
         #region Constructors
 
-        public Time(int hours, int minutes, int seconds, int milliseconds = 0)
+        public CreateTime(int hours, int minutes, int seconds, int milliseconds = 0)
         {
             this.Hours = hours;
             this.Minutes = minutes;
@@ -24,7 +24,7 @@ namespace SequelNet.Phrases
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            sb.Append(conn.Language.FormatTime(Hours, Minutes, Seconds, Milliseconds));
+            sb.Append(conn.Language.FormatCreateTime(Hours, Minutes, Seconds, Milliseconds));
         }
     }
 }

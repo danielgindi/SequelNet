@@ -3,7 +3,7 @@ using System.Text;
 
 namespace SequelNet.Phrases
 {
-    public class Date : IPhrase
+    public class CreateDate : IPhrase
     {
         public int Year;
         public int Month;
@@ -11,7 +11,7 @@ namespace SequelNet.Phrases
 
         #region Constructors
 
-        public Date(int year, int month, int day)
+        public CreateDate(int year, int month, int day)
         {
             this.Year = year;
             this.Month = month;
@@ -22,7 +22,7 @@ namespace SequelNet.Phrases
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            sb.Append(conn.Language.FormatDate(Year, Month, Day));
+            sb.Append(conn.Language.FormatCreateDate(Year, Month, Day));
         }
     }
 }

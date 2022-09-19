@@ -3,33 +3,33 @@ using System.Text;
 
 namespace SequelNet.Phrases
 {
-    public class Day : IPhrase
+    public class ExtractDate : IPhrase
     {
         public ValueWrapper Value;
 
         #region Constructors
 
-        public Day(object value, ValueObjectType valueType)
+        public ExtractDate(object value, ValueObjectType valueType)
         {
             this.Value = ValueWrapper.Make(value, valueType);
         }
 
-        public Day(string tableName, string columnName)
+        public ExtractDate(string tableName, string columnName)
         {
             this.Value = ValueWrapper.Column(tableName, columnName);
         }
 
-        public Day(string columnName)
+        public ExtractDate(string columnName)
             : this(null, columnName)
         {
         }
 
-        public Day(IPhrase phrase)
+        public ExtractDate(IPhrase phrase)
             : this(phrase, ValueObjectType.Value)
         {
         }
 
-        public Day(ValueWrapper value)
+        public ExtractDate(ValueWrapper value)
         {
             this.Value = value;
         }
@@ -38,7 +38,7 @@ namespace SequelNet.Phrases
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
         {
-            sb.Append(conn.Language.DayPartOfDateTime(Value.Build(conn, relatedQuery)));
+            sb.Append(conn.Language.DatePartOfDateTime(Value.Build(conn, relatedQuery)));
         }
     }
 }

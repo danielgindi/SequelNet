@@ -59,19 +59,29 @@ namespace SequelNet.Connector
             return @"GETUTCDATE()";
         }
 
-        public override string HourPartOfDate(string date)
+        public override string HourPartOfDateOrTime(string date)
         {
             return @"DATEPART(hour, " + date + ")";
         }
 
-        public override string MinutePartOfDate(string date)
+        public override string MinutePartOfDateOrTime(string date)
         {
             return @"DATEPART(minute, " + date + ")";
         }
 
-        public override string SecondPartOfDate(string date)
+        public override string SecondPartOfDateOrTime(string date)
         {
             return @"DATEPART(second, " + date + ")";
+        }
+
+        public override string DatePartOfDateTime(string dateTime)
+        {
+            return "CAST(" + dateTime + " AS DATE)";
+        }
+
+        public override string TimePartOfDateTime(string dateTime)
+        {
+            return "CAST(" + dateTime + " AS TIME)";
         }
 
         public override string ExtractUnixTimestamp(string date)
@@ -858,7 +868,7 @@ namespace SequelNet.Connector
             return "CAST(" + dateTime.ToString(@"yyyy-MM-dd HH:mm:ss.fff") + " AS DATETIME)";
         }
         
-        public override string FormatDate(int year, int month, int day)
+        public override string FormatCreateDate(int year, int month, int day)
         {
             return "CAST('" +
                 year.ToString().PadLeft(4, '0') + '-' +
@@ -866,7 +876,7 @@ namespace SequelNet.Connector
                 day.ToString().PadLeft(2, '0') + "' AS DATE)";
         }
         
-        public override string FormatTime(int hours, int minutes, int seconds, int milliseconds)
+        public override string FormatCreateTime(int hours, int minutes, int seconds, int milliseconds)
         {
             return "CAST('" +
                 hours.ToString().PadLeft(2, '0') + ':' +

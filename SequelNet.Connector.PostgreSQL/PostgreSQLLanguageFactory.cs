@@ -35,34 +35,44 @@ namespace SequelNet.Connector
             return @"now() at time zone 'utc'";
         }
 
-        public override string YearPartOfDate(string date)
+        public override string YearPartOfDateTime(string date)
         {
             return $"EXTRACT(YEAR FROM {date})";
         }
 
-        public override string MonthPartOfDate(string date)
+        public override string MonthPartOfDateTime(string date)
         {
             return $"EXTRACT(MONTH FROM {date})";
         }
 
-        public override string DayPartOfDate(string date)
+        public override string DayPartOfDateTime(string date)
         {
             return $"EXTRACT(DAY FROM {date})";
         }
 
-        public override string HourPartOfDate(string date)
+        public override string HourPartOfDateOrTime(string date)
         {
             return $"EXTRACT(HOUR FROM {date})";
         }
 
-        public override string MinutePartOfDate(string date)
+        public override string MinutePartOfDateOrTime(string date)
         {
             return $"EXTRACT(MINUTE FROM {date})";
         }
 
-        public override string SecondPartOfDate(string date)
+        public override string SecondPartOfDateOrTime(string date)
         {
             return $"EXTRACT(SECOND FROM {date})";
+        }
+
+        public override string DatePartOfDateTime(string dateTime)
+        {
+            return dateTime + "::DATE";
+        }
+
+        public override string TimePartOfDateTime(string dateTime)
+        {
+            return dateTime + "::TIME";
         }
 
         public override string ExtractUnixTimestamp(string date)
