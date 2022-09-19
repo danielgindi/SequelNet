@@ -410,11 +410,13 @@ namespace SequelNet.Connector
 
             if (column.LiteralType != null && column.LiteralType.Length > 0)
             {
-                isDefaultAllowed = column.ActualDataType != DataType.VarChar &&
-                    column.ActualDataType != DataType.Char &&
-                    column.ActualDataType != DataType.Text &&
-                    column.ActualDataType != DataType.MediumText &&
-                    column.ActualDataType != DataType.LongText &&
+                var dataType = column.ActualDataType;
+
+                isDefaultAllowed = dataType != DataType.VarChar &&
+                    dataType != DataType.Char &&
+                    dataType != DataType.Text &&
+                    dataType != DataType.MediumText &&
+                    dataType != DataType.LongText &&
                     column.Type == typeof(string);
 
                 sb.Append(column.LiteralType);
