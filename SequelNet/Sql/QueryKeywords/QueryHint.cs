@@ -19,6 +19,6 @@
         /// * Applies only when ever there's no auto-commit, i.e inside a transaction.
         /// * Supported in MySql
         /// </summary>
-        LockInSharedMode
+        LockInShareMode
     }
 }

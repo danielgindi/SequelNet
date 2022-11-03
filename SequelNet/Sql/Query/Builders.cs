@@ -406,10 +406,10 @@ namespace SequelNet
                                             sb.Append(@" FOR UPDATE");
                                         }
                                         break;
-                                    case QueryHint.LockInSharedMode:
+                                    case QueryHint.LockInShareMode:
                                         if (connection.TYPE == ConnectorBase.SqlServiceType.MYSQL)
                                         {
-                                            sb.Append(@" LOCK IN SHARED MODE");
+                                            sb.Append(@" LOCK IN SHARE MODE");
                                         }
                                         else if (connection.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
                                         {
