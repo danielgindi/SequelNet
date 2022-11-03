@@ -333,12 +333,21 @@ namespace SequelNet
                 return cmd;
             }
         }
-
+        
         public string BuildCommand(ConnectorBase connection)
         {
-            if (this.QueryMode == QueryMode.ExecuteStoredProcedure || this.QueryMode == QueryMode.None) return string.Empty;
-
             StringBuilder sb = new StringBuilder();
+
+            BuildCommand(sb, connection);
+            
+            return sb.ToString();
+        }
+
+        public void BuildCommand(StringBuilder sb, ConnectorBase connection)
+        {
+            if (this.QueryMode == QueryMode.ExecuteStoredProcedure ||
+                this.QueryMode == QueryMode.None)
+                return;
 
             bool ownsConnection = false;
             if (connection == null)
@@ -389,6 +398,35 @@ namespace SequelNet
 
                                 BuildGroupBy(sb, connection, false);
                                 BuildHaving(sb, connection);
+
+                                // UNION/INTERSECT/EXCEPT are before ORDER BY/LIMIT/OFFSET and hint
+                                if (_QueryCombineData != null)
+                                {
+                                    foreach (var combine in _QueryCombineData)
+                                    {
+                                        switch (combine.Mode)
+                                        {
+                                            default:
+                                            case QueryCombineMode.Union:
+                                                sb.Append(" UNION ");
+                                                break;
+                                            case QueryCombineMode.Intersect:
+                                                sb.Append(" INTERSECT ");
+                                                break;
+                                            case QueryCombineMode.Except:
+                                                sb.Append(" EXCEPT ");
+                                                break;
+                                        }
+
+                                        if (combine.All)
+                                        {
+                                            sb.Append("ALL ");
+                                        }
+
+                                        combine.Query.BuildCommand(sb, connection);
+                                    }
+                                }
+
                                 BuildOrderBy(sb, connection, false);
 
                                 language.BuildLimitOffset(this, false, sb);
@@ -1077,8 +1115,6 @@ namespace SequelNet
                     connection = null;
                 }
             }
-
-            return sb.ToString();
         }
     }
 }

@@ -25,6 +25,7 @@ namespace SequelNet
         internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();
         private QueryHint _QueryHint = QueryHint.None;
         private GroupByHint _GroupByHint = GroupByHint.None;
+        private List<QueryCombineData> _QueryCombineData = null;
 
         #endregion
 
