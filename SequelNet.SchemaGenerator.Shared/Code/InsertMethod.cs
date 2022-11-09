@@ -67,6 +67,11 @@ namespace SequelNet.SchemaGenerator
                 }
             }
 
+            if (!string.IsNullOrEmpty(context.CustomAfterInsertQuery))
+            {
+                stringBuilder.AppendFormat("{1}{0}", "\r\n", context.CustomAfterInsertQuery);
+            }
+            
             stringBuilder.AppendFormat("{0}return qry;{0}", "\r\n");
 
             stringBuilder.AppendFormat("}}{0}", "\r\n");

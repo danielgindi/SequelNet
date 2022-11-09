@@ -26,7 +26,9 @@ namespace SequelNet.SchemaGenerator
 
         public string SingleColumnPrimaryKeyName = null;
         public string CustomBeforeInsert = null;
+        public string CustomAfterInsertQuery = null;
         public string CustomBeforeUpdate = null;
+        public string CustomAfterUpdateQuery = null;
         public string CustomAfterRead = null;
         public string MySqlEngineName = "";
 

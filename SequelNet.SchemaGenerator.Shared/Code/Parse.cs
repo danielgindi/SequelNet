@@ -207,11 +207,23 @@ namespace SequelNet.SchemaGenerator
                         context.CustomBeforeInsert = context.CustomBeforeInsert + "\n";
                     context.CustomBeforeInsert = (context.CustomBeforeInsert ?? "") + currentLineTrimmed.Substring(14).Trim();
                 }
+                else if (currentLineTrimmed.StartsWith("@AfterInsertQuery:", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!string.IsNullOrEmpty(context.CustomAfterInsertQuery))
+                        context.CustomAfterInsertQuery = context.CustomAfterInsertQuery + "\n";
+                    context.CustomAfterInsertQuery = (context.CustomAfterInsertQuery ?? "") + currentLineTrimmed.Substring(18).Trim();
+                }
                 else if (currentLineTrimmed.StartsWith("@BeforeUpdate:", StringComparison.OrdinalIgnoreCase))
                 {
                     if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
                         context.CustomBeforeUpdate = context.CustomBeforeUpdate + "\n";
                     context.CustomBeforeUpdate = (context.CustomBeforeUpdate ?? "") + currentLineTrimmed.Substring(14).Trim();
+                }
+                else if (currentLineTrimmed.StartsWith("@AfterUpdateQuery:", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!string.IsNullOrEmpty(context.CustomAfterUpdateQuery))
+                        context.CustomAfterUpdateQuery = context.CustomAfterUpdateQuery + "\n";
+                    context.CustomAfterUpdateQuery = (context.CustomAfterUpdateQuery ?? "") + currentLineTrimmed.Substring(18).Trim();
                 }
                 else if (currentLineTrimmed.StartsWith("@AfterRead:", StringComparison.OrdinalIgnoreCase))
                 {
