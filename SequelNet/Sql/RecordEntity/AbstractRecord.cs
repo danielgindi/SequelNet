@@ -298,10 +298,17 @@ namespace SequelNet
             if (__CLASS_TYPE == null)
                 __CLASS_TYPE = this.GetType();
 
+            object primaryKey = SchemaPrimaryKeyName;
+            bool hasSimplePrimaryKeyName = primaryKey is string;
+
             var qry = new Query(Schema);
 
             foreach (var column in Schema.Columns)
             {
+                if (primaryKey != null &&
+                    ((hasSimplePrimaryKeyName && column.Name == (string)primaryKey) ||
+                    (!hasSimplePrimaryKeyName && StringArrayContains((string[])primaryKey, column.Name)))) continue;
+
                 var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
                     qry.Insert(column.Name, propInfo.GetValue(this, null));
@@ -324,14 +331,15 @@ namespace SequelNet
                 __CLASS_TYPE = this.GetType();
 
             object primaryKey = SchemaPrimaryKeyName;
-            bool isPrimaryKeyNullOrString = primaryKey == null || primaryKey is string;
+            bool hasSimplePrimaryKeyName = primaryKey is string;
 
             var qry = new Query(Schema);
 
             foreach (var column in Schema.Columns)
             {
-                if ((isPrimaryKeyNullOrString && column.Name == (string)primaryKey) ||
-                    (!isPrimaryKeyNullOrString && StringArrayContains((string[])primaryKey, column.Name))) continue;
+                if (primaryKey != null &&
+                    ((hasSimplePrimaryKeyName && column.Name == (string)primaryKey) ||
+                    (!hasSimplePrimaryKeyName && StringArrayContains((string[])primaryKey, column.Name)))) continue;
 
                 var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
                 if (propInfo != null)
