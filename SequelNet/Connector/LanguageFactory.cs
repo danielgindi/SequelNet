@@ -51,6 +51,15 @@ namespace SequelNet.Connector
             return @"NOW()";
         }
 
+        public virtual void BuildConvertUtcToTz(
+            ValueWrapper value, ValueWrapper timeZone, 
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            value.Build(sb, conn, relatedQuery);
+            sb.Append(" AT TIME ZONE 'UTC' AT TIME ZONE ");
+            timeZone.Build(sb, conn, relatedQuery);
+        }
+
         public virtual string StringToLower(string value)
         {
             return @"LOWER(" + value + ")";

@@ -161,6 +161,17 @@ namespace SequelNet.Connector
             return @"UTC_TIMESTAMP()";
         }
 
+        public override void BuildConvertUtcToTz(
+            ValueWrapper value, ValueWrapper timeZone,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            sb.Append("CONVERT_TZ(");
+            value.Build(sb, conn, relatedQuery);
+            sb.Append(",'UTC',");
+            timeZone.Build(sb, conn, relatedQuery);
+            sb.Append(")");
+        }
+
         public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
         {
             switch (format)

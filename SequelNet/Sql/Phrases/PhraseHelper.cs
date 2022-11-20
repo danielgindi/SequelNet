@@ -7,6 +7,16 @@ namespace SequelNet
     public static class PhraseHelper
     {
         #region DateTime
+
+        public static ConvertUtcToTz ConvertUtcToTz(ValueWrapper value, ValueWrapper timezone)
+        {
+            return new ConvertUtcToTz(value, timezone);
+        }
+
+        public static ConvertUtcToTz ConvertUtcToTz(ValueWrapper value, string timezone)
+        {
+            return new ConvertUtcToTz(value, timezone);
+        }
         
         public static CreateDate CreateDate(int year, int month, int day)
         {

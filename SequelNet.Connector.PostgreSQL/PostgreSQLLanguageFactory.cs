@@ -35,6 +35,15 @@ namespace SequelNet.Connector
             return @"now() at time zone 'utc'";
         }
 
+        public override void BuildConvertUtcToTz(
+            ValueWrapper value, ValueWrapper timeZone,
+            StringBuilder sb, ConnectorBase conn, Query relatedQuery)
+        {
+            value.Build(sb, conn, relatedQuery);
+            sb.Append(" AT TIME ZONE ");
+            timeZone.Build(sb, conn, relatedQuery);
+        }
+
         public override string YearPartOfDateTime(string date)
         {
             return $"EXTRACT(YEAR FROM {date})";
