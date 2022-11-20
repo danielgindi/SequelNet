@@ -293,7 +293,7 @@ namespace SequelNet.Connector
                     attachCommandToReader ? command : null,
                     attachConnectionToReader ? this : null);
             }
-            catch (Exception ex)
+            catch
             {
                 if (attachCommandToReader && command != null)
                     command.Dispose();
@@ -301,7 +301,7 @@ namespace SequelNet.Connector
                 if (attachConnectionToReader && Connection != null)
                     Connection.Dispose();
 
-                throw ex;
+                throw;
             }
         }
 
@@ -336,7 +336,7 @@ namespace SequelNet.Connector
                     attachCommandToReader ? command : null,
                     attachConnectionToReader ? this : null);
             }
-            catch (Exception ex)
+            catch
             {
                 if (attachCommandToReader && command != null)
                     command.Dispose();
@@ -344,7 +344,7 @@ namespace SequelNet.Connector
                 if (attachConnectionToReader && Connection != null)
                     Connection.Dispose();
 
-                throw ex;
+                throw;
             }
         }
 

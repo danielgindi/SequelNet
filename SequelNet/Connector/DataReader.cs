@@ -687,6 +687,16 @@ namespace SequelNet.Connector
             return GetTimeSpan(ordinal);
         }
 
+#if NET6_0_OR_GREATER
+	    public DateOnly GetDateOnly(string name) => GetDateOnly(UnderlyingReader.GetOrdinal(name));
+        
+	    public DateOnly? GetDateOnlyOrNull(string name) => GetDateOnlyOrNull(UnderlyingReader.GetOrdinal(name));
+    
+	    public TimeOnly GetTimeOnly(string name) => GetTimeOnly(UnderlyingReader.GetOrdinal(name));
+    
+	    public TimeOnly? GetTimeOnlyOrNull(string name) => GetTimeOnlyOrNull(UnderlyingReader.GetOrdinal(name));
+#endif
+
         public decimal GetDecimal(string columnName)
         {
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
@@ -1120,6 +1130,38 @@ namespace SequelNet.Connector
             var ordinal = UnderlyingReader.GetOrdinal(columnName);
             return UnderlyingReader.IsDBNull(ordinal) ? null : (TimeSpan?)GetTimeSpan(ordinal);
         }
+
+#if NET6_0_OR_GREATER
+	    public DateOnly GetDateOnly(int ordinal)
+        {
+            var value = (DateTime)UnderlyingReader.GetValue(ordinal);
+            return DateOnly.FromDateTime(value);
+        }
+        
+	    public DateOnly? GetDateOnlyOrNull(int ordinal)
+        {
+            if (UnderlyingReader.IsDBNull(ordinal))
+                return null;
+            
+            var value = (DateTime)UnderlyingReader.GetValue(ordinal);
+            return DateOnly.FromDateTime(value);
+        }
+    
+	    public TimeOnly GetTimeOnly(int ordinal)
+        {
+            var value = (TimeSpan)UnderlyingReader.GetValue(ordinal);
+            return TimeOnly.FromTimeSpan(value);
+        }
+    
+	    public TimeOnly? GetTimeOnlyOrNull(int ordinal)
+        {
+            if (UnderlyingReader.IsDBNull(ordinal))
+                return null;
+
+            var value = (TimeSpan)UnderlyingReader.GetValue(ordinal);
+            return TimeOnly.FromTimeSpan(value);
+        }
+#endif
 
         public float? GetFloatOrNull(int ordinal)
         {
