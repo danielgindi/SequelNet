@@ -32,12 +32,32 @@ namespace SequelNet.Phrases
         }
 
         public Replace(
+            ValueWrapper source,
+            string searchTableName, string searchColumn,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceValue = source;
+            this.SearchValue = ValueWrapper.Column(searchTableName, searchColumn);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
+        }
+
+        public Replace(
             string sourceTableName, string sourceColumn,
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
             this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
             this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
+        }
+
+        public Replace(
+            string sourceTableName, string sourceColumn,
+            ValueWrapper search,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = search;
             this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
@@ -52,12 +72,32 @@ namespace SequelNet.Phrases
         }
 
         public Replace(
+            string sourceTableName, string sourceColumn,
+            string searchTableName, string searchColumn,
+            ValueWrapper replace)
+        {
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = ValueWrapper.Column(searchTableName, searchColumn);
+            this.ReplaceWithValue = replace;
+        }
+
+        public Replace(
             object source, ValueObjectType sourceType,
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
         {
             this.SourceValue = ValueWrapper.Make(source, sourceType);
             this.SearchValue = ValueWrapper.Make(search, searchType);
+            this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
+        }
+
+        public Replace(
+            ValueWrapper source,
+            ValueWrapper search,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            this.SourceValue = source;
+            this.SearchValue = search;
             this.ReplaceWithValue = ValueWrapper.Column(replaceWithTableName, replaceWithColumn);
         }
 
@@ -72,6 +112,16 @@ namespace SequelNet.Phrases
         }
 
         public Replace(
+            string sourceTableName, string sourceColumn,
+            ValueWrapper search,
+            ValueWrapper replace)
+        {
+            this.SourceValue = ValueWrapper.Column(sourceTableName, sourceColumn);
+            this.SearchValue = search;
+            this.ReplaceWithValue = replace;
+        }
+
+        public Replace(
             object source, ValueObjectType sourceType,
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
@@ -80,7 +130,14 @@ namespace SequelNet.Phrases
             this.SearchValue = ValueWrapper.Make(search, searchType);
             this.ReplaceWithValue = ValueWrapper.Make(replace, replaceWithType);
         }
-        
+
+        public Replace(ValueWrapper source, ValueWrapper search, ValueWrapper replace)
+        {
+            this.SourceValue = source;
+            this.SearchValue = search;
+            this.ReplaceWithValue = replace;
+        }
+
         #endregion
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)

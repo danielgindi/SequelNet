@@ -2441,6 +2441,17 @@ namespace SequelNet
         }
 
         public static Replace Replace(
+            ValueWrapper source,
+            string searchTableName, string searchColumn,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            return new Replace(
+                source,
+                searchTableName, searchColumn,
+                replaceWithTableName, replaceWithColumn);
+        }
+
+        public static Replace Replace(
             string sourceTableName, string sourceColumn,
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
@@ -2448,6 +2459,17 @@ namespace SequelNet
             return new Replace(
                 sourceTableName, sourceColumn,
                 search, searchType,
+                replaceWithTableName, replaceWithColumn);
+        }
+
+        public static Replace Replace(
+            string sourceTableName, string sourceColumn,
+            ValueWrapper search,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            return new Replace(
+                sourceTableName, sourceColumn,
+                search,
                 replaceWithTableName, replaceWithColumn);
         }
 
@@ -2463,6 +2485,17 @@ namespace SequelNet
         }
 
         public static Replace Replace(
+            string sourceTableName, string sourceColumn,
+            string searchTableName, string searchColumn,
+            ValueWrapper replace)
+        {
+            return new Replace(
+                sourceTableName, sourceColumn,
+                searchTableName, searchColumn,
+                replace);
+        }
+
+        public static Replace Replace(
             object source, ValueObjectType sourceType,
             object search, ValueObjectType searchType,
             string replaceWithTableName, string replaceWithColumn)
@@ -2470,6 +2503,17 @@ namespace SequelNet
             return new Replace(
                 source, sourceType,
                 search, searchType,
+                replaceWithTableName, replaceWithColumn);
+        }
+
+        public static Replace Replace(
+            ValueWrapper source,
+            ValueWrapper search,
+            string replaceWithTableName, string replaceWithColumn)
+        {
+            return new Replace(
+                source,
+                search,
                 replaceWithTableName, replaceWithColumn);
         }
 
@@ -2485,6 +2529,17 @@ namespace SequelNet
         }
 
         public static Replace Replace(
+            string sourceTableName, string sourceColumn,
+            ValueWrapper search,
+            ValueWrapper replace)
+        {
+            return new Replace(
+                sourceTableName, sourceColumn,
+                search,
+                replace);
+        }
+
+        public static Replace Replace(
             object source, ValueObjectType sourceType,
             object search, ValueObjectType searchType,
             object replace, ValueObjectType replaceWithType)
@@ -2493,6 +2548,11 @@ namespace SequelNet
                 source, sourceType,
                 search, searchType,
                 replace, replaceWithType);
+        }
+
+        public static Replace Replace(ValueWrapper source, ValueWrapper search, ValueWrapper replace)
+        {
+            return new Replace(source, search, replace);
         }
         
         public static Substring Substring(object value, ValueObjectType valueType, int from, int? length = null)
