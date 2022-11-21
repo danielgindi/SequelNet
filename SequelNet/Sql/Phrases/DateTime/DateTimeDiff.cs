@@ -153,18 +153,18 @@ namespace SequelNet.Phrases
                 }
                 sb.Append(',');
 
+                sb.Append(Value1.Build(conn, relatedQuery));
+
+                sb.Append(',');
+
                 sb.Append(Value2.Build(conn, relatedQuery));
+
+                sb.Append(')');
 
                 if (Unit == DateTimeUnit.Millisecond)
                 {
                     sb.Append(" * 1000");
                 }
-
-                sb.Append(',');
-
-                sb.Append(Value1.Build(conn, relatedQuery));
-
-                sb.Append(')');
             }
             else if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
             {
@@ -172,54 +172,54 @@ namespace SequelNet.Phrases
                 {
                     case DateTimeUnit.Microsecond:
                         sb.AppendFormat(@"((((DATE_PART('day', {0}) - DATE_PART('day', {1})) * 24 + (DATE_PART('hour', {0}) - DATE_PART('hour', {1}))) * 60 + (DATE_PART('minute', {0}) - DATE_PART('minute', {1}))) * 60 + (DATE_PART('second', {0}) - DATE_PART('second', {1}))) * 1000000",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Millisecond:
                         sb.AppendFormat(@"((((DATE_PART('day', {0}) - DATE_PART('day', {1})) * 24 + (DATE_PART('hour', {0}) - DATE_PART('hour', {1}))) * 60 + (DATE_PART('minute', {0}) - DATE_PART('minute', {1}))) * 60 + (DATE_PART('second', {0}) - DATE_PART('second', {1}))) * 1000",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     default:
                     case DateTimeUnit.Second:
                         sb.AppendFormat(@"(((DATE_PART('day', {0}) - DATE_PART('day', {1})) * 24 + (DATE_PART('hour', {0}) - DATE_PART('hour', {1}))) * 60 + (DATE_PART('minute', {0}) - DATE_PART('minute', {1}))) * 60 + (DATE_PART('second', {0}) - DATE_PART('second', {1}))",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Minute:
                         sb.AppendFormat(@"((DATE_PART('day', {0}) - DATE_PART('day', {1})) * 24 + (DATE_PART('hour', {0}) - DATE_PART('hour', {1}))) * 60 + (DATE_PART('minute', {0}) - DATE_PART('minute', {1}))",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Hour:
                         sb.AppendFormat(@"(DATE_PART('day', {0}) - DATE_PART('day', {1})) * 24 + (DATE_PART('hour', {0}) - DATE_PART('hour', {1}))",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Day:
                         sb.AppendFormat(@"DATE_PART('day', {0}) - DATE_PART('day', {1})",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Week:
                         sb.AppendFormat(@"TRUNC(DATE_PART('day', {0} - {1}) / 7)",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Month:
                         sb.AppendFormat(@"(DATE_PART('year', {0}) - DATE_PART('year', {1})) * 12 + (DATE_PART('month', {0}) - DATE_PART('month', {1}))",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.QuarterYear:
                         sb.AppendFormat(@"(DATE_PART('year', {0}) - DATE_PART('year', {1})) * 4 + TRUNC((DATE_PART('month', {0}) - DATE_PART('month', {1})) / 4)",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                     case DateTimeUnit.Year:
                         sb.AppendFormat(@"DATE_PART('year', {0}) - DATE_PART('year', {1})",
-                            Value2.Build(conn, relatedQuery),
-                            Value1.Build(conn, relatedQuery));
+                            Value1.Build(conn, relatedQuery),
+                            Value2.Build(conn, relatedQuery));
                         break;
                 }
             }
@@ -261,9 +261,9 @@ namespace SequelNet.Phrases
                         break;
                 }
                 sb.Append(',');
-                sb.Append(Value2.Build(conn, relatedQuery));
-                sb.Append(',');
                 sb.Append(Value1.Build(conn, relatedQuery));
+                sb.Append(',');
+                sb.Append(Value2.Build(conn, relatedQuery));
                 sb.Append(')');
             }
         }
