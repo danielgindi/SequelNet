@@ -6,6 +6,7 @@ using System.Data;
 using SequelNet.Sql.Spatial;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace SequelNet.Connector
 {
@@ -1132,25 +1133,64 @@ namespace SequelNet.Connector
         }
 
 #if NET6_0_OR_GREATER
-	    public DateOnly GetDateOnly(int ordinal)
+        private static Regex DATE_ONLY_RGX = new Regex("^(\\d{1,4})-(\\d{1,2})-(\\d{1,2})$", RegexOptions.Compiled);
+
+        public DateOnly GetDateOnly(int ordinal)
         {
-            var value = (DateTime)UnderlyingReader.GetValue(ordinal);
-            return DateOnly.FromDateTime(value);
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is DateTime dt)
+            {
+                return DateOnly.FromDateTime(dt);
+            }
+            else if (value is string str)
+            {
+                var match = DATE_ONLY_RGX.Match(str);
+                if (match?.Success == true)
+                {
+                    return new DateOnly(
+                        Int32.Parse(match.Groups[1].Value),
+                        Int32.Parse(match.Groups[2].Value),
+                        Int32.Parse(match.Groups[3].Value)
+                    );
+                }
+            }
+            
+            return (DateOnly)value;
         }
         
 	    public DateOnly? GetDateOnlyOrNull(int ordinal)
         {
             if (UnderlyingReader.IsDBNull(ordinal))
                 return null;
-            
-            var value = (DateTime)UnderlyingReader.GetValue(ordinal);
-            return DateOnly.FromDateTime(value);
+
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is DateTime dt)
+            {
+                return DateOnly.FromDateTime(dt);
+            }
+            else if (value is string str)
+            {
+                var match = DATE_ONLY_RGX.Match(str);
+                if (match?.Success == true)
+                {
+                    return new DateOnly(
+                        Int32.Parse(match.Groups[1].Value),
+                        Int32.Parse(match.Groups[2].Value),
+                        Int32.Parse(match.Groups[3].Value)
+                    );
+                }
+            }
+
+            return (DateOnly)value;
         }
     
 	    public TimeOnly GetTimeOnly(int ordinal)
         {
-            var value = (TimeSpan)UnderlyingReader.GetValue(ordinal);
-            return TimeOnly.FromTimeSpan(value);
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is TimeSpan ts)
+                return TimeOnly.FromTimeSpan(ts);
+
+            return (TimeOnly)value;
         }
     
 	    public TimeOnly? GetTimeOnlyOrNull(int ordinal)
@@ -1158,8 +1198,11 @@ namespace SequelNet.Connector
             if (UnderlyingReader.IsDBNull(ordinal))
                 return null;
 
-            var value = (TimeSpan)UnderlyingReader.GetValue(ordinal);
-            return TimeOnly.FromTimeSpan(value);
+            var value = UnderlyingReader.GetValue(ordinal);
+            if (value is TimeSpan ts)
+                return TimeOnly.FromTimeSpan(ts);
+
+            return (TimeOnly)value;
         }
 #endif
 
