@@ -1189,6 +1189,8 @@ namespace SequelNet.Connector
             var value = UnderlyingReader.GetValue(ordinal);
             if (value is TimeSpan ts)
                 return TimeOnly.FromTimeSpan(ts);
+            if (value is DateTime dt)
+                return TimeOnly.FromDateTime(dt);
 
             return (TimeOnly)value;
         }
@@ -1201,6 +1203,8 @@ namespace SequelNet.Connector
             var value = UnderlyingReader.GetValue(ordinal);
             if (value is TimeSpan ts)
                 return TimeOnly.FromTimeSpan(ts);
+            if (value is DateTime dt)
+                return TimeOnly.FromDateTime(dt);
 
             return (TimeOnly)value;
         }
