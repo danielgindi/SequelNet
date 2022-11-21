@@ -986,6 +986,13 @@ namespace SequelNet
         }
 
         public static IfNull IfNull(
+            ValueWrapper first,
+            ValueWrapper second)
+        {
+            return new IfNull(first, second);
+        }
+        
+        public static IfNull IfNull(
             string firstTableName, string firstColumnName,
             string secondTableName, string secondColumnName)
         {
@@ -1013,11 +1020,29 @@ namespace SequelNet
         }
 
         public static IfNull IfNull(
+             string firstTableName, string firstColumnName,
+             ValueWrapper second)
+        {
+            return new IfNull(
+                firstTableName, firstColumnName,
+                second);
+        }
+
+        public static IfNull IfNull(
              object firstValue, ValueObjectType firstValueType,
              string secondTableName, string secondColumnName)
         {
             return new IfNull(
                 firstValue, firstValueType,
+                secondTableName, secondColumnName);
+        }
+
+        public static IfNull IfNull(
+             ValueWrapper first,
+             string secondTableName, string secondColumnName)
+        {
+            return new IfNull(
+                first,
                 secondTableName, secondColumnName);
         }
 

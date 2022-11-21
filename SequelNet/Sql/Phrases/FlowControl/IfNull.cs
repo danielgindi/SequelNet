@@ -11,6 +11,14 @@ namespace SequelNet.Phrases
         #region Constructors
 
         public IfNull(
+            ValueWrapper first,
+            ValueWrapper second)
+        {
+            this.Value1 = first;
+            this.Value2 = second;
+        }
+
+        public IfNull(
             string firstTableName, string firstColumnName,
             string secondTableName, string secondColumnName)
         {
@@ -35,10 +43,26 @@ namespace SequelNet.Phrases
         }
 
         public IfNull(
+             string firstTableName, string firstColumnName,
+             ValueWrapper second)
+        {
+            this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
+            this.Value2 = second;
+        }
+
+        public IfNull(
              object firstValue, ValueObjectType firstValueType,
              string secondTableName, string secondColumnName)
         {
             this.Value1 = ValueWrapper.Make(firstValue, firstValueType);
+            this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
+        }
+
+        public IfNull(
+             ValueWrapper first,
+             string secondTableName, string secondColumnName)
+        {
+            this.Value1 = first;
             this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
         }
 
