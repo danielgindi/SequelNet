@@ -63,10 +63,10 @@ namespace SequelNet.SchemaGenerator
                 stringBuilder.AppendFormat("return false;{0}", "\r\n");
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
-                // GetMutatedColumnsSet
-                stringBuilder.AppendFormat("public override HashSet<string> GetMutatedColumnsSet(){0}{{{0}", "\r\n");
-                stringBuilder.AppendFormat("  var set = new HashSet<string>(base.GetMutatedColumnsSet());{0}", "\r\n");
-                stringBuilder.AppendFormat("  return base.GetMutatedColumnsSet();{0}", "\r\n");
+                // GetMutatedColumnNamesSet
+                stringBuilder.AppendFormat("public override HashSet<string> GetMutatedColumnNamesSet(){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("  var set = new HashSet<string>(base.GetMutatedColumnNamesSet());{0}", "\r\n");
+                stringBuilder.AppendFormat("  return base.GetMutatedColumnNamesSet();{0}", "\r\n");
                 foreach (var dalCol in customMutatedColumns)
                 {
                     stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) set.Add(Columns.{1});{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);

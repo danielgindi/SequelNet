@@ -247,7 +247,7 @@ namespace SequelNet
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }
 
-        public virtual HashSet<string> GetMutatedColumnsSet()
+        public virtual HashSet<string> GetMutatedColumnNamesSet()
         {
             return _MutatedColumns;
         }

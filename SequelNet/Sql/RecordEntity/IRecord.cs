@@ -23,7 +23,7 @@ namespace SequelNet
         void MarkAllColumnsNotMutated();
         bool IsColumnMutated(string column);
         bool HasMutatedColumns();
-        HashSet<string> GetMutatedColumnsSet();
+        HashSet<string> GetMutatedColumnNamesSet();
 
         void Insert(ConnectorBase connection = null);
         Task InsertAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null);
