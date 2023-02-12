@@ -247,6 +247,11 @@ namespace SequelNet
             return _MutatedColumns != null && _MutatedColumns.Count > 0;
         }
 
+        public virtual HashSet<string> GetMutatedColumnsSet()
+        {
+            return _MutatedColumns;
+        }
+
         /// <summary>
         /// Atomic updates are enabled by default
         /// </summary>

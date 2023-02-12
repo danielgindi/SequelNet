@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Text;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
@@ -60,6 +61,17 @@ namespace SequelNet.SchemaGenerator
                     stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) return true;{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
                 }
                 stringBuilder.AppendFormat("return false;{0}", "\r\n");
+                stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+                // GetMutatedColumnsSet
+                stringBuilder.AppendFormat("public override HashSet<string> GetMutatedColumnsSet(){0}{{{0}", "\r\n");
+                stringBuilder.AppendFormat("  var set = new HashSet<string>(base.GetMutatedColumnsSet());{0}", "\r\n");
+                stringBuilder.AppendFormat("  return base.GetMutatedColumnsSet();{0}", "\r\n");
+                foreach (var dalCol in customMutatedColumns)
+                {
+                    stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) set.Add(Columns.{1});{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
+                }
+                stringBuilder.AppendFormat("return set;{0}", "\r\n");
                 stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
 
                 stringBuilder.AppendFormat("#endregion{0}", "\r\n");
