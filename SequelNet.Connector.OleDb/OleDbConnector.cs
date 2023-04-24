@@ -79,6 +79,11 @@ namespace SequelNet.Connector
             return ExecuteScalar("SELECT @@identity AS id");
         }
 
+        public override Task<object> GetLastInsertIdAsync()
+        {
+            return ExecuteScalarAsync(@"SELECT @@identity AS id");
+        }
+
         public override bool CheckIfTableExists(string tableName)
         {
             return ExecuteScalar($"SELECT name FROM MSysObjects WHERE name like {Language.PrepareValue(tableName)}") != null;

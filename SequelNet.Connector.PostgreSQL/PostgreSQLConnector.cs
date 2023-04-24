@@ -161,6 +161,11 @@ namespace SequelNet.Connector
             return ExecuteScalar("select lastval() AS id");
         }
 
+        public override Task<object> GetLastInsertIdAsync()
+        {
+            return ExecuteScalarAsync(@"select lastval() AS id");
+        }
+
         public override void SetIdentityInsert(string tableName, bool enabled)
         {
             // Nothing to do. In PostgreSQL IDENTITY_INSERT is always allowed

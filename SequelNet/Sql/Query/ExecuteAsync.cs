@@ -387,14 +387,13 @@ namespace SequelNet
                 int retValue = 0;
 
                 using (var cmd = BuildDbCommand(connection))
-                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken)
-                        .ConfigureAwait(false);
+                    retValue = await connection.ExecuteNonQueryAsync(cmd, cancellationToken).ConfigureAwait(false);
 
                 object lastInsertId;
 
                 if (retValue > 0)
                 {
-                    lastInsertId = connection.GetLastInsertID();
+                    lastInsertId = await connection.GetLastInsertIdAsync().ConfigureAwait(false);
                     if (lastInsertId is DBNull) lastInsertId = null;
                     else if (lastInsertId is System.Data.SqlTypes.INullable && ((System.Data.SqlTypes.INullable)lastInsertId).IsNull) lastInsertId = null;
                 }

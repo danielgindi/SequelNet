@@ -164,6 +164,11 @@ namespace SequelNet.Connector
             return ExecuteScalar(@"SELECT LAST_INSERT_ID() AS id");
         }
 
+        public override Task<object> GetLastInsertIdAsync()
+        {
+            return ExecuteScalarAsync(@"SELECT LAST_INSERT_ID() AS id");
+        }
+
         public override void SetIdentityInsert(string tableName, bool enabled)
         {
             // Nothing to do. In MySql IDENTITY_INSERT is always allowed

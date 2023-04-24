@@ -158,6 +158,11 @@ namespace SequelNet.Connector
             return ExecuteScalar(@"SELECT @@identity AS id");
         }
 
+        public override Task<object> GetLastInsertIdAsync()
+        {
+            return ExecuteScalarAsync(@"SELECT @@identity AS id");
+        }
+
         public override void SetIdentityInsert(string tableName, bool enabled)
         {
             string sql = string.Format(@"SET IDENTITY_INSERT {0} {1}",

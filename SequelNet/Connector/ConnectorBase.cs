@@ -489,6 +489,8 @@ namespace SequelNet.Connector
 
         abstract public object GetLastInsertID();
 
+        abstract public Task<object> GetLastInsertIdAsync();
+
         virtual public void SetIdentityInsert(string tableName, bool enabled) { }
 
         abstract public bool CheckIfTableExists(string tableName);
