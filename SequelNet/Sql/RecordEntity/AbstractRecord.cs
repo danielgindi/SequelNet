@@ -489,14 +489,7 @@ namespace SequelNet
 
         public Task SaveAsync(CancellationToken? cancellationToken)
         {
-            if (IsNewRecord)
-            {
-                return InsertAsync(null, cancellationToken);
-            }
-            else
-            {
-                return UpdateAsync(null, cancellationToken);
-            }
+            return SaveAsync(null, cancellationToken);
         }
 
         #endregion
