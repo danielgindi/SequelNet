@@ -260,87 +260,455 @@ namespace SequelNet
 
         #region Casts
 
-        public static explicit operator ValueWrapper(byte value)
+        public static implicit operator ValueWrapper(byte value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
         
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static explicit operator ValueWrapper(sbyte value)
+        public static implicit operator ValueWrapper(sbyte value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int16 value)
+        public static implicit operator ValueWrapper(Int16 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static explicit operator ValueWrapper(UInt16 value)
+        public static implicit operator ValueWrapper(UInt16 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int32 value)
+        public static implicit operator ValueWrapper(Int32 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static explicit operator ValueWrapper(UInt32 value)
+        public static implicit operator ValueWrapper(UInt32 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Int64 value)
+        public static implicit operator ValueWrapper(Int64 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static explicit operator ValueWrapper(UInt64 value)
+        public static implicit operator ValueWrapper(UInt64 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(float value)
+        public static implicit operator ValueWrapper(float value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(float? value)
+        public static implicit operator ValueWrapper(float? value)
         {
             return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(double value)
+        public static implicit operator ValueWrapper(double value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(double? value)
+        public static implicit operator ValueWrapper(double? value)
         {
             return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(decimal value)
+        public static implicit operator ValueWrapper(decimal value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(Where value)
+        public static implicit operator ValueWrapper(Where value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static explicit operator ValueWrapper(WhereList value)
+        public static implicit operator ValueWrapper(WhereList value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Phrases.Multiply value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Phrases.Divide value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Phrases.Add value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        public static implicit operator ValueWrapper(Phrases.Subtract value)
+        {
+            return new ValueWrapper(value, ValueObjectType.Value);
+        }
+
+        #endregion
+
+        #region Multiply operators
+
+        public static Phrases.Multiply operator *(ValueWrapper a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(ValueWrapper a, IPhrase b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(IPhrase a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(ValueWrapper a, decimal b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(ValueWrapper a, double b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(ValueWrapper a, Int64 b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(ValueWrapper a, Int32 b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Multiply operator *(ValueWrapper a, UInt64 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Multiply operator *(ValueWrapper a, UInt32 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(decimal a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(double a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(Int64 a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        public static Phrases.Multiply operator *(Int32 a, ValueWrapper b)
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Multiply operator *(UInt64 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Multiply operator *(UInt32 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Multiply(a, b);
+        }
+
+        #endregion
+
+        #region Divide operators
+
+        public static Phrases.Divide operator /(ValueWrapper a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(ValueWrapper a, IPhrase b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(IPhrase a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(ValueWrapper a, decimal b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(ValueWrapper a, double b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(ValueWrapper a, Int64 b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(ValueWrapper a, Int32 b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Divide operator /(ValueWrapper a, UInt64 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Divide operator /(ValueWrapper a, UInt32 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(decimal a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(double a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(Int64 a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        public static Phrases.Divide operator /(Int32 a, ValueWrapper b)
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Divide operator /(UInt64 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Divide operator /(UInt32 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Divide(a, b);
+        }
+
+        #endregion
+
+        #region Add operators
+
+        public static Phrases.Add operator +(ValueWrapper a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(ValueWrapper a, IPhrase b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(IPhrase a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(ValueWrapper a, decimal b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(ValueWrapper a, double b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(ValueWrapper a, Int64 b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(ValueWrapper a, Int32 b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS+compliant
+        public static Phrases.Add operator +(ValueWrapper a, UInt64 b)
+#pragma warning restore CS3001 // Argument type is not CLS+compliant
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS+compliant
+        public static Phrases.Add operator +(ValueWrapper a, UInt32 b)
+#pragma warning restore CS3001 // Argument type is not CLS+compliant
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(decimal a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(double a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(Int64 a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        public static Phrases.Add operator +(Int32 a, ValueWrapper b)
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS+compliant
+        public static Phrases.Add operator +(UInt64 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS+compliant
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS+compliant
+        public static Phrases.Add operator +(UInt32 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS+compliant
+        {
+            return PhraseHelper.Add(a, b);
+        }
+
+        #endregion
+
+        #region Subtract operators
+
+        public static Phrases.Subtract operator -(ValueWrapper a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(ValueWrapper a, IPhrase b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(IPhrase a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(ValueWrapper a, decimal b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(ValueWrapper a, double b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(ValueWrapper a, Int64 b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(ValueWrapper a, Int32 b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Subtract operator -(ValueWrapper a, UInt64 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Subtract operator -(ValueWrapper a, UInt32 b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(decimal a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(double a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(Int64 a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+        public static Phrases.Subtract operator -(Int32 a, ValueWrapper b)
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Subtract operator -(UInt64 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Subtract(a, b);
+        }
+
+#pragma warning disable CS3001 // Argument type is not CLS-compliant
+        public static Phrases.Subtract operator -(UInt32 a, ValueWrapper b)
+#pragma warning restore CS3001 // Argument type is not CLS-compliant
+        {
+            return PhraseHelper.Subtract(a, b);
         }
 
         #endregion

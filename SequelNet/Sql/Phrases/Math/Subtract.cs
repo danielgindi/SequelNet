@@ -103,6 +103,15 @@ namespace SequelNet.Phrases
             this.Value2 = ValueWrapper.From(value2);
         }
 
+        public Subtract(
+            object value1,
+            object value2
+            )
+        {
+            this.Value1 = value1 is ValueWrapper vw1 ? vw1 : ValueWrapper.Make(value1, ValueObjectType.Value);
+            this.Value2 = value2 is ValueWrapper vw2 ? vw2 : ValueWrapper.Make(value2, ValueObjectType.Value);
+        }
+
         #endregion
 
         public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)

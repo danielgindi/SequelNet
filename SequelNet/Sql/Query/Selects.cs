@@ -113,6 +113,24 @@
             return this;
         }
 
+        public Query Select(WhereList wl, string alias = null)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(wl, alias));
+
+            return this;
+        }
+
+        public Query Select(Where where, string alias = null)
+        {
+            this.QueryMode = QueryMode.Select;
+            if (_ListSelect == null) _ListSelect = new SelectColumnList();
+            _ListSelect.Add(new SelectColumn(where, alias));
+
+            return this;
+        }
+
         public Query SelectLiteral(string literalExpression)
         {
             this.QueryMode = QueryMode.Select;

@@ -43,7 +43,7 @@ namespace SequelNet.Phrases
             )
         {
             this.Value1 = ValueWrapper.Column(tableName1, column1);
-            this.Value2 = ValueWrapper.Make(value2, ValueObjectType.Value);
+            this.Value2 = value2 is ValueWrapper vw2 ? vw2 : ValueWrapper.Make(value2, ValueObjectType.Value);
         }
 
         public Multiply(
@@ -60,7 +60,7 @@ namespace SequelNet.Phrases
             string tableName2, string column2
             )
         {
-            this.Value1 = ValueWrapper.Make(value1, ValueObjectType.Value);
+            this.Value1 = value1 is ValueWrapper vw1 ? vw1 : ValueWrapper.Make(value1, ValueObjectType.Value);
             this.Value2 = ValueWrapper.Column(tableName2, column2);
         }
 
@@ -69,8 +69,8 @@ namespace SequelNet.Phrases
             object value2
             )
         {
-            this.Value1 = ValueWrapper.Make(value1, ValueObjectType.Value);
-            this.Value2 = ValueWrapper.Make(value2, ValueObjectType.Value);
+            this.Value1 = value1 is ValueWrapper vw1 ? vw1 : ValueWrapper.Make(value1, ValueObjectType.Value);
+            this.Value2 = value2 is ValueWrapper vw2 ? vw2 : ValueWrapper.Make(value2, ValueObjectType.Value);
         }
 
         #endregion

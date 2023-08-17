@@ -121,6 +121,14 @@ namespace SequelNet.Phrases
                   ValueWrapper.From(value2))
         {
         }
+        public Add(
+            object value1,
+            object value2
+            )
+        {
+            Values.Add(value1 is ValueWrapper vw1 ? vw1 : ValueWrapper.Make(value1, ValueObjectType.Value));
+            Values.Add(value2 is ValueWrapper vw2 ? vw2 : ValueWrapper.Make(value2, ValueObjectType.Value));
+        }
 
         #endregion
 

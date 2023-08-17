@@ -1225,6 +1225,11 @@ namespace SequelNet
                 value2);
         }
 
+        public static Add Add(object value1, object value2)
+        {
+            return new Add(value1, value2);
+        }
+
         public static Subtract Subtract(
             string tableName1, string columnName1,
             string tableName2, string columnName2)
@@ -1329,6 +1334,11 @@ namespace SequelNet
             return new Subtract(
                 columnName1,
                 value2);
+        }
+
+        public static Subtract Subtract(object value1, object value2)
+        {
+            return new Subtract(value1, value2);
         }
 
         public static Abs Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
