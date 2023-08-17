@@ -260,105 +260,105 @@ namespace SequelNet
 
         #region Casts
 
-        public static implicit operator ValueWrapper(byte value)
+        public static explicit operator ValueWrapper(byte value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
         
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static implicit operator ValueWrapper(sbyte value)
+        public static explicit operator ValueWrapper(sbyte value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int16 value)
+        public static explicit operator ValueWrapper(Int16 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static implicit operator ValueWrapper(UInt16 value)
+        public static explicit operator ValueWrapper(UInt16 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int32 value)
+        public static explicit operator ValueWrapper(Int32 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static implicit operator ValueWrapper(UInt32 value)
+        public static explicit operator ValueWrapper(UInt32 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Int64 value)
+        public static explicit operator ValueWrapper(Int64 value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
 #pragma warning disable CS3001 // Argument type is not CLS-compliant
-        public static implicit operator ValueWrapper(UInt64 value)
+        public static explicit operator ValueWrapper(UInt64 value)
 #pragma warning restore CS3001 // Argument type is not CLS-compliant
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(float value)
+        public static explicit operator ValueWrapper(float value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(float? value)
+        public static explicit operator ValueWrapper(float? value)
         {
             return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(double value)
+        public static explicit operator ValueWrapper(double value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(double? value)
+        public static explicit operator ValueWrapper(double? value)
         {
             return value == null ? ValueWrapper.Null() : new ValueWrapper(value.Value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(decimal value)
+        public static explicit operator ValueWrapper(decimal value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Where value)
+        public static explicit operator ValueWrapper(Where value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(WhereList value)
+        public static explicit operator ValueWrapper(WhereList value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Phrases.Multiply value)
+        public static explicit operator ValueWrapper(Phrases.Multiply value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Phrases.Divide value)
+        public static explicit operator ValueWrapper(Phrases.Divide value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Phrases.Add value)
+        public static explicit operator ValueWrapper(Phrases.Add value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
 
-        public static implicit operator ValueWrapper(Phrases.Subtract value)
+        public static explicit operator ValueWrapper(Phrases.Subtract value)
         {
             return new ValueWrapper(value, ValueObjectType.Value);
         }
