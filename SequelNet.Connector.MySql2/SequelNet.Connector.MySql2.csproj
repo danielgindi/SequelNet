@@ -13,6 +13,7 @@
 	<TargetFrameworks>netstandard2.0;netstandard2.1;net6.0;net7.0</TargetFrameworks>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
+    <LangVersion>8.0</LangVersion>
     <AssemblyOriginatorKeyFile>strongName.pfx</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>

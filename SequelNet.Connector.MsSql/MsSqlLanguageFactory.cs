@@ -677,7 +677,7 @@ namespace SequelNet.Connector
             sb.Append(")");
         }
 
-        public override void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        public override void BuildOrderByRandom(ValueWrapper? seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"NEWID()");
         }

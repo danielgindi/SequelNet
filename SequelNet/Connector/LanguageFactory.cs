@@ -432,7 +432,7 @@ namespace SequelNet.Connector
             }
         }
 
-        public virtual void BuildOrderByRandom(ValueWrapper seedValue, ConnectorBase conn, StringBuilder outputBuilder)
+        public virtual void BuildOrderByRandom(ValueWrapper? seedValue, ConnectorBase conn, StringBuilder outputBuilder)
         {
             outputBuilder.Append(@"RAND()");
         }
