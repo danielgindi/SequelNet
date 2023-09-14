@@ -1,58 +1,57 @@
 ﻿using System.Collections.Generic;
 
-namespace SequelNet
+namespace SequelNet;
+
+public partial class Query
 {
-    public partial class Query
+    public Query Union(Query otherQuery, bool all = false)
     {
-        public Query Union(Query otherQuery, bool all = false)
+        if (_QueryCombineData == null)
+            _QueryCombineData = new List<QueryCombineData>();
+
+        _QueryCombineData.Add(new QueryCombineData
         {
-            if (_QueryCombineData == null)
-                _QueryCombineData = new List<QueryCombineData>();
+            Mode = QueryCombineMode.Union,
+            All = all,
+            Query = otherQuery
+        });
 
-            _QueryCombineData.Add(new QueryCombineData
-            {
-                Mode = QueryCombineMode.Union,
-                All = all,
-                Query = otherQuery
-            });
+        return this;
+    }
 
-            return this;
-        }
+    public Query Intersect(Query otherQuery, bool all = false)
+    {
+        if (_QueryCombineData == null)
+            _QueryCombineData = new List<QueryCombineData>();
 
-        public Query Intersect(Query otherQuery, bool all = false)
+        _QueryCombineData.Add(new QueryCombineData
         {
-            if (_QueryCombineData == null)
-                _QueryCombineData = new List<QueryCombineData>();
+            Mode = QueryCombineMode.Intersect,
+            All = all,
+            Query = otherQuery
+        });
 
-            _QueryCombineData.Add(new QueryCombineData
-            {
-                Mode = QueryCombineMode.Intersect,
-                All = all,
-                Query = otherQuery
-            });
+        return this;
+    }
 
-            return this;
-        }
+    public Query Except(Query otherQuery, bool all = false)
+    {
+        if (_QueryCombineData == null)
+            _QueryCombineData = new List<QueryCombineData>();
 
-        public Query Except(Query otherQuery, bool all = false)
+        _QueryCombineData.Add(new QueryCombineData
         {
-            if (_QueryCombineData == null)
-                _QueryCombineData = new List<QueryCombineData>();
+            Mode = QueryCombineMode.Except,
+            All = all,
+            Query = otherQuery
+        });
 
-            _QueryCombineData.Add(new QueryCombineData
-            {
-                Mode = QueryCombineMode.Except,
-                All = all,
-                Query = otherQuery
-            });
+        return this;
+    }
 
-            return this;
-        }
-
-        public Query ClearCombinations()
-        {
-            _QueryCombineData = null;
-            return this;
-        }
+    public Query ClearCombinations()
+    {
+        _QueryCombineData = null;
+        return this;
     }
 }

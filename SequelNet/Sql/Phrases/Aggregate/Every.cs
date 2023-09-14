@@ -1,45 +1,44 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class Every : BaseAggregatePhrase
 {
-    public class Every : BaseAggregatePhrase
+    #region Constructors
+
+    public Every() : base()
     {
-        #region Constructors
+    }
 
-        public Every() : base()
-        {
-        }
+    public Every(string tableName, string columnName) : base(tableName, columnName)
+    {
+    }
 
-        public Every(string tableName, string columnName) : base(tableName, columnName)
-        {
-        }
+    public Every(string columnName) : base(columnName)
+    {
+    }
 
-        public Every(string columnName) : base(columnName)
-        {
-        }
+    public Every(object value, ValueObjectType valueType) : base(value, valueType)
+    {
+    }
 
-        public Every(object value, ValueObjectType valueType) : base(value, valueType)
-        {
-        }
+    public Every(IPhrase phrase) : base(phrase)
+    {
+    }
 
-        public Every(IPhrase phrase) : base(phrase)
-        {
-        }
+    public Every(Where where) : base(where)
+    {
+    }
 
-        public Every(Where where) : base(where)
-        {
-        }
+    public Every(WhereList where) : base(where)
+    {
+    }
 
-        public Every(WhereList where) : base(where)
-        {
-        }
+    #endregion
 
-        #endregion
-
-        public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            sb.Append(conn.Language.Aggregate_Every(Value.Build(conn, relatedQuery)));
-        }
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        sb.Append(conn.Language.Aggregate_Every(Value.Build(conn, relatedQuery)));
     }
 }

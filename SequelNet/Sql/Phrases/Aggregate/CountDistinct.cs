@@ -1,34 +1,33 @@
-﻿namespace SequelNet.Phrases
+﻿namespace SequelNet.Phrases;
+
+public class CountDistinct : Count
 {
-    public class CountDistinct : Count
+    #region Constructors
+
+    public CountDistinct()
+        : base(true)
     {
-        #region Constructors
-
-        public CountDistinct()
-            : base(true)
-        {
-        }
-
-        public CountDistinct(string tableName, string columnName)
-            : base(tableName, columnName, true)
-        {
-        }
-
-        public CountDistinct(string columnName)
-            : base(null, columnName, true)
-        {
-        }
-
-        public CountDistinct(object theObject, ValueObjectType valueType)
-            : base(theObject, valueType, true)
-        {
-        }
-
-        public CountDistinct(IPhrase phrase)
-            : base(phrase, true)
-        {
-        }
-
-        #endregion
     }
+
+    public CountDistinct(string tableName, string columnName)
+        : base(tableName, columnName, true)
+    {
+    }
+
+    public CountDistinct(string columnName)
+        : base(null, columnName, true)
+    {
+    }
+
+    public CountDistinct(object theObject, ValueObjectType valueType)
+        : base(theObject, valueType, true)
+    {
+    }
+
+    public CountDistinct(IPhrase phrase)
+        : base(phrase, true)
+    {
+    }
+
+    #endregion
 }

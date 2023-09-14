@@ -1,7 +1,7 @@
 ﻿using System;
 
-namespace SequelNet
-{
+namespace SequelNet;
+
 	internal static class TypeExtensions
 	{
 		internal static bool IsCollectionType(this Type type)
@@ -16,4 +16,3 @@ namespace SequelNet
 			return false;
 		}
 	}
-}

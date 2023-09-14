@@ -1,11 +1,10 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+public partial class Query
 {
-    public partial class Query
+    public Query Delete()
     {
-        public Query Delete()
-        {
-            this.QueryMode = QueryMode.Delete;
-            return this;
-        }
+        this.QueryMode = QueryMode.Delete;
+        return this;
     }
 }

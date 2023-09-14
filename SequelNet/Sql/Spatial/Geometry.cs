@@ -1,22 +1,21 @@
 ﻿using System.Text;
 using SequelNet.Connector;
 
-namespace SequelNet
+namespace SequelNet;
+
+public abstract partial class Geometry
 {
-    public abstract partial class Geometry
-    {
-        public abstract void BuildValue(StringBuilder sb, ConnectorBase conn);
-        public abstract ValueWrapper BuildValueText(ConnectorBase conn);
-        public int? SRID;
+    public abstract void BuildValue(StringBuilder sb, ConnectorBase conn);
+    public abstract ValueWrapper BuildValueText(ConnectorBase conn);
+    public int? SRID;
 
-        public abstract bool IsEmpty { get; }
+    public abstract bool IsEmpty { get; }
 
-        public abstract bool IsValid { get; }
+    public abstract bool IsValid { get; }
 
-        public bool IsGeographyType
-        { 
-            get; 
-            set; 
-        }
+    public bool IsGeographyType
+    { 
+        get; 
+        set; 
     }
 }

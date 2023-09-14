@@ -1,186 +1,185 @@
 ﻿using System.Collections.Generic;
 
-namespace SequelNet
+namespace SequelNet;
+
+public class JsonPathValue
 {
-    public class JsonPathValue
+    public string Path;
+    public ValueWrapper Value;
+
+    #region Constructors
+
+    public JsonPathValue()
     {
-        public string Path;
-        public ValueWrapper Value;
+        this.Value = new ValueWrapper();
+    }
 
-        #region Constructors
+    public JsonPathValue(string path, string tableName, string columnName)
+    {
+        this.Path = path;
+        this.Value = ValueWrapper.Column(tableName, columnName);
+    }
 
-        public JsonPathValue()
+    public JsonPathValue(string path, string column)
+    {
+        this.Path = path;
+        this.Value = ValueWrapper.Column(column);
+    }
+
+    public JsonPathValue(string path, object value, ValueObjectType type)
+    {
+        this.Path = path;
+        this.Value = ValueWrapper.Make(value, type);
+    }
+
+    public JsonPathValue(string path, IPhrase value)
+    {
+        this.Path = path;
+        this.Value = ValueWrapper.From(value);
+    }
+
+    public JsonPathValue(string path, ValueWrapper value)
+    {
+        this.Path = path;
+        this.Value = value;
+    }
+
+    #endregion
+
+    #region Convenience
+
+    public static JsonPathValue From(string path, string tableName, string columnName)
+    {
+        return new JsonPathValue(path, tableName, columnName);
+    }
+
+    public static JsonPathValue From(string path, string column)
+    {
+        return new JsonPathValue(path, column);
+    }
+
+    public static JsonPathValue From(string path, object value, ValueObjectType type)
+    {
+        return new JsonPathValue(path, value, type);
+    }
+    
+    public static JsonPathValue From(string path, IPhrase value)
+    {
+        return new JsonPathValue(path, value);
+    }
+
+    public static JsonPathValue From(string path, ValueWrapper value)
+    {
+        return new JsonPathValue(path, value);
+    }
+
+    #endregion
+
+    #region Utility
+
+    public static List<string> GetPathParts(string path)
+    {
+        List<string> parts = new List<string>();
+
+        bool inProp = true; // Starts with a $
+        bool isEscaped = false;
+        bool inArray = false;
+        bool isQuoted = false;
+        string part = "";
+
+        for (int i = 0, len = path.Length; i < len; i++)
         {
-            this.Value = new ValueWrapper();
-        }
+            char c = path[i];
 
-        public JsonPathValue(string path, string tableName, string columnName)
-        {
-            this.Path = path;
-            this.Value = ValueWrapper.Column(tableName, columnName);
-        }
-
-        public JsonPathValue(string path, string column)
-        {
-            this.Path = path;
-            this.Value = ValueWrapper.Column(column);
-        }
-
-        public JsonPathValue(string path, object value, ValueObjectType type)
-        {
-            this.Path = path;
-            this.Value = ValueWrapper.Make(value, type);
-        }
-
-        public JsonPathValue(string path, IPhrase value)
-        {
-            this.Path = path;
-            this.Value = ValueWrapper.From(value);
-        }
-
-        public JsonPathValue(string path, ValueWrapper value)
-        {
-            this.Path = path;
-            this.Value = value;
-        }
-
-        #endregion
-
-        #region Convenience
-
-        public static JsonPathValue From(string path, string tableName, string columnName)
-        {
-            return new JsonPathValue(path, tableName, columnName);
-        }
-
-        public static JsonPathValue From(string path, string column)
-        {
-            return new JsonPathValue(path, column);
-        }
-
-        public static JsonPathValue From(string path, object value, ValueObjectType type)
-        {
-            return new JsonPathValue(path, value, type);
-        }
-        
-        public static JsonPathValue From(string path, IPhrase value)
-        {
-            return new JsonPathValue(path, value);
-        }
-
-        public static JsonPathValue From(string path, ValueWrapper value)
-        {
-            return new JsonPathValue(path, value);
-        }
-
-        #endregion
-
-        #region Utility
-
-        public static List<string> GetPathParts(string path)
-        {
-            List<string> parts = new List<string>();
-
-            bool inProp = true; // Starts with a $
-            bool isEscaped = false;
-            bool inArray = false;
-            bool isQuoted = false;
-            string part = "";
-
-            for (int i = 0, len = path.Length; i < len; i++)
+            if (isQuoted)
             {
-                char c = path[i];
-
-                if (isQuoted)
+                if (isEscaped || c != '"')
                 {
-                    if (isEscaped || c != '"')
-                    {
-                        part += c;
-                    }
-
-                    if (isEscaped)
-                    {
-                        isEscaped = false;
-                    }
-                    else
-                    {
-                        switch (c)
-                        {
-                            case '\\':
-                                isEscaped = true;
-                                break;
-
-                            case '"':
-                                parts.Add(StringUtils.UnescapeStringLiteral(part));
-                                isQuoted = false;
-                                inProp = false;
-                                break;
-                        }
-                    }
-
-                    continue;
+                    part += c;
                 }
 
-                if (inArray)
+                if (isEscaped)
                 {
-                    if (c == ']')
-                    {
-                        parts.Add(part);
-                        inArray = false;
-                    }
-                    else
-                    {
-                        part += c;
-                    }
-
-                    continue;
+                    isEscaped = false;
                 }
-
-                if (inProp)
+                else
                 {
-                    if (c == '.' || c == '[')
+                    switch (c)
                     {
-                        parts.Add(part);
-                        inProp = false;
-                    }
-                    else
-                    {
-                        if (c == '"' && part.Length == 0)
-                        {
-                            isQuoted = true;
-                            isEscaped = false;
-                        }
-                        else
-                        {
-                            part += c;
-                        }
+                        case '\\':
+                            isEscaped = true;
+                            break;
 
-                        continue;
+                        case '"':
+                            parts.Add(StringUtils.UnescapeStringLiteral(part));
+                            isQuoted = false;
+                            inProp = false;
+                            break;
                     }
                 }
 
-                switch (c)
-                {
-                    case '.':
-                        part = "";
-                        inProp = true;
-                        break;
+                continue;
+            }
 
-                    case '[':
-                        part = "";
-                        inArray = true;
-                        break;
+            if (inArray)
+            {
+                if (c == ']')
+                {
+                    parts.Add(part);
+                    inArray = false;
                 }
+                else
+                {
+                    part += c;
+                }
+
+                continue;
             }
 
             if (inProp)
             {
-                parts.Add(part);
+                if (c == '.' || c == '[')
+                {
+                    parts.Add(part);
+                    inProp = false;
+                }
+                else
+                {
+                    if (c == '"' && part.Length == 0)
+                    {
+                        isQuoted = true;
+                        isEscaped = false;
+                    }
+                    else
+                    {
+                        part += c;
+                    }
+
+                    continue;
+                }
             }
 
-            return parts;
+            switch (c)
+            {
+                case '.':
+                    part = "";
+                    inProp = true;
+                    break;
+
+                case '[':
+                    part = "";
+                    inArray = true;
+                    break;
+            }
         }
 
-        #endregion
+        if (inProp)
+        {
+            parts.Add(part);
+        }
+
+        return parts;
     }
+
+    #endregion
 }

@@ -1,6 +1,5 @@
-﻿namespace SequelNet.Migrations
+﻿namespace SequelNet.Migrations;
+
+public interface IMigration
 {
-    public interface IMigration
-    {
-    }
 }

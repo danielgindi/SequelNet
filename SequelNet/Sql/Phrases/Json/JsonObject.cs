@@ -3,124 +3,123 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+/// <summary>
+/// Creates a json object.
+/// </summary>
+public class JsonObject : IPhrase
 {
-    /// <summary>
-    /// Creates a json object.
-    /// </summary>
-    public class JsonObject : IPhrase
+    public Dictionary<string, ValueWrapper> Values;
+
+    #region Constructors
+
+    public JsonObject()
     {
-        public Dictionary<string, ValueWrapper> Values;
+        this.Values = new Dictionary<string, ValueWrapper>();
+    }
 
-        #region Constructors
+    public JsonObject(Dictionary<string, ValueWrapper> values)
+    {
+        this.Values = values == null
+            ? new Dictionary<string, ValueWrapper>()
+            : new Dictionary<string, ValueWrapper>(values);
+    }
 
-        public JsonObject()
+    public JsonObject(Dictionary<string, object> values)
+    {
+        this.Values = new Dictionary<string, ValueWrapper>();
+        if (values != null)
         {
-            this.Values = new Dictionary<string, ValueWrapper>();
-        }
-
-        public JsonObject(Dictionary<string, ValueWrapper> values)
-        {
-            this.Values = values == null
-                ? new Dictionary<string, ValueWrapper>()
-                : new Dictionary<string, ValueWrapper>(values);
-        }
-
-        public JsonObject(Dictionary<string, object> values)
-        {
-            this.Values = new Dictionary<string, ValueWrapper>();
-            if (values != null)
+            foreach (var pair in values)
             {
-                foreach (var pair in values)
-                {
-                    Values.Add(pair.Key, ValueWrapper.Make(pair.Value, ValueObjectType.Value));
-                }
+                Values.Add(pair.Key, ValueWrapper.Make(pair.Value, ValueObjectType.Value));
             }
         }
+    }
 
-        public JsonObject(Dictionary<string, string> values)
+    public JsonObject(Dictionary<string, string> values)
+    {
+        this.Values = new Dictionary<string, ValueWrapper>();
+        if (values != null)
         {
-            this.Values = new Dictionary<string, ValueWrapper>();
-            if (values != null)
+            foreach (var pair in values)
             {
-                foreach (var pair in values)
-                {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
-                }
+                Values.Add(pair.Key, ValueWrapper.From(pair.Value));
             }
         }
+    }
 
-        public JsonObject(Dictionary<string, Int64> values)
+    public JsonObject(Dictionary<string, Int64> values)
+    {
+        this.Values = new Dictionary<string, ValueWrapper>();
+        if (values != null)
         {
-            this.Values = new Dictionary<string, ValueWrapper>();
-            if (values != null)
+            foreach (var pair in values)
             {
-                foreach (var pair in values)
-                {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
-                }
+                Values.Add(pair.Key, ValueWrapper.From(pair.Value));
             }
         }
+    }
 
-        public JsonObject(Dictionary<string, Int32> values)
+    public JsonObject(Dictionary<string, Int32> values)
+    {
+        this.Values = new Dictionary<string, ValueWrapper>();
+        if (values != null)
         {
-            this.Values = new Dictionary<string, ValueWrapper>();
-            if (values != null)
+            foreach (var pair in values)
             {
-                foreach (var pair in values)
-                {
-                    Values.Add(pair.Key, ValueWrapper.From(pair.Value));
-                }
+                Values.Add(pair.Key, ValueWrapper.From(pair.Value));
             }
         }
+    }
 
-        #endregion
+    #endregion
 
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        switch (conn.TYPE)
         {
-            switch (conn.TYPE)
-            {
-                case ConnectorBase.SqlServiceType.MYSQL:
+            case ConnectorBase.SqlServiceType.MYSQL:
+                {
+                    sb.Append("JSON_OBJECT(");
+
+                    bool first = true;
+                    foreach (var val in Values)
                     {
-                        sb.Append("JSON_OBJECT(");
+                        if (first) first = false;
+                        else sb.Append(",");
 
-                        bool first = true;
-                        foreach (var val in Values)
-                        {
-                            if (first) first = false;
-                            else sb.Append(",");
-
-                            sb.Append(conn.Language.PrepareValue(val.Key));
-                            sb.Append(",");
-                            sb.Append(val.Value.Build(conn, relatedQuery));
-                        }
-
-                        sb.Append(")");
+                        sb.Append(conn.Language.PrepareValue(val.Key));
+                        sb.Append(",");
+                        sb.Append(val.Value.Build(conn, relatedQuery));
                     }
-                    break;
 
-                case ConnectorBase.SqlServiceType.POSTGRESQL:
+                    sb.Append(")");
+                }
+                break;
+
+            case ConnectorBase.SqlServiceType.POSTGRESQL:
+                {
+                    sb.Append("json_build_object(");
+
+                    bool first = true;
+                    foreach (var val in Values)
                     {
-                        sb.Append("json_build_object(");
+                        if (first) first = false;
+                        else sb.Append(",");
 
-                        bool first = true;
-                        foreach (var val in Values)
-                        {
-                            if (first) first = false;
-                            else sb.Append(",");
-
-                            sb.Append(conn.Language.PrepareValue(val.Key));
-                            sb.Append(",");
-                            sb.Append(val.Value.Build(conn, relatedQuery));
-                        }
-
-                        sb.Append(")");
+                        sb.Append(conn.Language.PrepareValue(val.Key));
+                        sb.Append(",");
+                        sb.Append(val.Value.Build(conn, relatedQuery));
                     }
-                    break;
 
-                default:
-                    throw new NotSupportedException("JsonExtract is not supported by current DB type");
-            }
+                    sb.Append(")");
+                }
+                break;
+
+            default:
+                throw new NotSupportedException("JsonExtract is not supported by current DB type");
         }
     }
 }

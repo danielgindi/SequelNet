@@ -1,23 +1,22 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+public abstract partial class Geometry
 {
-    public abstract partial class Geometry
+    public class MultiPolygon : GeometryCollection<Polygon>
     {
-        public class MultiPolygon : GeometryCollection<Polygon>
+        public MultiPolygon()
+            : base()
         {
-            public MultiPolygon()
-                : base()
-            {
-            }
+        }
 
-            public MultiPolygon(params Polygon[] polygons)
-                : base(polygons)
-            {
-            }
+        public MultiPolygon(params Polygon[] polygons)
+            : base(polygons)
+        {
+        }
 
-            public MultiPolygon(int capacity)
-                : base(capacity)
-            {
-            }
+        public MultiPolygon(int capacity)
+            : base(capacity)
+        {
         }
     }
 }

@@ -1,34 +1,33 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class ST_X : IPhrase
 {
-    public class ST_X : IPhrase
+    public ValueWrapper Value;
+
+    #region Constructors
+    
+    public ST_X(IPhrase phrase)
     {
-        public ValueWrapper Value;
+        this.Value = ValueWrapper.From(phrase);
+    }
 
-        #region Constructors
-        
-        public ST_X(IPhrase phrase)
-        {
-            this.Value = ValueWrapper.From(phrase);
-        }
+    public ST_X(string tableName, string column)
+    {
+        this.Value = ValueWrapper.Column(tableName, column);
+    }
 
-        public ST_X(string tableName, string column)
-        {
-            this.Value = ValueWrapper.Column(tableName, column);
-        }
+    public ST_X(ValueWrapper value)
+    {
+        this.Value = value;
+    }
 
-        public ST_X(ValueWrapper value)
-        {
-            this.Value = value;
-        }
+    #endregion
 
-        #endregion
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            sb.Append(conn.Language.ST_X(Value.Build(conn, relatedQuery)));
-        }
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        sb.Append(conn.Language.ST_X(Value.Build(conn, relatedQuery)));
     }
 }

@@ -1,23 +1,22 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+public abstract partial class Geometry
 {
-    public abstract partial class Geometry
+    public class MultiPoint : GeometryCollection<Point>
     {
-        public class MultiPoint : GeometryCollection<Point>
+        public MultiPoint()
+            : base()
         {
-            public MultiPoint()
-                : base()
-            {
-            }
+        }
 
-            public MultiPoint(params Point[] points)
-                : base(points)
-            {
-            }
+        public MultiPoint(params Point[] points)
+            : base(points)
+        {
+        }
 
-            public MultiPoint(int capacity)
-                : base(capacity)
-            {
-            }
+        public MultiPoint(int capacity)
+            : base(capacity)
+        {
         }
     }
 }

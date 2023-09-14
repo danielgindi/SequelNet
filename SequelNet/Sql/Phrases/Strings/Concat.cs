@@ -2,77 +2,76 @@
 using System.Text;
 using SequelNet.Connector;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class Concat : IPhrase
 {
-    public class Concat : IPhrase
+    public bool IgnoreNulls = false;
+    public List<ValueWrapper> Values = new List<ValueWrapper>();
+
+    #region Constructors
+
+    public Concat(params ValueWrapper[] values)
     {
-        public bool IgnoreNulls = false;
-        public List<ValueWrapper> Values = new List<ValueWrapper>();
+        this.Values.AddRange(values);
+    }
 
-        #region Constructors
+    public Concat(bool ignoreNulls, params ValueWrapper[] values)
+    {
+        this.IgnoreNulls = ignoreNulls;
+        this.Values.AddRange(values);
+    }
 
-        public Concat(params ValueWrapper[] values)
+    #endregion
+
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        if (Values.Count == 0)
         {
-            this.Values.AddRange(values);
+            sb.Append(conn.Language.PrepareValue(""));
         }
-
-        public Concat(bool ignoreNulls, params ValueWrapper[] values)
+        else
         {
-            this.IgnoreNulls = ignoreNulls;
-            this.Values.AddRange(values);
-        }
+            bool first = true;
 
-        #endregion
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            if (Values.Count == 0)
+            if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL && !IgnoreNulls)
             {
-                sb.Append(conn.Language.PrepareValue(""));
+                // PostgreSQL does not ignore NULL values in || operator, like CONCAT in other sql languages
+
+                foreach (var value in Values)
+                {
+                    if (first) first = false;
+                    else sb.Append(" || ");
+
+                    sb.Append(value.Build(conn, relatedQuery));
+                }
             }
             else
             {
-                bool first = true;
+                // PostgreSQL ignores NULL values in CONCAT
 
-                if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL && !IgnoreNulls)
+                bool coalesce = IgnoreNulls && conn.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL;
+                
+                sb.Append("CONCAT(");
+
+                foreach (var value in Values)
                 {
-                    // PostgreSQL does not ignore NULL values in || operator, like CONCAT in other sql languages
+                    if (first) first = false;
+                    else sb.Append(",");
 
-                    foreach (var value in Values)
+                    if (coalesce)
                     {
-                        if (first) first = false;
-                        else sb.Append(" || ");
-
+                        sb.Append("COALESCE(");
+                        sb.Append(value.Build(conn, relatedQuery));
+                        sb.Append(",'')");
+                    }
+                    else
+                    {
                         sb.Append(value.Build(conn, relatedQuery));
                     }
                 }
-                else
-                {
-                    // PostgreSQL ignores NULL values in CONCAT
 
-                    bool coalesce = IgnoreNulls && conn.TYPE != ConnectorBase.SqlServiceType.POSTGRESQL;
-                    
-                    sb.Append("CONCAT(");
-
-                    foreach (var value in Values)
-                    {
-                        if (first) first = false;
-                        else sb.Append(",");
-
-                        if (coalesce)
-                        {
-                            sb.Append("COALESCE(");
-                            sb.Append(value.Build(conn, relatedQuery));
-                            sb.Append(",'')");
-                        }
-                        else
-                        {
-                            sb.Append(value.Build(conn, relatedQuery));
-                        }
-                    }
-
-                    sb.Append(")");
-                }
+                sb.Append(")");
             }
         }
     }

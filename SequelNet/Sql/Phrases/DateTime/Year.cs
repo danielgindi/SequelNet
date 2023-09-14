@@ -1,44 +1,44 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class Year : IPhrase
 {
-    public class Year : IPhrase
+    public ValueWrapper Value;
+
+    #region Constructors
+
+    public Year(object value, ValueObjectType valueType)
     {
-        public ValueWrapper Value;
+        this.Value = ValueWrapper.Make(value, valueType);
+    }
 
-        #region Constructors
+    public Year(string tableName, string columnName)
+    {
+        this.Value = ValueWrapper.Column(tableName, columnName);
+    }
 
-        public Year(object value, ValueObjectType valueType)
-        {
-            this.Value = ValueWrapper.Make(value, valueType);
-        }
+    public Year(string columnName)
+        : this(null, columnName)
+    {
+    }
 
-        public Year(string tableName, string columnName)
-        {
-            this.Value = ValueWrapper.Column(tableName, columnName);
-        }
+    public Year(IPhrase phrase)
+        : this(phrase, ValueObjectType.Value)
+    {
+    }
 
-        public Year(string columnName)
-            : this(null, columnName)
-        {
-        }
+    public Year(ValueWrapper value)
+    {
+        this.Value = value;
+    }
 
-        public Year(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
-        {
-        }
+    #endregion
 
-        public Year(ValueWrapper value)
-        {
-            this.Value = value;
-        }
-
-        #endregion
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            sb.Append(conn.Language.YearPartOfDateTime(Value.Build(conn, relatedQuery)));
-        }
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        sb.Append(conn.Language.YearPartOfDateTime(Value.Build(conn, relatedQuery)));
+    }
     }
 }

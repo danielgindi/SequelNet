@@ -1,21 +1,20 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+public partial class Query
 {
-    public partial class Query
+    public Query InsertOrUpdate()
     {
-        public Query InsertOrUpdate()
+        QueryMode currentMode = this.QueryMode;
+        if (currentMode != QueryMode.InsertOrUpdate)
         {
-            QueryMode currentMode = this.QueryMode;
-            if (currentMode != QueryMode.InsertOrUpdate)
+            this.QueryMode = QueryMode.InsertOrUpdate;
+            if (currentMode != QueryMode.Insert &&
+                currentMode != QueryMode.Update &&
+                _ListInsertUpdate != null)
             {
-                this.QueryMode = QueryMode.InsertOrUpdate;
-                if (currentMode != QueryMode.Insert &&
-                    currentMode != QueryMode.Update &&
-                    _ListInsertUpdate != null)
-                {
-                    if (_ListInsertUpdate != null) _ListInsertUpdate.Clear();
-                }
+                if (_ListInsertUpdate != null) _ListInsertUpdate.Clear();
             }
-            return this;
         }
+        return this;
     }
 }

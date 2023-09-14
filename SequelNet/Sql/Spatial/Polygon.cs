@@ -2,135 +2,134 @@
 using System.Text;
 using SequelNet.Connector;
 
-namespace SequelNet
+namespace SequelNet;
+
+public abstract partial class Geometry
 {
-    public abstract partial class Geometry
+    public class Polygon : Geometry
     {
-        public class Polygon : Geometry
+        private LineString _Exterior;
+        private List<LineString> _Holes;
+
+        public Polygon()
         {
-            private LineString _Exterior;
-            private List<LineString> _Holes;
+            _Holes = new List<LineString>();
+        }
 
-            public Polygon()
+        public Polygon(LineString exterior, params LineString[] rings)
+        {
+            this._Exterior = exterior;
+            _Holes = new List<LineString>(rings);
+        }
+
+        public Polygon(int holesCapacity)
+        {
+            _Holes = new List<LineString>(holesCapacity);
+        }
+
+        public LineString Exterior
+        {
+            get
             {
-                _Holes = new List<LineString>();
+                return _Exterior;
             }
-
-            public Polygon(LineString exterior, params LineString[] rings)
+            set
             {
-                this._Exterior = exterior;
-                _Holes = new List<LineString>(rings);
+                _Exterior = value;
             }
+        }
 
-            public Polygon(int holesCapacity)
+        public List<LineString> Holes
+        {
+            get
             {
-                _Holes = new List<LineString>(holesCapacity);
+                return _Holes;
             }
-
-            public LineString Exterior
+            set
             {
-                get
+                _Holes = value;
+            }
+        }
+
+        public override bool IsEmpty
+        {
+            get
+            {
+                return Exterior == null;
+            }
+        }
+
+        public override bool IsValid
+        {
+            get
+            {
+                if (_Exterior == null) return false;
+                if (!_Exterior.IsClosedRing) return false;
+                foreach (LineString hole in _Holes)
                 {
-                    return _Exterior;
+                    if (!hole.IsClosedRing) return false;
                 }
-                set
-                {
-                    _Exterior = value;
-                }
+                return true;
             }
+        }
 
-            public List<LineString> Holes
+        private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POLYGON(");
+        private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")");
+        private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",");
+        private static ValueWrapper OPEN_SUB_STRING_VALUE = ValueWrapper.From("(");
+        private static ValueWrapper CLOSE_SUB_STRING_VALUE = ValueWrapper.From(")");
+
+        public override void BuildValue(StringBuilder sb, ConnectorBase conn)
+        {
+            var geom = BuildValueText(conn);
+
+            sb.Append(IsGeographyType
+                ? conn.Language.ST_GeogFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal)
+                : conn.Language.ST_GeomFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal));
+        }
+
+        public override ValueWrapper BuildValueText(ConnectorBase conn)
+        {
+            var concat = new Phrases.Concat(OPEN_STRING_VALUE);
+
+            bool firstLineString = true, first;
+
+            if (_Exterior != null)
             {
-                get
+                firstLineString = false;
+
+                concat.Values.Add(OPEN_SUB_STRING_VALUE);
+                first = true;
+                foreach (Point pt in _Exterior.Points)
                 {
-                    return _Holes;
-                }
-                set
-                {
-                    _Holes = value;
-                }
-            }
-
-            public override bool IsEmpty
-            {
-                get
-                {
-                    return Exterior == null;
-                }
-            }
-
-            public override bool IsValid
-            {
-                get
-                {
-                    if (_Exterior == null) return false;
-                    if (!_Exterior.IsClosedRing) return false;
-                    foreach (LineString hole in _Holes)
-                    {
-                        if (!hole.IsClosedRing) return false;
-                    }
-                    return true;
-                }
-            }
-
-            private static ValueWrapper OPEN_STRING_VALUE = ValueWrapper.From("POLYGON(");
-            private static ValueWrapper CLOSE_STRING_VALUE = ValueWrapper.From(")");
-            private static ValueWrapper COMMA_STRING_VALUE = ValueWrapper.From(",");
-            private static ValueWrapper OPEN_SUB_STRING_VALUE = ValueWrapper.From("(");
-            private static ValueWrapper CLOSE_SUB_STRING_VALUE = ValueWrapper.From(")");
-
-            public override void BuildValue(StringBuilder sb, ConnectorBase conn)
-            {
-                var geom = BuildValueText(conn);
-
-                sb.Append(IsGeographyType
-                    ? conn.Language.ST_GeogFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal)
-                    : conn.Language.ST_GeomFromText(geom.Build(conn), SRID == null ? "" : SRID.Value.ToString(), geom.Type != ValueObjectType.Literal));
-            }
-
-            public override ValueWrapper BuildValueText(ConnectorBase conn)
-            {
-                var concat = new Phrases.Concat(OPEN_STRING_VALUE);
-
-                bool firstLineString = true, first;
-
-                if (_Exterior != null)
-                {
-                    firstLineString = false;
-
-                    concat.Values.Add(OPEN_SUB_STRING_VALUE);
-                    first = true;
-                    foreach (Point pt in _Exterior.Points)
-                    {
-                        if (first) first = false;
-                        else concat.Values.Add(COMMA_STRING_VALUE);
-
-                        concat.Values.Add(pt.BuildValueText(conn));
-                    }
-                    concat.Values.Add(CLOSE_SUB_STRING_VALUE);
-                }
-
-                foreach (var ring in _Holes)
-                {
-                    if (firstLineString) firstLineString = false; 
+                    if (first) first = false;
                     else concat.Values.Add(COMMA_STRING_VALUE);
 
-                    concat.Values.Add(OPEN_SUB_STRING_VALUE);
-                    first = true;
-                    foreach (var pt in ring.Points)
-                    {
-                        if (first) first = false;
-                        else concat.Values.Add(COMMA_STRING_VALUE);
-
-                        concat.Values.Add(pt.BuildValueText(conn));
-                    }
-                    concat.Values.Add(CLOSE_SUB_STRING_VALUE);
+                    concat.Values.Add(pt.BuildValueText(conn));
                 }
-
-                concat.Values.Add(CLOSE_STRING_VALUE);
-
-                return ValueWrapper.From(concat);
+                concat.Values.Add(CLOSE_SUB_STRING_VALUE);
             }
+
+            foreach (var ring in _Holes)
+            {
+                if (firstLineString) firstLineString = false; 
+                else concat.Values.Add(COMMA_STRING_VALUE);
+
+                concat.Values.Add(OPEN_SUB_STRING_VALUE);
+                first = true;
+                foreach (var pt in ring.Points)
+                {
+                    if (first) first = false;
+                    else concat.Values.Add(COMMA_STRING_VALUE);
+
+                    concat.Values.Add(pt.BuildValueText(conn));
+                }
+                concat.Values.Add(CLOSE_SUB_STRING_VALUE);
+            }
+
+            concat.Values.Add(CLOSE_STRING_VALUE);
+
+            return ValueWrapper.From(concat);
         }
     }
 }

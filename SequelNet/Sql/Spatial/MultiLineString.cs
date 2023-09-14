@@ -1,23 +1,22 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+public abstract partial class Geometry
 {
-    public abstract partial class Geometry
+    public class MultiLineString : GeometryCollection<LineString>
     {
-        public class MultiLineString : GeometryCollection<LineString>
+        public MultiLineString()
+            : base()
         {
-            public MultiLineString()
-                : base()
-            {
-            }
+        }
 
-            public MultiLineString(params LineString[] lineStrings)
-                : base(lineStrings)
-            {
-            }
+        public MultiLineString(params LineString[] lineStrings)
+            : base(lineStrings)
+        {
+        }
 
-            public MultiLineString(int capacity)
-                : base(capacity)
-            {
-            }
+        public MultiLineString(int capacity)
+            : base(capacity)
+        {
         }
     }
 }

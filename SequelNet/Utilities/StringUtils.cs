@@ -1,43 +1,42 @@
-﻿namespace SequelNet
+﻿namespace SequelNet;
+
+internal static class StringUtils
 {
-    internal static class StringUtils
+    internal static string UnescapeStringLiteral(string str)
     {
-        internal static string UnescapeStringLiteral(string str)
+        string unescaped = "";
+
+        bool escaped = false;
+        for (int i = 0, len = str.Length; i < len; i++)
         {
-            string unescaped = "";
-
-            bool escaped = false;
-            for (int i = 0, len = str.Length; i < len; i++)
+            char c = str[i];
+            if (escaped)
             {
-                char c = str[i];
-                if (escaped)
+                switch (c)
                 {
-                    switch (c)
-                    {
-                        case '0': unescaped += '\0'; break;
-                        case 'a': unescaped += '\a'; break;
-                        case 'b': unescaped += '\b'; break;
-                        case 'f': unescaped += '\f'; break;
-                        case 'n': unescaped += '\n'; break;
-                        case 'r': unescaped += '\r'; break;
-                        case 't': unescaped += '\t'; break;
-                        case 'v': unescaped += '\v'; break;
-                        default: unescaped += c; break;
-                    }
-                    escaped = false;
-                    continue;
+                    case '0': unescaped += '\0'; break;
+                    case 'a': unescaped += '\a'; break;
+                    case 'b': unescaped += '\b'; break;
+                    case 'f': unescaped += '\f'; break;
+                    case 'n': unescaped += '\n'; break;
+                    case 'r': unescaped += '\r'; break;
+                    case 't': unescaped += '\t'; break;
+                    case 'v': unescaped += '\v'; break;
+                    default: unescaped += c; break;
                 }
-
-                if (c == '\\')
-                {
-                    escaped = true;
-                    continue;
-                }
-                
-                unescaped += c;
+                escaped = false;
+                continue;
             }
 
-            return unescaped;
-        } 
-    }
+            if (c == '\\')
+            {
+                escaped = true;
+                continue;
+            }
+            
+            unescaped += c;
+        }
+
+        return unescaped;
+    } 
 }

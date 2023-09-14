@@ -1,11 +1,10 @@
-﻿namespace SequelNet.Phrases
+﻿namespace SequelNet.Phrases;
+
+public class UnionAll : Union
 {
-    public class UnionAll : Union
+    public UnionAll(params Query[] queries)
+        : base(queries)
     {
-        public UnionAll(params Query[] queries)
-            : base(queries)
-        {
-            this.All = true;
-        }
+        this.All = true;
     }
 }

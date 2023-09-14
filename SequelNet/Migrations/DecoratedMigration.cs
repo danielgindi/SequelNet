@@ -3,66 +3,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace SequelNet.Migrations
+namespace SequelNet.Migrations;
+
+public class DecoratedMigration
 {
-    public class DecoratedMigration
+    public Type Type { get; internal set; }
+    internal IMigration _Migration;
+    public MigrationAttribute Attribute { get; internal set; }
+
+    internal DecoratedMigration(Type migrationType)
     {
-        public Type Type { get; internal set; }
-        internal IMigration _Migration;
-        public MigrationAttribute Attribute { get; internal set; }
+        this.Type = migrationType;
 
-        internal DecoratedMigration(Type migrationType)
+        var attrs = migrationType.GetCustomAttributes(typeof(MigrationAttribute), true);
+        if (attrs.Length > 0)
         {
-            this.Type = migrationType;
+            this.Attribute = attrs[0] as MigrationAttribute;
+        }
+    }
 
-            var attrs = migrationType.GetCustomAttributes(typeof(MigrationAttribute), true);
-            if (attrs.Length > 0)
+    internal DecoratedMigration(IMigration migration) : this(migration.GetType())
+    {
+        this.Migration = migration;
+    }
+
+    internal IMigration Migration
+    {
+        get
+        {
+            if (_Migration == null)
             {
-                this.Attribute = attrs[0] as MigrationAttribute;
+                _Migration = Activator.CreateInstance(Type) as IMigration;
             }
-        }
 
-        internal DecoratedMigration(IMigration migration) : this(migration.GetType())
+            return _Migration;
+        }
+        set
         {
-            this.Migration = migration;
+            _Migration = value;
         }
+    }
 
-        internal IMigration Migration
+    internal string Description
+    {
+        get
         {
-            get
-            {
-                if (_Migration == null)
-                {
-                    _Migration = Activator.CreateInstance(Type) as IMigration;
-                }
+            if (this.Attribute?.Description != null)
+                return this.Attribute?.Description;
 
-                return _Migration;
-            }
-            set
-            {
-                _Migration = value;
-            }
+            return SnakeCase(this.Migration.GetType().Name);
         }
+    }
 
-        internal string Description
-        {
-            get
-            {
-                if (this.Attribute?.Description != null)
-                    return this.Attribute?.Description;
+    private static string SnakeCase(string value)
+    {
+        var values = new List<string>();
+        var matches = Regex.Matches(value, @"[^A-Z._-]+|[A-Z\d]+(?![^._-])|[A-Z\d]+(?=[A-Z])|[A-Z][^A-Z._-]*", RegexOptions.ECMAScript);
+        foreach (Match match in matches)
+            values.Add(match.Value);
 
-                return SnakeCase(this.Migration.GetType().Name);
-            }
-        }
-
-        private static string SnakeCase(string value)
-        {
-            var values = new List<string>();
-            var matches = Regex.Matches(value, @"[^A-Z._-]+|[A-Z\d]+(?![^._-])|[A-Z\d]+(?=[A-Z])|[A-Z][^A-Z._-]*", RegexOptions.ECMAScript);
-            foreach (Match match in matches)
-                values.Add(match.Value);
-
-            return string.Join("_", values.Select(x => x.ToLowerInvariant()));
-        }
+        return string.Join("_", values.Select(x => x.ToLowerInvariant()));
     }
 }

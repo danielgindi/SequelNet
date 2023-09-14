@@ -1,44 +1,44 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class Month : IPhrase
 {
-    public class Month : IPhrase
+    public ValueWrapper Value;
+
+    #region Constructors
+
+    public Month(object value, ValueObjectType valueType)
     {
-        public ValueWrapper Value;
+        this.Value = ValueWrapper.Make(value, valueType);
+    }
 
-        #region Constructors
+    public Month(string tableName, string columnName)
+    {
+        this.Value = ValueWrapper.Column(tableName, columnName);
+    }
 
-        public Month(object value, ValueObjectType valueType)
-        {
-            this.Value = ValueWrapper.Make(value, valueType);
-        }
+    public Month(string columnName)
+        : this(null, columnName)
+    {
+    }
 
-        public Month(string tableName, string columnName)
-        {
-            this.Value = ValueWrapper.Column(tableName, columnName);
-        }
+    public Month(IPhrase phrase)
+        : this(phrase, ValueObjectType.Value)
+    {
+    }
 
-        public Month(string columnName)
-            : this(null, columnName)
-        {
-        }
+    public Month(ValueWrapper value)
+    {
+        this.Value = value;
+    }
 
-        public Month(IPhrase phrase)
-            : this(phrase, ValueObjectType.Value)
-        {
-        }
+    #endregion
 
-        public Month(ValueWrapper value)
-        {
-            this.Value = value;
-        }
-
-        #endregion
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            sb.Append(conn.Language.MonthPartOfDateTime(Value.Build(conn, relatedQuery)));
-        }
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        sb.Append(conn.Language.MonthPartOfDateTime(Value.Build(conn, relatedQuery)));
+    }
     }
 }

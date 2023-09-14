@@ -1,28 +1,27 @@
 ﻿using System.Text;
 using SequelNet.Connector;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class Union : IPhrase
 {
-    public class Union : IPhrase
+    public Query[] Queries;
+    public bool All = false;
+
+    public Union(params Query[] queries)
     {
-        public Query[] Queries;
-        public bool All = false;
+        Queries = queries;
+    }
 
-        public Union(params Query[] queries)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        bool first = true;
+        sb.Append("(");
+        foreach (Query qry in Queries)
         {
-            Queries = queries;
+            if (first) first = false; else sb.Append(All ? " UNION ALL" : " UNION");
+            sb.Append(qry.BuildCommand(conn));
         }
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            bool first = true;
-            sb.Append("(");
-            foreach (Query qry in Queries)
-            {
-                if (first) first = false; else sb.Append(All ? " UNION ALL" : " UNION");
-                sb.Append(qry.BuildCommand(conn));
-            }
-            sb.Append(")");
-        }
+        sb.Append(")");
     }
 }

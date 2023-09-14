@@ -1,30 +1,29 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
+namespace SequelNet.Phrases;
+
+public class CreateTime : IPhrase
 {
-    public class CreateTime : IPhrase
+    public int Hours;
+    public int Minutes;
+    public int Seconds;
+    public int Milliseconds;
+
+    #region Constructors
+
+    public CreateTime(int hours, int minutes, int seconds, int milliseconds = 0)
     {
-        public int Hours;
-        public int Minutes;
-        public int Seconds;
-        public int Milliseconds;
+        this.Hours = hours;
+        this.Minutes = minutes;
+        this.Seconds = seconds;
+        this.Milliseconds = milliseconds;
+    }
+    
+    #endregion
 
-        #region Constructors
-
-        public CreateTime(int hours, int minutes, int seconds, int milliseconds = 0)
-        {
-            this.Hours = hours;
-            this.Minutes = minutes;
-            this.Seconds = seconds;
-            this.Milliseconds = milliseconds;
-        }
-        
-        #endregion
-
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            sb.Append(conn.Language.FormatCreateTime(Hours, Minutes, Seconds, Milliseconds));
-        }
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        sb.Append(conn.Language.FormatCreateTime(Hours, Minutes, Seconds, Milliseconds));
     }
 }

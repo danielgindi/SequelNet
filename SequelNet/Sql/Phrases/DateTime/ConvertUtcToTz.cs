@@ -1,28 +1,27 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
-namespace SequelNet.Phrases
-{
-    public class ConvertUtcToTz : IPhrase
-    {
-        public ValueWrapper Value;
-        public ValueWrapper Timezone;
-        
-        public ConvertUtcToTz(ValueWrapper value, ValueWrapper timezone)
-        {
-            this.Value = value;
-            this.Timezone = timezone;
-        }
-        
-        public ConvertUtcToTz(ValueWrapper value, string timezone)
-        {
-            this.Value = value;
-            this.Timezone = ValueWrapper.From(timezone);
-        }
+namespace SequelNet.Phrases;
 
-        public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
-        {
-            conn.Language.BuildConvertUtcToTz(Value, Timezone, sb, conn, relatedQuery);
-        }
+public class ConvertUtcToTz : IPhrase
+{
+    public ValueWrapper Value;
+    public ValueWrapper Timezone;
+    
+    public ConvertUtcToTz(ValueWrapper value, ValueWrapper timezone)
+    {
+        this.Value = value;
+        this.Timezone = timezone;
+    }
+    
+    public ConvertUtcToTz(ValueWrapper value, string timezone)
+    {
+        this.Value = value;
+        this.Timezone = ValueWrapper.From(timezone);
+    }
+
+    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    {
+        conn.Language.BuildConvertUtcToTz(Value, Timezone, sb, conn, relatedQuery);
     }
 }

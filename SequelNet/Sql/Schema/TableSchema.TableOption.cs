@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace SequelNet
+namespace SequelNet;
+
+public partial class TableSchema
 {
-    public partial class TableSchema
+    public class TableOptionList : Dictionary<string, string>
     {
-        public class TableOptionList : Dictionary<string, string>
-        {
-        }
     }
 }
