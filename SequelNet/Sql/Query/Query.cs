@@ -571,6 +571,18 @@ namespace SequelNet
         }
 
         /// <summary>
+        /// Do we have already some GROUP BY set for this query?
+        /// </summary>
+        public bool HasGroupBy
+        {
+            get
+            {
+                return _ListGroupBy != null &&
+                    _ListGroupBy.Count > 0;
+            }
+        }
+
+        /// <summary>
         /// LIMIT for query results.
         /// </summary>
         public Int64 Limit { get; set; } = 0;
