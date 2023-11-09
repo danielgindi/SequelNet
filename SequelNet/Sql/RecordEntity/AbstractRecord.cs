@@ -28,6 +28,7 @@ public abstract class AbstractRecord<T> : IRecord
     private static PropertyInfo __PRIMARY_KEY_PROP_INFO = null;
 
     private static bool __FLAGS_RETRIEVED = false;
+    private static bool __IS_AUTOINCREMENT_PK = false;
     private static string __IS_DELETED_NAME = null;
     private static string __CREATED_ON_NAME = null;
     private static string __MODIFIED_ON_NAME = null;
@@ -192,6 +193,13 @@ public abstract class AbstractRecord<T> : IRecord
         __IS_DELETED_NAME = Schema.Columns.Find(x => x.Name == "IsDeleted" || x.Name == "is_deleted" || x.Name == "Deleted" || x.Name == "deleted")?.Name;
         __CREATED_ON_NAME = Schema.Columns.Find(x => x.Name == "CreatedOn" || x.Name == "created_on")?.Name;
         __MODIFIED_ON_NAME = Schema.Columns.Find(x => x.Name == "ModifiedOn" || x.Name == "modified_on")?.Name;
+
+        var autoIncrementColumn = Schema.Columns.Find(x => x.AutoIncrement);
+        __IS_AUTOINCREMENT_PK = autoIncrementColumn != null && (
+            autoIncrementColumn.IsPrimaryKey ||
+            Schema.Indexes.Any(x => x.Mode == TableSchema.IndexMode.PrimaryKey && 
+                x.Columns.Any(x => x.Target.Type == ValueObjectType.ColumnName && Object.Equals(x.Target.Value, autoIncrementColumn.Name)))
+        );
         __FLAGS_RETRIEVED = true;
     }
 
@@ -370,7 +378,7 @@ public abstract class AbstractRecord<T> : IRecord
     {
         var qry = GetInsertQuery();
 
-        if (IsCompoundPrimaryKey())
+        if (IsCompoundPrimaryKey() || !__IS_AUTOINCREMENT_PK)
         {
             qry.Execute(connection);
         }
@@ -390,7 +398,7 @@ public abstract class AbstractRecord<T> : IRecord
     {
         var qry = GetInsertQuery();
 
-        if (IsCompoundPrimaryKey())
+        if (IsCompoundPrimaryKey() || !__IS_AUTOINCREMENT_PK)
         {
             await qry.ExecuteAsync(conn, cancellationToken).ConfigureAwait(false);
 
