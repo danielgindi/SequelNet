@@ -203,6 +203,15 @@ public abstract class AbstractRecord<T> : IRecord
         __FLAGS_RETRIEVED = true;
     }
 
+    private static bool IsAutoIncrementPrimaryKey()
+    {
+        if (!__FLAGS_RETRIEVED)
+        {
+            RetrieveFlags();
+        }
+        return __IS_AUTOINCREMENT_PK;
+    }
+
     #endregion
 
     #region Mutated
@@ -378,7 +387,7 @@ public abstract class AbstractRecord<T> : IRecord
     {
         var qry = GetInsertQuery();
 
-        if (IsCompoundPrimaryKey() || !__IS_AUTOINCREMENT_PK)
+        if (IsCompoundPrimaryKey() || !IsAutoIncrementPrimaryKey())
         {
             qry.Execute(connection);
         }
@@ -398,7 +407,7 @@ public abstract class AbstractRecord<T> : IRecord
     {
         var qry = GetInsertQuery();
 
-        if (IsCompoundPrimaryKey() || !__IS_AUTOINCREMENT_PK)
+        if (IsCompoundPrimaryKey() || !IsAutoIncrementPrimaryKey())
         {
             await qry.ExecuteAsync(conn, cancellationToken).ConfigureAwait(false);
 
