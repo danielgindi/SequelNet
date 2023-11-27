@@ -33,6 +33,28 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
 
     #endregion
 
+    #region Swap
+
+    /// <summary>
+    /// Swaps the underlying reader with the given reader.
+    /// CAn be used to control the flow of the reader, during Read()/ReadAsync() calls.
+    /// </summary>
+    /// <param name="reader"></param>
+    public void Swap(DataReader reader)
+    {
+        var underlyingReader = UnderlyingReader;
+        var attachedConnection = AttachedConnection;
+        var attachedDbCommand = AttachedDbCommand;
+        this.UnderlyingReader = reader.UnderlyingReader;
+        this.AttachedConnection = reader.AttachedConnection;
+        this.AttachedDbCommand = reader.AttachedDbCommand;
+        reader.UnderlyingReader = underlyingReader;
+        reader.AttachedConnection = attachedConnection;
+        reader.AttachedDbCommand = attachedDbCommand;
+    }
+
+    #endregion
+
     #region IDisposable
 
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -528,16 +550,26 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     ///    statements.
     /// </summary>
     /// <returns>true if there are more result sets; otherwise false.</returns>
-    public bool NextResult()
+    public virtual bool NextResult()
     {
         return UnderlyingReader.NextResult();
+    }
+
+    /// <summary>
+    /// Advances the reader to the next result when reading the results of a batch of
+    ///    statements.
+    /// </summary>
+    /// <returns>true if there are more result sets; otherwise false.</returns>
+    public virtual Task<bool> NextResultAsync()
+    {
+        return UnderlyingReader.NextResultAsync();
     }
 
     /// <summary>
     /// Advances the reader to the next record in a result set.
     /// </summary>
     /// <returns>true if there are more rows; otherwise false.</returns>
-    public bool Read()
+    public virtual bool Read()
     {
         return UnderlyingReader.Read();
     }
@@ -546,7 +578,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     /// Advances the reader to the next record in a result set.
     /// </summary>
     /// <returns>true if there are more rows; otherwise false.</returns>
-    public Task<bool> ReadAsync(CancellationToken? cancellationToken = null)
+    public virtual Task<bool> ReadAsync(CancellationToken? cancellationToken = null)
     {
         return UnderlyingReader.ReadAsync(cancellationToken ?? CancellationToken.None);
     }
@@ -555,7 +587,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     /// Gets a value indicating the depth of nesting for the current row.
     /// </summary>
     /// <returns>The depth of nesting for the current row.</returns>
-    public int Depth
+    public virtual int Depth
     {
         get
         {
@@ -567,7 +599,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     /// Gets a value that indicates whether this System.Data.Common.DbDataReader contains one or more rows.
     /// </summary>
     /// <returns>true if the System.Data.Common.DbDataReader contains one or more rows; otherwise false.</returns>
-    public bool HasRows
+    public virtual bool HasRows
     {
         get
         {
