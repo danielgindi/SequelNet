@@ -1046,6 +1046,67 @@ public static class PhraseHelper
             secondTableName, secondColumnName);
     }
 
+    public static NullIf NullIf(
+        ValueWrapper first,
+        ValueWrapper second)
+    {
+        return new NullIf(first, second);
+    }
+    
+    public static NullIf NullIf(
+        string firstTableName, string firstColumnName,
+        string secondTableName, string secondColumnName)
+    {
+        return new NullIf(
+            firstTableName, firstColumnName,
+            secondTableName, secondColumnName);
+    }
+
+    public static NullIf NullIf(
+         object firstValue, ValueObjectType firstValueType,
+         object secondValue, ValueObjectType secondValueType)
+    {
+        return new NullIf(
+            firstValue, firstValueType,
+            secondValue, secondValueType);
+    }
+
+    public static NullIf NullIf(
+         string firstTableName, string firstColumnName,
+         object secondValue, ValueObjectType secondValueType)
+    {
+        return new NullIf(
+            firstTableName, firstColumnName,
+            secondValue, secondValueType);
+    }
+
+    public static NullIf NullIf(
+         string firstTableName, string firstColumnName,
+         ValueWrapper second)
+    {
+        return new NullIf(
+            firstTableName, firstColumnName,
+            second);
+    }
+
+    public static NullIf NullIf(
+         object firstValue, ValueObjectType firstValueType,
+         string secondTableName, string secondColumnName)
+    {
+        return new NullIf(
+            firstValue, firstValueType,
+            secondTableName, secondColumnName);
+    }
+
+    public static NullIf NullIf(
+         ValueWrapper first,
+         string secondTableName, string secondColumnName)
+    {
+        return new NullIf(
+            first,
+            secondTableName, secondColumnName);
+    }
+
     #endregion
 
     #region General

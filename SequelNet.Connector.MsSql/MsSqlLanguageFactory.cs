@@ -89,6 +89,11 @@ namespace SequelNet.Connector
             return $"DATEDIFF(second, '1970-01-01 00:00:00', {date})";
         }
 
+        public override string NullOrDefaultValue(string expression, string defaultValue)
+        {
+            return $"ISNULL({expression}, {defaultValue})";
+        }
+
         public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
         {
             switch (format)

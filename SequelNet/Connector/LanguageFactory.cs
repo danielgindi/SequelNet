@@ -120,6 +120,16 @@ public class LanguageFactory
         return $"UNIX_TIMESTAMP({date})";
     }
 
+    public virtual string NullOrDefaultValue(string expression, string defaultValue)
+    {
+        return $"IFNULL({expression}, {defaultValue})";
+    }
+
+    public virtual string IfEqualThenNull(string value1expr, string value2expr)
+    {
+        return $"NULLIF({value1expr}, {value2expr})";
+    }
+
     public virtual string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
     {
         throw new NotImplementedException("DateTimeFormat has not been implemented for this connector");

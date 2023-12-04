@@ -4,16 +4,16 @@ using System.Text;
 namespace SequelNet.Phrases;
 
 /// <summary>
-/// Tests whether a value is NULL. Returns the second value if the first value is NULL, otherwise returns the first value.
+/// Tests equality of two values. Returns NULL if the values are equal, otherwise returns the first value.
 /// </summary>
-public class IfNull : IPhrase
+public class NullIf : IPhrase
 {
     public ValueWrapper Value1;
     public ValueWrapper Value2;
 
     #region Constructors
 
-    public IfNull(
+    public NullIf(
         ValueWrapper first,
         ValueWrapper second)
     {
@@ -21,7 +21,7 @@ public class IfNull : IPhrase
         this.Value2 = second;
     }
 
-    public IfNull(
+    public NullIf(
         string firstTableName, string firstColumnName,
         string secondTableName, string secondColumnName)
     {
@@ -29,7 +29,7 @@ public class IfNull : IPhrase
         this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
     }
 
-    public IfNull(
+    public NullIf(
          object firstValue, ValueObjectType firstValueType,
          object secondValue, ValueObjectType secondValueType)
     {
@@ -37,7 +37,7 @@ public class IfNull : IPhrase
         this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
     }
 
-    public IfNull(
+    public NullIf(
          string firstTableName, string firstColumnName,
          object secondValue, ValueObjectType secondValueType)
     {
@@ -45,7 +45,7 @@ public class IfNull : IPhrase
         this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
     }
 
-    public IfNull(
+    public NullIf(
          string firstTableName, string firstColumnName,
          ValueWrapper second)
     {
@@ -53,7 +53,7 @@ public class IfNull : IPhrase
         this.Value2 = second;
     }
 
-    public IfNull(
+    public NullIf(
          object firstValue, ValueObjectType firstValueType,
          string secondTableName, string secondColumnName)
     {
@@ -61,7 +61,7 @@ public class IfNull : IPhrase
         this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
     }
 
-    public IfNull(
+    public NullIf(
          ValueWrapper first,
          string secondTableName, string secondColumnName)
     {
@@ -73,7 +73,7 @@ public class IfNull : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append(conn.Language.NullOrDefaultValue(
+        sb.Append(conn.Language.IfEqualThenNull(
             Value1.Build(conn, relatedQuery),
             Value2.Build(conn, relatedQuery)
         ));
