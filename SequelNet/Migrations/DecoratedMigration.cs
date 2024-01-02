@@ -24,24 +24,19 @@ public class DecoratedMigration
 
     internal DecoratedMigration(IMigration migration) : this(migration.GetType())
     {
-        this.Migration = migration;
+        this._Migration = migration;
     }
 
-    internal IMigration Migration
+    internal IMigration GetMigration(MigrationController.InstanceCreator creator)
     {
-        get
+        if (_Migration == null)
         {
-            if (_Migration == null)
-            {
-                _Migration = Activator.CreateInstance(Type) as IMigration;
-            }
+            if (creator != null)
+                _Migration = creator(Type);
+            else _Migration = Activator.CreateInstance(Type) as IMigration;
+        }
 
-            return _Migration;
-        }
-        set
-        {
-            _Migration = value;
-        }
+        return _Migration;
     }
 
     internal string Description
@@ -51,7 +46,7 @@ public class DecoratedMigration
             if (this.Attribute?.Description != null)
                 return this.Attribute?.Description;
 
-            return SnakeCase(this.Migration.GetType().Name);
+            return SnakeCase(this.Type.Name);
         }
     }
 

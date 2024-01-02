@@ -10,6 +10,7 @@ public class MigrationController
     public delegate void MigrationItemEventHandler(object sender, MigrationItemEventArgs args);
     public delegate Int64 MigrationVersionQueryDelegate();
     public delegate List<DecoratedMigration> MigrationFilterDelegate(Int64 fromVersion, Int64 toVersion, List<DecoratedMigration> migrations);
+    public delegate IMigration InstanceCreator(Type migrationType);
 
     public event MigrationVersionEventHandler MigrationVersionEvent;
     public event MigrationItemEventHandler ItemStartEvent;
@@ -43,7 +44,7 @@ public class MigrationController
             var decor = new DecoratedMigration(migration);
             if (decor.Attribute == null)
             {
-                throw new ArgumentException($"Migration type {decor.Migration.GetType().Name} does not have a MigrationAttribute");
+                throw new ArgumentException($"Migration type {decor.Type.Name} does not have a MigrationAttribute");
             }
 
             _Migrations.Add(decor);
@@ -59,7 +60,7 @@ public class MigrationController
             var decor = new DecoratedMigration(migration);
             if (decor.Attribute == null)
             {
-                throw new ArgumentException($"Migration type {decor.Migration.GetType().Name} does not have a MigrationAttribute");
+                throw new ArgumentException($"Migration type {decor.Type.Name} does not have a MigrationAttribute");
             }
 
             _Migrations.Add(decor);
@@ -162,15 +163,17 @@ public class MigrationController
             _State.CurrentVersion = migration.Attribute.Version;
             _State.IsInIntermediateState = true;
 
+            var migrationInstance = migration.GetMigration(MigrationInstanceCreator);
+
             if (up)
             {
                 ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
 
-                if (migration.Migration is MigrationAsync ma)
+                if (migrationInstance is MigrationAsync ma)
                 {
                     await ma.UpAsync().ConfigureAwait(false);
                 }
-                else if (migration.Migration is Migration m)
+                else if (migrationInstance is Migration m)
                 {
                     m.Up();
                 }
@@ -181,11 +184,11 @@ public class MigrationController
             {
                 ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
 
-                if (migration.Migration is MigrationAsync ma)
+                if (migrationInstance is MigrationAsync ma)
                 {
                     await ma.DownAsync().ConfigureAwait(false);
                 }
-                else if (migration.Migration is Migration m)
+                else if (migrationInstance is Migration m)
                 {
                     m.Down();
                 }
@@ -252,6 +255,12 @@ public class MigrationController
     /// A way to supply a custom predicate for which migrations to run
     /// </summary>
     public MigrationFilterDelegate MigrationFilterHandler { get; set; }
+
+    /// <summary>
+    /// Allows you to supply a custom instance creator for a migration class.
+    /// i.e if you want to use a DI container to create your migrations.
+    /// </summary>
+    public InstanceCreator MigrationInstanceCreator;
 
     /// <summary>
     /// Query the current known version of the database.
