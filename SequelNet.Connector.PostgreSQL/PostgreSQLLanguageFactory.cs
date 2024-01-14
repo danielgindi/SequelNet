@@ -278,7 +278,7 @@ namespace SequelNet.Connector
             bool top,
             StringBuilder outputBuilder)
         {
-            if (top)
+            if (top || query.QueryMode == QueryMode.Update)
                 return;
 
             var withOffset = query.Offset > 0 && query.QueryMode == QueryMode.Select;

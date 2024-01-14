@@ -458,6 +458,7 @@ public partial class Query
                         }
 
                         break;
+                    
                     case QueryMode.Insert:
                         {
                             if (OnConflictDoUpdate != null && language.InsertSupportsMerge && !language.InsertSupportsOnConflictDoUpdate)
@@ -533,6 +534,8 @@ public partial class Query
                             {
                                 sb.Append("IGNORE ");
                             }
+
+                            language.BuildLimitOffset(this, true, sb);
 
                             if (hasJoins && language.UpdateJoinRequiresFromLeftTable && !string.IsNullOrEmpty(_SchemaAlias))
                             {
@@ -717,6 +720,8 @@ public partial class Query
                             }
 
                             BuildOrderBy(sb, connection, false);
+
+                            language.BuildLimitOffset(this, false, sb);
                         }
                         break;
 
