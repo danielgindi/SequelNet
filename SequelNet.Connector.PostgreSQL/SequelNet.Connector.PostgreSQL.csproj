@@ -69,7 +69,7 @@
     <None Include="strongKey.pfx" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Npgsql" Version="7.0.6" />
+    <PackageReference Include="Npgsql" Version="8.0.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SequelNet\SequelNet.csproj" />
