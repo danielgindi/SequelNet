@@ -1375,7 +1375,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     /// <summary>
     /// Gets the value of the specified column in Geometry type given the column index.
     /// </summary>
-    /// <param name="i">The zero-based column ordinal.</param>
+    /// <param name="columnIndex">The zero-based column ordinal.</param>
     /// <returns>The value of the specified column in Geometry type.</returns>
     /// <exception cref="IndexOutOfRangeException">The index passed was outside the range of 0 through System.Data.IDataRecord.FieldCount</exception>
     public Geometry GetGeometry(int columnIndex)
@@ -1391,7 +1391,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     /// <summary>
     /// Gets the value of the specified column in Geometry type given the column name.
     /// </summary>
-    /// <param name="i">The zero-based column ordinal.</param>
+    /// <param name="columnName">The zero-based column ordinal.</param>
     /// <returns>The value of the specified column in Geometry type.</returns>
     /// <exception cref="IndexOutOfRangeException">No column with the specified name was found</exception>
     public Geometry GetGeometry(string columnName)

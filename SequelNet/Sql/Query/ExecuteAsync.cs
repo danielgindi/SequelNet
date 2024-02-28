@@ -10,12 +10,12 @@ namespace SequelNet;
 public partial class Query
 {
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
     /// <param name="commandBehavior">Command behavior</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(
         ConnectorBase connection = null,
         CommandBehavior commandBehavior = CommandBehavior.Default,
@@ -44,23 +44,23 @@ public partial class Query
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(ConnectorBase connection, CancellationToken? cancellationToken)
     {
         return ExecuteReaderAsync(connection, CommandBehavior.Default, cancellationToken);
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="factory">A connector factory.</param>
     /// <param name="commandBehavior">Command behavior</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(
         IConnectorFactory factory,
         CommandBehavior commandBehavior = CommandBehavior.Default,
@@ -70,11 +70,11 @@ public partial class Query
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="factory">A connector factory.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(
         IConnectorFactory factory,
         CancellationToken? cancellationToken)
@@ -83,20 +83,20 @@ public partial class Query
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(CancellationToken? cancellationToken)
     {
         return ExecuteReaderAsync((ConnectorBase)null, CommandBehavior.Default, cancellationToken);
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="commandBehavior">Command behavior</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public Task<DataReader> ExecuteReaderAsync(CommandBehavior commandBehavior)
     {
         return ExecuteReaderAsync((ConnectorBase)null, commandBehavior, null);
@@ -335,7 +335,7 @@ public partial class Query
 
     /// <summary>
     /// Will execute the query without reading any results.
-    /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+    /// This is a synonym for <seealso cref="ExecuteNonQueryAsync(ConnectorBase, CancellationToken?)"/>
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -347,7 +347,7 @@ public partial class Query
 
     /// <summary>
     /// Will execute the query without reading any results.
-    /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+    /// This is a synonym for <seealso cref="ExecuteNonQueryAsync(IConnectorFactory, CancellationToken?)"/>
     /// </summary>
     /// <param name="factory">A connector factory.</param>
     /// <param name="cancellationToken">Cancellation token</param>
@@ -359,7 +359,7 @@ public partial class Query
 
     /// <summary>
     /// Will execute the query without reading any results.
-    /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+    /// This is a synonym for <seealso cref="ExecuteNonQueryAsync(CancellationToken?)"/>
     /// </summary>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Number of affected rows</returns>

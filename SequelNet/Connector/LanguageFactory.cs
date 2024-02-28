@@ -582,7 +582,7 @@ public class LanguageFactory
     /// <summary>
     /// Gets the value of the specified column in Geometry type given the column name.
     /// </summary>
-    /// <param name="i">The zero-based column ordinal.</param>
+    /// <param name="value">The zero-based column ordinal.</param>
     /// <returns>The value of the specified column in Geometry type.</returns>
     /// <exception cref="IndexOutOfRangeException">No column with the specified name was found</exception>
     public virtual Geometry ReadGeometry(object value)

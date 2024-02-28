@@ -151,7 +151,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <summary>
     /// The primary key name for this record's schema.
     /// It is found automatically and cached.
-    /// Could be either a String, an <typeparamref name="Array&lt;String&gt;"/> or <value>null</value>.
+    /// Could be either a String, an <see cref="Array&lt;String&gt;"/> or <value>null</value>.
     /// </summary>
     [XmlIgnore]
     public static object SchemaPrimaryKeyName
@@ -1181,7 +1181,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// Will me marked as "old".
     /// </summary>
     /// <param name="reader">The reader to use for loading the new record</param>
-    /// <returns>The new <typeparamref name="T"/>.</returns>
+    /// <returns>The new <see cref="T"/>.</returns>
     public static T FromReader(DataReader reader)
     {
         T item = new T();

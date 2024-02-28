@@ -135,7 +135,7 @@ public partial class Query
     /// <summary>
     /// Sets DISTINCT mode for this query.
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Distinct()
     {
         IsDistinct = true;
@@ -146,7 +146,7 @@ public partial class Query
     /// Sets DISTINCT mode for this query.
     /// </summary>
     /// <param name="IsDistinct">Is distinct?</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Distinct(bool isDistinct)
     {
         this.IsDistinct = isDistinct;
@@ -159,7 +159,7 @@ public partial class Query
     /// </summary>
     /// <param name="TableName">Random column's table</param>
     /// <param name="ColumnName">Column to randomize by.</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Randomize(string tableName = null, string columnName = null)
     {
         OrderBy orderBy = new OrderBy(tableName, columnName, SortDirection.None);
@@ -171,7 +171,7 @@ public partial class Query
     /// Sets LIMIT for query results
     /// </summary>
     /// <param name="limit">Limit. 0 for not limit.</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query LimitRows(Int64 limit)
     {
         this.Limit = limit;
@@ -182,7 +182,7 @@ public partial class Query
     /// Sets OFFSET for query results
     /// </summary>
     /// <param name="offset">Offset</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query OffsetRows(Int64 offset)
     {
         this.Offset = offset;
@@ -193,7 +193,7 @@ public partial class Query
     /// Sets a hint for this query.
     /// </summary>
     /// <param name="queryHint">Hint</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Hint(QueryHint queryHint)
     {
         _QueryHint = queryHint;
@@ -311,7 +311,7 @@ public partial class Query
     /// </summary>
     /// <param name="columnDefinition">A column definition, so we can adjust the value to it</param>
     /// <param name="value">Value to be prepared</param>
-    /// <param name="outputBuilder">The <typeparamref name="StringBuilder"/> to output the SQL expression</param>
+    /// <param name="outputBuilder">The <see cref="StringBuilder"/> to output the SQL expression</param>
     /// <param name="connection">A connector to use. Mandatory.</param>
     public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection, Query relatedQuery = null)
     {
@@ -476,7 +476,7 @@ public partial class Query
     }
 
     /// <summary>
-    /// Checks a value for <value>null</value>, <typeparamref name="DBNull"/>, and <typeparamref name="System.Data.SqlTypes.INullable"/>
+    /// Checks a value for <value>null</value>, <see cref="DBNull"/>, and <see cref="System.Data.SqlTypes.INullable"/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns><value>true</value> if null</returns>
@@ -595,12 +595,12 @@ public partial class Query
 
     /// <summary>
     /// The expression that is used for INSERT. e.g. INSERT INTO {schema} FROM {expression}.
-    /// This can be a <typeparamref name="Query"/> or a <typeparamref name="String"/>.
+    /// This can be a <see cref="Query"/> or a <see cref="String"/>.
     /// </summary>
     public object InsertExpression { get; set; } = null;
 
     /// <summary>
-    /// Main <typeparamref name="TableSchema"/> for this query
+    /// Main <see cref="TableSchema"/> for this query
     /// </summary>
     public TableSchema Schema
     {

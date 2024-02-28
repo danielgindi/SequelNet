@@ -9,7 +9,7 @@ public partial class Query
     /// <summary>
     /// Creates current table in the database.
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateTable()
     {
         ClearSelect();
@@ -27,7 +27,7 @@ public partial class Query
     /// <summary>
     /// Adds all indexes in this table's schema.
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateIndexes()
     {
         ClearSelect();
@@ -46,7 +46,7 @@ public partial class Query
     /// Adds an index.
     /// </summary>
     /// <param name="index">Index to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateIndex(TableSchema.Index index)
     {
         ClearSelect();
@@ -74,7 +74,7 @@ public partial class Query
     /// Will search in this table's schema for the index named <paramref name="indexName"/>
     /// </summary>
     /// <param name="indexName">Name of the index to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateIndex(string indexName)
     {
         return CreateIndex(Schema.Indexes.Find(indexName));
@@ -84,7 +84,7 @@ public partial class Query
     /// Adds a foreign key.
     /// </summary>
     /// <param name="foreignKey">Key to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateForeignKey(TableSchema.ForeignKey foreignKey)
     {
         ClearSelect();
@@ -112,7 +112,7 @@ public partial class Query
     /// Will search in this table's schema for the foreign key named <paramref name="fkName"/>
     /// </summary>
     /// <param name="fkName">Name of the foreign key to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateForeignKey(string fkName)
     {
         return CreateForeignKey(Schema.ForeignKeys.Find(fkName));
@@ -122,7 +122,7 @@ public partial class Query
     /// Adds a column.
     /// </summary>
     /// <param name="column">Column to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query AddColumn(TableSchema.Column column)
     {
         ClearSelect();
@@ -150,7 +150,7 @@ public partial class Query
     /// Will search in this table's schema for the column named <paramref name="columnName"/>
     /// </summary>
     /// <param name="columnName">Column to add</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query AddColumn(string columnName)
     {
         return AddColumn(Schema.Columns.Find(columnName));
@@ -161,7 +161,7 @@ public partial class Query
     /// Will use the same column name for old and updated column.
     /// </summary>
     /// <param name="column">The column to alter</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(TableSchema.Column column)
     {
         return ChangeColumn(null, column);
@@ -170,10 +170,10 @@ public partial class Query
     /// <summary>
     /// Alters a column.
     /// Will use the same column name for old and updated column.
-    /// Will search in this table's schema for the column named <paramref name="ColumnName"/>
+    /// Will search in this table's schema for the column named <paramref name="columnName"/>
     /// </summary>
     /// <param name="columnName">The column to alter</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(string columnName)
     {
         return ChangeColumn(Schema.Columns.Find(columnName));
@@ -184,7 +184,7 @@ public partial class Query
     /// </summary>
     /// <param name="oldColumnName">The column's old name</param>
     /// <param name="column">The updated column's definition</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(string oldColumnName, TableSchema.Column column)
     {
         ClearSelect();
@@ -213,7 +213,7 @@ public partial class Query
     /// </summary>
     /// <param name="oldColumnName">The column's old name</param>
     /// <param name="newColumnName">The column's new name. This column must have a definition under this name in the TableSchema.</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(string oldColumnName, string newColumnName)
     {
         return ChangeColumn(oldColumnName, Schema.Columns.Find(newColumnName));
@@ -223,7 +223,7 @@ public partial class Query
     /// Drops a column
     /// </summary>
     /// <param name="columnName">Column to drop</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query DropColumn(string columnName)
     {
         ClearSelect();
@@ -250,7 +250,7 @@ public partial class Query
     /// Drops a foreign key
     /// </summary>
     /// <param name="foreignKeyName">Key to drop</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query DropForeignKey(string foreignKeyName)
     {
         ClearSelect();
@@ -277,7 +277,7 @@ public partial class Query
     /// Drops an index
     /// </summary>
     /// <param name="indexName">Index to drop</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query DropIndex(string indexName)
     {
         ClearSelect();
@@ -303,7 +303,7 @@ public partial class Query
     /// <summary>
     /// Drops the primary key
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query DropPrimaryKey()
     {
         ClearSelect();
@@ -328,7 +328,7 @@ public partial class Query
     /// <summary>
     /// Drops current table
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query DropTable()
     {
         ClearSelect();

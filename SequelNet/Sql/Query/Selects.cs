@@ -9,7 +9,7 @@ public partial class Query
     /// 
     /// Note: All `Select...` methods clear the select list first.
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Select()
     {
         if (this.QueryMode != QueryMode.Select)
@@ -27,7 +27,7 @@ public partial class Query
     /// Note: All `Select...` methods clear the select list first.
     /// </summary>
     /// <param name="tableName">Optional. Table name to select all (table_name.*). If null, then it simply selects all (*).</param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query SelectAll(string tableName = null)
     {
         if (tableName != null)
@@ -46,7 +46,7 @@ public partial class Query
     /// 
     /// Note: All `Select...` methods clear the select list first.
     /// </summary>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query SelectAllTableColumns()
     {
         if (_SchemaAlias != null)

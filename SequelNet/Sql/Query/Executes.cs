@@ -8,10 +8,10 @@ namespace SequelNet;
 public partial class Query
 {
     /// <summary>
-    /// Will execute the query reading the results into a <typeparamref name="DataSet"/>.
+    /// Will execute the query reading the results into a <see cref="DataSet"/>.
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
-    /// <returns><typeparamref name="DataSet"/> object</returns>
+    /// <returns><see cref="DataSet"/> object</returns>
     public DataSet ExecuteDataSet(ConnectorBase connection = null)
     {
         bool needsDispose = connection == null;
@@ -31,10 +31,10 @@ public partial class Query
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public DataReader ExecuteReader(ConnectorBase connection = null, CommandBehavior commandBehavior = CommandBehavior.Default)
     {
         bool needsDispose = connection == null;
@@ -60,10 +60,10 @@ public partial class Query
     }
 
     /// <summary>
-    /// Will execute the query returning a <typeparamref name="DataReader"/> object.
+    /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="factory">A connector factory.</param>
-    /// <returns><typeparamref name="DataReader"/> object</returns>
+    /// <returns><see cref="DataReader"/> object</returns>
     public DataReader ExecuteReader(IConnectorFactory factory, CommandBehavior commandBehavior = CommandBehavior.Default)
     {
         return ExecuteReader(factory.Connector(), commandBehavior);

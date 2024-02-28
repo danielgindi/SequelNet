@@ -12,7 +12,7 @@ public partial class Query
     /// Adds a where condition. Does not remove any existing conditions.
     /// </summary>
     /// <param name="where"></param>
-    /// <returns>Current <typeparamref name="Query"/> object</returns>
+    /// <returns>Current <see cref="Query"/> object</returns>
     public Query Where(Where where)
     {
         if (_ListWhere == null) _ListWhere = new WhereList();
