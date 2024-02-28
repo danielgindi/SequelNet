@@ -40,22 +40,22 @@ public class JsonContains : IPhrase
     {
     }
 
-    public JsonContains(ValueWrapper target, ValueWrapper candidate, string? path = null)
+    public JsonContains(ValueWrapper target, ValueWrapper candidate, string? path)
         : this(target, candidate, path == null ? null : new JsonPathExpression(path))
     {
     }
 
-    public JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, string? path = null)
+    public JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, string? path)
         : this(target, targetType, candidate, candidateType, path == null ? null : new JsonPathExpression(path))
     {
     }
 
-    public JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, string? path = null)
+    public JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, string? path)
         : this(targetTableName, targetColumnName, candidate, candidateType, path == null ? null : new JsonPathExpression(path))
     {
     }
 
-    public JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string? path = null)
+    public JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string? path)
         : this(target, candidate, candidateType, path == null ? null : new JsonPathExpression(path))
     {
     }

@@ -649,22 +649,22 @@ public static class PhraseHelper
         return new JsonContains(target, candidate, candidateType, path);
     }
 
-    public static JsonContains JsonContains(ValueWrapper target, ValueWrapper candidate, string path = null)
+    public static JsonContains JsonContains(ValueWrapper target, ValueWrapper candidate, string path)
     {
         return new JsonContains(target, candidate, path);
     }
 
-    public static JsonContains JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, string path = null)
+    public static JsonContains JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, string path)
     {
         return new JsonContains(target, targetType, candidate, candidateType, path);
     }
 
-    public static JsonContains JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, string path = null)
+    public static JsonContains JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, string path)
     {
         return new JsonContains(targetTableName, targetColumnName, candidate, candidateType, path);
     }
 
-    public static JsonContains JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string path = null)
+    public static JsonContains JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string path)
     {
         return new JsonContains(target, candidate, candidateType, path);
     }
