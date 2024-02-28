@@ -103,6 +103,7 @@ public partial class Query
     /// <param name="size">Paremeter's type definition: Size</param>
     /// <param name="isNullable">Paremeter's type definition: Is nullable?</param>
     /// <param name="precision">Paremeter's type definition: Precision</param>
+    /// <param name="scale">Paremeter's type definition: Scale</param>
     /// <param name="sourceColumn">Source column</param>
     /// <param name="sourceVersion">Source version</param>
     /// <param name="value">Parameter value</param>

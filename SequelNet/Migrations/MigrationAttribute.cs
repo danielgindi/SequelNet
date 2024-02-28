@@ -35,7 +35,6 @@ public class MigrationAttribute : Attribute
     /// <param name="hour">Hour used in automatic timestamp generation</param>
     /// <param name="minutes">Minutes used in automatic timestamp generation</param>
     /// <param name="seconds">Seconds used in automatic timestamp generation</param>
-    /// <param name="version">Version number for this migration</param>
     /// <param name="description">Description for this migration</param>
     public MigrationAttribute(
         int year, int month, int day,

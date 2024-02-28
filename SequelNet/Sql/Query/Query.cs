@@ -145,7 +145,7 @@ public partial class Query
     /// <summary>
     /// Sets DISTINCT mode for this query.
     /// </summary>
-    /// <param name="IsDistinct">Is distinct?</param>
+    /// <param name="isDistinct">Is distinct?</param>
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query Distinct(bool isDistinct)
     {
@@ -157,8 +157,8 @@ public partial class Query
     /// Sets a random select mode, on specified column.
     /// A randomization column is currently required for MsAccess only, so you can pass null.
     /// </summary>
-    /// <param name="TableName">Random column's table</param>
-    /// <param name="ColumnName">Column to randomize by.</param>
+    /// <param name="tableName">Random column's table</param>
+    /// <param name="columnName">Column to randomize by.</param>
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query Randomize(string tableName = null, string columnName = null)
     {
@@ -236,7 +236,7 @@ public partial class Query
     /// Perform an update constraint errors (ON DUPLICATE KEY UPDATE / ON CONFLICT DO UPDATE etc.)
     /// Caution: Supported only by some RDBMS.
     /// </summary>
-    /// <param name="onConflictDoNothing">On conflict rule</param>
+    /// <param name="onConflictDoUpdate">On conflict rule</param>
     public Query SetOnConflictDoUpdate(OnConflict onConflictDoUpdate)
     {
         OnConflictDoUpdate = onConflictDoUpdate;
@@ -281,7 +281,7 @@ public partial class Query
     /// <summary>
     /// Returns a string representation of current Query.
     /// </summary>
-    /// <param name="Connection">Connection to use for building the query.</param>
+    /// <param name="connection">Connection to use for building the query.</param>
     /// <returns>String representation</returns>
     public string ToString(ConnectorBase connection)
     {
@@ -298,6 +298,7 @@ public partial class Query
     /// <param name="columnDefinition">A column definition, so we can adjust the value to it</param>
     /// <param name="value">Value to be prepared</param>
     /// <param name="connection">A connector to use. Mandatory.</param>
+    /// <param name="relatedQuery">The query that this call is involved in. It may be used to fetch the related schema in order to correctly format a type.</param>
     /// <returns>The SQL expression</returns>
     public static string PrepareColumnValue(TableSchema.Column columnDefinition, object value, ConnectorBase connection, Query relatedQuery = null)
     {
@@ -313,6 +314,7 @@ public partial class Query
     /// <param name="value">Value to be prepared</param>
     /// <param name="outputBuilder">The <see cref="StringBuilder"/> to output the SQL expression</param>
     /// <param name="connection">A connector to use. Mandatory.</param>
+    /// <param name="relatedQuery">The query that this call is involved in. It may be used to fetch the related schema in order to correctly format a type.</param>
     public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection, Query relatedQuery = null)
     {
         if (value == null)
@@ -521,7 +523,6 @@ public partial class Query
     /// This does not set an alias, but the actual schema name.
     /// When using an actual TableSchema class, this will allow to reuse it as different table names.
     /// </summary>
-    /// <param name="schemaName">A name, or null to default to current schema or alias.</param>
     public string SchemaAlias
     {
         get { return _SchemaAlias; }

@@ -822,6 +822,7 @@ public partial class Query
     /// <summary>
     /// Will execute the query, and fetch the last inserted ROWID.
     /// </summary>
+    /// <param name="aggregate">The actual aggregate phrase.</param>
     /// <param name="factory">A connector factory.</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Number of affected rows - and the lastInserId</returns>

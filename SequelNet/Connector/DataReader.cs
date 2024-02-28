@@ -1358,7 +1358,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     }
 
     /// <summary>
-    /// This is a synonym for <see cref="GetOrdinal(int)"/>,
+    /// This is a synonym for <see cref="GetOrdinal(string)"/>,
     /// as sometimes the developer looks for it and can't find it. As he looks for a GetColumnIndex(...)
     /// </summary>
     /// <param name="columnName"></param>

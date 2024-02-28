@@ -34,6 +34,7 @@ public partial class Query
     /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
+    /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use for this query.</param>
     /// <returns><see cref="DataReader"/> object</returns>
     public DataReader ExecuteReader(ConnectorBase connection = null, CommandBehavior commandBehavior = CommandBehavior.Default)
     {
@@ -63,6 +64,7 @@ public partial class Query
     /// Will execute the query returning a <see cref="DataReader"/> object.
     /// </summary>
     /// <param name="factory">A connector factory.</param>
+    /// <param name="commandBehavior">The <see cref="CommandBehavior"/> to use for this query.</param>
     /// <returns><see cref="DataReader"/> object</returns>
     public DataReader ExecuteReader(IConnectorFactory factory, CommandBehavior commandBehavior = CommandBehavior.Default)
     {
@@ -238,7 +240,7 @@ public partial class Query
 
     /// <summary>
     /// Will execute the query without reading any results.
-    /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+    /// This is a synonym for <seealso cref="ExecuteNonQuery(ConnectorBase)"/>
     /// </summary>
     /// <param name="connection">An existing connection to use.</param>
     /// <returns>Number of affected rows</returns>
@@ -249,13 +251,13 @@ public partial class Query
 
     /// <summary>
     /// Will execute the query without reading any results.
-    /// This is a synonym for <seealso cref="ExecuteNonQuery"/>
+    /// This is a synonym for <seealso cref="ExecuteNonQuery(IConnectorFactory)"/>
     /// </summary>
     /// <param name="factory">A connector factory.</param>
     /// <returns>Number of affected rows</returns>
     public int Execute(IConnectorFactory factory)
     {
-        return Execute(factory.Connector());
+        return ExecuteNonQuery(factory);
     }
 
     /// <summary>

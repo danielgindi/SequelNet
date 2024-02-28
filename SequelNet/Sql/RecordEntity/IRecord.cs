@@ -8,7 +8,6 @@ namespace SequelNet;
 /// <summary>
 /// Defines an interface for a record representing class - which will supply a schema and a few utility functions
 /// </summary>
-/// <typeparam name="T">The name of the record class</typeparam>
 public interface IRecord
 {
     object GetPrimaryKeyValue();
@@ -66,5 +65,6 @@ public interface IRecord
     /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     Task LoadByParamAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null);
 }
