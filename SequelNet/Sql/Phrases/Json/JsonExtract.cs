@@ -23,37 +23,62 @@ namespace SequelNet.Phrases;
 public class JsonExtract : IPhrase
 {
     public ValueWrapper Value;
-    public string Path = "$";
+    public JsonPathExpression Path = new JsonPathExpression("$");
     public bool Unquote = false;
 
     #region Constructors
 
-    public JsonExtract(object value, ValueObjectType valueType, string path, bool unquote = true)
+    public JsonExtract(object value, ValueObjectType valueType, JsonPathExpression jsonPath, bool unquote = true)
     {
         this.Value = ValueWrapper.Make(value, valueType);
-        this.Path = path;
+        this.Path = jsonPath;
         this.Unquote = unquote;
     }
 
-    public JsonExtract(string tableName, string columnName, string path, bool unquote = true)
+    public JsonExtract(string tableName, string columnName, JsonPathExpression jsonPath, bool unquote = true)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
-        this.Path = path;
+        this.Path = jsonPath;
         this.Unquote = unquote;
     }
 
-    public JsonExtract(string columnName, string path, bool unquote = true)
-        : this(null, columnName, path, unquote)
+    public JsonExtract(string columnName, JsonPathExpression jsonPath, bool unquote = true)
+        : this(null, columnName, jsonPath, unquote)
     {
     }
 
-    public JsonExtract(IPhrase phrase, string path, bool unquote = true)
-        : this(phrase, ValueObjectType.Value, path, unquote)
+    public JsonExtract(IPhrase phrase, JsonPathExpression jsonPath, bool unquote = true)
+        : this(phrase, ValueObjectType.Value, jsonPath, unquote)
     {
     }
 
-    public JsonExtract(Where where, string path, bool unquote = true)
-        : this(where, ValueObjectType.Value, path, unquote)
+    public JsonExtract(Where where, JsonPathExpression jsonPath, bool unquote = true)
+        : this(where, ValueObjectType.Value, jsonPath, unquote)
+    {
+    }
+
+    public JsonExtract(object value, ValueObjectType valueType, string jsonPath, bool unquote = true)
+        : this(value, valueType, new JsonPathExpression(jsonPath), unquote)
+    {
+    }
+
+    public JsonExtract(string tableName, string columnName, string jsonPath, bool unquote = true)
+        : this(tableName, columnName, new JsonPathExpression(jsonPath), unquote)
+    {
+    }
+
+    public JsonExtract(string columnName, string jsonPath, bool unquote = true)
+        : this(columnName, new JsonPathExpression(jsonPath), unquote)
+    {
+    }
+
+    public JsonExtract(IPhrase phrase, string jsonPath, bool unquote = true)
+        : this(phrase, new JsonPathExpression(jsonPath), unquote)
+    {
+    }
+
+    public JsonExtract(Where where, string jsonPath, bool unquote = true)
+        : this(where, new JsonPathExpression(jsonPath), unquote)
     {
     }
 

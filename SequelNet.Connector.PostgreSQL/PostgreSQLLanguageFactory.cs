@@ -641,12 +641,14 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonExtract(
-            ValueWrapper value, string path, bool unquote,
+            ValueWrapper value, JsonPathExpression path, bool unquote,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             // No support for returning "self". Postgres works with actual json Objects.
-            var parts = JsonPathValue.GetPathParts(path);
-            if (parts.Count > 0 && parts[0] == "$")
+            var parts = path.GetParts();
+            if (parts.Count > 0 && 
+                parts[0].Value.Type == ValueObjectType.Value && 
+                parts[0].Value.Value as string == "$")
             {
                 parts.RemoveAt(0);
             }
@@ -655,8 +657,8 @@ namespace SequelNet.Connector
             foreach (var part in parts)
             {
                 if (pgPath.Length > 0)
-                    pgPath += $", {PrepareValue(part)}";
-                else pgPath += PrepareValue(part);
+                    pgPath += $", ";
+                pgPath += part.Value.Build(conn, relatedQuery);
             }
 
             sb.Append("json_extract_path_text(");
@@ -666,26 +668,31 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonContains(
-            ValueWrapper target, ValueWrapper candidate, string path,
+            ValueWrapper target, ValueWrapper candidate, JsonPathExpression path,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             sb.Append("(");
 
             bool hasPath = false;
 
-            if (!string.IsNullOrEmpty(path))
+            if (path.GetParts().Count > 0)
             {
-                var parts = JsonPathValue.GetPathParts(path);
-                if (parts.Count > 0 && parts[0] == "$")
+                var parts = path.GetParts();
+                if (parts.Count > 0 &&
+                    parts[0].Value.Type == ValueObjectType.Value &&
+                    parts[0].Value.Value as string == "$")
                 {
                     parts.RemoveAt(0);
+                }
 
+                if (parts.Count > 0)
+                {
                     var pgPath = "";
                     foreach (var part in parts)
                     {
                         if (pgPath.Length > 0)
-                            pgPath += $", {PrepareValue(part)}";
-                        else pgPath += PrepareValue(part);
+                            pgPath += $", ";
+                        pgPath += part.Value.Build(conn, relatedQuery);
                     }
 
                     sb.Append("json_extract_path(");
@@ -707,15 +714,17 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonExtractValue(
-            ValueWrapper value, string path,
+            ValueWrapper value, JsonPathExpression path,
             DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             // No support for returning "self". Postgres works with actual json Objects.
-            var parts = JsonPathValue.GetPathParts(path);
-            if (parts.Count > 0 && parts[0] == "$")
+            var parts = path.GetParts();
+            if (parts.Count > 0 &&
+                parts[0].Value.Type == ValueObjectType.Value &&
+                parts[0].Value.Value as string == "$")
             {
                 parts.RemoveAt(0);
             }
@@ -724,8 +733,8 @@ namespace SequelNet.Connector
             foreach (var part in parts)
             {
                 if (pgPath.Length > 0)
-                    pgPath += ", " + PrepareValue(part);
-                else pgPath += PrepareValue(part);
+                    pgPath += ", ";
+                pgPath += part.Value.Build(conn, relatedQuery);
             }
 
             if (returnType != null)

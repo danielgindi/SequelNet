@@ -448,14 +448,14 @@ public class LanguageFactory
     }
 
     public virtual void BuildJsonExtract(
-        ValueWrapper value, string path, bool unquote,
+        ValueWrapper value, JsonPathExpression path, bool unquote,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
         throw new NotImplementedException("JSON_EXTRACT has not been implemented for this connector");
     }
 
     public virtual void BuildJsonContains(
-        ValueWrapper target, ValueWrapper candidate, string path,
+        ValueWrapper target, ValueWrapper candidate, JsonPathExpression path,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
         throw new NotImplementedException("JSON_CONTAINS has not been implemented for this connector");
@@ -469,7 +469,7 @@ public class LanguageFactory
     }
 
     public virtual void BuildJsonExtractValue(
-        ValueWrapper value, string path, 
+        ValueWrapper value, JsonPathExpression path, 
         DataTypeDef returnType,
         Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
         Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,

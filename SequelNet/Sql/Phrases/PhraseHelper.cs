@@ -629,6 +629,26 @@ public static class PhraseHelper
         return new JsonArrayInsert(doc, path, value);
     }
 
+    public static JsonContains JsonContains(ValueWrapper target, ValueWrapper candidate, JsonPathExpression path = null)
+    {
+        return new JsonContains(target, candidate, path);
+    }
+
+    public static JsonContains JsonContains(object target, ValueObjectType targetType, object candidate, ValueObjectType candidateType, JsonPathExpression path = null)
+    {
+        return new JsonContains(target, targetType, candidate, candidateType, path);
+    }
+
+    public static JsonContains JsonContains(string targetTableName, string targetColumnName, object candidate, ValueObjectType candidateType, JsonPathExpression path = null)
+    {
+        return new JsonContains(targetTableName, targetColumnName, candidate, candidateType, path);
+    }
+
+    public static JsonContains JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, JsonPathExpression path = null)
+    {
+        return new JsonContains(target, candidate, candidateType, path);
+    }
+
     public static JsonContains JsonContains(ValueWrapper target, ValueWrapper candidate, string path = null)
     {
         return new JsonContains(target, candidate, path);
@@ -647,6 +667,31 @@ public static class PhraseHelper
     public static JsonContains JsonContains(IPhrase target, object candidate, ValueObjectType candidateType, string path = null)
     {
         return new JsonContains(target, candidate, candidateType, path);
+    }
+
+    public static JsonExtract JsonExtract(object value, ValueObjectType valueType, JsonPathExpression path, bool unquote = true)
+    {
+        return new JsonExtract(value, valueType, path, unquote);
+    }
+
+    public static JsonExtract JsonExtract(string tableName, string columnName, JsonPathExpression path, bool unquote = true)
+    {
+        return new JsonExtract(tableName, columnName, path, unquote);
+    }
+
+    public static JsonExtract JsonExtract(string columnName, JsonPathExpression path, bool unquote = true)
+    {
+        return new JsonExtract(columnName, path, unquote);
+    }
+
+    public static JsonExtract JsonExtract(IPhrase phrase, JsonPathExpression path, bool unquote = true)
+    {
+        return new JsonExtract(phrase, path, unquote);
+    }
+
+    public static JsonExtract JsonExtract(Where where, JsonPathExpression path, bool unquote = true)
+    {
+        return new JsonExtract(where, path, unquote);
     }
 
     public static JsonExtract JsonExtract(object value, ValueObjectType valueType, string path, bool unquote = true)
@@ -672,6 +717,51 @@ public static class PhraseHelper
     public static JsonExtract JsonExtract(Where where, string path, bool unquote = true)
     {
         return new JsonExtract(where, path, unquote);
+    }
+
+    static public JsonValue JsonValue(object value, ValueObjectType valueType, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+        JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+    {
+        return new JsonValue(value, valueType, path,
+            returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+    }
+
+    static public JsonValue JsonValue(string tableName, string columnName, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+        JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+    {
+        return new JsonValue(tableName, columnName, path,
+            returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+    }
+
+    static public JsonValue JsonValue(string columnName, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+        JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+    {
+        return new JsonValue(columnName, path,
+            returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+    }
+
+    static public JsonValue JsonValue(IPhrase phrase, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+        JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+    {
+        return new JsonValue(phrase, path,
+            returnType, onEmpty, onEmptyValue, onError, onErrorValue);
+    }
+
+    static public JsonValue JsonValue(Where where, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        JsonValue.DefaultAction onEmpty = Phrases.JsonValue.DefaultAction.Value, object onEmptyValue = null,
+        JsonValue.DefaultAction onError = Phrases.JsonValue.DefaultAction.Value, object onErrorValue = null)
+    {
+        return new JsonValue(where, path,
+            returnType, onEmpty, onEmptyValue, onError, onErrorValue);
     }
 
     static public JsonValue JsonValue(object value, ValueObjectType valueType, string path,

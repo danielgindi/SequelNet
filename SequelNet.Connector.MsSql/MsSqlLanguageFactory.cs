@@ -688,16 +688,18 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonExtract(
-            ValueWrapper value, string path, bool unquote,
+            ValueWrapper value, JsonPathExpression path, bool unquote,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             sb.Append("JSON_VALUE(");
             value.Build(sb, conn, relatedQuery);
-            sb.Append($", {PrepareValue(path)})");
+            sb.Append(", ");
+            path.GetPath().Build(sb, conn, relatedQuery);
+            sb.Append(")");
         }
 
         public override void BuildJsonExtractValue(
-            ValueWrapper value, string path,
+            ValueWrapper value, JsonPathExpression path,
             DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
@@ -710,14 +712,18 @@ namespace SequelNet.Connector
                 {
                     sb.Append("CAST(JSON_VALUE(");
                     value.Build(sb, conn, relatedQuery);
-                    sb.Append($", {PrepareValue(path)}) AS {typeString})");
+                    sb.Append(", ");
+                    path.GetPath().Build(sb, conn, relatedQuery);
+                    sb.Append($") AS {typeString})");
                     return;
                 }
             }
 
             sb.Append("JSON_VALUE(");
             value.Build(sb, conn, relatedQuery);
-            sb.Append($", {PrepareValue(path)})");
+            sb.Append(", ");
+            path.GetPath().Build(sb, conn, relatedQuery);
+            sb.Append(")");
         }
 
         public override void BuildSeparateRenameColumn(

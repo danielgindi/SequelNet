@@ -891,10 +891,12 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonExtract(
-            ValueWrapper value, string path, bool unquote,
+            ValueWrapper value, JsonPathExpression path, bool unquote,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
-            var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, {PrepareValue(path)})";
+            var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, ";
+            phrase += path.GetPath().Build(conn, relatedQuery);
+            phrase += ")";
 
             if (unquote)
             {
@@ -911,7 +913,7 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonContains(
-            ValueWrapper target, ValueWrapper candidate, string path,
+            ValueWrapper target, ValueWrapper candidate, JsonPathExpression path,
             StringBuilder sb, ConnectorBase conn, Query relatedQuery)
         {
             sb.Append("JSON_CONTAINS(");
@@ -919,8 +921,11 @@ namespace SequelNet.Connector
             sb.Append(", ");
             candidate.Build(sb, conn, relatedQuery);
 
-            if (!string.IsNullOrEmpty(path))
-                sb.Append($", {PrepareValue(path)}");
+            if (!path.IsEmpty())
+            {
+                sb.Append(", ");
+                path.GetPath().Build(sb, conn, relatedQuery);
+            }
 
             sb.Append(")");
         }
@@ -941,7 +946,7 @@ namespace SequelNet.Connector
         }
 
         public override void BuildJsonExtractValue(
-            ValueWrapper value, string path,
+            ValueWrapper value, JsonPathExpression path,
             DataTypeDef returnType,
             Phrases.JsonValue.DefaultAction onEmptyAction, object onEmptyValue,
             Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
@@ -951,7 +956,7 @@ namespace SequelNet.Connector
             {
                 sb.Append("JSON_VALUE(");
                 value.Build(sb, conn, relatedQuery);
-                sb.Append($", {PrepareValue(path)}");
+                sb.Append($", {path.GetPath().Build(conn, relatedQuery)}");
 
                 if (returnType != null)
                 {
@@ -988,7 +993,7 @@ namespace SequelNet.Connector
             }
             else
             {
-                var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, {PrepareValue(path)})";
+                var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, {path.GetPath().Build(conn, relatedQuery)})";
 
                 if (returnType != null)
                 {

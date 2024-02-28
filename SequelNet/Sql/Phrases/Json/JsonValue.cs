@@ -23,7 +23,7 @@ namespace SequelNet.Phrases;
 public class JsonValue : IPhrase
 {
     public ValueWrapper Value;
-    public string Path = "$";
+    public JsonPathExpression Path = new JsonPathExpression("$");
     public DataTypeDef ReturnType = null;
     public DefaultAction OnEmptyAction = DefaultAction.Value;
     public object OnEmptyValue = null;
@@ -32,7 +32,7 @@ public class JsonValue : IPhrase
 
     #region Constructors
 
-    public JsonValue(object value, ValueObjectType valueType, string path,
+    public JsonValue(object value, ValueObjectType valueType, JsonPathExpression path,
         DataTypeDef returnType = null,
         DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
         DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
@@ -46,7 +46,7 @@ public class JsonValue : IPhrase
         this.OnErrorValue = onErrorValue;
     }
 
-    public JsonValue(string tableName, string columnName, string path,
+    public JsonValue(string tableName, string columnName, JsonPathExpression path,
         DataTypeDef returnType = null,
         DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
         DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
@@ -58,6 +58,52 @@ public class JsonValue : IPhrase
         this.OnEmptyValue = onEmptyValue;
         this.OnErrorAction = onError;
         this.OnErrorValue = onErrorValue;
+    }
+
+    public JsonValue(string columnName, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
+        DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
+        : this(null, columnName, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)
+    {
+    }
+
+    public JsonValue(IPhrase phrase, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
+        DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
+        : this(phrase, ValueObjectType.Value, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)
+    {
+    }
+
+    public JsonValue(Where where, JsonPathExpression path,
+        DataTypeDef returnType = null,
+        DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
+        DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
+        : this(where, ValueObjectType.Value, path, returnType, onEmpty, onEmptyValue, onError, onErrorValue)
+    {
+    }
+
+    public JsonValue(object value, ValueObjectType valueType, string path,
+        DataTypeDef returnType = null,
+        DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
+        DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
+        : this(value, valueType, new JsonPathExpression(path),
+               returnType,
+               onEmpty, onEmptyValue,
+               onError, onErrorValue)
+    {
+    }
+
+    public JsonValue(string tableName, string columnName, string path,
+        DataTypeDef returnType = null,
+        DefaultAction onEmpty = DefaultAction.Value, object onEmptyValue = null,
+        DefaultAction onError = DefaultAction.Value, object onErrorValue = null)
+        : this(tableName, columnName, new JsonPathExpression(path),
+               returnType,
+               onEmpty, onEmptyValue,
+               onError, onErrorValue)
+    {
     }
 
     public JsonValue(string columnName, string path,
