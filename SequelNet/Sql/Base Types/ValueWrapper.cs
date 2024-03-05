@@ -215,7 +215,14 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
         }
         else if (Type == ValueObjectType.Value)
         {
-            ret += "(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")";
+            if (Value is WhereList || Value is Where)
+            {
+                ret += "(" + conn.Language.PrepareValue(conn, Value, relatedQuery) + ")";
+            }
+            else
+            {
+                ret += conn.Language.PrepareValue(conn, Value, relatedQuery);
+            }
         }
         else
         {
@@ -243,6 +250,12 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
             {
                 sb.Append("(");
                 ((Where)Value).BuildCommand(sb, true, new Where.BuildContext { Conn = conn, RelatedQuery = relatedQuery });
+                sb.Append(")");
+            }
+            else if (Value is WhereList)
+            {
+                sb.Append("(");
+                ((WhereList)Value).BuildCommand(sb, new Where.BuildContext { Conn = conn, RelatedQuery = relatedQuery });
                 sb.Append(")");
             }
             else
