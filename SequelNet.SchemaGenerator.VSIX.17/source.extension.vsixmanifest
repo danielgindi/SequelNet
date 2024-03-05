@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="SequelNet.SchemaGenerator.VSIX.176ea402-5f99-4669-b815-0121310c482e" Version="3.0.127" Language="en-US" Publisher="Daniel Cohen Gindi" />
+        <Identity Id="SequelNet.SchemaGenerator.VSIX.176ea402-5f99-4669-b815-0121310c482e" Version="3.0.128" Language="en-US" Publisher="Daniel Cohen Gindi" />
         <DisplayName>SequelNet Schema Generator</DisplayName>
         <Description xml:space="preserve">A schema code generator for SequelNet. Takes a pseudo-script, and outputs a full C# code.</Description>
         <MoreInfo>https://github.com/danielgindi/SequelNet</MoreInfo>
