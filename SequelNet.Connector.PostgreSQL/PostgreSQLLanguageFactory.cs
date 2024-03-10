@@ -675,7 +675,7 @@ namespace SequelNet.Connector
 
             bool hasPath = false;
 
-            if (path.GetParts().Count > 0)
+            if (path != null && path.GetParts().Count > 0)
             {
                 var parts = path.GetParts();
                 if (parts.Count > 0 &&

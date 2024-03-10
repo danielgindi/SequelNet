@@ -921,7 +921,7 @@ namespace SequelNet.Connector
             sb.Append(", ");
             candidate.Build(sb, conn, relatedQuery);
 
-            if (!path.IsEmpty())
+            if (path != null && !path.IsEmpty())
             {
                 sb.Append(", ");
                 path.GetPath().Build(sb, conn, relatedQuery);
