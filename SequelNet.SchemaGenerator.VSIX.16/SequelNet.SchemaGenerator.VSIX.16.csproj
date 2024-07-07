@@ -127,7 +127,7 @@
       <Version>8.0.0.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.SDK">
-      <Version>15.0.1</Version>
+      <Version>17.10.40171</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
