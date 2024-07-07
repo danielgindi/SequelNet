@@ -454,7 +454,12 @@ namespace SequelNet.Connector
             {
                 sb.Append(" AS ");
 
+                var parenthesis = column.ComputedColumn.Value.Value is IPhrase;
+                if (parenthesis)
+                    sb.Append("(");
                 sb.Append(column.ComputedColumn?.Build(connection, relatedQuery));
+                if (parenthesis)
+                    sb.Append(")");
 
                 if (column.ComputedColumnStored)
                 {
