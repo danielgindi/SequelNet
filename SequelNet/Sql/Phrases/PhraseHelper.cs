@@ -879,6 +879,11 @@ public static class PhraseHelper
         return new JsonObject();
     }
 
+    public static JsonObject JsonObject(Dictionary<ValueWrapper, ValueWrapper> values)
+    {
+        return new JsonObject(values);
+    }
+
     public static JsonObject JsonObject(Dictionary<string, ValueWrapper> values)
     {
         return new JsonObject(values);
