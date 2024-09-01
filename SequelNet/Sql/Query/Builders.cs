@@ -172,6 +172,11 @@ public partial class Query
                     sb.Append(join.RightTableSchema != null ? join.RightTableSchema.Name : @"");
                 }
 
+                if (join.IndexHints != null && join.IndexHints.Count > 0)
+                {
+                    connection.Language.BuildIndexHints(join.IndexHints, sb, connection, this);
+                }
+
                 if (join.Pairs.Count > 1)
                 {
                     sb.Append(@" ON ");

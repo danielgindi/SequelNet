@@ -222,6 +222,7 @@ internal class Join
     private object _RightTableSql;
     private string _RightTableAlias;
     private List<JoinColumnPair> _Pairs = new List<JoinColumnPair>();
+    private IndexHintList _IndexHints;
 
     public Join(JoinType joinType,
         TableSchema leftTableSchema, string leftColumn, string leftTableAlias,
@@ -247,6 +248,7 @@ internal class Join
 
     public Join(JoinType joinType,
         TableSchema rightTableSchema, string rightTableAlias,
+        IndexHintList indexHints,
         params JoinColumnPair[] pairs)
     {
         _JoinType = joinType;
@@ -254,10 +256,12 @@ internal class Join
         _RightTableSchema = rightTableSchema;
         _RightTableAlias = rightTableAlias;
         if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
+        _IndexHints = indexHints;
     }
 
     public Join(JoinType joinType,
         object rightTableSql, string rightTableAlias,
+        IndexHintList indexHints,
         params JoinColumnPair[] pairs)
     {
         _JoinType = joinType;
@@ -265,6 +269,21 @@ internal class Join
         _RightTableSql = rightTableSql;
         _RightTableAlias = rightTableAlias;
         if (_RightTableAlias == null) _RightTableAlias = _RightTableSchema.Name;
+        _IndexHints = indexHints;
+    }
+
+    public Join(JoinType joinType,
+        TableSchema rightTableSchema, string rightTableAlias,
+        params JoinColumnPair[] pairs)
+        : this(joinType, rightTableSchema, rightTableAlias, null, pairs)
+    {
+    }
+
+    public Join(JoinType joinType,
+        object rightTableSql, string rightTableAlias,
+        params JoinColumnPair[] pairs)
+        : this(joinType, rightTableSql, rightTableAlias, null, pairs)
+    {
     }
 
     public JoinType JoinType
@@ -288,6 +307,12 @@ internal class Join
     {
         get { return _RightTableAlias; }
         set { _RightTableAlias = value; }
+    }
+
+    public IndexHintList IndexHints
+    {
+        get { return _IndexHints; }
+        set { _IndexHints = value; }
     }
 
     public List<JoinColumnPair> Pairs
