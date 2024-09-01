@@ -104,176 +104,178 @@ public partial class Query
 
     private void BuildJoin(StringBuilder sb, ConnectorBase connection)
     {
-        if (_ListJoin != null)
+        if (_ListJoin == null)
+            return;
+
+        var language = connection.Language;
+
+        foreach (Join join in _ListJoin)
         {
-            var language = connection.Language;
-
-            foreach (Join join in _ListJoin)
+            switch (join.JoinType)
             {
-                switch (join.JoinType)
-                {
-                    case JoinType.InnerJoin:
-                        sb.Append(@" INNER JOIN ");
-                        break;
-                    case JoinType.LeftJoin:
-                        sb.Append(@" LEFT JOIN ");
-                        break;
-                    case JoinType.RightJoin:
-                        sb.Append(@" RIGHT JOIN ");
-                        break;
-                    case JoinType.LeftOuterJoin:
-                        sb.Append(@" LEFT OUTER JOIN ");
-                        break;
-                    case JoinType.RightOuterJoin:
-                        sb.Append(@" RIGHT OUTER JOIN ");
-                        break;
-                    case JoinType.FullOuterJoin:
-                        sb.Append(@" FULL OUTER JOIN ");
-                        break;
-                }
+                case JoinType.InnerJoin:
+                    sb.Append(@" INNER JOIN ");
+                    break;
+                case JoinType.LeftJoin:
+                    sb.Append(@" LEFT JOIN ");
+                    break;
+                case JoinType.RightJoin:
+                    sb.Append(@" RIGHT JOIN ");
+                    break;
+                case JoinType.LeftOuterJoin:
+                    sb.Append(@" LEFT OUTER JOIN ");
+                    break;
+                case JoinType.RightOuterJoin:
+                    sb.Append(@" RIGHT OUTER JOIN ");
+                    break;
+                case JoinType.FullOuterJoin:
+                    sb.Append(@" FULL OUTER JOIN ");
+                    break;
+            }
 
-                if (join.RightTableSchema != null)
+            if (join.RightTableSchema != null)
+            {
+                if (join.RightTableSchema.DatabaseOwner.Length > 0)
                 {
-                    if (join.RightTableSchema.DatabaseOwner.Length > 0)
-                    {
-                        sb.Append(language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
-                        sb.Append('.');
-                    }
-                    sb.Append(language.WrapFieldName(join.RightTableSchema.Name));
+                    sb.Append(language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
+                    sb.Append('.');
+                }
+                sb.Append(language.WrapFieldName(join.RightTableSchema.Name));
+            }
+            else
+            {
+                if (join.RightTableSql is Query)
+                {
+                    sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
+                }
+                else if (join.RightTableSql is Phrases.Union)
+                {
+                    sb.Append('(');
+                    ((IPhrase)join.RightTableSql).Build(sb, connection);
+                    sb.Append(')');
+                }
+                else if (join.RightTableSql is IPhrase)
+                {
+                    ((IPhrase)join.RightTableSql).Build(sb, connection);
                 }
                 else
                 {
-                    if (join.RightTableSql is Query)
+                    sb.Append(join.RightTableSql.ToString());
+                }
+            }
+
+            if (join.RightTableAlias != null)
+            {
+                sb.Append(' ');
+                sb.Append(language.WrapFieldName(join.RightTableAlias));
+            }
+            else
+            {
+                sb.Append(' ');
+                sb.Append(join.RightTableSchema != null ? language.WrapFieldName(join.RightTableSchema.Name) : @"");
+            }
+
+            if (join.IndexHints != null && join.IndexHints.Count > 0)
+            {
+                language.BuildIndexHints(join.IndexHints, sb, connection, this);
+            }
+
+            if (join.Pairs.Count > 1)
+            {
+                sb.Append(@" ON ");
+
+                var wl = new WhereList();
+
+                foreach (var joins in join.Pairs)
+                    wl.AddRange(joins);
+
+                wl.BuildCommand(
+                    sb,
+                    new Where.BuildContext
                     {
-                        sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
-                    }
-                    else if (join.RightTableSql is Phrases.Union)
+                        Conn = connection,
+                        RelatedQuery = this,
+                        RightTableSchema = join.RightTableSchema,
+                        RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
+                    });
+            }
+            else if (join.Pairs.Count == 1)
+            {
+                sb.Append(@" ON ");
+                join.Pairs[0].BuildCommand(
+                    sb,
+                    new Where.BuildContext
                     {
-                        sb.Append('(');
-                        ((IPhrase)join.RightTableSql).Build(sb, connection);
-                        sb.Append(')');
-                    }
-                    else if (join.RightTableSql is IPhrase)
-                    {
-                        ((IPhrase)join.RightTableSql).Build(sb, connection);
-                    }
-                    else
-                    {
-                        sb.Append(join.RightTableSql.ToString());
-                    }
-                }
-
-                if (join.RightTableAlias != null)
-                {
-                    sb.Append(' ');
-                    sb.Append(language.WrapFieldName(join.RightTableAlias));
-                }
-                else
-                {
-                    sb.Append(' ');
-                    sb.Append(join.RightTableSchema != null ? language.WrapFieldName(join.RightTableSchema.Name) : @"");
-                }
-
-                if (join.IndexHints != null && join.IndexHints.Count > 0)
-                {
-                    language.BuildIndexHints(join.IndexHints, sb, connection, this);
-                }
-
-                if (join.Pairs.Count > 1)
-                {
-                    sb.Append(@" ON ");
-
-                    var wl = new WhereList();
-
-                    foreach (var joins in join.Pairs)
-                        wl.AddRange(joins);
-
-                    wl.BuildCommand(
-                        sb,
-                        new Where.BuildContext {
-                            Conn = connection,
-                            RelatedQuery = this,
-                            RightTableSchema = join.RightTableSchema, 
-                            RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias });
-                }
-                else if (join.Pairs.Count == 1)
-                {
-                    sb.Append(@" ON ");
-                    join.Pairs[0].BuildCommand(
-                        sb,
-                        new Where.BuildContext
-                        {
-                            Conn = connection,
-                            RelatedQuery = this,
-                            RightTableSchema = join.RightTableSchema,
-                            RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
-                        });
-                }
+                        Conn = connection,
+                        RelatedQuery = this,
+                        RightTableSchema = join.RightTableSchema,
+                        RightTableName = join.RightTableAlias == null ? join.RightTableSchema.Name : join.RightTableAlias
+                    });
             }
         }
     }
 
     private void BuildOrderBy(StringBuilder sb, ConnectorBase connection, bool invert)
     {
-        if (_ListOrderBy != null && _ListOrderBy.Count > 0)
-        {
-            _ListOrderBy.BuildCommand(sb, connection, this, invert);
-        }
+        if (_ListOrderBy == null || _ListOrderBy.Count <= 0)
+            return;
+
+        _ListOrderBy.BuildCommand(sb, connection, this, invert);
     }
 
     private void BuildGroupBy(StringBuilder sb, ConnectorBase connection, bool invert)
     {
-        if (_ListGroupBy != null && _ListGroupBy.Count > 0)
-        {
-            sb.Append(@" GROUP BY ");
-            bool first = true;
-            foreach (GroupBy groupBy in _ListGroupBy)
-            {
-                if (first) first = false;
-                else sb.Append(',');
+        if (_ListGroupBy == null || _ListGroupBy.Count <= 0)
+            return;
 
-                if (groupBy.ColumnName is IPhrase)
+        sb.Append(@" GROUP BY ");
+        bool first = true;
+        foreach (GroupBy groupBy in _ListGroupBy)
+        {
+            if (first) first = false;
+            else sb.Append(',');
+
+            if (groupBy.ColumnName is IPhrase)
+            {
+                ((IPhrase)groupBy.ColumnName).Build(sb, connection, this);
+            }
+            else if (groupBy.ColumnName is Where)
+            {
+                ((Where)groupBy.ColumnName).BuildCommand(sb, true, new Where.BuildContext
                 {
-                    ((IPhrase)groupBy.ColumnName).Build(sb, connection, this);
-                }
-                else if (groupBy.ColumnName is Where)
+                    Conn = connection,
+                    RelatedQuery = this
+                });
+            }
+            else if (groupBy.IsLiteral)
+            {
+                sb.Append(groupBy.ColumnName);
+            }
+            else
+            {
+                if (groupBy.TableName != null)
                 {
-                    ((Where)groupBy.ColumnName).BuildCommand(sb, true, new Where.BuildContext
-                    {
-                        Conn = connection,
-                        RelatedQuery = this
-                    });
-                }
-                else if (groupBy.IsLiteral)
-                {
-                    sb.Append(groupBy.ColumnName);
+                    sb.Append(connection.Language.WrapFieldName(groupBy.TableName) + @"." + connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
                 }
                 else
                 {
-                    if (groupBy.TableName != null)
-                    {
-                        sb.Append(connection.Language.WrapFieldName(groupBy.TableName) + @"." + connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
-                    }
-                    else
-                    {
-                        sb.Append(connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
-                    }
+                    sb.Append(connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
                 }
+            }
 
-                if (connection.Language.GroupBySupportsOrdering)
+            if (connection.Language.GroupBySupportsOrdering)
+            {
+                switch (groupBy.SortDirection)
                 {
-                    switch (groupBy.SortDirection)
-                    {
-                        default:
-                        case SortDirection.None:
-                            break;
-                        case SortDirection.ASC:
-                            sb.Append(invert ? @" DESC" : @" ASC");
-                            break;
-                        case SortDirection.DESC:
-                            sb.Append(invert ? @" ASC" : @" DESC");
-                            break;
-                    }
+                    default:
+                    case SortDirection.None:
+                        break;
+                    case SortDirection.ASC:
+                        sb.Append(invert ? @" DESC" : @" ASC");
+                        break;
+                    case SortDirection.DESC:
+                        sb.Append(invert ? @" ASC" : @" DESC");
+                        break;
                 }
             }
         }
@@ -281,15 +283,15 @@ public partial class Query
 
     private void BuildHaving(StringBuilder sb, ConnectorBase connection)
     {
-        if (_ListHaving != null && _ListHaving.Count > 0)
+        if (_ListHaving == null || _ListHaving.Count <= 0)
+            return;
+
+        sb.Append(@" HAVING ");
+        _ListHaving.BuildCommand(sb, new Where.BuildContext
         {
-            sb.Append(@" HAVING ");
-            _ListHaving.BuildCommand(sb, new Where.BuildContext
-            {
-                Conn = connection,
-                RelatedQuery = this
-            });
-        }
+            Conn = connection,
+            RelatedQuery = this
+        });
     }
 
     public string BuildCommand()
