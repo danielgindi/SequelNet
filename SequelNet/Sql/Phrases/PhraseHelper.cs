@@ -2103,9 +2103,19 @@ public static class PhraseHelper
         return new Max(columnName);
     }
 
-    public static Max Max(IPhrase phrase)
+    public static Max Max(IPhrase phrase, bool distinct = false)
     {
-        return new Max(phrase);
+        return new Max(phrase, distinct);
+    }
+
+    public static Max Max(Where where, bool distinct = false)
+    {
+        return new Max(where, distinct);
+    }
+
+    public static Max Max(WhereList where, bool distinct = false)
+    {
+        return new Max(where, distinct);
     }
 
     public static Min Min(object value, ValueObjectType valueType)
@@ -2123,9 +2133,19 @@ public static class PhraseHelper
         return new Min(columnName);
     }
 
-    public static Min Min(IPhrase phrase)
+    public static Min Min(IPhrase phrase, bool distinct = false)
     {
-        return new Min(phrase);
+        return new Min(phrase, distinct);
+    }
+
+    public static Min Min(Where where, bool distinct = false)
+    {
+        return new Min(where, distinct);
+    }
+
+    public static Min Min(WhereList where, bool distinct = false)
+    {
+        return new Min(where, distinct);
     }
 
     public static PassThroughAggregate PassThroughAggregate(string aggregateType, object value, ValueObjectType valueType)
@@ -2273,9 +2293,19 @@ public static class PhraseHelper
         return new Sum(columnName);
     }
 
-    public static Sum Sum(IPhrase phrase)
+    public static Sum Sum(IPhrase phrase, bool distinct = false)
     {
-        return new Sum(phrase);
+        return new Sum(phrase, distinct);
+    }
+
+    public static Sum Sum(Where where, bool distinct = false)
+    {
+        return new Sum(where, distinct);
+    }
+
+    public static Sum Sum(WhereList where, bool distinct = false)
+    {
+        return new Sum(where, distinct);
     }
 
     #endregion
