@@ -106,6 +106,8 @@ public partial class Query
     {
         if (_ListJoin != null)
         {
+            var language = connection.Language;
+
             foreach (Join join in _ListJoin)
             {
                 switch (join.JoinType)
@@ -134,10 +136,10 @@ public partial class Query
                 {
                     if (join.RightTableSchema.DatabaseOwner.Length > 0)
                     {
-                        sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
+                        sb.Append(language.WrapFieldName(join.RightTableSchema.DatabaseOwner));
                         sb.Append('.');
                     }
-                    sb.Append(connection.Language.WrapFieldName(join.RightTableSchema.Name));
+                    sb.Append(language.WrapFieldName(join.RightTableSchema.Name));
                 }
                 else
                 {
@@ -161,20 +163,20 @@ public partial class Query
                     }
                 }
 
-                sb.Append(' ');
-
                 if (join.RightTableAlias != null)
                 {
-                    sb.Append(join.RightTableAlias);
+                    sb.Append(' ');
+                    sb.Append(language.WrapFieldName(join.RightTableAlias));
                 }
                 else
                 {
-                    sb.Append(join.RightTableSchema != null ? join.RightTableSchema.Name : @"");
+                    sb.Append(' ');
+                    sb.Append(join.RightTableSchema != null ? language.WrapFieldName(join.RightTableSchema.Name) : @"");
                 }
 
                 if (join.IndexHints != null && join.IndexHints.Count > 0)
                 {
-                    connection.Language.BuildIndexHints(join.IndexHints, sb, connection, this);
+                    language.BuildIndexHints(join.IndexHints, sb, connection, this);
                 }
 
                 if (join.Pairs.Count > 1)
