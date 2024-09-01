@@ -22,6 +22,28 @@ public partial class Query
         _ListJoin.Add(join);
         return this;
     }
+    public Query Join(JoinType joinType,
+        TableSchema rightTableSchema, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        if (_ListJoin == null) _ListJoin = new JoinList();
+        Join join = new Join(joinType, rightTableSchema, rightTableAlias, indexHints, pairs);
+        _ListJoin.Add(join);
+        TableAliasMap[join.RightTableAlias] = join.RightTableSchema;
+        return this;
+    }
+
+    public Query Join(JoinType joinType,
+        object rightTableSql, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        if (_ListJoin == null) _ListJoin = new JoinList();
+        Join join = new Join(joinType, rightTableSql, rightTableAlias, indexHints, pairs);
+        _ListJoin.Add(join);
+        return this;
+    }
             
     public Query LeftJoin(
         TableSchema rightTableSchema, string rightTableAlias,
@@ -35,6 +57,22 @@ public partial class Query
         params JoinColumnPair[] pairs)
     {
         return Join(JoinType.LeftJoin, rightTableSql, rightTableAlias, pairs);
+    }
+            
+    public Query LeftJoin(
+        TableSchema rightTableSchema, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.LeftJoin, rightTableSchema, rightTableAlias, indexHints, pairs);
+    }
+
+    public Query LeftJoin(
+        object rightTableSql, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.LeftJoin, rightTableSql, rightTableAlias, indexHints, pairs);
     }
 
     public Query RightJoin(
@@ -51,6 +89,22 @@ public partial class Query
         return Join(JoinType.RightJoin, rightTableSql, rightTableAlias, pairs);
     }
 
+    public Query RightJoin(
+        TableSchema rightTableSchema, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.RightJoin, rightTableSchema, rightTableAlias, indexHints, pairs);
+    }
+
+    public Query RightJoin(
+        object rightTableSql, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.RightJoin, rightTableSql, rightTableAlias, indexHints, pairs);
+    }
+
     public Query InnerJoin(
         TableSchema rightTableSchema, string rightTableAlias,
         params JoinColumnPair[] pairs)
@@ -63,6 +117,22 @@ public partial class Query
         params JoinColumnPair[] pairs)
     {
         return Join(JoinType.InnerJoin, rightTableSql, rightTableAlias, pairs);
+    }
+
+    public Query InnerJoin(
+        TableSchema rightTableSchema, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.InnerJoin, rightTableSchema, rightTableAlias, indexHints, pairs);
+    }
+
+    public Query InnerJoin(
+        object rightTableSql, string rightTableAlias,
+        IndexHintList indexHints,
+        params JoinColumnPair[] pairs)
+    {
+        return Join(JoinType.InnerJoin, rightTableSql, rightTableAlias, indexHints, pairs);
     }
 
     public Query LeftOuterJoin(
