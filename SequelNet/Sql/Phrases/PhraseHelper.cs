@@ -1231,6 +1231,31 @@ public static class PhraseHelper
         return new Collate(phrase, collation, direction);
     }
 
+    public static Cast Cast(ValueWrapper value, DataTypeDef typeDef)
+    {
+        return new Cast(value, typeDef);
+    }
+
+    public static Cast Cast(object value, ValueObjectType valueType, DataTypeDef typeDef)
+    {
+        return new Cast(value, valueType, typeDef);
+    }
+
+    public static Cast Cast(string tableName, string columnName, DataTypeDef typeDef)
+    {
+        return new Cast(tableName, columnName, typeDef);
+    }
+
+    public static Cast Cast(string columnName, DataTypeDef typeDef)
+    {
+        return new Cast(columnName, typeDef);
+    }
+
+    public static Cast Cast(IPhrase phrase, DataTypeDef typeDef)
+    {
+        return new Cast(phrase, typeDef);
+    }
+
     public static Literal Literal(Literal.BuilderDelegate builder)
     {
         return new Literal(builder);

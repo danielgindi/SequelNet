@@ -369,6 +369,21 @@ public class LanguageFactory
         sb.Append(")");
     }
 
+    public virtual void BuildCast(
+        ValueWrapper value,
+        DataTypeDef typeDef,
+        StringBuilder sb,
+        ConnectorBase connection,
+        Query relatedQuery)
+    {
+        sb.Append("CAST(");
+        value.Build(sb, connection, relatedQuery);
+        sb.Append(" AS ");
+        var result = BuildDataTypeDef(typeDef, true);
+        sb.Append(result.typeString);
+        sb.Append(")");
+    }
+
     public virtual void BuildLimitOffset(
         Query query,
         bool top,
