@@ -405,7 +405,7 @@ public class Where
             return;
         }
 
-        if (First is WhereList)
+        if (First is WhereList && Comparison == WhereComparison.None)
         {
             outputBuilder.Append('(');
             ((WhereList)First).BuildCommand(outputBuilder, context);
