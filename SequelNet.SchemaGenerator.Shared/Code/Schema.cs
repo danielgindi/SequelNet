@@ -8,7 +8,10 @@ namespace SequelNet.SchemaGenerator
 	{
         private static void WriteSchema(StringBuilder stringBuilder, ScriptContext context)
         {
-            stringBuilder.AppendFormat("private static TableSchema _Schema;{0}public struct Columns{0}{{{0}", "\r\n");
+            var nullabilitySign = context.NullableEnabled ? "?" : "";
+
+            stringBuilder.AppendFormat("private static TableSchema{1} _Schema;{0}public struct Columns{0}{{{0}", "\r\n",
+                nullabilitySign);
             foreach (var dalCol in context.Columns)
             {
                 stringBuilder.AppendFormat("public {1} string {2} = \"{3}\";{0}", "\r\n",
@@ -24,7 +27,7 @@ namespace SequelNet.SchemaGenerator
             foreach (var dalCol in context.Columns)
             {
                 stringBuilder.Append("schema.AddColumn(new TableSchema.Column {");
-                WriteSchemaAddColumnArguments(dalCol, stringBuilder);
+                WriteSchemaAddColumnArguments(dalCol, context, stringBuilder);
                 stringBuilder.AppendFormat("}});{0}", "\r\n");
             }
 
@@ -57,7 +60,7 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("{0}}}{0}{0}return _Schema;{0}}}{0}", "\r\n");
         }
 
-        private static void WriteSchemaAddColumnArguments(DalColumn dalCol, StringBuilder stringBuilder)
+        private static void WriteSchemaAddColumnArguments(DalColumn dalCol, ScriptContext context, StringBuilder stringBuilder)
         {
             var isReferenceType = false;
 
@@ -509,7 +512,7 @@ namespace SequelNet.SchemaGenerator
                 dalCol.ActualType = customActualType;
                 dalCol.IsCustomType = true;
             }
-            else if (dalCol.IsNullable && !isReferenceType)
+            else if (dalCol.IsNullable && (!isReferenceType || context.NullableEnabled))
             {
                 dalCol.ActualType += "?";
             }

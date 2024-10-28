@@ -1,5 +1,7 @@
 ﻿namespace SequelNet;
 
+#nullable enable
+
 public enum QueryCombineMode
 {
     /// <summary>
@@ -22,5 +24,5 @@ public class QueryCombineData
 {
     public QueryCombineMode Mode = QueryCombineMode.Union;
     public bool All;
-    public Query Query;
+    public Query? Query;
 }

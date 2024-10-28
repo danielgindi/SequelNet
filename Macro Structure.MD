@@ -19,6 +19,7 @@
  *  @NoCreatedOn			Disable the automatic "CreatedOn" setting on Insert
  *  @NoModifiedBy			Disable the automatic "ModifiedBy" setting on Update
  *  @NoModifiedOn			Disable the automatic "ModifiedOn" setting on Update
+ *  @NullableEnabled		Generate code with nullable types
  */
  ```
 

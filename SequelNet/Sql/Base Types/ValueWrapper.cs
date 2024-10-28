@@ -3,22 +3,17 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet;
 
 public struct ValueWrapper : IEquatable<ValueWrapper>
 {
-    public string TableName;
-    public object Value;
+    public string? TableName;
+    public object? Value;
     public ValueObjectType Type;
 
     #region Constructors
-
-    public ValueWrapper(string tableName, object value, ValueObjectType type)
-    {
-        this.TableName = tableName;
-        this.Value = value;
-        this.Type = type;
-    }
 
     public ValueWrapper(string tableName, string columnName)
     {
@@ -27,7 +22,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
         this.Type = ValueObjectType.ColumnName;
     }
 
-    public ValueWrapper(object value, ValueObjectType type)
+    public ValueWrapper(object? value, ValueObjectType type)
     {
         this.TableName = null;
         this.Value = value;
@@ -52,12 +47,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     #region Convenience
 
-    public static ValueWrapper Make(string tableName, object value, ValueObjectType type)
-    {
-        return new ValueWrapper(tableName, value, type);
-    }
-
-    public static ValueWrapper Make(object value, ValueObjectType type)
+    public static ValueWrapper Make(object? value, ValueObjectType type)
     {
         return new ValueWrapper(value, type);
     }
@@ -177,7 +167,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     public static ValueWrapper Column(string tableName, string column)
     {
-        return new ValueWrapper(tableName, column, ValueObjectType.ColumnName);
+        return new ValueWrapper(tableName, column);
     }
 
     public static ValueWrapper Column(string column)
@@ -187,7 +177,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     public static ValueWrapper Literal(string literal)
     {
-        return new ValueWrapper(null, literal, ValueObjectType.Literal);
+        return new ValueWrapper(literal, ValueObjectType.Literal);
     }
 
     public static ValueWrapper Null()
@@ -199,7 +189,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     #region Builders
 
-    public string Build(ConnectorBase conn, Query relatedQuery = null)
+    public string Build(ConnectorBase conn, Query? relatedQuery = null)
     {
         string ret = "";
 
@@ -211,7 +201,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
                 ret += ".";
             }
 
-            ret += conn.Language.WrapFieldName(Value.ToString());
+            ret += conn.Language.WrapFieldName(Value!.ToString());
         }
         else if (Type == ValueObjectType.Value)
         {
@@ -231,14 +221,14 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
             }
         }
         else
-        {
-            ret += Value.ToString();
+        { // Literal
+            ret += Value!.ToString();
         }
 
         return ret;
     }
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         if (Type == ValueObjectType.ColumnName)
         {
@@ -248,7 +238,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
                 sb.Append(".");
             }
 
-            sb.Append(conn.Language.WrapFieldName(Value.ToString()));
+            sb.Append(conn.Language.WrapFieldName(Value!.ToString()));
         }
         else if (Type == ValueObjectType.Value)
         {
@@ -276,8 +266,8 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
             }
         }
         else
-        {
-            sb.Append(Value.ToString());
+        { // Literal
+            sb.Append(Value!.ToString());
         }
     }
 
@@ -740,7 +730,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     #region IEquatable
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is ValueWrapper other))
             return false;
@@ -774,8 +764,8 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
     public override int GetHashCode()
     {
         int hashCode = 1551432323;
-        hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(TableName);
-        hashCode = hashCode * -1521134295 + EqualityComparer<object>.Default.GetHashCode(Value);
+        hashCode = hashCode * -1521134295 + (TableName == null ? 0 : EqualityComparer<string>.Default.GetHashCode(TableName));
+        hashCode = hashCode * -1521134295 + (Value == null ? 0 : EqualityComparer<object>.Default.GetHashCode(Value));
         hashCode = hashCode * -1521134295 + Type.GetHashCode();
         return hashCode;
     }

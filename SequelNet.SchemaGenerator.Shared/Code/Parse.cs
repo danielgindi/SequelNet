@@ -247,6 +247,10 @@ namespace SequelNet.SchemaGenerator
                 {
                     context.SnakeColumnNames = true;
                 }
+                else if (currentLineTrimmed.StartsWith("@NullableEnabled", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.NullableEnabled = true;
+                }
                 else if (currentLineTrimmed.StartsWith("@InsertAutoIncrement", StringComparison.OrdinalIgnoreCase))
                 {
                     context.InsertAutoIncrement = true;

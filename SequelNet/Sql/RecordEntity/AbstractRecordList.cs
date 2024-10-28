@@ -4,6 +4,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet;
 
 /// <summary>
@@ -17,7 +19,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
     where TItemType : AbstractRecord<TItemType>, new()
     where TListType : AbstractRecordList<TItemType, TListType>, new()
 {
-    public virtual void SaveAll(ConnectorBase conn = null, bool withTransaction = false)
+    public virtual void SaveAll(ConnectorBase? conn = null, bool withTransaction = false)
     {
         bool ownsConnection = conn == null;
         bool ownsTransaction = false;
@@ -55,7 +57,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
         SaveAll(factory.Connector(), withTransaction);
     }
 
-    public virtual async Task SaveAllAsync(ConnectorBase conn = null, bool withTransaction = false, CancellationToken? cancellationToken = null)
+    public virtual async Task SaveAllAsync(ConnectorBase? conn = null, bool withTransaction = false, CancellationToken? cancellationToken = null)
     {
         bool ownsConnection = conn == null;
         bool ownsTransaction = false;
@@ -105,17 +107,17 @@ public abstract class AbstractRecordList<TItemType, TListType>
 
     public void SaveAll(bool withTransaction)
     {
-        SaveAll((ConnectorBase)null, withTransaction);
+        SaveAll((ConnectorBase?)null, withTransaction);
     }
 
     public Task SaveAllAsync(bool withTransaction, CancellationToken? cancellationToken = null)
     {
-        return SaveAllAsync((ConnectorBase)null, withTransaction, cancellationToken);
+        return SaveAllAsync((ConnectorBase?)null, withTransaction, cancellationToken);
     }
 
     public Task SaveAllAsync(CancellationToken? cancellationToken)
     {
-        return SaveAllAsync((ConnectorBase)null, false, cancellationToken);
+        return SaveAllAsync((ConnectorBase?)null, false, cancellationToken);
     }
 
     public static TListType FromReader(DataReader reader)
@@ -136,7 +138,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
         return coll;
     }
 
-    public static TListType FetchAll(ConnectorBase conn = null)
+    public static TListType FetchAll(ConnectorBase? conn = null)
     {
         using (var reader = new Query(AbstractRecord<TItemType>.Schema).ExecuteReader(conn))
         {
@@ -152,7 +154,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
         }
     }
 
-    public static async Task<TListType> FetchAllAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+    public static async Task<TListType> FetchAllAsync(ConnectorBase? conn = null, CancellationToken? cancellationToken = null)
     {
         using (var reader = await new Query(AbstractRecord<TItemType>.Schema).ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
         {
@@ -167,17 +169,17 @@ public abstract class AbstractRecordList<TItemType, TListType>
 
     public static Task<TListType> FetchAllAsync(CancellationToken? cancellationToken)
     {
-        return FetchAllAsync((ConnectorBase)null, cancellationToken);
+        return FetchAllAsync((ConnectorBase?)null, cancellationToken);
     }
 
-    public static TListType Where(string columnName, object columnValue)
+    public static TListType Where(string columnName, object? columnValue)
     {
         Query qry = new Query(AbstractRecord<TItemType>.Schema);
-        qry.Where(columnName, columnValue);
+        qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, columnValue, ValueObjectType.Value);
         return FetchByQuery(qry);
     }
 
-    public static TListType FetchByQuery(Query qry, ConnectorBase conn = null)
+    public static TListType FetchByQuery(Query qry, ConnectorBase? conn = null)
     {
         using (var reader = qry.ExecuteReader(conn))
             return FromReader(reader);
@@ -189,7 +191,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
             return FromReader(reader);
     }
 
-    public static async Task<TListType> FetchByQueryAsync(Query qry, ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+    public static async Task<TListType> FetchByQueryAsync(Query qry, ConnectorBase? conn = null, CancellationToken? cancellationToken = null)
     {
         using (var reader = await qry.ExecuteReaderAsync(conn, cancellationToken).ConfigureAwait(false))
             return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
@@ -202,7 +204,7 @@ public abstract class AbstractRecordList<TItemType, TListType>
 
     public static async Task<TListType> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
     {
-        using (var reader = await qry.ExecuteReaderAsync((ConnectorBase)null, cancellationToken).ConfigureAwait(false))
+        using (var reader = await qry.ExecuteReaderAsync((ConnectorBase?)null, cancellationToken).ConfigureAwait(false))
             return await FromReaderAsync(reader, cancellationToken).ConfigureAwait(false);
     }
 

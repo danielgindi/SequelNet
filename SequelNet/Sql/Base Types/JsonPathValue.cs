@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
 
 namespace SequelNet;
 
 public class JsonPathValue
 {
-    public string Path;
+    public string? Path;
     public ValueWrapper Value;
 
     #region Constructors

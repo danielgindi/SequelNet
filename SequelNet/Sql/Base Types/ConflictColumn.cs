@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet;
 
 public struct ConflictColumn : IPhrase, IEquatable<ConflictColumn>
@@ -20,7 +22,7 @@ public struct ConflictColumn : IPhrase, IEquatable<ConflictColumn>
 
     #region Builders
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         conn.Language.BuildConflictColumnUpdate(sb, conn, this, relatedQuery);
     }
@@ -38,7 +40,7 @@ public struct ConflictColumn : IPhrase, IEquatable<ConflictColumn>
 
     #region IEquatable
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (!(obj is ConflictColumn other))
             return false;

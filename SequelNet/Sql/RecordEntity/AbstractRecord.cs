@@ -8,6 +8,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
 
+#nullable enable
+
 namespace SequelNet;
 
 /// <summary>
@@ -22,16 +24,16 @@ public abstract class AbstractRecord<T> : IRecord
 
     private static bool __LOOKED_FOR_PRIMARY_KEY_NAME = false;
     private static bool __PRIMARY_KEY_MULTI = false;
-    private static object __PRIMARY_KEY_NAME = null;
-    private static TableSchema __TABLE_SCHEMA = null;
-    private static Type __CLASS_TYPE = null;
-    private static PropertyInfo __PRIMARY_KEY_PROP_INFO = null;
+    private static object? __PRIMARY_KEY_NAME = null;
+    private static TableSchema? __TABLE_SCHEMA = null;
+    private static Type? __CLASS_TYPE = null;
+    private static PropertyInfo? __PRIMARY_KEY_PROP_INFO = null;
 
     private static bool __FLAGS_RETRIEVED = false;
     private static bool __IS_AUTOINCREMENT_PK = false;
-    private static string __IS_DELETED_NAME = null;
-    private static string __CREATED_ON_NAME = null;
-    private static string __MODIFIED_ON_NAME = null;
+    private static string? __IS_DELETED_NAME = null;
+    private static string? __CREATED_ON_NAME = null;
+    private static string? __MODIFIED_ON_NAME = null;
 
     #endregion
 
@@ -39,7 +41,7 @@ public abstract class AbstractRecord<T> : IRecord
 
     private static bool _AtomicUpdates = false;
     private bool _IsAtomicUpdatesDisabled = false;
-    private HashSet<string> _MutatedColumns = null;
+    private HashSet<string>? _MutatedColumns = null;
 
     #endregion
 
@@ -47,12 +49,12 @@ public abstract class AbstractRecord<T> : IRecord
 
     public AbstractRecord() { }
 
-    public AbstractRecord(object keyValue)
+    public AbstractRecord(object? keyValue)
     {
         LoadByKey(keyValue);
     }
 
-    public AbstractRecord(string columnName, object columnValue)
+    public AbstractRecord(string columnName, object? columnValue)
     {
         LoadByParam(columnName, columnValue);
     }
@@ -86,7 +88,7 @@ public abstract class AbstractRecord<T> : IRecord
                     keyNames.AddRange(
                         idx.Columns
                             .Where(x => x.Target.Type == ValueObjectType.ColumnName)
-                            .Select(x => (string)x.Target.Value));
+                            .Select(x => (string)x.Target.Value!));
                     break;
                 }
             }
@@ -154,7 +156,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// Could be either a <see cref="String"/>, an <see cref="Array"/> of <see cref="String"/>s or <c>null</c>.
     /// </summary>
     [XmlIgnore]
-    public static object SchemaPrimaryKeyName
+    public static object? SchemaPrimaryKeyName
     {
         get
         {
@@ -169,7 +171,7 @@ public abstract class AbstractRecord<T> : IRecord
             if (value is ICollection)
             { // Make sure this is an Array!
                 List<string> keys = new List<string>();
-                foreach (string key in (IEnumerable)__PRIMARY_KEY_NAME)
+                foreach (string key in (IEnumerable)value)
                 {
                     keys.Add(key);
                 }
@@ -264,7 +266,7 @@ public abstract class AbstractRecord<T> : IRecord
         return _MutatedColumns != null && _MutatedColumns.Count > 0;
     }
 
-    public virtual HashSet<string> GetMutatedColumnNamesSet()
+    public virtual HashSet<string>? GetMutatedColumnNamesSet()
     {
         return _MutatedColumns;
     }
@@ -299,17 +301,21 @@ public abstract class AbstractRecord<T> : IRecord
 
     #region Virtual Read/Write Actions
 
-    public virtual void SetPrimaryKeyValue(object value)
+    public virtual void SetPrimaryKeyValue(object? value)
     {
         if (!__LOOKED_FOR_PRIMARY_KEY_NAME)
         {
             CachePrimaryKeyName();
         }
 
-        var propInfo = __PRIMARY_KEY_PROP_INFO;
-        propInfo?.SetValue(
-            this,
-            Convert.ChangeType(value, Schema.Columns.Find(SchemaPrimaryKeyName as string)?.Type), null);
+        var keyValueType = Schema.Columns.Find(SchemaPrimaryKeyName as string)?.Type;
+
+        if (keyValueType != null)
+        {
+            __PRIMARY_KEY_PROP_INFO?.SetValue(
+                this,
+                Convert.ChangeType(value, keyValueType), null);
+        }
     }
 
     public virtual Query GetInsertQuery()
@@ -320,7 +326,7 @@ public abstract class AbstractRecord<T> : IRecord
         if (__CLASS_TYPE == null)
             __CLASS_TYPE = this.GetType();
 
-        object primaryKey = SchemaPrimaryKeyName;
+        object? primaryKey = SchemaPrimaryKeyName;
         bool hasSimplePrimaryKeyName = primaryKey is string;
 
         var qry = new Query(Schema);
@@ -352,7 +358,7 @@ public abstract class AbstractRecord<T> : IRecord
         if (__CLASS_TYPE == null)
             __CLASS_TYPE = this.GetType();
 
-        object primaryKey = SchemaPrimaryKeyName;
+        object? primaryKey = SchemaPrimaryKeyName;
         bool hasSimplePrimaryKeyName = primaryKey is string;
 
         var qry = new Query(Schema);
@@ -383,7 +389,7 @@ public abstract class AbstractRecord<T> : IRecord
         return qry;
     }
 
-    public virtual void Insert(ConnectorBase connection = null)
+    public virtual void Insert(ConnectorBase? connection = null)
     {
         var qry = GetInsertQuery();
 
@@ -403,7 +409,7 @@ public abstract class AbstractRecord<T> : IRecord
         MarkAllColumnsNotMutated();
     }
 
-    public virtual async Task InsertAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+    public virtual async Task InsertAsync(ConnectorBase? conn = null, CancellationToken? cancellationToken = null)
     {
         var qry = GetInsertQuery();
 
@@ -433,7 +439,7 @@ public abstract class AbstractRecord<T> : IRecord
         return InsertAsync(null, cancellationToken);
     }
 
-    public virtual void Update(ConnectorBase connection = null)
+    public virtual void Update(ConnectorBase? connection = null)
     {
         var qry = GetUpdateQuery();
 
@@ -445,7 +451,7 @@ public abstract class AbstractRecord<T> : IRecord
         MarkAllColumnsNotMutated();
     }
 
-    public virtual async Task UpdateAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)
+    public virtual async Task UpdateAsync(ConnectorBase? conn = null, CancellationToken? cancellationToken = null)
     {
         var qry = GetUpdateQuery();
 
@@ -480,7 +486,7 @@ public abstract class AbstractRecord<T> : IRecord
         MarkAllColumnsNotMutated();
     }
 
-    public virtual void Save(ConnectorBase connection = null)
+    public virtual void Save(ConnectorBase? connection = null)
     {
         if (IsNewRecord)
         {
@@ -492,7 +498,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
     }
 
-    public virtual Task SaveAsync(ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public virtual Task SaveAsync(ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         if (IsNewRecord)
         {
@@ -521,9 +527,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    public static int Delete(object primaryKeyValue, ConnectorBase connection = null)
+    public static int Delete(object? primaryKeyValue, ConnectorBase? connection = null)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return 0;
         return DeleteByParameter(columnName, primaryKeyValue, connection);
     }
@@ -537,9 +543,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DeleteAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static Task<int> DeleteAsync(object? primaryKeyValue, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return Task.FromResult(0);
         return DeleteByParameterAsync(columnName, primaryKeyValue, connection, cancellationToken);
     }
@@ -552,9 +558,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DeleteAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+    public static Task<int> DeleteAsync(object? primaryKeyValue, CancellationToken? cancellationToken)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return Task.FromResult(0);
         return DeleteByParameterAsync(columnName, primaryKeyValue, null, cancellationToken);
     }
@@ -568,7 +574,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    public static int Delete(string columnName, object value, ConnectorBase connection = null)
+    public static int Delete(string columnName, object? value, ConnectorBase? connection = null)
     {
         return DeleteByParameter(columnName, value, connection);
     }
@@ -583,7 +589,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DeleteAsync(string columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static Task<int> DeleteAsync(string columnName, object? value, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         return DeleteByParameterAsync(columnName, value, connection, cancellationToken);
     }
@@ -597,7 +603,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DeleteAsync(string columnName, object value, CancellationToken? cancellationToken)
+    public static Task<int> DeleteAsync(string columnName, object? value, CancellationToken? cancellationToken)
     {
         return DeleteByParameterAsync(columnName, value, null, cancellationToken);
     }
@@ -611,7 +617,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    private static int DeleteByParameter(object columnName, object value, ConnectorBase connection = null)
+    private static int DeleteByParameter(object columnName, object? value, ConnectorBase? connection = null)
     {
         if (!__FLAGS_RETRIEVED)
         {
@@ -639,7 +645,7 @@ public abstract class AbstractRecord<T> : IRecord
             }
             else
             {
-                qry.Where((string)columnName, value);
+                qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
             }
             return qry.ExecuteNonQuery(connection);
         }
@@ -656,7 +662,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    private static Task<int> DeleteByParameterAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    private static Task<int> DeleteByParameterAsync(object columnName, object? value, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         if (!__FLAGS_RETRIEVED)
         {
@@ -684,7 +690,7 @@ public abstract class AbstractRecord<T> : IRecord
             }
             else
             {
-                qry.Where((string)columnName, value);
+                qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
             }
             return qry.ExecuteNonQueryAsync(connection, cancellationToken);
         }
@@ -700,7 +706,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    private static Task<int> DeleteByParameterAsync(object columnName, object value, CancellationToken? cancellationToken)
+    private static Task<int> DeleteByParameterAsync(object columnName, object? value, CancellationToken? cancellationToken)
     {
         return DeleteByParameterAsync(columnName, value, null, cancellationToken);
     }
@@ -711,9 +717,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    public static int Destroy(object primaryKeyValue, ConnectorBase connection = null)
+    public static int Destroy(object? primaryKeyValue, ConnectorBase? connection = null)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return 0;
         return DestroyByParameter(columnName, primaryKeyValue, connection);
     }
@@ -725,9 +731,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DestroyAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static Task<int> DestroyAsync(object? primaryKeyValue, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return Task.FromResult(0);
         return DestroyByParameterAsync(columnName, primaryKeyValue, connection, cancellationToken);
     }
@@ -738,9 +744,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DestroyAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+    public static Task<int> DestroyAsync(object? primaryKeyValue, CancellationToken? cancellationToken)
     {
-        object columnName = SchemaPrimaryKeyName;
+        object? columnName = SchemaPrimaryKeyName;
         if (columnName == null) return Task.FromResult(0);
         return DestroyByParameterAsync(columnName, primaryKeyValue, null, cancellationToken);
     }
@@ -752,7 +758,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    public static int Destroy(string columnName, object value, ConnectorBase connection = null)
+    public static int Destroy(string columnName, object? value, ConnectorBase? connection = null)
     {
         return DestroyByParameter(columnName, value, connection);
     }
@@ -765,7 +771,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DestroyAsync(string columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static Task<int> DestroyAsync(string columnName, object? value, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         return DestroyByParameterAsync(columnName, value, connection, cancellationToken);
     }
@@ -777,7 +783,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    public static Task<int> DestroyAsync(string columnName, object value, CancellationToken? cancellationToken)
+    public static Task<int> DestroyAsync(string columnName, object? value, CancellationToken? cancellationToken)
     {
         return DestroyByParameterAsync(columnName, value, null, cancellationToken);
     }
@@ -789,7 +795,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>Number of affected rows.</returns>
-    private static int DestroyByParameter(object columnName, object value, ConnectorBase connection)
+    private static int DestroyByParameter(object columnName, object? value, ConnectorBase? connection)
     {
         Query qry = new Query(Schema).Delete();
 
@@ -807,7 +813,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)columnName, value);
+            qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
         }
 
         return qry.ExecuteNonQuery(connection);
@@ -821,7 +827,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    private static Task<int> DestroyByParameterAsync(object columnName, object value, ConnectorBase connection, CancellationToken? cancellationToken = null)
+    private static Task<int> DestroyByParameterAsync(object columnName, object? value, ConnectorBase? connection, CancellationToken? cancellationToken = null)
     {
         Query qry = new Query(Schema).Delete();
 
@@ -839,7 +845,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)columnName, value);
+            qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
         }
 
         return qry.ExecuteNonQueryAsync(connection, cancellationToken);
@@ -852,7 +858,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of affected rows.</returns>
-    private static Task<int> DestroyByParameterAsync(object columnName, object value, CancellationToken? cancellationToken)
+    private static Task<int> DestroyByParameterAsync(object columnName, object? value, CancellationToken? cancellationToken)
     {
         return DestroyByParameterAsync(columnName, value, null, cancellationToken);
     }
@@ -861,12 +867,16 @@ public abstract class AbstractRecord<T> : IRecord
 
     #region Column utilities
 
-    private static PropertyInfo GetColumnPropInfo(Type classType, string name)
+    private static PropertyInfo? GetColumnPropInfo(Type classType, string? name)
     {
+        if (name == null)
+            return null;
+
         var propInfo = classType.GetProperty(name as string);
         if (propInfo == null) propInfo = classType.GetProperty(name as string + "X");
         if (propInfo == null) propInfo = classType.GetProperty(UnSnakeCase(name as string));
         if (propInfo == null) propInfo = classType.GetProperty(UnSnakeCase(name as string) + "X");
+
         return propInfo;
     }
 
@@ -894,16 +904,17 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="includeDeleted">Should logical deletions be included in the query?</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static T FetchById(object primaryKeyValue, bool includeDeleted = false, ConnectorBase connection = null)
+    public static T? FetchById(object? primaryKeyValue, bool includeDeleted = false, ConnectorBase? connection = null)
     {
         Query qry = new Query(Schema).LimitRows(1);
 
-        object primaryKey = SchemaPrimaryKeyName;
+        object? primaryKey = SchemaPrimaryKeyName;
         if (IsCompoundPrimaryKey())
         {
-            if (!(primaryKeyValue is ICollection)) return null;
+            if (!(primaryKeyValue is ICollection)) 
+                return null;
 
-            IEnumerator keyEnumerator = ((IEnumerable)primaryKey).GetEnumerator();
+            IEnumerator keyEnumerator = ((IEnumerable)primaryKey!).GetEnumerator();
             IEnumerator valueEnumerator = ((IEnumerable)primaryKeyValue).GetEnumerator();
 
             while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
@@ -913,7 +924,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)primaryKey, primaryKeyValue);
+            qry.Where(primaryKey, ValueObjectType.ColumnName, WhereComparison.EqualsTo, primaryKeyValue, ValueObjectType.Value);
         }
 
         if (!includeDeleted)
@@ -931,7 +942,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static T FetchById(object primaryKeyValue, ConnectorBase connection = null)
+    public static T? FetchById(object? primaryKeyValue, ConnectorBase? connection = null)
     {
         return FetchById(primaryKeyValue, false, connection);
     }
@@ -942,7 +953,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="qry">A query to execute. You should probably .</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static T FetchByQuery(Query qry, ConnectorBase connection = null)
+    public static T? FetchByQuery(Query qry, ConnectorBase? connection = null)
     {
         using (var reader = qry.ExecuteReader(connection))
         {
@@ -960,16 +971,17 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static Task<T> FetchByIdAsync(object primaryKeyValue, bool includeDeleted = false, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static Task<T?> FetchByIdAsync(object? primaryKeyValue, bool includeDeleted = false, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         Query qry = new Query(Schema).LimitRows(1);
 
-        object primaryKey = SchemaPrimaryKeyName;
+        object? primaryKey = SchemaPrimaryKeyName;
         if (IsCompoundPrimaryKey())
         {
-            if (!(primaryKeyValue is ICollection)) return null;
+            if (!(primaryKeyValue is ICollection))
+                return Task.FromResult((T?)null);
 
-            IEnumerator keyEnumerator = ((IEnumerable)primaryKey).GetEnumerator();
+            IEnumerator keyEnumerator = ((IEnumerable)primaryKey!).GetEnumerator();
             IEnumerator valueEnumerator = ((IEnumerable)primaryKeyValue).GetEnumerator();
 
             while (keyEnumerator.MoveNext() && valueEnumerator.MoveNext())
@@ -979,7 +991,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)primaryKey, primaryKeyValue);
+            qry.Where(primaryKey, ValueObjectType.ColumnName, WhereComparison.EqualsTo, primaryKeyValue, ValueObjectType.Value);
         }
 
         if (!includeDeleted)
@@ -998,7 +1010,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static Task<T> FetchByIdAsync(object primaryKeyValue, ConnectorBase connection, CancellationToken? cancellationToken = null)
+    public static Task<T?> FetchByIdAsync(object? primaryKeyValue, ConnectorBase? connection, CancellationToken? cancellationToken = null)
     {
         return FetchByIdAsync(primaryKeyValue, false, connection, cancellationToken);
     }
@@ -1010,7 +1022,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="includeDeleted">Should logical deletions be included in the query?</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static Task<T> FetchByIdAsync(object primaryKeyValue, bool includeDeleted, CancellationToken? cancellationToken)
+    public static Task<T?> FetchByIdAsync(object? primaryKeyValue, bool includeDeleted, CancellationToken? cancellationToken)
     {
         return FetchByIdAsync(primaryKeyValue, includeDeleted, null, cancellationToken);
     }
@@ -1021,7 +1033,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static Task<T> FetchByIdAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+    public static Task<T?> FetchByIdAsync(object? primaryKeyValue, CancellationToken? cancellationToken)
     {
         return FetchByIdAsync(primaryKeyValue, false, null, cancellationToken);
     }
@@ -1033,7 +1045,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static async Task<T> FetchByQueryAsync(Query qry, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static async Task<T?> FetchByQueryAsync(Query qry, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
         {
@@ -1049,7 +1061,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="qry">A query to execute. You should probably .</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A record (marked as "old") or null.</returns>
-    public static Task<T> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
+    public static Task<T?> FetchByQueryAsync(Query qry, CancellationToken? cancellationToken)
     {
         return FetchByQueryAsync(qry, null, cancellationToken);
     }
@@ -1060,9 +1072,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// </summary>
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
-    public void LoadByKey(object primaryKeyValue, ConnectorBase connection = null)
+    public void LoadByKey(object? primaryKeyValue, ConnectorBase? connection = null)
     {
-        LoadByParam(SchemaPrimaryKeyName, primaryKeyValue, connection);
+        LoadByParam(SchemaPrimaryKeyName!, primaryKeyValue, connection);
     }
 
     /// <summary>
@@ -1072,9 +1084,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public Task LoadByKeyAsync(object primaryKeyValue, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public Task LoadByKeyAsync(object? primaryKeyValue, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
-        return LoadByParamAsync(SchemaPrimaryKeyName, primaryKeyValue, connection, cancellationToken);
+        return LoadByParamAsync(SchemaPrimaryKeyName!, primaryKeyValue, connection, cancellationToken);
     }
 
     /// <summary>
@@ -1083,9 +1095,9 @@ public abstract class AbstractRecord<T> : IRecord
     /// </summary>
     /// <param name="primaryKeyValue">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the Primary Key.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public Task LoadByKeyAsync(object primaryKeyValue, CancellationToken? cancellationToken)
+    public Task LoadByKeyAsync(object? primaryKeyValue, CancellationToken? cancellationToken)
     {
-        return LoadByParamAsync(SchemaPrimaryKeyName, primaryKeyValue, null, cancellationToken);
+        return LoadByParamAsync(SchemaPrimaryKeyName!, primaryKeyValue, null, cancellationToken);
     }
 
     /// <summary>
@@ -1095,7 +1107,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
-    public void LoadByParam(object columnName, object value, ConnectorBase connection = null)
+    public void LoadByParam(object columnName, object? value, ConnectorBase? connection = null)
     {
         Query qry = new Query(Schema).LimitRows(1);
 
@@ -1113,7 +1125,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)columnName, value);
+            qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
         }
 
         using (var reader = qry.ExecuteReader(connection))
@@ -1133,7 +1145,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="connection">An optional db connection to use when executing the query.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public async Task LoadByParamAsync(object columnName, object value, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public async Task LoadByParamAsync(object columnName, object? value, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         Query qry = new Query(Schema).LimitRows(1);
 
@@ -1152,7 +1164,7 @@ public abstract class AbstractRecord<T> : IRecord
         }
         else
         {
-            qry.Where((string)columnName, value);
+            qry.Where(columnName, ValueObjectType.ColumnName, WhereComparison.EqualsTo, value, ValueObjectType.Value);
         }
 
         using (var reader = await qry.ExecuteReaderAsync(connection, cancellationToken).ConfigureAwait(false))
@@ -1171,7 +1183,7 @@ public abstract class AbstractRecord<T> : IRecord
     /// <param name="columnName">The column's name to Where. Could be a String or an IEnumerable of strings.</param>
     /// <param name="value">The columns' values to match. Could be a String or an IEnumerable of strings. Must match the <paramref name="columnName"/></param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    public Task LoadByParamAsync(object columnName, object value, CancellationToken? cancellationToken = null)
+    public Task LoadByParamAsync(object columnName, object? value, CancellationToken? cancellationToken = null)
     {
         return LoadByParamAsync(columnName, value, null, cancellationToken);
     }

@@ -2,13 +2,15 @@
 using System.Linq;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet;
 
 public class JsonPathExpression
 {
     private bool _IsPathCompiled = false;
-    private string _Path = null;
-    private List<Part> _Parts = null;
+    private string? _Path = null;
+    private List<Part>? _Parts = null;
 
     #region Constructors
 
@@ -53,16 +55,16 @@ public class JsonPathExpression
     {
         if (this._IsPathCompiled)
         {
-            return ValueWrapper.From(this._Path);
+            return ValueWrapper.From(this._Path!);
         }
 
-        if (_Parts.Any(x => x.Value.Type == ValueObjectType.Value))
+        if (_Parts != null && _Parts.Any(x => x.Value.Type == ValueObjectType.Value))
         {
             var sb = new StringBuilder("$");
 
             var first = true;
 
-            foreach (var part in _Parts)
+            foreach (var part in _Parts!)
             {
                 if (first)
                 {
@@ -75,7 +77,7 @@ public class JsonPathExpression
                     sb.Append("[");
                 else sb.Append(".");
 
-                var v = part.Value.Value.ToString();
+                var v = part.Value.Value!.ToString()!;
 
                 // test if the value is a simple property accessor name
                 if (v.Length == 0 ||
@@ -111,65 +113,69 @@ public class JsonPathExpression
 
             var first = true;
 
-            foreach (var part in _Parts)
+            if (_Parts != null)
             {
-                if (first)
+                foreach (var part in _Parts)
                 {
-                    first = false;
-                    if (part.Value.Type == ValueObjectType.Value && part.Value.Value as string == "$")
-                        continue;
-                }
-
-                if (part.Indexed)
-                    parts.Add(ValueWrapper.From("["));
-                else parts.Add(ValueWrapper.From("."));
-
-                if (part.Value.Type == ValueObjectType.Value)
-                {
-                    var v = part.Value.Value.ToString();
-                    // test if the value is a simple property accessor name
-                    if (v.Length == 0 ||
-                        (!part.Indexed && (
-                            char.IsDigit(v[0]) ||
-                            !v.All(x => char.IsLetterOrDigit(x) || x == '_')
-                        )) ||
-                        (part.Indexed && !v.All(char.IsDigit)))
+                    if (first)
                     {
-                        parts.Add(ValueWrapper.From(
-                            PhraseHelper.Replace(
-                                ValueWrapper.From(
-                                    PhraseHelper.Replace(ValueWrapper.From(v), ValueWrapper.From("\\"), ValueWrapper.From("\\\\"))
-                                ),
-                                ValueWrapper.From("\""), ValueWrapper.From("\\\"")
-                            )
-                        ));
+                        first = false;
+                        if (part.Value.Type == ValueObjectType.Value && part.Value.Value as string == "$")
+                            continue;
                     }
-                    else
-                    {
-                        parts.Add(ValueWrapper.From(v));
-                    }
-                }
-                else
-                {
+
                     if (part.Indexed)
+                        parts.Add(ValueWrapper.From("["));
+                    else parts.Add(ValueWrapper.From("."));
+
+                    if (part.Value.Type == ValueObjectType.Value)
                     {
-                        parts.Add(part.Value);
+                        var v = part.Value.Value!.ToString()!;
+
+                        // test if the value is a simple property accessor name
+                        if (v.Length == 0 ||
+                            (!part.Indexed && (
+                                char.IsDigit(v[0]) ||
+                                !v.All(x => char.IsLetterOrDigit(x) || x == '_')
+                            )) ||
+                            (part.Indexed && !v.All(char.IsDigit)))
+                        {
+                            parts.Add(ValueWrapper.From(
+                                PhraseHelper.Replace(
+                                    ValueWrapper.From(
+                                        PhraseHelper.Replace(ValueWrapper.From(v), ValueWrapper.From("\\"), ValueWrapper.From("\\\\"))
+                                    ),
+                                    ValueWrapper.From("\""), ValueWrapper.From("\\\"")
+                                )
+                            ));
+                        }
+                        else
+                        {
+                            parts.Add(ValueWrapper.From(v));
+                        }
                     }
                     else
                     {
-                        parts.Add(ValueWrapper.From(
-                            PhraseHelper.Replace(
-                                ValueWrapper.From(
-                                    PhraseHelper.Replace(part.Value, ValueWrapper.From("\\"), ValueWrapper.From("\\\\"))
-                                ),
-                                ValueWrapper.From("\""), ValueWrapper.From("\\\"")
-                            )
-                        ));
+                        if (part.Indexed)
+                        {
+                            parts.Add(part.Value);
+                        }
+                        else
+                        {
+                            parts.Add(ValueWrapper.From(
+                                PhraseHelper.Replace(
+                                    ValueWrapper.From(
+                                        PhraseHelper.Replace(part.Value, ValueWrapper.From("\\"), ValueWrapper.From("\\\\"))
+                                    ),
+                                    ValueWrapper.From("\""), ValueWrapper.From("\\\"")
+                                )
+                            ));
+                        }
                     }
-                }
 
-                if (part.Indexed)
-                    parts.Add(ValueWrapper.From("]"));
+                    if (part.Indexed)
+                        parts.Add(ValueWrapper.From("]"));
+                }
             }
 
             return ValueWrapper.From(PhraseHelper.Concat(parts.ToArray()));
@@ -184,7 +190,7 @@ public class JsonPathExpression
         }
         else
         {
-            _Parts = GetPathParts(this._Path);
+            _Parts = GetPathParts(this._Path ?? "$");
             return _Parts;
         }
     }
