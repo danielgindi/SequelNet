@@ -213,7 +213,9 @@ namespace SequelNet.SchemaGenerator
         {
             if (!string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName))
             {
-                stringBuilder.AppendFormat("public override void SetPrimaryKeyValue(object value){0}{{{0}", "\r\n");
+                var nullabilitySign = context.NullableEnabled ? "?" : "";
+
+                stringBuilder.AppendFormat("public override void SetPrimaryKeyValue(object{1} value){0}{{{0}", "\r\n", nullabilitySign);
 
                 stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n",
                     context.SingleColumnPrimaryKeyName,
