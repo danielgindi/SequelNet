@@ -1,6 +1,7 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using SequelNet.Connector;
+
+#nullable enable
 
 namespace SequelNet.Phrases;
 
@@ -28,14 +29,14 @@ public class JsonExtract : IPhrase
 
     #region Constructors
 
-    public JsonExtract(object value, ValueObjectType valueType, JsonPathExpression jsonPath, bool unquote = true)
+    public JsonExtract(object? value, ValueObjectType valueType, JsonPathExpression jsonPath, bool unquote = true)
     {
         this.Value = ValueWrapper.Make(value, valueType);
         this.Path = jsonPath;
         this.Unquote = unquote;
     }
 
-    public JsonExtract(string tableName, string columnName, JsonPathExpression jsonPath, bool unquote = true)
+    public JsonExtract(string? tableName, string columnName, JsonPathExpression jsonPath, bool unquote = true)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
         this.Path = jsonPath;
@@ -57,12 +58,12 @@ public class JsonExtract : IPhrase
     {
     }
 
-    public JsonExtract(object value, ValueObjectType valueType, string jsonPath, bool unquote = true)
+    public JsonExtract(object? value, ValueObjectType valueType, string jsonPath, bool unquote = true)
         : this(value, valueType, new JsonPathExpression(jsonPath), unquote)
     {
     }
 
-    public JsonExtract(string tableName, string columnName, string jsonPath, bool unquote = true)
+    public JsonExtract(string? tableName, string columnName, string jsonPath, bool unquote = true)
         : this(tableName, columnName, new JsonPathExpression(jsonPath), unquote)
     {
     }
@@ -84,7 +85,7 @@ public class JsonExtract : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         conn.Language.BuildJsonExtract(Value, Path, Unquote, sb, conn, relatedQuery);
     }

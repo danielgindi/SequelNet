@@ -15,7 +15,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
 
     #region Constructors
 
-    public ValueWrapper(string tableName, string columnName)
+    public ValueWrapper(string? tableName, string columnName)
     {
         this.TableName = tableName;
         this.Value = columnName;
@@ -165,7 +165,7 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
         return new ValueWrapper(value, ValueObjectType.Value);
     }
 
-    public static ValueWrapper Column(string tableName, string column)
+    public static ValueWrapper Column(string? tableName, string column)
     {
         return new ValueWrapper(tableName, column);
     }
