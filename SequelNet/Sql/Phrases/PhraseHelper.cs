@@ -1296,6 +1296,16 @@ public static class PhraseHelper
         return new UnionAll(queries);
     }
 
+    public static Exists Exists(Query query)
+    {
+        return new Exists(query);
+    }
+
+    public static NotExists NotExists(Query query)
+    {
+        return new NotExists(query);
+    }
+
     #endregion
 
     #region Math
