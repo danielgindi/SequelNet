@@ -1,12 +1,14 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Literal : IPhrase
 {
-    public delegate void BuilderDelegate(StringBuilder sb, ConnectorBase conn, Query relatedQuery);
-    public BuilderDelegate Builder = null;
+    public delegate void BuilderDelegate(StringBuilder sb, ConnectorBase conn, Query? relatedQuery);
+    public readonly BuilderDelegate Builder;
 
     #region Constructors
 
@@ -17,7 +19,7 @@ public class Literal : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         Builder.Invoke(sb, conn, relatedQuery);
     }

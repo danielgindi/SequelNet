@@ -2,6 +2,8 @@
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Case : IPhrase
@@ -16,7 +18,7 @@ public class Case : IPhrase
     public List<WhenClause> Conditions = new List<WhenClause>();
     public ValueWrapper? ElseValue;
 
-    private WhenClause _CurrentWhen;
+    private WhenClause? _CurrentWhen;
 
     #region Constructors
 
@@ -39,12 +41,12 @@ public class Case : IPhrase
         this.Value = ValueWrapper.From(condition);
     }
 
-    public Case(string tableName, string columnName)
+    public Case(string? tableName, string columnName)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
     }
 
-    public Case(object value, ValueObjectType valueType)
+    public Case(object? value, ValueObjectType valueType)
     {
         this.Value = ValueWrapper.Make(value, valueType);
     }
@@ -73,12 +75,12 @@ public class Case : IPhrase
         return When(ValueWrapper.From(condition));
     }
 
-    public Case When(string tableName, string columnName)
+    public Case When(string? tableName, string columnName)
     {
         return When(ValueWrapper.Column(tableName, columnName));
     }
 
-    public Case When(object value, ValueObjectType valueType)
+    public Case When(object? value, ValueObjectType valueType)
     {
         return When(ValueWrapper.Make(value, valueType));
     }
@@ -103,12 +105,12 @@ public class Case : IPhrase
         return this;
     }
 
-    public Case Then(string tableName, string columnName)
+    public Case Then(string? tableName, string columnName)
     {
         return Then(ValueWrapper.Column(tableName, columnName));
     }
 
-    public Case Then(object value, ValueObjectType valueType)
+    public Case Then(object? value, ValueObjectType valueType)
     {
         return Then(ValueWrapper.Make(value, valueType));
     }
@@ -124,12 +126,12 @@ public class Case : IPhrase
         return this;
     }
 
-    public Case Else(string tableName, string columnName)
+    public Case Else(string? tableName, string columnName)
     {
         return Else(ValueWrapper.Column(tableName, columnName));
     }
 
-    public Case Else(object value, ValueObjectType valueType)
+    public Case Else(object? value, ValueObjectType valueType)
     {
         return Else(ValueWrapper.Make(value, valueType));
     }
@@ -141,7 +143,7 @@ public class Case : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append("CASE");
 

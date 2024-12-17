@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class RandWeight : IPhrase
@@ -9,12 +11,12 @@ public class RandWeight : IPhrase
 
     #region Constructors
 
-    public RandWeight(object value, ValueObjectType valueType)
+    public RandWeight(object? value, ValueObjectType valueType)
     {
         this.Value = ValueWrapper.Make(value, valueType);
     }
 
-    public RandWeight(string tableName, string columnName)
+    public RandWeight(string? tableName, string columnName)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
     }
@@ -36,7 +38,7 @@ public class RandWeight : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
             sb.Append("RAND(CAST(NEWID() AS VARBINARY)) * ");

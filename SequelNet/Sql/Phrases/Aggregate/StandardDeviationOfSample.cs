@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class StandardDeviationOfSample : BaseAggregatePhrase
@@ -11,7 +13,7 @@ public class StandardDeviationOfSample : BaseAggregatePhrase
     {
     }
 
-    public StandardDeviationOfSample(string tableName, string columnName) : base(tableName, columnName)
+    public StandardDeviationOfSample(string? tableName, string columnName) : base(tableName, columnName)
     {
     }
 
@@ -19,7 +21,7 @@ public class StandardDeviationOfSample : BaseAggregatePhrase
     {
     }
 
-    public StandardDeviationOfSample(object value, ValueObjectType valueType) : base(value, valueType)
+    public StandardDeviationOfSample(object? value, ValueObjectType valueType) : base(value, valueType)
     {
     }
 
@@ -37,7 +39,7 @@ public class StandardDeviationOfSample : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append("STDDEV_SAMP(");
         sb.Append(Value.Build(conn, relatedQuery));

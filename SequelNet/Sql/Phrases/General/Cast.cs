@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Cast : IPhrase
@@ -16,12 +18,12 @@ public class Cast : IPhrase
         this.TypeDef = typeDef;
     }
 
-    public Cast(object value, ValueObjectType valueType, DataTypeDef typeDef)
+    public Cast(object? value, ValueObjectType valueType, DataTypeDef typeDef)
         : this(ValueWrapper.Make(value, valueType), typeDef)
     {
     }
 
-    public Cast(string tableName, string columnName, DataTypeDef typeDef)
+    public Cast(string? tableName, string columnName, DataTypeDef typeDef)
         : this(ValueWrapper.Column(tableName, columnName), typeDef)
     {
     }
@@ -38,7 +40,7 @@ public class Cast : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         conn.Language.BuildCast(Value, TypeDef, sb, conn, relatedQuery);
     }

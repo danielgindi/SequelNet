@@ -1,5 +1,7 @@
 ﻿namespace SequelNet.Phrases;
 
+#nullable enable
+
 public class CountDistinct : Count
 {
     #region Constructors
@@ -9,7 +11,7 @@ public class CountDistinct : Count
     {
     }
 
-    public CountDistinct(string tableName, string columnName)
+    public CountDistinct(string? tableName, string columnName)
         : base(tableName, columnName, true)
     {
     }
@@ -19,8 +21,8 @@ public class CountDistinct : Count
     {
     }
 
-    public CountDistinct(object theObject, ValueObjectType valueType)
-        : base(theObject, valueType, true)
+    public CountDistinct(object? value, ValueObjectType valueType)
+        : base(value, valueType, true)
     {
     }
 

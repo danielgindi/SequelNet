@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class JsonArrayInsert : IPhrase
     public JsonArrayInsert(
         object doc, ValueObjectType docType,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this()
     {
         this.Document = ValueWrapper.Make(doc, docType);
@@ -31,9 +33,9 @@ public class JsonArrayInsert : IPhrase
     }
 
     public JsonArrayInsert(
-        string docTableName, string docColumnName,
+        string? docTableName, string docColumnName,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this()
     {
         this.Document = ValueWrapper.Column(docTableName, docColumnName);
@@ -43,7 +45,7 @@ public class JsonArrayInsert : IPhrase
     public JsonArrayInsert(
         string docColumnName,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this(null, docColumnName, path, value, valueType)
     {
     }
@@ -51,7 +53,7 @@ public class JsonArrayInsert : IPhrase
     public JsonArrayInsert(
         IPhrase doc,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this()
     {
         this.Document = ValueWrapper.From(doc);
@@ -70,7 +72,7 @@ public class JsonArrayInsert : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         switch (conn.TYPE)
         {

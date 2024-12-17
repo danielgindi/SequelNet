@@ -14,7 +14,7 @@ public class JsonPathValue
         this.Value = new ValueWrapper();
     }
 
-    public JsonPathValue(string path, string tableName, string columnName)
+    public JsonPathValue(string path, string? tableName, string columnName)
     {
         this.Path = path;
         this.Value = ValueWrapper.Column(tableName, columnName);
@@ -26,7 +26,7 @@ public class JsonPathValue
         this.Value = ValueWrapper.Column(column);
     }
 
-    public JsonPathValue(string path, object value, ValueObjectType type)
+    public JsonPathValue(string path, object? value, ValueObjectType type)
     {
         this.Path = path;
         this.Value = ValueWrapper.Make(value, type);
@@ -48,7 +48,7 @@ public class JsonPathValue
 
     #region Convenience
 
-    public static JsonPathValue From(string path, string tableName, string columnName)
+    public static JsonPathValue From(string path, string? tableName, string columnName)
     {
         return new JsonPathValue(path, tableName, columnName);
     }
@@ -58,7 +58,7 @@ public class JsonPathValue
         return new JsonPathValue(path, column);
     }
 
-    public static JsonPathValue From(string path, object value, ValueObjectType type)
+    public static JsonPathValue From(string path, object? value, ValueObjectType type)
     {
         return new JsonPathValue(path, value, type);
     }

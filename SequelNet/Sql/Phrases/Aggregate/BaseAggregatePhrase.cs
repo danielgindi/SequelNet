@@ -2,6 +2,8 @@
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet;
 
 public abstract class BaseAggregatePhrase : IPhrase
@@ -14,7 +16,7 @@ public abstract class BaseAggregatePhrase : IPhrase
         this.Value = ValueWrapper.Literal("*");
     }
 
-    public BaseAggregatePhrase(string tableName, string columnName)
+    public BaseAggregatePhrase(string? tableName, string columnName)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
     }
@@ -24,7 +26,7 @@ public abstract class BaseAggregatePhrase : IPhrase
     {
     }
 
-    public BaseAggregatePhrase(object value, ValueObjectType valueType)
+    public BaseAggregatePhrase(object? value, ValueObjectType valueType)
     {
         this.Value = ValueWrapper.Make(value, valueType);
     }
@@ -46,7 +48,7 @@ public abstract class BaseAggregatePhrase : IPhrase
 
     #endregion
 
-    public virtual void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public virtual void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         throw new NotImplementedException();
     }

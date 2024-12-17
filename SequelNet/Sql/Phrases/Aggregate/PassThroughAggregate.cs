@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class PassThroughAggregate : IPhrase
@@ -10,7 +12,7 @@ public class PassThroughAggregate : IPhrase
 
     #region Constructors
 
-    public PassThroughAggregate(string aggregateType, string tableName, string columnName)
+    public PassThroughAggregate(string aggregateType, string? tableName, string columnName)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
         this.AggregateType = aggregateType;
@@ -21,7 +23,7 @@ public class PassThroughAggregate : IPhrase
     {
     }
 
-    public PassThroughAggregate(string aggregateType, object value, ValueObjectType valueType)
+    public PassThroughAggregate(string aggregateType, object? value, ValueObjectType valueType)
     {
         this.Value = ValueWrapper.Make(value, valueType);
         this.AggregateType = aggregateType;
@@ -34,7 +36,7 @@ public class PassThroughAggregate : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(AggregateType + @"(");
         sb.Append(Value.Build(conn, relatedQuery));

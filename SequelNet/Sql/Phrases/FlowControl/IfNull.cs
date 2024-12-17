@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 /// <summary>
@@ -22,31 +24,31 @@ public class IfNull : IPhrase
     }
 
     public IfNull(
-        string firstTableName, string firstColumnName,
-        string secondTableName, string secondColumnName)
+        string? firstTableName, string firstColumnName,
+        string? secondTableName, string secondColumnName)
     {
         this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
         this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
     }
 
     public IfNull(
-         object firstValue, ValueObjectType firstValueType,
-         object secondValue, ValueObjectType secondValueType)
+         object? firstValue, ValueObjectType firstValueType,
+         object? secondValue, ValueObjectType secondValueType)
     {
         this.Value1 = ValueWrapper.Make(firstValue, firstValueType);
         this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
     }
 
     public IfNull(
-         string firstTableName, string firstColumnName,
-         object secondValue, ValueObjectType secondValueType)
+         string? firstTableName, string firstColumnName,
+         object? secondValue, ValueObjectType secondValueType)
     {
         this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
         this.Value2 = ValueWrapper.Make(secondValue, secondValueType);
     }
 
     public IfNull(
-         string firstTableName, string firstColumnName,
+         string? firstTableName, string firstColumnName,
          ValueWrapper second)
     {
         this.Value1 = ValueWrapper.Column(firstTableName, firstColumnName);
@@ -54,8 +56,8 @@ public class IfNull : IPhrase
     }
 
     public IfNull(
-         object firstValue, ValueObjectType firstValueType,
-         string secondTableName, string secondColumnName)
+         object? firstValue, ValueObjectType firstValueType,
+         string? secondTableName, string secondColumnName)
     {
         this.Value1 = ValueWrapper.Make(firstValue, firstValueType);
         this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
@@ -63,7 +65,7 @@ public class IfNull : IPhrase
 
     public IfNull(
          ValueWrapper first,
-         string secondTableName, string secondColumnName)
+         string? secondTableName, string secondColumnName)
     {
         this.Value1 = first;
         this.Value2 = ValueWrapper.Column(secondTableName, secondColumnName);
@@ -71,7 +73,7 @@ public class IfNull : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(conn.Language.NullOrDefaultValue(
             Value1.Build(conn, relatedQuery),

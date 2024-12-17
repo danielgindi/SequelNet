@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class ConvertUtcToTz : IPhrase
@@ -20,7 +22,7 @@ public class ConvertUtcToTz : IPhrase
         this.Timezone = ValueWrapper.From(timezone);
     }
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         conn.Language.BuildConvertUtcToTz(Value, Timezone, sb, conn, relatedQuery);
     }

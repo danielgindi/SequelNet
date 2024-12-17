@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class StandardDeviationOfPopulation : BaseAggregatePhrase
@@ -11,7 +13,7 @@ public class StandardDeviationOfPopulation : BaseAggregatePhrase
     {
     }
 
-    public StandardDeviationOfPopulation(string tableName, string columnName) : base(tableName, columnName)
+    public StandardDeviationOfPopulation(string? tableName, string columnName) : base(tableName, columnName)
     {
     }
 
@@ -19,7 +21,7 @@ public class StandardDeviationOfPopulation : BaseAggregatePhrase
     {
     }
 
-    public StandardDeviationOfPopulation(object value, ValueObjectType valueType) : base(value, valueType)
+    public StandardDeviationOfPopulation(object? value, ValueObjectType valueType) : base(value, valueType)
     {
     }
 
@@ -37,7 +39,7 @@ public class StandardDeviationOfPopulation : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append("STDDEV_POP(");
         sb.Append(Value.Build(conn, relatedQuery));

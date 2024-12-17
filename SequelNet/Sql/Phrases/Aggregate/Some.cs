@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Some : BaseAggregatePhrase
@@ -11,7 +13,7 @@ public class Some : BaseAggregatePhrase
     {
     }
 
-    public Some(string tableName, string columnName) : base(tableName, columnName)
+    public Some(string? tableName, string columnName) : base(tableName, columnName)
     {
     }
 
@@ -19,7 +21,7 @@ public class Some : BaseAggregatePhrase
     {
     }
 
-    public Some(object value, ValueObjectType valueType) : base(value, valueType)
+    public Some(object? value, ValueObjectType valueType) : base(value, valueType)
     {
     }
 
@@ -37,7 +39,7 @@ public class Some : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(conn.Language.Aggregate_Some(Value.Build(conn, relatedQuery)));
     }

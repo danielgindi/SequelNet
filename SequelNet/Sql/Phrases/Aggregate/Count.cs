@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Count : BaseAggregatePhrase
@@ -14,7 +16,7 @@ public class Count : BaseAggregatePhrase
         this.Distinct = distinct;
     }
 
-    public Count(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
+    public Count(string? tableName, string columnName, bool distinct = false) : base(tableName, columnName)
     {
         this.Distinct = distinct;
     }
@@ -24,7 +26,7 @@ public class Count : BaseAggregatePhrase
         this.Distinct = distinct;
     }
 
-    public Count(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
+    public Count(object? value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
     {
         this.Distinct = distinct;
     }
@@ -46,7 +48,7 @@ public class Count : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(Distinct ? "COUNT(DISTINCT " : "COUNT(");
         sb.Append(Value.Build(conn, relatedQuery));

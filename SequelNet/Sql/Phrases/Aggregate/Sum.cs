@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Sum : BaseAggregatePhrase
@@ -14,7 +16,7 @@ public class Sum : BaseAggregatePhrase
         this.Distinct = distinct;
     }
 
-    public Sum(string tableName, string columnName, bool distinct = false) : base(tableName, columnName)
+    public Sum(string? tableName, string columnName, bool distinct = false) : base(tableName, columnName)
     {
         this.Distinct = distinct;
     }
@@ -24,7 +26,7 @@ public class Sum : BaseAggregatePhrase
         this.Distinct = distinct;
     }
 
-    public Sum(object value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
+    public Sum(object? value, ValueObjectType valueType, bool distinct = false) : base(value, valueType)
     {
         this.Distinct = distinct;
     }
@@ -46,7 +48,7 @@ public class Sum : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(Distinct ? "SUM(DISTINCT " : "SUM(");
         sb.Append(Value.Build(conn, relatedQuery));

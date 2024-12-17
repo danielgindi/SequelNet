@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 /// <summary>
@@ -23,7 +25,7 @@ public class JsonSet : IPhrase
     public JsonSet(
         ValueWrapper doc,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this()
     {
         this.Document = doc;
@@ -33,15 +35,15 @@ public class JsonSet : IPhrase
     public JsonSet(
         object doc, ValueObjectType docType,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this(ValueWrapper.Make(doc, docType), path, value, valueType)
     {
     }
 
     public JsonSet(
-        string docTableName, string docColumnName,
+        string? docTableName, string docColumnName,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this(ValueWrapper.Column(docTableName, docColumnName), path, value, valueType)
     {
     }
@@ -49,7 +51,7 @@ public class JsonSet : IPhrase
     public JsonSet(
         string docColumnName,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this(ValueWrapper.Column(docColumnName), path, value, valueType)
     {
     }
@@ -57,7 +59,7 @@ public class JsonSet : IPhrase
     public JsonSet(
         IPhrase doc,
         string path,
-        object value, ValueObjectType valueType)
+        object? value, ValueObjectType valueType)
         : this(ValueWrapper.From(doc), path, value, valueType)
     {
     }
@@ -92,7 +94,7 @@ public class JsonSet : IPhrase
 
     #endregion
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         switch (conn.TYPE)
         {

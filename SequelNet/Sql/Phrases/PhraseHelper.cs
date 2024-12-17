@@ -2003,124 +2003,64 @@ public static class PhraseHelper
         return new Every(where);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, tableName, columnName, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, string separator)
-    {
-        return new GroupConcat(distinct, tableName, columnName, separator);
-    }
-
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, char separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, char separator, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, tableName, columnName, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, char separator)
-    {
-        return new GroupConcat(distinct, tableName, columnName, separator);
-    }
-
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, tableName, columnName, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, string tableName, string columnName)
-    {
-        return new GroupConcat(distinct, tableName, columnName);
-    }
-
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, value, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, string separator)
-    {
-        return new GroupConcat(distinct, value, separator);
-    }
-
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, char separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, char separator, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, value, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, char separator)
-    {
-        return new GroupConcat(distinct, value, separator);
-    }
-
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, OrderByList orderBy)
+    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value, OrderByList orderBy = null)
     {
         return new GroupConcat(distinct, value, orderBy);
     }
 
-    public static GroupConcat GroupConcat(bool distinct, ValueWrapper value)
-    {
-        return new GroupConcat(distinct, value);
-    }
-
-    public static GroupConcat GroupConcat(string tableName, string columnName, string separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(string tableName, string columnName, string separator, OrderByList orderBy = null)
     {
         return new GroupConcat(tableName, columnName, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(string tableName, string columnName, string separator)
-    {
-        return new GroupConcat(tableName, columnName, separator);
-    }
-
-    public static GroupConcat GroupConcat(string tableName, string columnName, char separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(string tableName, string columnName, char separator, OrderByList orderBy = null)
     {
         return new GroupConcat(tableName, columnName, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(string tableName, string columnName, char separator)
-    {
-        return new GroupConcat(tableName, columnName, separator);
-    }
-
-    public static GroupConcat GroupConcat(string tableName, string columnName, OrderByList orderBy)
+    public static GroupConcat GroupConcat(string tableName, string columnName, OrderByList orderBy = null)
     {
         return new GroupConcat(tableName, columnName, orderBy);
     }
 
-    public static GroupConcat GroupConcat(string tableName, string columnName)
-    {
-        return new GroupConcat(tableName, columnName);
-    }
-
-    public static GroupConcat GroupConcat(ValueWrapper value, string separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(ValueWrapper value, string separator, OrderByList orderBy = null)
     {
         return new GroupConcat(value, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(ValueWrapper value, string separator)
-    {
-        return new GroupConcat(value, separator);
-    }
-
-    public static GroupConcat GroupConcat(ValueWrapper value, char separator, OrderByList orderBy)
+    public static GroupConcat GroupConcat(ValueWrapper value, char separator, OrderByList orderBy = null)
     {
         return new GroupConcat(value, separator, orderBy);
     }
 
-    public static GroupConcat GroupConcat(ValueWrapper value, char separator)
-    {
-        return new GroupConcat(value, separator);
-    }
-
-    public static GroupConcat GroupConcat(ValueWrapper value, OrderByList orderBy)
+    public static GroupConcat GroupConcat(ValueWrapper value, OrderByList orderBy = null)
     {
         return new GroupConcat(value, orderBy);
-    }
-
-    public static GroupConcat GroupConcat(ValueWrapper value)
-    {
-        return new GroupConcat(value);
     }
 
     public static Max Max(object value, ValueObjectType valueType)

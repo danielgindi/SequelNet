@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Union : IPhrase
@@ -13,7 +15,7 @@ public class Union : IPhrase
         Queries = queries;
     }
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         bool first = true;
         sb.Append("(");

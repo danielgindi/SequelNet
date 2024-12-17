@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Avg : BaseAggregatePhrase
@@ -11,7 +13,7 @@ public class Avg : BaseAggregatePhrase
     {
     }
 
-    public Avg(string tableName, string columnName) : base(tableName, columnName)
+    public Avg(string? tableName, string columnName) : base(tableName, columnName)
     {
     }
 
@@ -19,7 +21,7 @@ public class Avg : BaseAggregatePhrase
     {
     }
 
-    public Avg(object value, ValueObjectType valueType) : base(value, valueType)
+    public Avg(object? value, ValueObjectType valueType) : base(value, valueType)
     {
     }
 
@@ -37,7 +39,7 @@ public class Avg : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append("AVG(");
         sb.Append(Value.Build(conn, relatedQuery));

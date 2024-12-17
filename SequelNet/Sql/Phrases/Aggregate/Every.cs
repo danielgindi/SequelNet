@@ -1,6 +1,8 @@
 ﻿using SequelNet.Connector;
 using System.Text;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Every : BaseAggregatePhrase
@@ -11,7 +13,7 @@ public class Every : BaseAggregatePhrase
     {
     }
 
-    public Every(string tableName, string columnName) : base(tableName, columnName)
+    public Every(string? tableName, string columnName) : base(tableName, columnName)
     {
     }
 
@@ -19,7 +21,7 @@ public class Every : BaseAggregatePhrase
     {
     }
 
-    public Every(object value, ValueObjectType valueType) : base(value, valueType)
+    public Every(object? value, ValueObjectType valueType) : base(value, valueType)
     {
     }
 
@@ -37,7 +39,7 @@ public class Every : BaseAggregatePhrase
 
     #endregion
 
-    public override void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append(conn.Language.Aggregate_Every(Value.Build(conn, relatedQuery)));
     }

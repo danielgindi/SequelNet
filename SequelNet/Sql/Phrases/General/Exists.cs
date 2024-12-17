@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet.Phrases;
 
 public class Exists : IPhrase
@@ -12,7 +14,7 @@ public class Exists : IPhrase
         Query = query;
     }
 
-    public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
+    public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         sb.Append("EXISTS (");
         sb.Append(Query.BuildCommand(conn));
