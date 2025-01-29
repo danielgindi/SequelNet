@@ -55,7 +55,7 @@ public class Case : IPhrase
 
     #region Builder
 
-    public Case When(ValueWrapper value)
+    public Case When(ValueWrapper? value)
     {
         this._CurrentWhen = new WhenClause
         {
@@ -90,7 +90,7 @@ public class Case : IPhrase
         return When(ValueWrapper.From(value));
     }
 
-    public Case Then(ValueWrapper value)
+    public Case Then(ValueWrapper? value)
     {
         if (this._CurrentWhen != null)
         {
