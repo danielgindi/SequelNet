@@ -1,6 +1,7 @@
 ﻿using SequelNet.Sql.Spatial;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -12,6 +13,8 @@ namespace SequelNet.Connector
         {
             _MsSqlVersion = sqlVersion;
         }
+
+        private static readonly CultureInfo DefaultCulture = CultureInfo.InvariantCulture;
 
         #region Versioning
 
@@ -882,18 +885,18 @@ namespace SequelNet.Connector
         public override string FormatCreateDate(int year, int month, int day)
         {
             return "CAST('" +
-                year.ToString().PadLeft(4, '0') + '-' +
-                month.ToString().PadLeft(2, '0') + '-' +
-                day.ToString().PadLeft(2, '0') + "' AS DATE)";
+                year.ToString(DefaultCulture).PadLeft(4, '0') + '-' +
+                month.ToString(DefaultCulture).PadLeft(2, '0') + '-' +
+                day.ToString(DefaultCulture).PadLeft(2, '0') + "' AS DATE)";
         }
         
         public override string FormatCreateTime(int hours, int minutes, int seconds, int milliseconds)
         {
             return "CAST('" +
-                hours.ToString().PadLeft(2, '0') + ':' +
-                minutes.ToString().PadLeft(2, '0') + ':' +
-                seconds.ToString().PadLeft(2, '0') + '.' +
-                milliseconds.ToString().PadLeft(3, '0') + "' AS TIME)";
+                hours.ToString(DefaultCulture).PadLeft(2, '0') + ':' +
+                minutes.ToString(DefaultCulture).PadLeft(2, '0') + ':' +
+                seconds.ToString(DefaultCulture).PadLeft(2, '0') + '.' +
+                milliseconds.ToString(DefaultCulture).PadLeft(3, '0') + "' AS TIME)";
         }
 
         public override string EscapeLike(string expression)

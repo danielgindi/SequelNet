@@ -6,6 +6,8 @@ namespace SequelNet.Connector;
 
 public class LanguageFactory
 {
+    private static readonly CultureInfo DefaultCulture = CultureInfo.InvariantCulture;
+
     #region Syntax
 
     public virtual Func<Query, ConnectorBase, Exception, int> OnExecuteNonQueryException => null;
@@ -621,17 +623,17 @@ public class LanguageFactory
 
     public virtual string PrepareValue(decimal value)
     {
-        return value.ToString(CultureInfo.InvariantCulture);
+        return value.ToString(DefaultCulture);
     }
 
     public virtual string PrepareValue(float value)
     {
-        return value.ToString(CultureInfo.InvariantCulture);
+        return value.ToString(DefaultCulture);
     }
 
     public virtual string PrepareValue(double value)
     {
-        return value.ToString(CultureInfo.InvariantCulture);
+        return value.ToString(DefaultCulture);
     }
 
     public virtual string PrepareValue(bool value)
@@ -641,7 +643,7 @@ public class LanguageFactory
 
     public virtual string PrepareValue(Guid value)
     {
-        return '\'' + value.ToString("D") + '\'';
+        return '\'' + value.ToString("D", DefaultCulture) + '\'';
     }
 
     public virtual string PrepareValue(string value)
@@ -662,7 +664,7 @@ public class LanguageFactory
         }
         else if (value is char)
         {
-            return PrepareValue(((char)value).ToString());
+            return PrepareValue(((char)value).ToString(DefaultCulture));
         }
         else if (value is DateTime)
         {
@@ -734,29 +736,33 @@ public class LanguageFactory
 
             return underlyingValue.ToString();
         }
+        else if (value is IConvertible)
+        {
+            return ((IConvertible)value).ToString(DefaultCulture);
+        }
         else return value.ToString();
     }
 
     public virtual string FormatDateTime(DateTime dateTime)
     {
-        return dateTime.ToString("yyyy-MM-dd HH:mm:ss");
+        return dateTime.ToString("yyyy'-'MM'-'dd HH':'mm':'ss", DefaultCulture);
     }
 
     public virtual string FormatCreateDate(int year, int month, int day)
     {
         return "DATE'" +
-            year.ToString().PadLeft(4, '0') + '-' +
-            month.ToString().PadLeft(2, '0') + '-' +
-            day.ToString().PadLeft(2, '0') + "'";
+            year.ToString(DefaultCulture).PadLeft(4, '0') + '-' +
+            month.ToString(DefaultCulture).PadLeft(2, '0') + '-' +
+            day.ToString(DefaultCulture).PadLeft(2, '0') + "'";
     }
 
     public virtual string FormatCreateTime(int hours, int minutes, int seconds, int milliseconds)
     {
         return "TIME'" +
-            hours.ToString().PadLeft(2, '0') + ':' +
-            minutes.ToString().PadLeft(2, '0') + ':' +
-            seconds.ToString().PadLeft(2, '0') + '.' +
-            milliseconds.ToString().PadLeft(3, '0') + "'";
+            hours.ToString(DefaultCulture).PadLeft(2, '0') + ':' +
+            minutes.ToString(DefaultCulture).PadLeft(2, '0') + ':' +
+            seconds.ToString(DefaultCulture).PadLeft(2, '0') + '.' +
+            milliseconds.ToString(DefaultCulture).PadLeft(3, '0') + "'";
     }
 
     public virtual string EscapeLike(string expression)
