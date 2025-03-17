@@ -3,35 +3,44 @@ using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
+#nullable enable
+
 namespace SequelNet;
 
 public partial class Query
 {
     #region Private variables
 
-    private TableSchema _Schema;
-    private string _SchemaName = null;
-    private string _SchemaAlias = null;
-    private OrderByList _ListOrderBy;
-    private GroupByList _ListGroupBy;
-    private WhereList _ListHaving;
-    private SelectColumnList _ListSelect;
-    private AssignmentColumnList _ListInsertUpdate;
-    private WhereList _ListWhere;
-    private JoinList _ListJoin;
-    private IndexHintList _ListIndexHint;
-    private string _StoredProcedureName;
-    private List<DbParameterWrapper> _StoredProcedureParameters = null;
+    private TableSchema? _Schema;
+    private string? _SchemaName = null;
+    private string? _SchemaAlias = null;
+    private OrderByList? _ListOrderBy;
+    private GroupByList? _ListGroupBy;
+    private WhereList? _ListHaving;
+    private SelectColumnList? _ListSelect;
+    private AssignmentColumnList? _ListInsertUpdate;
+    private WhereList? _ListWhere;
+    private JoinList? _ListJoin;
+    private IndexHintList? _ListIndexHint;
+    private string? _StoredProcedureName;
+    private List<DbParameterWrapper>? _StoredProcedureParameters = null;
     internal Dictionary<string, TableSchema> TableAliasMap = new Dictionary<string, TableSchema>();
     private QueryHint _QueryHint = QueryHint.None;
     private GroupByHint _GroupByHint = GroupByHint.None;
-    private List<QueryCombineData> _QueryCombineData = null;
+    private List<QueryCombineData>? _QueryCombineData = null;
 
     #endregion
 
     #region Instantitaion
 
-    public Query(TableSchema schema, string alias = null)
+    /// <summary>
+    /// Initialize a query without any FROM specified yet
+    /// </summary>
+    public Query()
+    {
+    }
+
+    public Query(TableSchema schema, string? alias = null)
     {
         this.Schema = schema;
         this._SchemaAlias = alias;
@@ -44,7 +53,7 @@ public partial class Query
         }
     }
 
-    public Query(string schemaName, string alias = null)
+    public Query(string schemaName, string? alias = null)
         : this(new TableSchema(schemaName, null), alias)
     {
     }
@@ -91,6 +100,11 @@ public partial class Query
     public static Query New(object fromExpression, string fromExpressionTableAlias)
     {
         return new Query(fromExpression, fromExpressionTableAlias);
+    }
+
+    public static Query New()
+    {
+        return new Query();
     }
 
     #endregion
@@ -160,7 +174,7 @@ public partial class Query
     /// <param name="tableName">Random column's table</param>
     /// <param name="columnName">Column to randomize by.</param>
     /// <returns>Current <see cref="Query"/> object</returns>
-    public Query Randomize(string tableName = null, string columnName = null)
+    public Query Randomize(string? tableName = null, string? columnName = null)
     {
         OrderBy orderBy = new OrderBy(tableName, columnName, SortDirection.None);
         orderBy.Randomize = true;
@@ -300,7 +314,7 @@ public partial class Query
     /// <param name="connection">A connector to use. Mandatory.</param>
     /// <param name="relatedQuery">The query that this call is involved in. It may be used to fetch the related schema in order to correctly format a type.</param>
     /// <returns>The SQL expression</returns>
-    public static string PrepareColumnValue(TableSchema.Column columnDefinition, object value, ConnectorBase connection, Query relatedQuery = null)
+    public static string PrepareColumnValue(TableSchema.Column? columnDefinition, object value, ConnectorBase connection, Query? relatedQuery = null)
     {
         StringBuilder sb = new StringBuilder();
         PrepareColumnValue(columnDefinition, value, sb, connection, relatedQuery);
@@ -315,7 +329,7 @@ public partial class Query
     /// <param name="outputBuilder">The <see cref="StringBuilder"/> to output the SQL expression</param>
     /// <param name="connection">A connector to use. Mandatory.</param>
     /// <param name="relatedQuery">The query that this call is involved in. It may be used to fetch the related schema in order to correctly format a type.</param>
-    public static void PrepareColumnValue(TableSchema.Column columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection, Query relatedQuery = null)
+    public static void PrepareColumnValue(TableSchema.Column? columnDefinition, object value, StringBuilder outputBuilder, ConnectorBase connection, Query? relatedQuery = null)
     {
         if (value == null)
         {
@@ -447,7 +461,7 @@ public partial class Query
             }
             else
             {
-                if (value.GetType().BaseType.Name == @"Enum")
+                if (value.GetType().BaseType?.Name == @"Enum")
                 {
                     try
                     {
@@ -500,9 +514,9 @@ public partial class Query
     public QueryMode QueryMode { get; set; } = QueryMode.Select;
 
     /// <summary>
-    /// Current query type.
+    /// Current schema name (defaults to alias if no schema is specified).
     /// </summary>
-    public string SchemaName
+    public string? SchemaName
     {
         get { return _SchemaName; }
         set 
@@ -516,14 +530,12 @@ public partial class Query
     /// <summary>
     /// Expression that replaces a table to select from.
     /// </summary>
-    public object FromExpression { get; set; } = null;
+    public object? FromExpression { get; set; } = null;
 
     /// <summary>
-    /// Setting a schema name.
-    /// This does not set an alias, but the actual schema name.
-    /// When using an actual TableSchema class, this will allow to reuse it as different table names.
+    /// Setting a schema alias name.
     /// </summary>
-    public string SchemaAlias
+    public string? SchemaAlias
     {
         get { return _SchemaAlias; }
         set
@@ -534,14 +546,7 @@ public partial class Query
 
             if (modifySchemaName)
             {
-                if (_SchemaAlias == null)
-                {
-                    SchemaName = null;
-                }
-                else
-                {
-                    SchemaName = _SchemaAlias;
-                }
+                SchemaName = _SchemaAlias ?? _Schema?.Name;
             }
         }
     }
@@ -566,7 +571,7 @@ public partial class Query
         }
     }
 
-    public AssignmentColumnList GetInsertUpdateList()
+    public AssignmentColumnList? GetInsertUpdateList()
     {
         return _ListInsertUpdate;
     }
@@ -598,12 +603,12 @@ public partial class Query
     /// The expression that is used for INSERT. e.g. INSERT INTO {schema} FROM {expression}.
     /// This can be a <see cref="Query"/> or a <see cref="String"/>.
     /// </summary>
-    public object InsertExpression { get; set; } = null;
+    public object? InsertExpression { get; set; } = null;
 
     /// <summary>
     /// Main <see cref="TableSchema"/> for this query
     /// </summary>
-    public TableSchema Schema
+    public TableSchema? Schema
     {
         get { return _Schema; }
         set
@@ -613,10 +618,11 @@ public partial class Query
                 TableAliasMap.Remove(_Schema.DatabaseOwner + @"/" + (_SchemaName ?? _Schema.Name));
             }
             _Schema = value;
-            if (Schema != null)
+
+            if (_Schema != null)
             {
                 TableAliasMap[_Schema.DatabaseOwner + @"/" + _Schema.Name] = _Schema;
-                _SchemaName = Schema.Name;
+                _SchemaName = _Schema.Name;
             }
             else
             {
@@ -636,8 +642,8 @@ public partial class Query
     /// </summary>
     public int? CommandTimeout { get; set; } = null;
 
-    private OnConflict _OnConflictDoNothing = null;
-    private OnConflict _OnConflictDoUpdate = null;
+    private OnConflict? _OnConflictDoNothing = null;
+    private OnConflict? _OnConflictDoUpdate = null;
 
     /// <summary>
     /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
@@ -664,7 +670,7 @@ public partial class Query
     /// Ignore constraint errors (INSERT IGNORE / ON CONFLICT DO NOTHING etc.)
     /// Caution: Supported only by some RDBMS.
     /// </summary>
-    public OnConflict OnConflictDoNothing
+    public OnConflict? OnConflictDoNothing
     {
         get { return _OnConflictDoNothing; }
         set
@@ -677,7 +683,7 @@ public partial class Query
     /// Perform an update constraint errors (ON DUPLICATE KEY UPDATE / ON CONFLICT DO UPDATE etc.)
     /// Caution: Supported only by some RDBMS.
     /// </summary>
-    public OnConflict OnConflictDoUpdate
+    public OnConflict? OnConflictDoUpdate
     {
         get { return _OnConflictDoUpdate; }
         set
@@ -690,7 +696,7 @@ public partial class Query
     /// List of alter table steps in a big ALTER TABLE statement.
     /// May be null if not steps were added yet.
     /// </summary>
-    public List<AlterTableQueryData> AlterTableSteps { get; set; } = null;
+    public List<AlterTableQueryData>? AlterTableSteps { get; set; } = null;
 
     #endregion
 }

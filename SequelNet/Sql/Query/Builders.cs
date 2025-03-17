@@ -384,16 +384,20 @@ public partial class Query
 
                             BuildSelectList(sb, connection);
 
-                            sb.Append(@" FROM ");
-
-                            language.BuildTableName(this, connection, sb, true);
-
-                            if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                            if (this.Schema != null || this.FromExpression != null)
                             {
-                                language.BuildIndexHints(_ListIndexHint, sb, connection, this);
-                            }
+                                sb.Append(@" FROM ");
 
-                            BuildJoin(sb, connection);
+                                language.BuildTableName(this, connection, sb, true);
+
+
+                                if (_ListIndexHint != null && _ListIndexHint.Count > 0)
+                                {
+                                    language.BuildIndexHints(_ListIndexHint, sb, connection, this);
+                                }
+
+                                BuildJoin(sb, connection);
+                            }
 
                             if (_ListWhere != null && _ListWhere.Count > 0)
                             {
