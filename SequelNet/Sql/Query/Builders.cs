@@ -146,7 +146,9 @@ public partial class Query
             {
                 if (join.RightTableSql is Query)
                 {
+                    sb.Append('(');
                     sb.Append(((Query)join.RightTableSql).BuildCommand(connection));
+                    sb.Append(')');
                 }
                 else if (join.RightTableSql is Phrases.Union)
                 {
