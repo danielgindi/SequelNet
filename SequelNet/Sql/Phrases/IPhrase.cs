@@ -8,7 +8,7 @@ public interface IPhrase
 {
     void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null);
 
-#if NETSTANDARD21 || NETCORE
+#if NETSTANDARD2_1 || NET6_0_OR_GREATER
 
     #region Multiply operators
 

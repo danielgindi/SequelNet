@@ -236,7 +236,7 @@ public abstract class ConnectorBase : IDisposable
             {
                 try
                 {
-#if NETCORE
+#if NET6_0_OR_GREATER
                     while (HasTransaction)
                         await RollbackTransactionAsync();
 #else
@@ -246,7 +246,7 @@ public abstract class ConnectorBase : IDisposable
                 }
                 catch { /*ignore errors here*/ }
 
-#if NETCORE
+#if NET6_0_OR_GREATER
                 await _Connection.CloseAsync();
 #else
                 _Connection.Close();
@@ -575,7 +575,7 @@ public abstract class ConnectorBase : IDisposable
         return (_Transaction != null);
     }
 
-#if NETCORE
+#if NET6_0_OR_GREATER
     public virtual async Task<bool> BeginTransaction(CancellationToken cancellationToken)
     {
         try
@@ -627,7 +627,7 @@ public abstract class ConnectorBase : IDisposable
         }
     }
 
-#if NETCORE
+#if NET6_0_OR_GREATER
     public virtual async Task<bool> CommitTransactionAsync()
     {
         if (_Transaction == null) return false;
@@ -667,7 +667,7 @@ public abstract class ConnectorBase : IDisposable
         }
     }
 
-#if NETCORE
+#if NET6_0_OR_GREATER
     public virtual async Task<bool> RollbackTransactionAsync()
     {
         if (_Transaction == null) return false;
