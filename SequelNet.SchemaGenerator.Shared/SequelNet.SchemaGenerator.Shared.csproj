@@ -18,7 +18,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <AutoGenerateBindingRedirects>False</AutoGenerateBindingRedirects>
     <Authors>Daniel Cohen Gindi</Authors>
-    <Version>3.0.145</Version>
+    <Version>3.0.146</Version>
     <Copyright>Daniel Cohen Gindi</Copyright>
     <RepositoryType>git</RepositoryType>
     <DelaySign>False</DelaySign>
