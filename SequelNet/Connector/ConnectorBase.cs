@@ -228,7 +228,37 @@ public abstract class ConnectorBase : IDisposable
         _Connection = null;
     }
 
-    #endregion
+    public virtual async Task CloseAsync()
+    {
+        try
+        {
+            if (_Connection != null && _Connection.State != ConnectionState.Closed)
+            {
+                try
+                {
+#if NETCORE
+                    while (HasTransaction)
+                        await RollbackTransactionAsync();
+#else
+                    while (HasTransaction)
+                        RollbackTransaction();
+#endif
+                }
+                catch { /*ignore errors here*/ }
+
+#if NETCORE
+                await _Connection.CloseAsync();
+#else
+                _Connection.Close();
+#endif
+            }
+        }
+        catch { }
+        if (_Connection != null) _Connection.Dispose();
+        _Connection = null;
+    }
+
+#endregion
 
     #region Executing
 
@@ -530,20 +560,53 @@ public abstract class ConnectorBase : IDisposable
         return false;
     }
 
-    public virtual bool BeginTransaction(IsolationLevel IsolationLevel)
+    public virtual bool BeginTransaction(IsolationLevel isolationLevel)
     {
         try
         {
             if (_Connection.State == ConnectionState.Closed)
                 _Connection.Open();
 
-            _Transaction = _Connection.BeginTransaction(IsolationLevel);
+            _Transaction = _Connection.BeginTransaction(isolationLevel);
             if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
             _Transactions.Push(_Transaction);
         }
         catch (DbException) { return false; }
         return (_Transaction != null);
     }
+
+#if NETCORE
+    public virtual async Task<bool> BeginTransaction(CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (_Connection.State == ConnectionState.Closed) 
+                _Connection.Open();
+
+            _Transaction = await _Connection.BeginTransactionAsync(cancellationToken);
+            if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
+            _Transactions.Push(_Transaction);
+            return (_Transaction != null);
+        }
+        catch (DbException) { }
+        return false;
+    }
+
+    public virtual async Task<bool> BeginTransaction(IsolationLevel isolationLevel, CancellationToken cancellationToken)
+    {
+        try
+        {
+            if (_Connection.State == ConnectionState.Closed)
+                _Connection.Open();
+
+            _Transaction = await _Connection.BeginTransactionAsync(isolationLevel, cancellationToken);
+            if (_Transactions == null) _Transactions = new Stack<DbTransaction>(1);
+            _Transactions.Push(_Transaction);
+        }
+        catch (DbException) { return false; }
+        return (_Transaction != null);
+    }
+#endif
 
     public virtual bool CommitTransaction()
     {
@@ -564,6 +627,27 @@ public abstract class ConnectorBase : IDisposable
         }
     }
 
+#if NETCORE
+    public virtual async Task<bool> CommitTransactionAsync()
+    {
+        if (_Transaction == null) return false;
+        else
+        {
+            _Transactions.Pop();
+
+            try
+            {
+                await _Transaction.CommitAsync();
+            }
+            catch (DbException) { return false; }
+
+            if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+            else _Transaction = null;
+            return true;
+        }
+    }
+#endif
+
     public virtual bool RollbackTransaction()
     {
         if (_Transaction == null) return false;
@@ -582,6 +666,27 @@ public abstract class ConnectorBase : IDisposable
             return true;
         }
     }
+
+#if NETCORE
+    public virtual async Task<bool> RollbackTransactionAsync()
+    {
+        if (_Transaction == null) return false;
+        else
+        {
+            _Transactions.Pop();
+
+            try
+            {
+                await _Transaction.RollbackAsync();
+            }
+            catch (DbException) { return false; }
+
+            if (_Transactions.Count > 0) _Transaction = _Transactions.Peek();
+            else _Transaction = null;
+            return true;
+        }
+    }
+#endif
 
     public virtual bool HasTransaction
     {
