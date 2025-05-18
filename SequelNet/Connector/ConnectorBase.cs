@@ -576,7 +576,7 @@ public abstract class ConnectorBase : IDisposable
     }
 
 #if NET6_0_OR_GREATER
-    public virtual async Task<bool> BeginTransaction(CancellationToken cancellationToken = default)
+    public virtual async Task<bool> BeginTransactionAsync(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -592,7 +592,7 @@ public abstract class ConnectorBase : IDisposable
         return false;
     }
 
-    public virtual async Task<bool> BeginTransaction(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
+    public virtual async Task<bool> BeginTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
     {
         try
         {
