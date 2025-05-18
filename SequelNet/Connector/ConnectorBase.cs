@@ -576,7 +576,7 @@ public abstract class ConnectorBase : IDisposable
     }
 
 #if NET6_0_OR_GREATER
-    public virtual async Task<bool> BeginTransaction(CancellationToken cancellationToken)
+    public virtual async Task<bool> BeginTransaction(CancellationToken cancellationToken = default)
     {
         try
         {
@@ -592,7 +592,7 @@ public abstract class ConnectorBase : IDisposable
         return false;
     }
 
-    public virtual async Task<bool> BeginTransaction(IsolationLevel isolationLevel, CancellationToken cancellationToken)
+    public virtual async Task<bool> BeginTransaction(IsolationLevel isolationLevel, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -628,7 +628,7 @@ public abstract class ConnectorBase : IDisposable
     }
 
 #if NET6_0_OR_GREATER
-    public virtual async Task<bool> CommitTransactionAsync()
+    public virtual async Task<bool> CommitTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_Transaction == null) return false;
         else
@@ -637,7 +637,7 @@ public abstract class ConnectorBase : IDisposable
 
             try
             {
-                await _Transaction.CommitAsync();
+                await _Transaction.CommitAsync(cancellationToken);
             }
             catch (DbException) { return false; }
 
@@ -668,7 +668,7 @@ public abstract class ConnectorBase : IDisposable
     }
 
 #if NET6_0_OR_GREATER
-    public virtual async Task<bool> RollbackTransactionAsync()
+    public virtual async Task<bool> RollbackTransactionAsync(CancellationToken cancellationToken = default)
     {
         if (_Transaction == null) return false;
         else
@@ -677,7 +677,7 @@ public abstract class ConnectorBase : IDisposable
 
             try
             {
-                await _Transaction.RollbackAsync();
+                await _Transaction.RollbackAsync(cancellationToken);
             }
             catch (DbException) { return false; }
 
