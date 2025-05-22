@@ -9,7 +9,7 @@
 		<SignAssembly>true</SignAssembly>
 		<AssemblyOriginatorKeyFile>strongKey.pfx</AssemblyOriginatorKeyFile>
 		<PublishUrl>publish\</PublishUrl>
-		<Version>3.0.146</Version>
+		<Version>3.0.147</Version>
 		<Company />
 		<Product>SequelNet Hosting Extensions</Product>
 		<Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2022</Copyright>
