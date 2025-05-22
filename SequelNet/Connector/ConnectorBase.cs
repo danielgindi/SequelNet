@@ -224,7 +224,16 @@ public abstract class ConnectorBase : IDisposable
             }
         }
         catch { }
-        if (_Connection != null) _Connection.Dispose();
+
+        if (_Connection != null)
+        {
+            try
+            {
+                _Connection.Dispose();
+            }
+            catch { }
+        }
+
         _Connection = null;
     }
 
