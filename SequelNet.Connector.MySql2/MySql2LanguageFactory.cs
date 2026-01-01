@@ -974,24 +974,24 @@ namespace SequelNet.Connector
 
                 if (onEmptyAction == Phrases.JsonValue.DefaultAction.Error)
                 {
-                    sb.Append($" ON EMPTY ERROR");
+                    sb.Append($" ERROR ON EMPTY");
                 }
                 else
                 {
                     if (onEmptyValue == null)
-                        sb.Append($" ON EMPTY NULL");
-                    else sb.Append($" ON EMPTY DEFAULT {PrepareValue(conn, onEmptyValue, relatedQuery)}");
+                        sb.Append($" NULL ON EMPTY");
+                    else sb.Append($" DEFAULT {PrepareValue(conn, onEmptyValue, relatedQuery)} ON EMPTY");
                 }
 
                 if (onErrorAction == Phrases.JsonValue.DefaultAction.Error)
                 {
-                    sb.Append($" ON ERROR ERROR");
+                    sb.Append($" ERROR ON ERROR");
                 }
                 else
                 {
                     if (onErrorValue == null)
-                        sb.Append($" ON ERROR NULL");
-                    else sb.Append($" ON ERROR DEFAULT {PrepareValue(conn, onErrorValue, relatedQuery)}");
+                        sb.Append($" NULL ON ERROR");
+                    else sb.Append($" DEFAULT {PrepareValue(conn, onErrorValue, relatedQuery)} ON ERROR");
                 }
 
                 sb.Append($")");
