@@ -121,7 +121,7 @@ public abstract class AbstractRecord<T> : IRecord
         __LOOKED_FOR_PRIMARY_KEY_NAME = false;
     }
 
-    public abstract object GetPrimaryKeyValue();
+    public abstract object? GetPrimaryKeyValue();
 
     public abstract TableSchema GenerateTableSchema();
 

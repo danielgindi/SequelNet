@@ -247,7 +247,8 @@ namespace SequelNet.SchemaGenerator
                 {
                     context.SnakeColumnNames = true;
                 }
-                else if (currentLineTrimmed.StartsWith("@NullableEnabled", StringComparison.OrdinalIgnoreCase))
+                else if (currentLineTrimmed.StartsWith("@NullableEnabled", StringComparison.OrdinalIgnoreCase) ||
+                    currentLineTrimmed.StartsWith("@NullableEnable", StringComparison.OrdinalIgnoreCase))
                 {
                     context.NullableEnabled = true;
                 }

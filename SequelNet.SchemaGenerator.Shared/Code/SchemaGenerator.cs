@@ -77,6 +77,8 @@ namespace SequelNet.SchemaGenerator
 
         private static void WriteRecord(StringBuilder stringBuilder, ScriptContext context)
         {
+            var nullabilitySign = context.NullableEnabled ? "?" : "";
+
             stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}", "\r\n", context.ClassName);
 
             if (context.AtomicUpdates)
@@ -118,8 +120,9 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("#region AbstractRecord members{0}{0}", "\r\n");
 
             // GetPrimaryKeyValue() function
-            stringBuilder.AppendFormat("public override object GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
-                string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName);
+            stringBuilder.AppendFormat("public override object{1} GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
+                string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName,
+                nullabilitySign);
 
             WriteSetPrimaryKeyValueMethod(stringBuilder, context);
             stringBuilder.Append("\r\n");
