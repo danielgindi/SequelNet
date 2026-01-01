@@ -973,26 +973,16 @@ namespace SequelNet.Connector
                 }
 
                 if (onEmptyAction == Phrases.JsonValue.DefaultAction.Error)
-                {
                     sb.Append($" ERROR ON EMPTY");
-                }
-                else
-                {
-                    if (onEmptyValue == null)
-                        sb.Append($" NULL ON EMPTY");
-                    else sb.Append($" DEFAULT {PrepareValue(conn, onEmptyValue, relatedQuery)} ON EMPTY");
-                }
+                else if (onEmptyValue == null)
+                    sb.Append($" NULL ON EMPTY");
+                else sb.Append($" DEFAULT {PrepareValue(conn, onEmptyValue, relatedQuery)} ON EMPTY");
 
                 if (onErrorAction == Phrases.JsonValue.DefaultAction.Error)
-                {
                     sb.Append($" ERROR ON ERROR");
-                }
-                else
-                {
-                    if (onErrorValue == null)
-                        sb.Append($" NULL ON ERROR");
-                    else sb.Append($" DEFAULT {PrepareValue(conn, onErrorValue, relatedQuery)} ON ERROR");
-                }
+                else if (onErrorValue == null)
+                    sb.Append($" NULL ON ERROR");
+                else sb.Append($" DEFAULT {PrepareValue(conn, onErrorValue, relatedQuery)} ON ERROR");
 
                 sb.Append($")");
             }
