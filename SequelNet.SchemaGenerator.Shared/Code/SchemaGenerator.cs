@@ -120,7 +120,7 @@ namespace SequelNet.SchemaGenerator
             stringBuilder.AppendFormat("#region AbstractRecord members{0}{0}", "\r\n");
 
             // GetPrimaryKeyValue() function
-            stringBuilder.AppendFormat("public override object{1} GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
+            stringBuilder.AppendFormat("public override object{2} GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
                 string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName,
                 nullabilitySign);
 
