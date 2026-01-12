@@ -39,10 +39,31 @@ public partial class Query
         return this;
     }
 
+    public Query OrderBy(ValueWrapper value, SortDirection sortDirection)
+    {
+        if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
+        _ListOrderBy.Add(new OrderBy(value, sortDirection));
+        return this;
+    }
+
     public Query OrderBy(IPhrase phrase, SortDirection sortDirection)
     {
         if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
         _ListOrderBy.Add(new OrderBy(phrase, sortDirection));
+        return this;
+    }
+
+    public Query OrderBy(Where where, SortDirection sortDirection)
+    {
+        if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
+        _ListOrderBy.Add(new OrderBy(where, sortDirection));
+        return this;
+    }
+
+    public Query OrderBy(WhereList wheres, SortDirection sortDirection)
+    {
+        if (_ListOrderBy == null) _ListOrderBy = new OrderByList();
+        _ListOrderBy.Add(new OrderBy(wheres, sortDirection));
         return this;
     }
 

@@ -237,33 +237,7 @@ public partial class Query
             if (first) first = false;
             else sb.Append(',');
 
-            if (groupBy.ColumnName is IPhrase)
-            {
-                ((IPhrase)groupBy.ColumnName).Build(sb, connection, this);
-            }
-            else if (groupBy.ColumnName is Where)
-            {
-                ((Where)groupBy.ColumnName).BuildCommand(sb, true, new Where.BuildContext
-                {
-                    Conn = connection,
-                    RelatedQuery = this
-                });
-            }
-            else if (groupBy.IsLiteral)
-            {
-                sb.Append(groupBy.ColumnName);
-            }
-            else
-            {
-                if (groupBy.TableName != null)
-                {
-                    sb.Append(connection.Language.WrapFieldName(groupBy.TableName) + @"." + connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
-                }
-                else
-                {
-                    sb.Append(connection.Language.WrapFieldName(groupBy.ColumnName.ToString()));
-                }
-            }
+            groupBy.Value.Build(sb, connection, this);
 
             if (connection.Language.GroupBySupportsOrdering)
             {

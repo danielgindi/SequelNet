@@ -13,47 +13,65 @@ public partial class Query
 
     public Query GroupBy(string columnName)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(columnName));
-        return this;
+        return GroupBy(new GroupBy(columnName));
     }
 
     public Query GroupBy(string columnName, SortDirection sortDirection)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(columnName, sortDirection));
-        return this;
+        return GroupBy(new GroupBy(columnName, sortDirection));
     }
 
-    public Query GroupBy(object value, bool valueIsLiteral)
+    public Query GroupBy(ValueWrapper value)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(value, valueIsLiteral));
-        return this;
+        return GroupBy(new GroupBy(value));
     }
 
-    public Query GroupBy(object value, bool valueIsLiteral, SortDirection sortDirection)
+    public Query GroupBy(ValueWrapper value, SortDirection sortDirection)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(value, valueIsLiteral, sortDirection));
-        return this;
+        return GroupBy(new GroupBy(value, sortDirection));
+    }
+
+    public Query GroupBy(IPhrase phrse)
+    {
+        return GroupBy(new GroupBy(phrse));
+    }
+
+    public Query GroupBy(IPhrase phrase, SortDirection sortDirection)
+    {
+        return GroupBy(new GroupBy(phrase, sortDirection));
+    }
+
+    public Query GroupBy(Where where)
+    {
+        return GroupBy(new GroupBy(where));
+    }
+
+    public Query GroupBy(Where where, SortDirection sortDirection)
+    {
+        return GroupBy(new GroupBy(where, sortDirection));
+    }
+
+    public Query GroupBy(WhereList wheres)
+    {
+        return GroupBy(new GroupBy(wheres));
+    }
+
+    public Query GroupBy(WhereList wheres, SortDirection sortDirection)
+    {
+        return GroupBy(new GroupBy(wheres, sortDirection));
     }
 
     public Query GroupBy(string tableName, string columnName)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(tableName, columnName));
-        return this;
+        return GroupBy(new GroupBy(tableName, columnName));
     }
 
     public Query GroupBy(string tableName, string columnName, SortDirection sortDirection)
     {
-        if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
-        _ListGroupBy.Add(new GroupBy(tableName, columnName, sortDirection));
-        return this;
+        return GroupBy(new GroupBy(tableName, columnName, sortDirection));
     }
 
-    private Query GroupBy(GroupBy groupBy)
+    public Query GroupBy(GroupBy groupBy)
     {
         if (_ListGroupBy == null) _ListGroupBy = new GroupByList();
         _ListGroupBy.Add(groupBy);

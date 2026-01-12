@@ -3,73 +3,87 @@
 namespace SequelNet;
 
 internal class GroupByList : List<GroupBy> { }
-internal class GroupBy
+
+public class GroupBy
 {
-    private string _TableName;
-    private object _ColumnName;
-    private SortDirection _SortDirection;
-    internal bool _IsLiteral = false;
+    public ValueWrapper Value = new ValueWrapper();
+    public SortDirection SortDirection;
 
-    public GroupBy(object ColumnName)
+    public GroupBy(ValueWrapper value)
     {
-        _ColumnName = ColumnName;
+        Value = value;
     }
 
-    public GroupBy(object ColumnName, SortDirection SortDirection)
+    public GroupBy(ValueWrapper value, SortDirection sortDirection)
     {
-        _ColumnName = ColumnName;
-        _SortDirection = SortDirection;
+        Value = value;
+        SortDirection = sortDirection;
     }
 
-    public GroupBy(string TableName, string ColumnName)
+    public GroupBy(IPhrase phrase)
     {
-        _TableName = TableName;
-        _ColumnName = ColumnName;
+        Value.Value = phrase;
+        Value.Type = ValueObjectType.Value;
     }
 
-    public GroupBy(string TableName, string ColumnName, SortDirection SortDirection)
+    public GroupBy(IPhrase phrase, SortDirection sortDirection)
     {
-        _TableName = TableName;
-        _ColumnName = ColumnName;
-        _SortDirection = SortDirection;
+        Value.Value = phrase;
+        Value.Type = ValueObjectType.Value;
+        SortDirection = sortDirection;
     }
 
-    public GroupBy(object ColumnName, bool IsLiteral)
+    public GroupBy(Where where)
     {
-        _TableName = null;
-        _ColumnName = ColumnName;
-        _IsLiteral = IsLiteral;
+        Value.Value = where;
+        Value.Type = ValueObjectType.Value;
     }
 
-    public GroupBy(object ColumnName, bool IsLiteral, SortDirection SortDirection)
+    public GroupBy(Where where, SortDirection sortDirection)
     {
-        _TableName = null;
-        _ColumnName = ColumnName;
-        _IsLiteral = IsLiteral;
-        _SortDirection = SortDirection;
+        Value.Value = where;
+        Value.Type = ValueObjectType.Value;
+        SortDirection = sortDirection;
     }
 
-    public string TableName
+    public GroupBy(WhereList wheres)
     {
-        get { return _TableName; }
-        set { _TableName = value; }
+        Value.Value = wheres;
+        Value.Type = ValueObjectType.Value;
     }
 
-    public object ColumnName
+    public GroupBy(WhereList wheres, SortDirection sortDirection)
     {
-        get { return _ColumnName; }
-        set { _ColumnName = value; }
+        Value.Value = wheres;
+        Value.Type = ValueObjectType.Value;
+        SortDirection = sortDirection;
     }
 
-    public SortDirection SortDirection
+    public GroupBy(string columnName)
     {
-        get { return _SortDirection; }
-        set { _SortDirection = value; }
+        Value.Value = columnName;
+        Value.Type = ValueObjectType.ColumnName;
     }
 
-    internal bool IsLiteral
+    public GroupBy(string columnName, SortDirection sortDirection)
     {
-        get { return _IsLiteral; }
-        set { _IsLiteral = value; }
+        Value.Value = columnName;
+        Value.Type = ValueObjectType.ColumnName;
+        SortDirection = sortDirection;
+    }
+
+    public GroupBy(string tableName, string columnName)
+    {
+        Value.TableName = tableName;
+        Value.Value = columnName;
+        Value.Type = ValueObjectType.ColumnName;
+    }
+
+    public GroupBy(string tableName, string columnName, SortDirection sortDirection)
+    {
+        Value.TableName = tableName;
+        Value.Value = columnName;
+        Value.Type = ValueObjectType.ColumnName;
+        SortDirection = sortDirection;
     }
 }

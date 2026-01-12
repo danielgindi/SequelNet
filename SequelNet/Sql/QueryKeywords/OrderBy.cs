@@ -24,6 +24,30 @@ public class OrderByList : List<OrderBy>
         return this;
     }
 
+    public OrderByList Then(ValueWrapper value, SortDirection sortDirection)
+    {
+        Add(new OrderBy(value, sortDirection));
+        return this;
+    }
+
+    public OrderByList Then(IPhrase phrase, SortDirection sortDirection)
+    {
+        Add(new OrderBy(phrase, sortDirection));
+        return this;
+    }
+
+    public OrderByList Then(Where where, SortDirection sortDirection)
+    {
+        Add(new OrderBy(where, sortDirection));
+        return this;
+    }
+
+    public OrderByList Then(WhereList wheres, SortDirection sortDirection)
+    {
+        Add(new OrderBy(wheres, sortDirection));
+        return this;
+    }
+
     public void BuildCommand(StringBuilder outputBuilder, ConnectorBase conn, Query relatedQuery, bool invert = false)
     {
         if (this.Count > 0)
@@ -80,9 +104,29 @@ public class OrderBy
         this.SortDirection = sortDirection;
     }
 
+    public OrderBy(ValueWrapper value, SortDirection sortDirection)
+    {
+        Value = value;
+        this.SortDirection = sortDirection;
+    }
+
     public OrderBy(IPhrase phrase, SortDirection sortDirection)
     {
         Value.Value = phrase;
+        Value.Type = ValueObjectType.Value;
+        this.SortDirection = sortDirection;
+    }
+
+    public OrderBy(Where wheres, SortDirection sortDirection)
+    {
+        Value.Value = wheres;
+        Value.Type = ValueObjectType.Value;
+        this.SortDirection = sortDirection;
+    }
+
+    public OrderBy(WhereList wheres, SortDirection sortDirection)
+    {
+        Value.Value = wheres;
         Value.Type = ValueObjectType.Value;
         this.SortDirection = sortDirection;
     }
@@ -123,11 +167,35 @@ public class OrderBy
         return list;
     }
 
+    public OrderByList Then(ValueWrapper value, SortDirection sortDirection)
+    {
+        var list = new OrderByList();
+        list.Add(this);
+        list.Add(new OrderBy(value, sortDirection));
+        return list;
+    }
+
     public OrderByList Then(IPhrase phrase, SortDirection sortDirection)
     {
         var list = new OrderByList();
         list.Add(this);
         list.Add(new OrderBy(phrase, sortDirection));
+        return list;
+    }
+
+    public OrderByList Then(Where where, SortDirection sortDirection)
+    {
+        var list = new OrderByList();
+        list.Add(this);
+        list.Add(new OrderBy(where, sortDirection));
+        return list;
+    }
+
+    public OrderByList Then(WhereList wheres, SortDirection sortDirection)
+    {
+        var list = new OrderByList();
+        list.Add(this);
+        list.Add(new OrderBy(wheres, sortDirection));
         return list;
     }
 
