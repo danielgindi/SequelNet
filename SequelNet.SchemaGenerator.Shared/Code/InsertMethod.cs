@@ -85,6 +85,12 @@ namespace SequelNet.SchemaGenerator
                 (DalColumn c) => c.Name == context.SingleColumnPrimaryKeyName
                 || c.PropertyName == context.SingleColumnPrimaryKeyName
             );
+
+            if (context.NullableEnabled && !dalCol.IsNullable)
+            {
+                valueConvertorFormat += "!";
+            }
+
             if (dalCol.Type == DalColumnType.TBool)
             {
                 valueConvertorFormat = "Convert.ToBoolean({0})";

@@ -8,6 +8,7 @@
  *  @Index:                 NAME(ix_name); [Column name, column name]; UNIQUE/PRIMARYKEY/SPATIAL/FULLTEXT/BTREE/RTREE/HASH/NONCLUSTERED/CLUSTERED
  *  @BeforeInsert:          Code to execute in beginning of Insert(...) code
  *  @BeforeUpdate:          Code to execute in beginning of Update(...) code
+ *  @AfterUpdateQuery:      Code to execute after generating the Update query.
  *  @AfterRead:             Code to execute at the end of Read(...) code
  *  @MySqlEngine:           InnoDB/MyISAM/ARCHIVE (Use MyISAM for geographical, FULLTEXT, and general RTREE indexes)
  *  @StaticColumns          Export column names as static fields (writable) instead of const
@@ -19,6 +20,7 @@
  *  @NoCreatedOn			Disable the automatic "CreatedOn" setting on Insert
  *  @NoModifiedBy			Disable the automatic "ModifiedBy" setting on Update
  *  @NoModifiedOn			Disable the automatic "ModifiedOn" setting on Update
+ *  @NullableEnabled		Enable nullable properties (#nullable enable)
  */
  ```
 
@@ -29,7 +31,7 @@
  `Primary Key` - Defines the column as primary key or part of primary key  
  `AutoIncrement` / `Auto Increment` / `AUTO_INCREMENT` - Defines the column as a serial column  
  `Default` _value_ - Sets the DEFAULT value for the column  
- `Nullable` - Defines the column as NULLABLE. Default is NOT NULL.  
+ `Nullable` - Defines the column as NULLABLE. Default is NOT NULL.   
  `IsMutatedProperty` - the name of a property specifying whether the column is mutated. Goes hand-in-hand with `@AtomicUpdates`
  `Charset` - the name of a character set for this column  
  `Collate` - the name of a collation for this column  
