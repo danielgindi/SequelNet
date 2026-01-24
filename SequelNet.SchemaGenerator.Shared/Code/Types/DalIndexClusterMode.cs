@@ -1,9 +1,8 @@
-namespace SequelNet.SchemaGenerator
+namespace SequelNet.SchemaGenerator;
+
+public enum DalIndexClusterMode
 {
-    public enum DalIndexClusterMode
-	{
-		None,
-		NonClustered,
-		Clustered
-	}
+    None,
+    NonClustered,
+    Clustered
 }

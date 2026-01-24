@@ -9,7 +9,7 @@
     <RootNamespace>SequelNet.SchemaGenerator</RootNamespace>
     <AssemblyName>SequelNet.SchemaGenerator.Shared</AssemblyName>
 	<SignAssembly>True</SignAssembly>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <AssemblyOriginatorKeyFile>Key.pfx</AssemblyOriginatorKeyFile>
     <TargetFramework>net472</TargetFramework>
     <FileUpgradeFlags>

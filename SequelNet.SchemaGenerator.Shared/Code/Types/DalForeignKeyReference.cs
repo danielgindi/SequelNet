@@ -1,11 +1,10 @@
-namespace SequelNet.SchemaGenerator
+namespace SequelNet.SchemaGenerator;
+
+public enum DalForeignKeyReference
 {
-    public enum DalForeignKeyReference
-	{
-		None,
-		Restrict,
-		Cascade,
-		SetNull,
-		NoAction
-	}
+    None,
+    Restrict,
+    Cascade,
+    SetNull,
+    NoAction
 }

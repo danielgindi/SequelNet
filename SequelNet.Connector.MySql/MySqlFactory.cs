@@ -2,98 +2,97 @@
 using System.Data;
 using System.Data.Common;
 
-namespace SequelNet.Connector
+namespace SequelNet.Connector;
+
+public class MySqlFactory : IConnectorFactory
 {
-    public class MySqlFactory : IConnectorFactory
+    internal static MySqlFactory Shared = new MySqlFactory(null);
+
+    public string ConnectionString { get; set; }
+
+    public MySqlFactory(string connectionString)
     {
-        internal static MySqlFactory Shared = new MySqlFactory(null);
+        this.ConnectionString = connectionString;
+    }
 
-        public string ConnectionString { get; set; }
+    public ConnectorBase Connector()
+    {
+        return new MySqlConnector(this);
+    }
+    public DbParameter NewParameter(string name, object value)
+    {
+        return new MySqlParameter(name, value);
+    }
 
-        public MySqlFactory(string connectionString)
-        {
-            this.ConnectionString = connectionString;
-        }
+    public DbParameter NewParameter(string name, DbType type, object value)
+    {
+        MySqlParameter p = new MySqlParameter(name, value);
+        p.DbType = type;
+        return p;
+    }
 
-        public ConnectorBase Connector()
-        {
-            return new MySqlConnector(this);
-        }
-        public DbParameter NewParameter(string name, object value)
-        {
-            return new MySqlParameter(name, value);
-        }
+    public DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection)
+    {
+        MySqlParameter p = new MySqlParameter(name, value);
+        p.Direction = parameterDirection;
+        return p;
+    }
 
-        public DbParameter NewParameter(string name, DbType type, object value)
-        {
-            MySqlParameter p = new MySqlParameter(name, value);
-            p.DbType = type;
-            return p;
-        }
+    public DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
+        int size, bool isNullable,
+        byte precision, byte scale,
+        string sourceColumn, DataRowVersion sourceVersion,
+        object value)
+    {
+        MySqlParameter p = new MySqlParameter(name, value);
+        p.DbType = type;
+        p.Direction = parameterDirection;
+        p.Size = size;
+        p.IsNullable = isNullable;
+        p.Precision = precision;
+        p.Scale = scale;
+        p.SourceColumn = sourceColumn;
+        p.SourceVersion = sourceVersion;
+        return p;
+    }
 
-        public DbParameter NewParameter(string name, object value, ParameterDirection parameterDirection)
-        {
-            MySqlParameter p = new MySqlParameter(name, value);
-            p.Direction = parameterDirection;
-            return p;
-        }
+    public DbCommand NewCommand()
+    {
+        return new MySqlCommand();
+    }
 
-        public DbParameter NewParameter(string name, DbType type, ParameterDirection parameterDirection,
-            int size, bool isNullable,
-            byte precision, byte scale,
-            string sourceColumn, DataRowVersion sourceVersion,
-            object value)
-        {
-            MySqlParameter p = new MySqlParameter(name, value);
-            p.DbType = type;
-            p.Direction = parameterDirection;
-            p.Size = size;
-            p.IsNullable = isNullable;
-            p.Precision = precision;
-            p.Scale = scale;
-            p.SourceColumn = sourceColumn;
-            p.SourceVersion = sourceVersion;
-            return p;
-        }
+    public DbCommand NewCommand(string commandText)
+    {
+        return new MySqlCommand(commandText);
+    }
 
-        public DbCommand NewCommand()
-        {
-            return new MySqlCommand();
-        }
+    public DbCommand NewCommand(string commandText, DbConnection connection)
+    {
+        return new MySqlCommand(commandText, (MySqlConnection)connection);
+    }
 
-        public DbCommand NewCommand(string commandText)
-        {
-            return new MySqlCommand(commandText);
-        }
+    public DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
+    {
+        return new MySqlCommand(commandText, (MySqlConnection)connection, (MySqlTransaction)transaction);
+    }
 
-        public DbCommand NewCommand(string commandText, DbConnection connection)
-        {
-            return new MySqlCommand(commandText, (MySqlConnection)connection);
-        }
+    public DbDataAdapter NewDataAdapter()
+    {
+        return new MySqlDataAdapter();
+    }
 
-        public DbCommand NewCommand(string commandText, DbConnection connection, DbTransaction transaction)
-        {
-            return new MySqlCommand(commandText, (MySqlConnection)connection, (MySqlTransaction)transaction);
-        }
+    public DbDataAdapter NewDataAdapter(DbCommand selectCommand)
+    {
+        return new MySqlDataAdapter((MySqlCommand)selectCommand);
+    }
 
-        public DbDataAdapter NewDataAdapter()
-        {
-            return new MySqlDataAdapter();
-        }
+    public DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
+    {
+        return new MySqlDataAdapter(selectCommandText, (MySqlConnection)connection);
+    }
 
-        public DbDataAdapter NewDataAdapter(DbCommand selectCommand)
-        {
-            return new MySqlDataAdapter((MySqlCommand)selectCommand);
-        }
-
-        public DbDataAdapter NewDataAdapter(string selectCommandText, DbConnection connection)
-        {
-            return new MySqlDataAdapter(selectCommandText, (MySqlConnection)connection);
-        }
-
-        public DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
-        {
-            return new MySqlDataAdapter(selectCommandText, selectConnString);
-        }
+    public DbDataAdapter NewDataAdapter(string selectCommandText, string selectConnString)
+    {
+        return new MySqlDataAdapter(selectCommandText, selectConnString);
     }
 }

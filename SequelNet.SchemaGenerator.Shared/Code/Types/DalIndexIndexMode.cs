@@ -1,11 +1,10 @@
-namespace SequelNet.SchemaGenerator
+namespace SequelNet.SchemaGenerator;
+
+public enum DalIndexIndexMode
 {
-    public enum DalIndexIndexMode
-	{
-		None,
-		Unique,
-		FullText,
-		Spatial,
-		PrimaryKey
-	}
+    None,
+    Unique,
+    FullText,
+    Spatial,
+    PrimaryKey
 }

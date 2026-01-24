@@ -1,10 +1,9 @@
-namespace SequelNet.SchemaGenerator
+namespace SequelNet.SchemaGenerator;
+
+public enum DalIndexIndexType
 {
-    public enum DalIndexIndexType
-	{
-		None,
-		BTREE,
-		HASH,
-		RTREE
-	}
+    None,
+    BTREE,
+    HASH,
+    RTREE
 }

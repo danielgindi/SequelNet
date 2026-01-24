@@ -1,9 +1,8 @@
-﻿namespace SequelNet.Connector
+﻿namespace SequelNet.Connector;
+
+public enum MySql2EngineType
 {
-    public enum MySql2EngineType
-    {
-        InnoDB,
-        MyISAM,
-        ARCHIVE
-    }
+    InnoDB,
+    MyISAM,
+    ARCHIVE
 }

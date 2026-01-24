@@ -14,7 +14,7 @@
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SignAssembly>true</SignAssembly>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <AssemblyOriginatorKeyFile>strongName.pfx</AssemblyOriginatorKeyFile>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
