@@ -94,88 +94,88 @@ public partial class GeneratorCore
 
         if (dalCol.Type == DalColumnType.TBool)
         {
-            valueConvertorFormat = "Convert.ToBoolean({0})";
+            valueConvertorFormat = $"Convert.ToBoolean({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TGuid)
         {
-            valueConvertorFormat = "new Guid({0}.ToString())";
+            valueConvertorFormat = $"new Guid({valueConvertorFormat}.ToString())";
         }
         else if (dalCol.Type == DalColumnType.TInt)
         {
-            valueConvertorFormat = "Convert.ToInt32({0})";
+            valueConvertorFormat = $"Convert.ToInt32({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TInt8)
         {
-            valueConvertorFormat = "Convert.ToSByte({0})";
+            valueConvertorFormat = $"Convert.ToSByte({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TInt16)
         {
-            valueConvertorFormat = "Convert.ToInt16({0})";
+            valueConvertorFormat = $"Convert.ToInt16({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TInt32)
         {
-            valueConvertorFormat = "Convert.ToInt32({0})";
+            valueConvertorFormat = $"Convert.ToInt32({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TInt64)
         {
-            valueConvertorFormat = "Convert.ToInt64({0})";
+            valueConvertorFormat = $"Convert.ToInt64({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TUInt8)
         {
-            valueConvertorFormat = "Convert.ToByte({0})";
+            valueConvertorFormat = $"Convert.ToByte({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TUInt16)
         {
-            valueConvertorFormat = "Convert.ToUInt16({0})";
+            valueConvertorFormat = $"Convert.ToUInt16({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TUInt32)
         {
-            valueConvertorFormat = "Convert.ToUInt32({0})";
+            valueConvertorFormat = $"Convert.ToUInt32({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TUInt64)
         {
-            valueConvertorFormat = "Convert.ToUInt64({0})";
+            valueConvertorFormat = $"Convert.ToUInt64({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TDecimal || dalCol.Type == DalColumnType.TMoney)
         {
-            valueConvertorFormat = "Convert.ToDecimal({0})";
+            valueConvertorFormat = $"Convert.ToDecimal({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TDouble)
         {
-            valueConvertorFormat = "Convert.ToDouble({0})";
+            valueConvertorFormat = $"Convert.ToDouble({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TFloat)
         {
-            valueConvertorFormat = "Convert.ToSingle({0})";
+            valueConvertorFormat = $"Convert.ToSingle({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TDateTime)
         {
-            valueConvertorFormat = "Convert.ToDateTime({0})";
+            valueConvertorFormat = $"Convert.ToDateTime({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TDateTimeUtc)
         {
-            valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Utc)";
+            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Utc)";
         }
         else if (dalCol.Type == DalColumnType.TDateTimeLocal)
         {
-            valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Local)";
+            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Local)";
         }
         else if (dalCol.Type == DalColumnType.TDateTimeOffset)
         {
-            valueConvertorFormat = "(DateTimeOffset)DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Utc)";
+            valueConvertorFormat = $"(DateTimeOffset)DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Utc)";
         }
         else if (dalCol.Type == DalColumnType.TDate)
         {
-            valueConvertorFormat = "Convert.ToDateTime({0})";
+            valueConvertorFormat = $"Convert.ToDateTime({valueConvertorFormat})";
         }
         else if (dalCol.Type == DalColumnType.TTime)
         {
-            valueConvertorFormat = "({0}) is TimeSpan ? (TimeSpan)({0}) : TimeSpan.Parse((string)({0}))";
+            valueConvertorFormat = $"({{0}}) is TimeSpan ? (TimeSpan)({valueConvertorFormat}) : TimeSpan.Parse((string)({valueConvertorFormat}))";
         }
         else if (dalCol.Type == DalColumnType.TJson ||
             dalCol.Type == DalColumnType.TJsonBinary)
         {
-            valueConvertorFormat = "(string){0}";
+            valueConvertorFormat = $"(string){valueConvertorFormat}";
         }
         else if (dalCol.Type == DalColumnType.TLongText ||
             dalCol.Type == DalColumnType.TMediumText ||
@@ -183,7 +183,7 @@ public partial class GeneratorCore
             dalCol.Type == DalColumnType.TString ||
             dalCol.Type == DalColumnType.TFixedString)
         {
-            valueConvertorFormat = "(string){0}";
+            valueConvertorFormat = $"(string){valueConvertorFormat}";
         }
         else if (dalCol.Type == DalColumnType.TGeometry
             || dalCol.Type == DalColumnType.TGeometryCollection
@@ -214,7 +214,7 @@ public partial class GeneratorCore
             || dalCol.Type == DalColumnType.TGeographicMultiCurve
             || dalCol.Type == DalColumnType.TGeographicMultiSurface)
         {
-            valueConvertorFormat = "conn.ReadGeometry({0}) as " + dalCol.ActualType;
+            valueConvertorFormat = $"conn.ReadGeometry({valueConvertorFormat}) as " + dalCol.ActualType;
         }
 
         return valueConvertorFormat;
