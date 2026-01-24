@@ -26,6 +26,7 @@ namespace SequelNet.SchemaGenerator
 		TDateTime,
 		TDateTimeUtc,
 		TDateTimeLocal,
+        TDateTimeOffset,
 		TDate,
 		TTime,
 

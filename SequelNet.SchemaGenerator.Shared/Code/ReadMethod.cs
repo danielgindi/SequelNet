@@ -87,6 +87,7 @@ namespace SequelNet.SchemaGenerator
                 else if (dalCol.Type == DalColumnType.TDateTime ||
                     dalCol.Type == DalColumnType.TDateTimeUtc ||
                     dalCol.Type == DalColumnType.TDateTimeLocal ||
+                    dalCol.Type == DalColumnType.TDateTimeOffset ||
                     dalCol.Type == DalColumnType.TDate)
                 {
                     fromReader = "reader.GetDateTime";
@@ -98,6 +99,10 @@ namespace SequelNet.SchemaGenerator
                     else if (dalCol.Type == DalColumnType.TDateTimeLocal)
                     {
                         fromReader += "Local";
+                    }
+                    else if (dalCol.Type == DalColumnType.TDateTimeOffset)
+                    {
+                        fromReader += "Offset";
                     }
 
                     if (dalCol.IsNullable)

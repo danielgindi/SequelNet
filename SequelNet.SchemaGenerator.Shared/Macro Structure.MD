@@ -60,6 +60,7 @@
  `FIXEDSTRING(length)`; `STRING(length)`; `TEXT`; `LONGTEXT(length)`; `MEDIUMTEXT(length)`; 
  `BOOL`; `GUID`;
  `DATETIME`; `DATETIME_UTC`; `DATETIME_LOCAL`; 
+ `DATETIMEOFFSET` (always UTC); 
  `LITERALTYPE _some_literal_type_here_`
 
 **NOTE:** `LITERALTYPE` must come with an `ActualType` 

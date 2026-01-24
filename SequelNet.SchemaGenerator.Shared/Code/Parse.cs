@@ -659,6 +659,10 @@ namespace SequelNet.SchemaGenerator
                         {
                             dalColumn.Type = DalColumnType.TDateTimeLocal;
                         }
+                        else if (columnKeyword.Equals("DATETIMEOFFSET", StringComparison.OrdinalIgnoreCase))
+                        {
+                            dalColumn.Type = DalColumnType.TDateTimeOffset;
+                        }
                         else if (columnKeyword.Equals("DATE", StringComparison.OrdinalIgnoreCase))
                         {
                             dalColumn.Type = DalColumnType.TDate;

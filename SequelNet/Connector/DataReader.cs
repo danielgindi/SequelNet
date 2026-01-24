@@ -1153,6 +1153,46 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return date;
     }
 
+    public DateTimeOffset? GetDateTimeOffsetOrNull(int ordinal)
+    {
+        var date = GetDateTime(ordinal);
+        if (date == null)
+            return null;
+        if (date.Kind == DateTimeKind.Unspecified)
+        {
+            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        }
+        return (DateTimeOffset)date;
+    }
+
+    public DateTimeOffset? GetDateTimeOffset(int ordinal)
+    {
+        var date = GetDateTime(ordinal);
+        if (date.Kind == DateTimeKind.Unspecified)
+            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        return (DateTimeOffset)date;
+    }
+
+    public DateTimeOffset? GetDateTimeOffsetOrNull(string columnName)
+    {
+        var date = GetDateTime(columnName);
+        if (date == null)
+            return null;
+        if (date.Kind == DateTimeKind.Unspecified)
+        {
+            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        }
+        return (DateTimeOffset)date;
+    }
+
+    public DateTimeOffset? GetDateTimeOffset(string columnName)
+    {
+        var date = GetDateTime(columnName);
+        if (date.Kind == DateTimeKind.Unspecified)
+            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+        return (DateTimeOffset)date;
+    }
+
     public TimeSpan? GetTimeSpanOrNull(int ordinal)
     {
         return UnderlyingReader.IsDBNull(ordinal) ? null : (TimeSpan?)GetTimeSpan(ordinal);

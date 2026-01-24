@@ -47,6 +47,10 @@ namespace SequelNet.SchemaGenerator
                     {
                         defaultValue = "DateTime.UtcNow";
                     }
+                    else if (dalColumn.Type == DalColumnType.TDateTimeOffset)
+                    {
+                        defaultValue = "DateTimeOffset.UtcNow";
+                    }
                     else if (dalColumn.Type == DalColumnType.TTime)
                     {
                         defaultValue = "TimeSpan.Zero";

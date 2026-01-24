@@ -85,6 +85,10 @@ namespace SequelNet.SchemaGenerator
             {
                 dalCol.ActualType = "DateTime";
             }
+            else if (dalCol.Type == DalColumnType.TDateTimeOffset)
+            {
+                dalCol.ActualType = "DateTimeOffset";
+            }
             else if (dalCol.Type == DalColumnType.TTime)
             {
                 dalCol.ActualType = "TimeSpan";
