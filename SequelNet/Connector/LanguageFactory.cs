@@ -670,6 +670,10 @@ public class LanguageFactory
         {
             return '\'' + FormatDateTime((DateTime)value) + '\'';
         }
+        else if (value is DateTimeOffset)
+        {
+            return '\'' + FormatDateTime((DateTimeOffset)value) + '\'';
+        }
         else if (value is Guid)
         {
             return PrepareValue((Guid)value);
@@ -746,6 +750,11 @@ public class LanguageFactory
     public virtual string FormatDateTime(DateTime dateTime)
     {
         return dateTime.ToString("yyyy'-'MM'-'dd HH':'mm':'ss", DefaultCulture);
+    }
+
+    public virtual string FormatDateTime(DateTimeOffset dateTime)
+    {
+        return FormatDateTime(dateTime.UtcDateTime);
     }
 
     public virtual string FormatCreateDate(int year, int month, int day)

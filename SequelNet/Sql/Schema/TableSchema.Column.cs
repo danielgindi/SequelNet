@@ -125,6 +125,10 @@ public partial class TableSchema
             {
                 return DataType.DateTime;
             }
+            else if (this.Type.Equals(typeof(DateTimeOffset)))
+            {
+                return DataType.DateTimeOffset;
+            }
             else if (this.Type.Equals(typeof(TimeSpan)))
             {
                 return DataType.Time;

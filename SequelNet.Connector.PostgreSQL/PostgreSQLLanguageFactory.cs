@@ -460,6 +460,9 @@ public class PostgreSQLLanguageFactory : LanguageFactory
             case DataType.DateTime:
                 typeString = "TIMESTAMP";
                 break;
+            case DataType.DateTimeOffset:
+                typeString = "TIMESTAMP";
+                break;
             case DataType.Date:
                 typeString = "DATE";
                 break;

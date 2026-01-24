@@ -1165,7 +1165,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return (DateTimeOffset)date;
     }
 
-    public DateTimeOffset? GetDateTimeOffset(int ordinal)
+    public DateTimeOffset GetDateTimeOffset(int ordinal)
     {
         var date = GetDateTime(ordinal);
         if (date.Kind == DateTimeKind.Unspecified)
@@ -1185,7 +1185,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return (DateTimeOffset)date;
     }
 
-    public DateTimeOffset? GetDateTimeOffset(string columnName)
+    public DateTimeOffset GetDateTimeOffset(string columnName)
     {
         var date = GetDateTime(columnName);
         if (date.Kind == DateTimeKind.Unspecified)

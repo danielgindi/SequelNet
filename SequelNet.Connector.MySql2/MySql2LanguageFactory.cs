@@ -580,6 +580,10 @@ public class MySql2LanguageFactory : LanguageFactory
                 typeString = "DATETIME";
                 break;
 
+            case DataType.DateTimeOffset:
+                typeString = "DATETIME";
+                break;
+
             case DataType.Date:
                 typeString = "DATE";
                 break;

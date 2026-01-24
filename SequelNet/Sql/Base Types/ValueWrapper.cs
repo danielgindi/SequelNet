@@ -160,6 +160,11 @@ public struct ValueWrapper : IEquatable<ValueWrapper>
         return new ValueWrapper(value, ValueObjectType.Value);
     }
 
+    public static ValueWrapper From(DateTimeOffset value)
+    {
+        return new ValueWrapper(value, ValueObjectType.Value);
+    }
+
     public static ValueWrapper From(Geometry value)
     {
         return new ValueWrapper(value, ValueObjectType.Value);

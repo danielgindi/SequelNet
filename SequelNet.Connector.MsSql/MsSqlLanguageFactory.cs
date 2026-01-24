@@ -494,6 +494,9 @@ public class MsSqlLanguageFactory : LanguageFactory
             case DataType.DateTime:
                 typeString = "DATETIME";
                 break;
+            case DataType.DateTimeOffset:
+                typeString = "DATETIMEOFFSET";
+                break;
             case DataType.Date:
                 typeString = "DATE";
                 break;

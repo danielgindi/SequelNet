@@ -25,6 +25,11 @@ public enum DataType : int
     DateTime,
 
     /// <summary>
+    /// DateTimeOffset
+    /// </summary>
+    DateTimeOffset,
+
+    /// <summary>
     /// Date
     /// </summary>
     Date,
