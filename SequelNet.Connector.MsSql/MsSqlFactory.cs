@@ -1,6 +1,6 @@
 ﻿using System.Data;
-using System.Data.SqlClient;
 using System.Data.Common;
+using Microsoft.Data.SqlClient;
 
 namespace SequelNet.Connector
 {
