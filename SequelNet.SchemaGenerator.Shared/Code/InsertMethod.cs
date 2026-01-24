@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
@@ -158,6 +159,10 @@ namespace SequelNet.SchemaGenerator
             else if (dalCol.Type == DalColumnType.TDateTimeLocal)
             {
                 valueConvertorFormat = "DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Local)";
+            }
+            else if (dalCol.Type == DalColumnType.TDateTimeOffset)
+            {
+                valueConvertorFormat = "(DateTimeOffset)DateTime.SpecifyKind(Convert.ToDateTime({0}),  DateTimeKind.Utc)";
             }
             else if (dalCol.Type == DalColumnType.TDate)
             {

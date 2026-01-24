@@ -23,6 +23,25 @@ namespace SequelNet.SchemaGenerator
                         dalCol.Comment.Replace("\r\n", "/// ").Replace("\r", "/// ").Replace("\n", "/// "));
                 }
 
+                if (context.ComponentModel)
+                {
+                    if (dalCol.IsPrimaryKey || context.GetPrimaryKeyColumns().Contains(dalCol))
+                    {
+                        stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsKey]{0}", formatArgs);
+                    }
+
+                    if (dalCol.MaxLength > 0 &&
+                        (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString /*|| dalCol.Type == DalColumnType.TBlob*/))
+                    {
+                        stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsMaxLength({1})]{0}", formatArgs, dalCol.MaxLength);
+                    }
+
+                    if (!dalCol.IsNullable)
+                    {
+                        stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsRequired]{0}", formatArgs);
+                    }
+                }
+
                 stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}", formatArgs);
                 stringBuilder.AppendFormat("get {{ return _{2}; }}{0}", formatArgs);
                 if (context.AtomicUpdates && dalCol.Computed == null)

@@ -21,6 +21,7 @@
  *  @NoModifiedBy			Disable the automatic "ModifiedBy" setting on Update
  *  @NoModifiedOn			Disable the automatic "ModifiedOn" setting on Update
  *  @NullableEnabled		Enable nullable properties (#nullable enable)
+ *  @ComponentModel			Add component model annotations
  */
  ```
 

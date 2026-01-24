@@ -268,6 +268,10 @@ namespace SequelNet.SchemaGenerator
                 {
                     context.MySqlEngineName = currentLineTrimmed.Substring(13).Trim();
                 }
+                else if (currentLineTrimmed.StartsWith("@ComponentModel", StringComparison.OrdinalIgnoreCase))
+                {
+                    context.ComponentModel = true;
+                }
                 else
                 {
                     int startPos = currentLineTrimmed.IndexOf(":");

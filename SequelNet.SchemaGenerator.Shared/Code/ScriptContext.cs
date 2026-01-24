@@ -24,6 +24,7 @@ namespace SequelNet.SchemaGenerator
         public bool NoCreatedOn = false;
         public bool NoModifiedOn = false;
         public bool NullableEnabled = false;
+        public bool ComponentModel = false;
 
         public string SingleColumnPrimaryKeyName = null;
         public string CustomBeforeInsert = null;
