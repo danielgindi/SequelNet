@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using System.Windows.Forms;
 using Task = System.Threading.Tasks.Task;
 
 namespace SequelNet.SchemaGenerator.VSIX
@@ -109,7 +110,8 @@ namespace SequelNet.SchemaGenerator.VSIX
                     return;
                 }
 
-                string code = GeneratorCore.GenerateDalClass(selectionText);
+                string code = GeneratorCore.GenerateDalClass(selectionText,
+                    warning => MessageBox.Show(warning));
 
                 // Copy result to ClipBoard
                 ClipboardHelper.SetClipboard(code);

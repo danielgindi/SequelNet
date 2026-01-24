@@ -1,6 +1,5 @@
 using System;
 using System.Text;
-using System.Windows;
 
 // Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
@@ -12,7 +11,7 @@ public partial class GeneratorCore
     {
     }
 
-    public static string GenerateDalClass(string script)
+    public static string GenerateDalClass(string script, Action<string> onWarning)
     {
         ScriptContext context = new ScriptContext();
 
@@ -28,7 +27,7 @@ public partial class GeneratorCore
 
                 if (context.Columns.Find(x => x.Name.Equals(column.Name)) == null && context.Columns.Find(x => x.PropertyName.Equals(column.Name)) == null)
                 {
-                    MessageBox.Show(@"Column " + column.Name + @" not found in index " + (dalIx.IndexName ?? ""));
+                    onWarning(@"Column " + column.Name + @" not found in index " + (dalIx.IndexName ?? ""));
                 }
             }
         }
