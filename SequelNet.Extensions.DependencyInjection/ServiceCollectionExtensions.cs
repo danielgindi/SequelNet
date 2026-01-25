@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
             ConnectorBase.SetDefaultConnectorTypeByName(connectorName);
         }
 
-        services.AddSingleton(factoryType, factoryInstance);
+        services.AddSingleton<IConnectorFactory>(factoryInstance);
 
         return services;
     }
