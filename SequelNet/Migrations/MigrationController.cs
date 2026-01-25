@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 
 namespace SequelNet.Migrations;
 
 public class MigrationController
 {
     public delegate void MigrationVersionEventHandler(object sender, MigrationVersionEventArgs args);
+    public delegate System.Threading.Tasks.Task MigrationVersionEventAsyncHandler(object sender, MigrationVersionEventArgs args);
     public delegate void MigrationItemEventHandler(object sender, MigrationItemEventArgs args);
+    public delegate System.Threading.Tasks.Task MigrationItemEventAsyncHandler(object sender, MigrationItemEventArgs args);
     public delegate Int64 MigrationVersionQueryDelegate();
     public delegate List<DecoratedMigration> MigrationFilterDelegate(Int64 fromVersion, Int64 toVersion, List<DecoratedMigration> migrations);
     public delegate IMigration InstanceCreator(Type migrationType);
 
     public event MigrationVersionEventHandler MigrationVersionEvent;
+    public event MigrationVersionEventAsyncHandler MigrationVersionAsyncEvent;
     public event MigrationItemEventHandler ItemStartEvent;
+    public event MigrationItemEventAsyncHandler ItemStartAsyncEvent;
     public event MigrationItemEventHandler ItemEndEvent;
+    public event MigrationItemEventAsyncHandler ItemEndAsyncEvent;
 
     private List<DecoratedMigration> _Migrations = new List<DecoratedMigration>();
     private MigrationState _State = null;
@@ -165,42 +171,44 @@ public class MigrationController
 
             var migrationInstance = migration.GetMigration(MigrationInstanceCreator);
 
-            if (up)
+            if (ItemStartAsyncEvent != null)
             {
-                ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
-
-                if (migrationInstance is MigrationAsync ma)
-                {
-                    await ma.UpAsync().ConfigureAwait(false);
-                }
-                else if (migrationInstance is Migration m)
-                {
-                    m.Up();
-                }
-
-                ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, true));
+                await ItemStartAsyncEvent.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, up)).ConfigureAwait(false);
             }
-            else
+            ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, up));
+
+            if (migrationInstance is MigrationAsync ma)
             {
-                ItemStartEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
-
-                if (migrationInstance is MigrationAsync ma)
-                {
-                    await ma.DownAsync().ConfigureAwait(false);
-                }
-                else if (migrationInstance is Migration m)
-                {
+                if (up)
+                    await ma.UpAsync().ConfigureAwait(false);
+                else await ma.DownAsync().ConfigureAwait(false);
+            }
+            else if (migrationInstance is Migration m)
+            {
+                if (up)
+                    m.Up();
+                else
                     m.Down();
-                }
+            }
 
-                ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, false));
+            if (ItemEndAsyncEvent != null)
+            {
+                await ItemEndAsyncEvent.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, up)).ConfigureAwait(false);
+            }
+            ItemEndEvent?.Invoke(this, new MigrationItemEventArgs(migration.Attribute.Version, migration.Description, migration.Type, up));
 
+            if (!up)
+            {
                 _State.CurrentVersion--;
             }
 
             counter++;
 
             // Let the user know he should store the db version now
+            if (MigrationVersionAsyncEvent != null)
+            {
+                await MigrationVersionAsyncEvent.Invoke(this, new MigrationVersionEventArgs(_State.CurrentVersion)).ConfigureAwait(false);
+            }
             MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.CurrentVersion));
             _State.IsInIntermediateState = false;
         }
@@ -231,6 +239,10 @@ public class MigrationController
 
         var counter = await MigrateToAsync(_State.TargetVersion).ConfigureAwait(false);
 
+        if (MigrationVersionAsyncEvent != null)
+        {
+            await MigrationVersionAsyncEvent.Invoke(this, new MigrationVersionEventArgs(_State.TargetVersion)).ConfigureAwait(false);
+        }
         MigrationVersionEvent?.Invoke(this, new MigrationVersionEventArgs(_State.TargetVersion));
 
         return counter;
