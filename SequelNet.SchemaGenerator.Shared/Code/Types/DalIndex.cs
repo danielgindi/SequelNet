@@ -13,7 +13,7 @@ public class DalIndex
         this.IndexMode = DalIndexIndexMode.None;
     }
 
-    public string IndexName;
+    public string? IndexName;
     public DalIndexClusterMode ClusterMode;
     public DalIndexIndexType IndexType;
     public DalIndexIndexMode IndexMode;

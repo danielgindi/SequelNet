@@ -1,7 +1,5 @@
 using System.Text;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
@@ -14,45 +12,49 @@ public partial class GeneratorCore
             {
                 continue;
             }
-            object[] formatArgs = new object[] { "\r\n", dalCol.ActualType, dalCol.PropertyName, null };
-            formatArgs[3] = (dalCol.VirtualProp ? "virtual " : "");
+            var virtualPrefix = dalCol.VirtualProp ? "virtual " : "";
 
             if (!string.IsNullOrEmpty(dalCol.Comment))
             {
-                stringBuilder.AppendFormat("/// <summary>{0}/// {1}{0}/// </summary>{0}", "\r\n",
-                    dalCol.Comment.Replace("\r\n", "/// ").Replace("\r", "/// ").Replace("\n", "/// "));
+                AppendLine(stringBuilder, "/// <summary>");
+                AppendLine(stringBuilder, "/// " + dalCol.Comment!.Replace("\r\n", NewLine + "/// ").Replace("\r", NewLine + "/// ").Replace("\n", NewLine + "/// "));
+                AppendLine(stringBuilder, "/// </summary>");
             }
 
             if (context.ComponentModel)
             {
                 if (dalCol.IsPrimaryKey || context.GetPrimaryKeyColumns().Contains(dalCol))
                 {
-                    stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsKey]{0}", formatArgs);
+                    AppendLine(stringBuilder, "[System.ComponentModel.DataAnnotations.Key]");
                 }
 
                 if (dalCol.MaxLength > 0 &&
                     (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString /*|| dalCol.Type == DalColumnType.TBlob*/))
                 {
-                    stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsMaxLength({1})]{0}", formatArgs, dalCol.MaxLength);
+                    AppendLine(stringBuilder, $"[System.ComponentModel.DataAnnotations.MaxLength({dalCol.MaxLength})]");
                 }
 
                 if (!dalCol.IsNullable)
                 {
-                    stringBuilder.AppendFormat("[System.ComponentModel.DataAnnotationsRequired]{0}", formatArgs);
+                    AppendLine(stringBuilder, "[System.ComponentModel.DataAnnotations.Required]");
                 }
             }
 
-            stringBuilder.AppendFormat("public {3}{1} {2}{0}{{{0}", formatArgs);
-            stringBuilder.AppendFormat("get {{ return _{2}; }}{0}", formatArgs);
+            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+
+            AppendLine(stringBuilder, $"public {virtualPrefix}{effectiveType} {dalCol.PropertyName}");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, $"get {{ return _{dalCol.PropertyName}; }}");
             if (context.AtomicUpdates && dalCol.Computed == null)
             {
-                stringBuilder.AppendFormat("set{{ _{2} = value; MarkColumnMutated(Columns.{2}); }}{0}", formatArgs);
+                AppendLine(stringBuilder, $"set{{ _{dalCol.PropertyName} = value; MarkColumnMutated(Columns.{dalCol.PropertyName}); }}");
             }
             else
             {
-                stringBuilder.AppendFormat("set{{ _{2} = value; }}{0}", formatArgs);
+                AppendLine(stringBuilder, $"set{{ _{dalCol.PropertyName} = value; }}");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", formatArgs);
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
         }
     }
 }

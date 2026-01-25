@@ -1,7 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
-
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
 namespace SequelNet.SchemaGenerator;
 
@@ -13,37 +12,94 @@ public partial class GeneratorCore
 
     public static string GenerateDalClass(string script, Action<string> onWarning)
     {
-        ScriptContext context = new ScriptContext();
+        var result = GenerateDalClass(script);
 
-        var scriptLines = script.Trim(new char[] { ' ', '*', '/', '\t', '\r', '\n' }).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        foreach (var warning in result.Warnings)
+        {
+            onWarning(warning);
+        }
+
+        return result.Code;
+    }
+
+    public static GenerateDalClassResult GenerateDalClass(string script)
+    {
+        var context = Parse(script);
+
+        var warnings = Validate(context);
+
+        Normalize(context);
+
+        var code = Render(context);
+
+        return new GenerateDalClassResult(code, warnings, context);
+    }
+
+    private static ScriptContext Parse(string script)
+    {
+        var context = new ScriptContext();
+
+        // Avoid repeated allocations and keep trimming rules explicit.
+        var scriptLines = script
+            .Trim(new[] { ' ', '*', '/', '\t', '\r', '\n' })
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
         ParseScript(context, scriptLines);
+
+        return context;
+    }
+
+    private static List<string> Validate(ScriptContext context)
+    {
+        // Column name matching is case-sensitive (Ordinal).
+        var knownColumnNames = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var c in context.Columns)
+        {
+            if (!string.IsNullOrEmpty(c.Name))
+                knownColumnNames.Add(c.Name!);
+
+            if (!string.IsNullOrEmpty(c.PropertyName))
+                knownColumnNames.Add(c.PropertyName!);
+        }
+
+        var warnings = new List<string>();
 
         foreach (var dalIx in context.Indices)
         {
             foreach (var column in dalIx.Columns)
             {
-                if (column.Literal) continue;
+                if (column.Literal)
+                    continue;
 
-                if (context.Columns.Find(x => x.Name.Equals(column.Name)) == null && context.Columns.Find(x => x.PropertyName.Equals(column.Name)) == null)
+                if (!string.IsNullOrEmpty(column.Name) && !knownColumnNames.Contains(column.Name!))
                 {
-                    onWarning(@"Column " + column.Name + @" not found in index " + (dalIx.IndexName ?? ""));
+                    warnings.Add($"Column {column.Name} not found in index {dalIx.IndexName ?? ""}");
                 }
             }
         }
 
-        if (context.SnakeColumnNames)
+        return warnings;
+    }
+
+    private static void Normalize(ScriptContext context)
+    {
+        if (!context.SnakeColumnNames)
+            return;
+
+        foreach (var column in context.Columns)
         {
-            foreach (var column in context.Columns)
-            {
-                if (column.HasCustomName) continue;
+            if (column.HasCustomName)
+                continue;
 
-                column.Name = SnakeCase(column.Name);
-            }
+            if (!string.IsNullOrEmpty(column.Name))
+                column.Name = SnakeCase(column.Name!);
         }
+    }
 
+    private static string Render(ScriptContext context)
+    {
         // Start building the output classes
-
         var stringBuilder = new StringBuilder();
 
         if (context.ExportCollection)
@@ -56,108 +112,142 @@ public partial class GeneratorCore
             WriteRecord(stringBuilder, context);
         }
 
-        // Return results
         return stringBuilder.ToString();
+    }
+
+    public sealed class GenerateDalClassResult
+    {
+        public GenerateDalClassResult(string code, IReadOnlyList<string> warnings, ScriptContext context)
+        {
+            Code = code;
+            Warnings = warnings;
+            Context = context;
+        }
+
+        public string Code { get; }
+
+        public IReadOnlyList<string> Warnings { get; }
+
+        public ScriptContext Context { get; }
     }
 
     private static void WriteCollection(StringBuilder stringBuilder, ScriptContext context)
     {
-        stringBuilder.AppendFormat("public partial class {1}Collection : AbstractRecordList<{1}, {1}Collection> {{{0}}}{0}{0}", "\r\n", context.ClassName);
+        var w = new CodeWriter(stringBuilder);
+
+        w.AppendLine($"public partial class {context.ClassName}Collection : AbstractRecordList<{context.ClassName}, {context.ClassName}Collection>");
+        w.AppendLine("{");
+        w.AppendLine("}");
+        w.AppendLine();
+
         foreach (DalEnum dalEn in context.Enums)
         {
-            stringBuilder.AppendFormat("public enum {1}{0}{{{0}", "\r\n", dalEn.Name);
-            foreach (string item in dalEn.Items)
+            w.AppendLine($"public enum {dalEn.Name}");
+            w.AppendLine("{");
+            w.Indent();
+
+            foreach (var item in dalEn.Items!)
             {
-                stringBuilder.AppendFormat("{1},{0}", "\r\n", item);
+                w.AppendLine(item + ",");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+
+            w.Unindent();
+            w.AppendLine("}");
+            w.AppendLine();
         }
     }
 
     private static void WriteRecord(StringBuilder stringBuilder, ScriptContext context)
     {
+        var w = new CodeWriter(stringBuilder);
+
         var nullabilitySign = context.NullableEnabled ? "?" : "";
 
-        stringBuilder.AppendFormat("public partial class {1} : AbstractRecord<{1}>{0}{{{0}", "\r\n", context.ClassName);
+        w.AppendLine($"public partial class {context.ClassName} : AbstractRecord<{context.ClassName}>");
+        w.AppendLine("{");
 
         if (context.AtomicUpdates)
         {
-            stringBuilder.AppendFormat("#region Static Constructor{0}{0}", "\r\n");
-            stringBuilder.AppendFormat("static {1}(){0}", "\r\n", context.ClassName);
-            stringBuilder.AppendFormat("{{{0}", "\r\n", context.ClassName);
-            stringBuilder.AppendFormat("AtomicUpdates = true;{0}", "\r\n");
-            stringBuilder.AppendFormat("}}{0}", "\r\n");
-            stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
+            w.AppendLine();
+            w.AppendLine("#region Static Constructor");
+            w.AppendLine();
+            w.AppendLine($"static {context.ClassName}()");
+            w.AppendLine("{");
+            w.Indent();
+            w.AppendLine("AtomicUpdates = true;");
+            w.Unindent();
+            w.AppendLine("}");
+            w.AppendLine();
+            w.AppendLine("#endregion");
         }
 
-        #region Table Schema
-
-        stringBuilder.AppendFormat("#region Table Schema{0}{0}", "\r\n");
+        w.AppendLine();
+        w.AppendLine("#region Table Schema");
+        w.AppendLine();
         WriteSchema(stringBuilder, context);
-        stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
+        w.AppendLine();
+        w.AppendLine("#endregion");
+        w.AppendLine();
 
-        #endregion
-
-        #region Private Members
-
-        stringBuilder.AppendFormat("#region Private Members{0}{0}", "\r\n");
+        w.AppendLine("#region Private Members");
+        w.AppendLine();
         WriteValueStoredVariables(stringBuilder, context);
-        stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
+        w.AppendLine();
+        w.AppendLine("#endregion");
+        w.AppendLine();
 
-        #endregion
-
-        #region Properties
-
-        stringBuilder.AppendFormat("#region Properties{0}{0}", "\r\n");
+        w.AppendLine("#region Properties");
+        w.AppendLine();
         WriteValueProperties(stringBuilder, context);
-        stringBuilder.AppendFormat("#endregion{0}{0}", "\r\n");
+        w.AppendLine();
+        w.AppendLine("#endregion");
+        w.AppendLine();
 
-        #endregion
+        w.AppendLine("#region AbstractRecord members");
+        w.AppendLine();
 
-        #region AbstractRecord members
-
-        stringBuilder.AppendFormat("#region AbstractRecord members{0}{0}", "\r\n");
-
-        // GetPrimaryKeyValue() function
-        stringBuilder.AppendFormat("public override object{2} GetPrimaryKeyValue(){0}{{{0}return {1};{0}}}{0}{0}", "\r\n",
-            string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName,
-            nullabilitySign);
+        w.AppendLine($"public override object{nullabilitySign} GetPrimaryKeyValue()");
+        w.AppendLine("{");
+        w.Indent();
+        w.AppendLine($"return {(string.IsNullOrEmpty(context.SingleColumnPrimaryKeyName) ? "null" : context.SingleColumnPrimaryKeyName)};");
+        w.Unindent();
+        w.AppendLine("}");
+        w.AppendLine();
 
         WriteSetPrimaryKeyValueMethod(stringBuilder, context);
-        stringBuilder.Append("\r\n");
+        w.AppendLine();
         WriteGetInsertQuery(stringBuilder, context);
-        stringBuilder.Append("\r\n");
+        w.AppendLine();
         WriteGetUpdateQuery(stringBuilder, context);
+
         if (WriteUpdateMethod(stringBuilder, context))
-            stringBuilder.Append("\r\n");
+            w.AppendLine();
+
         if (WriteUpdateAsyncMethod(stringBuilder, context))
-            stringBuilder.Append("\r\n");
-        stringBuilder.Append("\r\n");
+            w.AppendLine();
+
+        w.AppendLine();
+
         if (WriteInsertMethod(stringBuilder, context))
-            stringBuilder.Append("\r\n");
+            w.AppendLine();
+
         if (WriteInsertAsyncMethod(stringBuilder, context))
-            stringBuilder.Append("\r\n");
+            w.AppendLine();
+
         WriteReadMethod(stringBuilder, context);
-
-        stringBuilder.AppendFormat("{0}#endregion{0}{0}", "\r\n");
-
-        #endregion
-
-        #region Mutated
+        w.AppendLine();
+        w.AppendLine("#endregion");
+        w.AppendLine();
 
         WriteMutationMethods(stringBuilder, context);
+        w.AppendLine();
 
-        #endregion
-
-        #region Helpers
-
-        stringBuilder.AppendFormat("#region Helpers{0}{0}", "\r\n");
+        w.AppendLine("#region Helpers");
+        w.AppendLine();
         WriteFetchMethods(stringBuilder, context);
-        stringBuilder.AppendFormat("{0}#endregion{0}", "\r\n");
+        w.AppendLine();
+        w.AppendLine("#endregion");
 
-        #endregion
-
-        // End of class
-        stringBuilder.Append("}");
+        w.AppendLine("}");
     }
 }

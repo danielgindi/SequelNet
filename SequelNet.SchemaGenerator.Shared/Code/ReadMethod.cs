@@ -1,6 +1,5 @@
+using System;
 using System.Text;
-
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
 namespace SequelNet.SchemaGenerator;
 
@@ -9,7 +8,8 @@ public partial class GeneratorCore
     private static void WriteReadMethod(StringBuilder stringBuilder, ScriptContext context)
     {
         // Read() method
-        stringBuilder.AppendFormat("public override void Read(DataReader reader){0}{{{0}", "\r\n");
+        AppendLine(stringBuilder, "public override void Read(DataReader reader)");
+        AppendLine(stringBuilder, "{");
         foreach (DalColumn dalCol in context.Columns)
         {
             if (dalCol.NoRead) continue;
@@ -33,7 +33,7 @@ public partial class GeneratorCore
                 dalCol.Type == DalColumnType.TDouble ||
                 dalCol.Type == DalColumnType.TFloat)
             {
-                BuildReaderStatement(dalCol, ref fromReader, ref fromDb);
+                BuildReaderStatement(dalCol, context, ref fromReader, ref fromDb);
             }
             else if (dalCol.Type == DalColumnType.TJson
                 || dalCol.Type == DalColumnType.TJsonBinary)
@@ -81,7 +81,8 @@ public partial class GeneratorCore
                 dalCol.Type == DalColumnType.TGeographicMultiCurve ||
                 dalCol.Type == DalColumnType.TGeographicMultiSurface)
             {
-                fromReader = "reader.GetGeometry(Columns.{0}) as " + dalCol.ActualType;
+                var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+                fromReader = "reader.GetGeometry(Columns.{0}) as " + actualType;
             }
 
             else if (dalCol.Type == DalColumnType.TDateTime ||
@@ -153,28 +154,32 @@ public partial class GeneratorCore
 
             if (!string.IsNullOrEmpty(dalCol.FromDb))
             {
-                fromDb = dalCol.FromDb;
+                fromDb = dalCol.FromDb!;
             }
 
-            stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n", dalCol.PropertyName, string.Format(fromDb, string.Format(fromReader, dalCol.PropertyName), dalCol.DefaultValue, dalCol.PropertyName));
+            AppendLine(stringBuilder, $"{dalCol.PropertyName} = {string.Format(fromDb, string.Format(fromReader, dalCol.PropertyName), dalCol.DefaultValue, dalCol.PropertyName)};");
         }
 
         if (!string.IsNullOrEmpty(context.CustomAfterRead))
         {
-            stringBuilder.AppendFormat("{0}{1}{0}", "\r\n", context.CustomAfterRead);
+            AppendLine(stringBuilder);
+            AppendLine(stringBuilder, context.CustomAfterRead!);
+            AppendLine(stringBuilder);
         }
 
-        stringBuilder.AppendFormat("{0}MarkOld();{0}", "\r\n");
+        AppendLine(stringBuilder);
+        AppendLine(stringBuilder, "MarkOld();");
+        AppendLine(stringBuilder);
 
         if (context.AtomicUpdates)
         {
-            stringBuilder.AppendFormat("MarkAllColumnsNotMutated();{0}", "\r\n");
+            AppendLine(stringBuilder, "MarkAllColumnsNotMutated();");
         }
 
-        stringBuilder.AppendFormat("}}{0}", "\r\n");
+        AppendLine(stringBuilder, "}");
     }
 
-    private static void BuildReaderStatement(DalColumn col, ref string fromReader, ref string fromDb)
+    private static void BuildReaderStatement(DalColumn col, ScriptContext context, ref string fromReader, ref string fromDb)
     {
         var typeName = "";
 
@@ -197,11 +202,13 @@ public partial class GeneratorCore
             case DalColumnType.TGuid: typeName = "Guid"; break;
         }
 
-        if (col.IsNullable || col.ActualType.EndsWith("?"))
+        var (actualType, effectiveType, isReferenceType) = GetClrTypeName(col, context);
+
+        if (col.IsNullable || effectiveType?.EndsWith("?") == true)
         {
             if (col.IsCustomType)
             {
-                fromReader = $"({col.ActualType})reader.Get{typeName}OrNull(Columns.{{0}})";
+                fromReader = $"({effectiveType})reader.Get{typeName}OrNull(Columns.{{0}})";
             }
             else
             {
@@ -209,7 +216,7 @@ public partial class GeneratorCore
 
                 if (!col.IsNullable && !string.IsNullOrEmpty(col.ActualDefaultValue))
                 {
-                    fromReader = fromReader + " ?? " + col.ActualDefaultValue.Replace("{", "{{").Replace("}", "}}");
+                    fromReader = fromReader + " ?? " + col.ActualDefaultValue!.Replace("{", "{{").Replace("}", "}}");
                 }
             }
         }
@@ -217,7 +224,7 @@ public partial class GeneratorCore
         {
             if (col.IsCustomType)
             {
-                fromReader = $"({col.ActualType})reader.Get{typeName}(Columns.{{0}})";
+                fromReader = $"({effectiveType})reader.Get{typeName}(Columns.{{0}})";
             }
             else
             {

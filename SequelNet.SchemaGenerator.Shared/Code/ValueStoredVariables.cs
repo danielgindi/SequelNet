@@ -1,7 +1,5 @@
 using System.Text;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
@@ -10,12 +8,7 @@ public partial class GeneratorCore
     {
         foreach (DalColumn dalColumn in context.Columns)
         {
-            if (!dalColumn.NoProperty)
-            {
-                stringBuilder.Append("internal ");
-            }
-
-            string defaultValue = dalColumn.DefaultValue;
+            string? defaultValue = dalColumn.DefaultValue;
 
             if (string.IsNullOrEmpty(defaultValue) || defaultValue == "null")
             {
@@ -113,26 +106,27 @@ public partial class GeneratorCore
                 }
             }
 
-            if (dalColumn.ActualDefaultValue.Length > 0)
-                defaultValue = dalColumn.ActualDefaultValue;
+            if (!string.IsNullOrEmpty(dalColumn.ActualDefaultValue))
+                defaultValue = dalColumn.ActualDefaultValue!;
 
             if (dalColumn.NoProperty)
                 continue;
 
-            stringBuilder.Append(dalColumn.ActualType);
-            stringBuilder.AppendFormat(" _{0}", dalColumn.PropertyName);
-            if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue.Length > 0 & (dalColumn.ActualDefaultValue == "null")) && dalColumn.IsNullable)
+            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalColumn, context);
+            var declaration = $"internal {effectiveType} _{dalColumn.PropertyName}";
+
+            if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue == "null") && dalColumn.IsNullable)
             {
-                stringBuilder.AppendFormat(" = {1};{0}", "\r\n",
-                    (dalColumn.ActualDefaultValue.Length > 0 ? dalColumn.ActualDefaultValue : dalColumn.DefaultValue));
+                var expr = !string.IsNullOrEmpty(dalColumn.ActualDefaultValue) ? dalColumn.ActualDefaultValue : dalColumn.DefaultValue;
+                AppendLine(stringBuilder, $"{declaration} = {expr};");
             }
             else if (defaultValue != null)
             {
-                stringBuilder.AppendFormat(" = {1};{0}", "\r\n", defaultValue);
+                AppendLine(stringBuilder, $"{declaration} = {defaultValue};");
             }
             else
             {
-                stringBuilder.AppendFormat(";{0}", "\r\n");
+                AppendLine(stringBuilder, $"{declaration};");
             }
         }
     }

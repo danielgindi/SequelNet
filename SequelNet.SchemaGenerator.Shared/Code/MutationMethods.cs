@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
@@ -12,69 +10,90 @@ public partial class GeneratorCore
         var customMutatedColumns = context.Columns.FindAll(x => !string.IsNullOrEmpty(x.IsMutatedProperty));
         if (customMutatedColumns.Count > 0)
         {
-            stringBuilder.AppendFormat("{0}#region Mutated{0}{0}", "\r\n");
+            AppendLine(stringBuilder);
+            AppendLine(stringBuilder, "#region Mutated");
+            AppendLine(stringBuilder);
 
             // MarkColumnMutated
-            stringBuilder.AppendFormat("public override void MarkColumnMutated(string column){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("base.MarkColumnMutated(column);{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "public override void MarkColumnMutated(string column)");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "base.MarkColumnMutated(column);");
+            AppendLine(stringBuilder);
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = true;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"if (column == Columns.{dalCol.PropertyName} && {dalCol.PropertyName} != null) {dalCol.PropertyName}.{dalCol.IsMutatedProperty} = true;");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
             // MarkColumnNotMutated
-            stringBuilder.AppendFormat("public override void MarkColumnNotMutated(string column){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("base.MarkColumnNotMutated(column);{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "public override void MarkColumnNotMutated(string column)");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "base.MarkColumnNotMutated(column);");
+            AppendLine(stringBuilder);
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("if (column == Columns.{1} && {2} != null) {2}.{3} = false;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"if (column == Columns.{dalCol.PropertyName} && {dalCol.PropertyName} != null) {dalCol.PropertyName}.{dalCol.IsMutatedProperty} = false;");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
             // MarkAllColumnsNotMutated
-            stringBuilder.AppendFormat("public override void MarkAllColumnsNotMutated(){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("base.MarkAllColumnsNotMutated();{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "public override void MarkAllColumnsNotMutated()");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "base.MarkAllColumnsNotMutated();");
+            AppendLine(stringBuilder);
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("if ({1} != null) {1}.{2} = false;{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"if ({dalCol.PropertyName} != null) {dalCol.PropertyName}.{dalCol.IsMutatedProperty} = false;");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
             // IsColumnMutated
-            stringBuilder.AppendFormat("public override bool IsColumnMutated(string column){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("if (base.IsColumnMutated(column)) return true;{0}{0}", "\r\n");
-            stringBuilder.AppendFormat("switch (column){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "public override bool IsColumnMutated(string column)");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "if (base.IsColumnMutated(column)) return true;");
+            AppendLine(stringBuilder);
+            AppendLine(stringBuilder, "switch (column)");
+            AppendLine(stringBuilder, "{");
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("case Columns.{1}:{0}if ({2} != null && {2}.{3}) return true;{0}break;{0}", "\r\n", dalCol.PropertyName, dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"case Columns.{dalCol.PropertyName}:");
+                AppendLine(stringBuilder, $"if ({dalCol.PropertyName} != null && {dalCol.PropertyName}.{dalCol.IsMutatedProperty}) return true;");
+                AppendLine(stringBuilder, "break;");
             }
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
-            stringBuilder.AppendFormat("return false;{0}", "\r\n");
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
+            AppendLine(stringBuilder, "return false;");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
             // HasMutatedColumns
-            stringBuilder.AppendFormat("public override bool HasMutatedColumns(){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("if (base.HasMutatedColumns()) return true;{0}", "\r\n");
+            AppendLine(stringBuilder, "public override bool HasMutatedColumns()");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "if (base.HasMutatedColumns()) return true;");
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) return true;{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"if ({dalCol.PropertyName} != null && {dalCol.PropertyName}.{dalCol.IsMutatedProperty}) return true;");
             }
-            stringBuilder.AppendFormat("return false;{0}", "\r\n");
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "return false;");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
             // GetMutatedColumnNamesSet
-            stringBuilder.AppendFormat("public override HashSet<string> GetMutatedColumnNamesSet(){0}{{{0}", "\r\n");
-            stringBuilder.AppendFormat("  var set = new HashSet<string>(base.GetMutatedColumnNamesSet());{0}", "\r\n");
-            stringBuilder.AppendFormat("  return base.GetMutatedColumnNamesSet();{0}", "\r\n");
+            AppendLine(stringBuilder, "public override HashSet<string> GetMutatedColumnNamesSet()");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder, "  var set = new HashSet<string>(base.GetMutatedColumnNamesSet());");
             foreach (var dalCol in customMutatedColumns)
             {
-                stringBuilder.AppendFormat("if ({1} != null && {1}.{2}) set.Add(Columns.{1});{0}", "\r\n", dalCol.PropertyName, dalCol.IsMutatedProperty);
+                AppendLine(stringBuilder, $"if ({dalCol.PropertyName} != null && {dalCol.PropertyName}.{dalCol.IsMutatedProperty}) set.Add(Columns.{dalCol.PropertyName});");
             }
-            stringBuilder.AppendFormat("return set;{0}", "\r\n");
-            stringBuilder.AppendFormat("}}{0}{0}", "\r\n");
+            AppendLine(stringBuilder, "return set;");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder);
 
-            stringBuilder.AppendFormat("#endregion{0}", "\r\n");
+            AppendLine(stringBuilder, "#endregion");
         }
     }
 }

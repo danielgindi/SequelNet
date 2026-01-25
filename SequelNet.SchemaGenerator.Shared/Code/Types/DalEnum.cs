@@ -4,6 +4,6 @@ namespace SequelNet.SchemaGenerator;
 
 public class DalEnum
 {
-    public string Name;
-    public List<string> Items;
+    public string? Name;
+    public List<string>? Items;
 }

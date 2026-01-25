@@ -1,7 +1,4 @@
-using System;
 using System.Text;
-
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
 
 namespace SequelNet.SchemaGenerator;
 
@@ -9,7 +6,7 @@ public partial class GeneratorCore
 {
     private static void WriteGetInsertQuery(StringBuilder stringBuilder, ScriptContext context)
     {
-        stringBuilder.AppendFormat("public override Query GetInsertQuery(){0}{{{0}", "\r\n");
+        AppendLine(stringBuilder, "public override Query GetInsertQuery()" + NewLine + "{" );
 
         bool printExtraNewLine = false;
 
@@ -17,17 +14,18 @@ public partial class GeneratorCore
         {
             if (context.Columns.Find((DalColumn c) => c.PropertyName == "CreatedOn") != null)
             {
-                stringBuilder.AppendFormat("CreatedOn = DateTime.UtcNow;{0}", "\r\n");
+                AppendLine(stringBuilder, "CreatedOn = DateTime.UtcNow;");
                 printExtraNewLine = true;
             }
         }
 
         if (printExtraNewLine)
         {
-            stringBuilder.Append("\r\n");
+            AppendLine(stringBuilder);
         }
 
-        stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}{0}", "\r\n");
+        AppendLine(stringBuilder, "Query qry = new Query(Schema);");
+        AppendLine(stringBuilder);
 
         foreach (DalColumn dalCol in context.Columns)
         {
@@ -48,34 +46,38 @@ public partial class GeneratorCore
                     dalCol.Type == DalColumnType.TUInt32 ||
                     dalCol.Type == DalColumnType.TUInt64)
                 {
-                    stringBuilder.AppendFormat("if ({1} > 0){0}{{{0}", "\r\n", dalCol.PropertyName);
+                    AppendLine(stringBuilder, $"if ({dalCol.PropertyName} > 0)");
+                    AppendLine(stringBuilder, "{");
                 }
                 else if (dalCol.Type == DalColumnType.TGuid)
                 {
-                    stringBuilder.AppendFormat("if ({1}.Equals(Guid.Empty)){0}{{{0}", "\r\n", dalCol.PropertyName);
+                    AppendLine(stringBuilder, $"if ({dalCol.PropertyName}.Equals(Guid.Empty))");
+                    AppendLine(stringBuilder, "{");
                 }
                 else
                 {
-                    stringBuilder.AppendFormat("if ({1} != null){0}{{{0}", "\r\n", dalCol.PropertyName);
+                    AppendLine(stringBuilder, $"if ({dalCol.PropertyName} != null)");
+                    AppendLine(stringBuilder, "{");
                 }
             }
 
-            stringBuilder.AppendFormat("qry.Insert(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol));
+            AppendLine(stringBuilder, $"qry.Insert(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)});");
 
             if (dalCol.AutoIncrement)
             {
-                stringBuilder.AppendFormat("}}{0}", "\r\n");
+                AppendLine(stringBuilder, "}");
             }
         }
 
         if (!string.IsNullOrEmpty(context.CustomAfterInsertQuery))
         {
-            stringBuilder.AppendFormat("{1}{0}", "\r\n", context.CustomAfterInsertQuery);
+            AppendLine(stringBuilder, context.CustomAfterInsertQuery!);
         }
 
-        stringBuilder.AppendFormat("{0}return qry;{0}", "\r\n");
+        AppendLine(stringBuilder);
+        AppendLine(stringBuilder, "return qry;");
 
-        stringBuilder.AppendFormat("}}{0}", "\r\n");
+        AppendLine(stringBuilder, "}");
     }
 
     private static string GetLastInsertValueConvertFormat(ScriptContext context)
@@ -214,7 +216,8 @@ public partial class GeneratorCore
             || dalCol.Type == DalColumnType.TGeographicMultiCurve
             || dalCol.Type == DalColumnType.TGeographicMultiSurface)
         {
-            valueConvertorFormat = $"conn.ReadGeometry({valueConvertorFormat}) as " + dalCol.ActualType;
+            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+            valueConvertorFormat = $"conn.ReadGeometry({valueConvertorFormat}) as " + effectiveType;
         }
 
         return valueConvertorFormat;
@@ -226,13 +229,11 @@ public partial class GeneratorCore
         {
             var nullabilitySign = context.NullableEnabled ? "?" : "";
 
-            stringBuilder.AppendFormat("public override void SetPrimaryKeyValue(object{1} value){0}{{{0}", "\r\n", nullabilitySign);
-
-            stringBuilder.AppendFormat("{1} = {2};{0}", "\r\n",
-                context.SingleColumnPrimaryKeyName,
-                string.Format(GetLastInsertValueConvertFormat(context), "value"));
-
-            stringBuilder.AppendFormat("}}{0}", "\r\n");
+            AppendLine(stringBuilder, $"public override void SetPrimaryKeyValue(object{nullabilitySign} value)");
+            AppendLine(stringBuilder, "{");
+            AppendLine(stringBuilder,
+                $"{context.SingleColumnPrimaryKeyName} = {string.Format(GetLastInsertValueConvertFormat(context), "value")};");
+            AppendLine(stringBuilder, "}");
         }
     }
 
@@ -242,16 +243,19 @@ public partial class GeneratorCore
 
         if (hasInsertMethod)
         {
-            stringBuilder.AppendFormat("public override void Insert(ConnectorBase conn = null){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "public override void Insert(ConnectorBase conn = null)");
+            AppendLine(stringBuilder, "{");
 
             if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
             {
-                stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
+                AppendLine(stringBuilder, context.CustomBeforeInsert!);
+                AppendLine(stringBuilder);
             }
 
-            stringBuilder.AppendFormat("super.Insert(conn);{0}", "\r\n");
+            AppendLine(stringBuilder, "super.Insert(conn);");
 
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder, "}");
         }
 
         return hasInsertMethod;
@@ -263,16 +267,19 @@ public partial class GeneratorCore
 
         if (hasInsertMethod)
         {
-            stringBuilder.AppendFormat("public override Task InsertAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "public override Task InsertAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)");
+            AppendLine(stringBuilder, "{");
 
             if (!string.IsNullOrEmpty(context.CustomBeforeInsert))
             {
-                stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeInsert);
+                AppendLine(stringBuilder, context.CustomBeforeInsert!);
+                AppendLine(stringBuilder);
             }
 
-            stringBuilder.AppendFormat("super.InsertAsync(conn, cancellationToken);{0}", "\r\n");
+            AppendLine(stringBuilder, "super.InsertAsync(conn, cancellationToken);");
 
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder, "}");
         }
 
         return hasInsertMethod;

@@ -3,22 +3,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
 {
 
+    private static readonly char[] TrimScriptChars = new[] { ' ', '*', '\t' };
+    private static readonly char[] TrimScriptAndQuotesChars = new[] { ' ', '*', '"', '\t' };
+    private static readonly char[] TrimScriptAndDashChars = new[] { ' ', '*', '-', '\t' };
+    private static readonly char[] TrimBracketScriptChars = new[] { ' ', '[', ']', '\t' };
+
     private static void ParseScript(ScriptContext context, string[] scriptLines)
     {
-        context.ClassName = scriptLines[0].Trim(new char[] { ' ', '*', '\t' });
-        context.SchemaName = scriptLines[1].Trim(new char[] { ' ', '*', '\t' });
+        context.ClassName = scriptLines[0].Trim(TrimScriptChars);
+        context.SchemaName = scriptLines[1].Trim(TrimScriptChars);
 
-        if (context.SchemaName.Contains("."))
+        var schemaDotIndex = context.SchemaName.IndexOf('.');
+        if (schemaDotIndex >= 0)
         {
-            context.DatabaseOwner = context.SchemaName.Substring(0, context.SchemaName.IndexOf(".")).Trim();
-            context.SchemaName = context.SchemaName.Substring(context.SchemaName.IndexOf(".") + 1).Trim();
+            context.DatabaseOwner = context.SchemaName.Substring(0, schemaDotIndex).Trim();
+            context.SchemaName = context.SchemaName.Substring(schemaDotIndex + 1).Trim();
         }
 
         for (int i = 2; i < scriptLines.Length; i++)
@@ -27,27 +31,28 @@ public partial class GeneratorCore
             while (currentLine.EndsWith("\\") && i + 1 < scriptLines.Length)
             {
                 i++;
-                currentLine = currentLine.Substring(0, currentLine.Length - 1).Trim(new char[] { ' ', '*', '\t' }) + scriptLines[i].Trim(new char[] { ' ', '*', '\t' });
+                currentLine = currentLine.Substring(0, currentLine.Length - 1).Trim(TrimScriptChars) + scriptLines[i].Trim(TrimScriptChars);
             }
 
-            string currentLineTrimmed = currentLine.Trim(new char[] { ' ', '*', '\t' });
+            string currentLineTrimmed = currentLine.Trim(TrimScriptChars);
 
             if (currentLineTrimmed.StartsWith("@Index:", StringComparison.OrdinalIgnoreCase))
             {
                 string[] indexArguments = currentLineTrimmed.Substring(7)
                     .SplitWithEscape(';', '\\')
-                    .Select(x => x?.Trim())
+                    .Select(x => x.Trim())
                     .Where(x => !string.IsNullOrEmpty(x))
                     .ToArray();
 
                 DalIndex dalIndex = new DalIndex();
-                for (int j = 0; j <= (int)indexArguments.Length - 1; j++)
+                for (int j = 0; j < indexArguments.Length; j++)
                 {
                     string arg = indexArguments[j].Trim();
 
                     if (arg.StartsWith("NAME(", StringComparison.OrdinalIgnoreCase))
                     {
-                        dalIndex.IndexName = arg.Substring(5, arg.IndexOf(")") - 5).Trim();
+                        var closeParenIndex = arg.IndexOf(')');
+                        dalIndex.IndexName = arg.Substring(5, closeParenIndex - 5).Trim();
                     }
                     else if (arg.Equals("UNIQUE", StringComparison.OrdinalIgnoreCase))
                     {
@@ -88,16 +93,16 @@ public partial class GeneratorCore
                     else if (arg.StartsWith("[", StringComparison.OrdinalIgnoreCase))
                     {
                         var columns = arg
-                            .Trim(new char[] { ' ', '[', ']', '\t' })
+                            .Trim(TrimBracketScriptChars)
                             .SplitWithEscape(',', '\\')
-                            .Select(x => x?.Trim())
+                            .Select(x => x.Trim())
                             .Where(x => !string.IsNullOrEmpty(x))
                             .ToArray();
 
-                        foreach (string column in columns)
+                        foreach (string? column in columns)
                         {
                             string columnName = column;
-                            string direction = null;
+                            string? direction = null;
 
                             if (column.EndsWith(" ASC") || column.EndsWith(" DESC"))
                             {
@@ -124,17 +129,19 @@ public partial class GeneratorCore
                 string[] foreignKeyArguments = currentLineTrimmed.Substring(12).Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
 
                 DalForeignKey dalForeignKey = new DalForeignKey();
-                for (int l = 0; l <= (int)foreignKeyArguments.Length - 1; l++)
+                for (int l = 0; l < foreignKeyArguments.Length; l++)
                 {
                     string arg = foreignKeyArguments[l].Trim();
 
                     if (arg.StartsWith("NAME(", StringComparison.OrdinalIgnoreCase))
                     {
-                        dalForeignKey.ForeignKeyName = arg.Substring(5, arg.IndexOf(")") - 5).Trim();
+                        var closeParenIndex = arg.IndexOf(')');
+                        dalForeignKey.ForeignKeyName = arg.Substring(5, closeParenIndex - 5).Trim();
                     }
                     else if (arg.StartsWith("FOREIGNTABLE(", StringComparison.OrdinalIgnoreCase))
                     {
-                        dalForeignKey.ForeignTable = arg.Substring(13, arg.IndexOf(")") - 13).Trim();
+                        var closeParenIndex = arg.IndexOf(')');
+                        dalForeignKey.ForeignTable = arg.Substring(13, closeParenIndex - 13).Trim();
                     }
                     else if (arg.StartsWith("ONUPDATE(", StringComparison.OrdinalIgnoreCase))
                     {
@@ -182,7 +189,7 @@ public partial class GeneratorCore
                     }
                     else if (arg.StartsWith("COLUMNS[", StringComparison.OrdinalIgnoreCase))
                     {
-                        string columns = arg.Substring(7).Trim(new char[] { ' ', '[', ']', '\t' });
+                        string columns = arg.Substring(7).Trim(TrimBracketScriptChars);
                         string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         for (int k = 0; k < strArrays.Length; k++)
                         {
@@ -191,7 +198,7 @@ public partial class GeneratorCore
                     }
                     else if (arg.StartsWith("FOREIGNCOLUMNS[", StringComparison.OrdinalIgnoreCase))
                     {
-                        string columns = arg.Substring(14).Trim(new char[] { ' ', '[', ']', '\t' });
+                        string columns = arg.Substring(14).Trim(TrimBracketScriptChars);
                         string[] strArrays = columns.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                         for (int k = 0; k < strArrays.Length; k++)
                         {
@@ -294,15 +301,15 @@ public partial class GeneratorCore
                 dalColumn.EnumTypeName = "";
                 currentLineTrimmed = currentLineTrimmed.Substring(startPos + 1).Trim();
                 string[] columnKeywords = currentLineTrimmed.Split(new char[] { ';' }, StringSplitOptions.None);
-                for (int m = 0; m <= (int)columnKeywords.Length - 1; m++)
+                for (int m = 0; m < columnKeywords.Length; m++)
                 {
                     string columnKeyword = columnKeywords[m].Trim();
                     if (m == (int)columnKeywords.Length - 1)
                     {
                         if (!columnKeyword.EndsWith(":") ||
                             (int)scriptLines.Length <= i + 2 ||
-                            !scriptLines[i + 1].Trim(new char[] { ' ', '*', '\t' }).StartsWith("\"") ||
-                            !scriptLines[i + 2].Trim(new char[] { ' ', '*', '\t' }).StartsWith("-"))
+                            !scriptLines[i + 1].Trim(TrimScriptChars).StartsWith("\"") ||
+                            !scriptLines[i + 2].Trim(TrimScriptChars).StartsWith("-"))
                         {
                             dalColumn.Comment = columnKeyword;
                         }
@@ -312,14 +319,14 @@ public partial class GeneratorCore
                             i++;
                             currentLineTrimmed = scriptLines[i];
                             DalEnum dalEnum = new DalEnum();
-                            dalEnum.Name = currentLineTrimmed.Trim(new char[] { ' ', '*', '\"', '\t' });
+                            dalEnum.Name = currentLineTrimmed.Trim(TrimScriptAndQuotesChars);
                             dalColumn.EnumTypeName = dalEnum.Name;
                             dalEnum.Items = new List<string>();
                             while ((int)scriptLines.Length > i + 1 &&
-                                scriptLines[i + 1].Trim(new char[] { ' ', '*', '\t' }).StartsWith("-"))
+                                scriptLines[i + 1].Trim(TrimScriptChars).StartsWith("-"))
                             {
                                 i++;
-                                currentLineTrimmed = scriptLines[i].Trim(new char[] { ' ', '*', '-', '\t' });
+                                currentLineTrimmed = scriptLines[i].Trim(TrimScriptAndDashChars);
                                 dalEnum.Items.Add(currentLineTrimmed);
                             }
                             context.Enums.Add(dalEnum);
@@ -449,7 +456,7 @@ public partial class GeneratorCore
                     {
                         dalColumn.Type = DalColumnType.TMoney;
                     }
-                    else if (columnKeyword.StartsWith("DECIMAL", StringComparison.OrdinalIgnoreCase) |
+                    else if (columnKeyword.StartsWith("DECIMAL", StringComparison.OrdinalIgnoreCase) ||
                         columnKeyword.StartsWith("MONEY", StringComparison.OrdinalIgnoreCase))
                     {
                         string precision = "";
@@ -457,7 +464,7 @@ public partial class GeneratorCore
                         int leftPartIndex = columnKeyword.IndexOf("(");
                         int commaIndex = columnKeyword.IndexOf(",");
                         int rightParIndex = columnKeyword.IndexOf(")");
-                        if (leftPartIndex > -1 & commaIndex > -1)
+                        if (leftPartIndex > -1 && commaIndex > -1)
                         {
                             precision = columnKeyword.Substring(leftPartIndex + 1, commaIndex - leftPartIndex - 1).Trim();
                             scale = columnKeyword.Substring(commaIndex + 1, rightParIndex - commaIndex - 1).Trim();
@@ -757,7 +764,7 @@ public partial class GeneratorCore
                         dalColumn.SRID = Convert.ToInt32(columnKeyword.Substring(5).Trim());
                     }
                 }
-                if (dalColumn.IsPrimaryKey & dalColumn.Type == DalColumnType.TInt)
+                if (dalColumn.IsPrimaryKey && dalColumn.Type == DalColumnType.TInt)
                 {
                     dalColumn.Type = DalColumnType.TInt64;
                 }

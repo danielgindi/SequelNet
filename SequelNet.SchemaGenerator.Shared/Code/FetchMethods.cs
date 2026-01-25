@@ -1,8 +1,6 @@
 using System;
 using System.Text;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
@@ -17,23 +15,24 @@ public partial class GeneratorCore
             var sbQueryCond = new StringBuilder();
             var sbQueryStart = new StringBuilder();
 
-            sbQueryStart.AppendFormat("var qry = new Query(Schema){0}", "\r\n");
+            AppendLine(sbQueryStart, "var qry = new Query(Schema)");
             var first = true;
             foreach (var dalCol in primaryKeyColumns)
             {
                 if (!first)
                 {
-                    sbQueryCond.AppendFormat("{0}.AND(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
+                    sbQueryCond.Append(NewLine);
+                    sbQueryCond.Append($".AND(Columns.{dalCol.PropertyName}, {ValueToDb(FirstLetterLowerCase(dalCol.PropertyName!), dalCol)})");
                 }
                 else
                 {
-                    sbQueryCond.AppendFormat(".Where(Columns.{1}, {2})", "\r\n", dalCol.PropertyName, ValueToDb(FirstLetterLowerCase(dalCol.PropertyName), dalCol));
+                    sbQueryCond.Append($".Where(Columns.{dalCol.PropertyName}, {ValueToDb(FirstLetterLowerCase(dalCol.PropertyName!), dalCol)})");
                     first = false;
                 }
             }
 
-            var colIsDeleted = context.Columns.Find(x => x.Name.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase))
-                ?? context.Columns.Find(x => x.Name.Equals("Deleted", StringComparison.InvariantCultureIgnoreCase));
+            var colIsDeleted = context.Columns.Find(x => x.Name!.Equals("IsDeleted", StringComparison.InvariantCultureIgnoreCase))
+                ?? context.Columns.Find(x => x.Name!.Equals("Deleted", StringComparison.InvariantCultureIgnoreCase));
 
             var sbParams = new StringBuilder();
             var sbParamsCall = new StringBuilder();
@@ -50,67 +49,93 @@ public partial class GeneratorCore
                     first = false;
                 }
 
-                sbParams.AppendFormat("{0} {1}", dalCol.ActualType, FirstLetterLowerCase(dalCol.PropertyName));
-                sbParamsCall.AppendFormat("{0}", FirstLetterLowerCase(dalCol.PropertyName));
+                var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+                sbParams.AppendFormat("{0} {1}", effectiveType, FirstLetterLowerCase(dalCol.PropertyName!));
+                sbParamsCall.AppendFormat("{0}", FirstLetterLowerCase(dalCol.PropertyName!));
             }
 
             if (colIsDeleted != null)
             {
                 // FetchById(..., bool includeDeleted = false, ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static {1}{3} FetchById({2}, bool includeDeleted = false, ConnectorBase{3} conn = null){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
-                stringBuilder.AppendFormat("return FetchByQuery(qry, conn);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static {context.ClassName}{nullabilitySign} FetchById({sbParams}, bool includeDeleted = false, ConnectorBase{nullabilitySign} conn = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "if (!includeDeleted)");
+                AppendLine(stringBuilder, $"qry.AND(Columns.{colIsDeleted.PropertyName}, false);");
+                AppendLine(stringBuilder, "return FetchByQuery(qry, conn);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchById(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static {1}{4} FetchById({2}, ConnectorBase{4} conn = null){0}{{{0}return FetchById({3}, false, conn);{0}}}{0}{0}", "\r\n",
-                    context.ClassName, sbParams, sbParamsCall, nullabilitySign);
+                AppendLine(stringBuilder, $"public static {context.ClassName}{nullabilitySign} FetchById({sbParams}, ConnectorBase{nullabilitySign} conn = null)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return FetchById({sbParamsCall}, false, conn);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., bool includeDeleted = false, ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat(", bool includeDeleted = false, ConnectorBase{1} conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n",
-                    nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("if (!includeDeleted){0}qry.AND(Columns.{1}, false);{0}", "\r\n", colIsDeleted.PropertyName);
-                stringBuilder.AppendFormat("return FetchByQueryAsync(qry, conn, cancellationToken);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, bool includeDeleted = false, ConnectorBase{nullabilitySign} conn = null, CancellationToken? cancellationToken = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "if (!includeDeleted)");
+                AppendLine(stringBuilder, $"qry.AND(Columns.{colIsDeleted.PropertyName}, false);");
+                AppendLine(stringBuilder, "return FetchByQueryAsync(qry, conn, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., ConnectorBase conn, CancellationToken? cancellationToken = null) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}, ConnectorBase conn, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("return FetchByIdAsync({1}, false, conn, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, ConnectorBase conn, CancellationToken? cancellationToken = null)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return FetchByIdAsync({sbParamsCall}, false, conn, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., bool includeDeleted, CancellationToken? cancellationToken) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}, bool includeDeleted, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("return FetchByIdAsync({1}, includeDeleted, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, bool includeDeleted, CancellationToken? cancellationToken)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return FetchByIdAsync({sbParamsCall}, includeDeleted, null, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., CancellationToken? cancellationToken) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("return FetchByIdAsync({1}, false, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, CancellationToken? cancellationToken)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return FetchByIdAsync({sbParamsCall}, false, null, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
             }
             else
             {
                 // FetchById(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static {1}{3} FetchById({2}, ConnectorBase{3} conn = null){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("return FetchByQuery(qry, conn);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static {context.ClassName}{nullabilitySign} FetchById({sbParams}, ConnectorBase{nullabilitySign} conn = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "return FetchByQuery(qry, conn);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat(", ConnectorBase{1} conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n",
-                    nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2};{0}", "\r\n", sbQueryStart, sbQueryCond);
-                stringBuilder.AppendFormat("return FetchByQueryAsync(qry, conn, cancellationToken);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, ConnectorBase{nullabilitySign} conn = null, CancellationToken? cancellationToken = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "return FetchByQueryAsync(qry, conn, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // FetchByIdAsync(..., CancellationToken? cancellationToken) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<{1}{3}> FetchByIdAsync({2}, CancellationToken? cancellationToken){0}{{{0}", "\r\n",
-                    context.ClassName, sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("return FetchByIdAsync({1}, null, cancellationToken);{0}}}{0}{0}", "\r\n", sbParamsCall);
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<{context.ClassName}{nullabilitySign}> FetchByIdAsync({sbParams}, CancellationToken? cancellationToken)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return FetchByIdAsync({sbParamsCall}, null, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
             }
 
             if (primaryKeyColumns.Count > 1)
@@ -119,28 +144,42 @@ public partial class GeneratorCore
 
                 if (colIsDeleted != null)
                 {
-                    sbQueryDelete.AppendFormat("{0}.Update(Columns.{1}, true)", "\r\n", colIsDeleted.PropertyName);
+                    sbQueryDelete.Append(NewLine);
+                    sbQueryDelete.Append($".Update(Columns.{colIsDeleted.PropertyName}, true)");
                 }
                 else
                 {
-                    sbQueryDelete.AppendFormat("{0}.Delete()", "\r\n");
+                    sbQueryDelete.Append(NewLine);
+                    sbQueryDelete.Append(".Delete()");
                 }
 
                 // Delete(..., ConnectorBase conn = null) function
-                stringBuilder.AppendFormat("public static int Delete({1}, ConnectorBase{2} conn = null){0}{{{0}", "\r\n",
-                    sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2}{3};{0}", "\r\n", sbQueryStart, sbQueryDelete, sbQueryCond);
-                stringBuilder.AppendFormat("return qry.Execute(conn);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static int Delete({sbParams}, ConnectorBase{nullabilitySign} conn = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryDelete);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "return qry.Execute(conn);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // DeleteAsync(..., ConnectorBase conn = null, CancellationToken? cancellationToken = null) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<int> DeleteAsync({1}, ConnectorBase{2} conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n",
-                    sbParams, nullabilitySign);
-                stringBuilder.AppendFormat("{1}{2}{3};{0}", "\r\n", sbQueryStart, sbQueryDelete, sbQueryCond);
-                stringBuilder.AppendFormat("return qry.ExecuteAsync(conn, cancellationToken);{0}}}{0}{0}", "\r\n");
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<int> DeleteAsync({sbParams}, ConnectorBase{nullabilitySign} conn = null, CancellationToken? cancellationToken = null)");
+                AppendLine(stringBuilder, "{");
+                stringBuilder.Append(sbQueryStart);
+                stringBuilder.Append(sbQueryDelete);
+                stringBuilder.Append(sbQueryCond);
+                AppendLine(stringBuilder, ";");
+                AppendLine(stringBuilder, "return qry.ExecuteAsync(conn, cancellationToken);");
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
 
                 // DeleteAsync(..., CancellationToken? cancellationToken) function
-                stringBuilder.AppendFormat("public static System.Threading.Tasks.Task<int> DeleteAsync({1}, CancellationToken? cancellationToken){0}{{{0}", "\r\n", sbParams);
-                stringBuilder.AppendFormat("return DeleteAsync({1}, null, cancellationToken);{0}}}{0}", "\r\n", sbParamsCall);
+                AppendLine(stringBuilder, $"public static System.Threading.Tasks.Task<int> DeleteAsync({sbParams}, CancellationToken? cancellationToken)");
+                AppendLine(stringBuilder, "{");
+                AppendLine(stringBuilder, $"return DeleteAsync({sbParamsCall}, null, cancellationToken);");
+                AppendLine(stringBuilder, "}");
             }
         }
     }

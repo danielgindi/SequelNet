@@ -1,45 +1,47 @@
 using System.Text;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public partial class GeneratorCore
 {
     private static void WriteGetUpdateQuery(StringBuilder stringBuilder, ScriptContext context)
     {
-        stringBuilder.AppendFormat("public override Query GetUpdateQuery(){0}{{{0}", "\r\n");
+        AppendLine(stringBuilder, "public override Query GetUpdateQuery()");
+        AppendLine(stringBuilder, "{");
 
         bool hasModifiedOn = context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null;
 
         if (context.AtomicUpdates && (hasModifiedOn))
         {
-            stringBuilder.AppendFormat(@"if (HasMutatedColumns()){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "if (HasMutatedColumns())");
+            AppendLine(stringBuilder, "{");
         }
 
         if (!context.NoModifiedOn)
         {
             if (context.Columns.Find((DalColumn c) => c.PropertyName == "ModifiedOn") != null)
             {
-                stringBuilder.AppendFormat("ModifiedOn = DateTime.UtcNow;{0}", "\r\n");
+                AppendLine(stringBuilder, "ModifiedOn = DateTime.UtcNow;");
             }
         }
 
         if (context.AtomicUpdates && (hasModifiedOn))
         {
-            stringBuilder.AppendFormat(@"}}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
         }
 
         if (hasModifiedOn)
         {
-            stringBuilder.Append("\r\n");
+            AppendLine(stringBuilder);
         }
         if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
         {
-            stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
+            AppendLine(stringBuilder, context.CustomBeforeUpdate!);
+            AppendLine(stringBuilder);
         }
 
-        stringBuilder.AppendFormat("Query qry = new Query(Schema);{0}{0}", "\r\n");
+        AppendLine(stringBuilder, "Query qry = new Query(Schema);");
+        AppendLine(stringBuilder);
         foreach (var dalCol in context.Columns)
         {
             if (dalCol.AutoIncrement || dalCol.NoSave)
@@ -49,14 +51,16 @@ public partial class GeneratorCore
 
             if (context.AtomicUpdates)
             {
-                stringBuilder.AppendFormat(@"if (IsColumnMutated(Columns.{1}) || IsAtomicUpdatesDisabled){0}{{{0}", "\r\n", dalCol.PropertyName);
+                AppendLine(stringBuilder, $"if (IsColumnMutated(Columns.{dalCol.PropertyName}) || IsAtomicUpdatesDisabled)");
+                AppendLine(stringBuilder, "{");
             }
 
-            stringBuilder.AppendFormat("qry.Update(Columns.{1}, {2});{0}", "\r\n", dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol));
+            AppendLine(stringBuilder, $"qry.Update(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)});");
 
             if (context.AtomicUpdates)
             {
-                stringBuilder.AppendFormat(@"}}{0}{0}", "\r\n", dalCol.PropertyName);
+                AppendLine(stringBuilder, "}");
+                AppendLine(stringBuilder);
             }
         }
 
@@ -65,20 +69,20 @@ public partial class GeneratorCore
         bool isFirst = true;
         foreach (var dalCol in primaryKeyColumns)
         {
-            stringBuilder.AppendFormat("qry.{3}(Columns.{1}, {2});{0}", "\r\n",
-                dalCol.PropertyName, ValueToDb(dalCol.PropertyName, dalCol),
-                (isFirst ? "Where" : "AND"));
+            var whereMethod = isFirst ? "Where" : "AND";
+            AppendLine(stringBuilder, $"qry.{whereMethod}(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)});");
             isFirst = false;
         }
 
         if (!string.IsNullOrEmpty(context.CustomAfterUpdateQuery))
         {
-            stringBuilder.AppendFormat("{1}{0}", "\r\n", context.CustomAfterUpdateQuery);
+            AppendLine(stringBuilder, context.CustomAfterUpdateQuery!);
         }
 
-        stringBuilder.AppendFormat("{0}return qry;{0}", "\r\n");
+        AppendLine(stringBuilder);
+        AppendLine(stringBuilder, "return qry;");
 
-        stringBuilder.AppendFormat("}}{0}", "\r\n");
+        AppendLine(stringBuilder, "}");
     }
 
     private static bool WriteUpdateMethod(StringBuilder stringBuilder, ScriptContext context)
@@ -87,16 +91,19 @@ public partial class GeneratorCore
 
         if (hasUpdateMethod)
         {
-            stringBuilder.AppendFormat("public override void Update(ConnectorBase conn = null){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "public override void Update(ConnectorBase conn = null)");
+            AppendLine(stringBuilder, "{");
 
             if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
             {
-                stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
+                AppendLine(stringBuilder, context.CustomBeforeUpdate!);
+                AppendLine(stringBuilder);
             }
 
-            stringBuilder.AppendFormat("super.Update(conn);{0}", "\r\n");
+            AppendLine(stringBuilder, "super.Update(conn);");
 
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder, "}");
         }
 
         return hasUpdateMethod;
@@ -108,16 +115,19 @@ public partial class GeneratorCore
 
         if (hasUpdateMethod)
         {
-            stringBuilder.AppendFormat("public override Task UpdateAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null){0}{{{0}", "\r\n");
+            AppendLine(stringBuilder, "public override Task UpdateAsync(ConnectorBase conn = null, CancellationToken? cancellationToken = null)");
+            AppendLine(stringBuilder, "{");
 
             if (!string.IsNullOrEmpty(context.CustomBeforeUpdate))
             {
-                stringBuilder.AppendFormat("{1}{0}{0}", "\r\n", context.CustomBeforeUpdate);
+                AppendLine(stringBuilder, context.CustomBeforeUpdate!);
+                AppendLine(stringBuilder);
             }
 
-            stringBuilder.AppendFormat("super.UpdateAsync(conn, cancellationToken);{0}", "\r\n");
+            AppendLine(stringBuilder, "super.UpdateAsync(conn, cancellationToken);");
 
-            stringBuilder.AppendFormat("}}{0}}}{0}", "\r\n");
+            AppendLine(stringBuilder, "}");
+            AppendLine(stringBuilder, "}");
         }
 
         return hasUpdateMethod;

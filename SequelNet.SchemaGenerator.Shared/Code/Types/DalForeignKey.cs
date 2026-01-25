@@ -14,9 +14,9 @@ public class DalForeignKey
         this.OnUpdate = DalForeignKeyReference.None;
     }
 
-    public string ForeignKeyName;
+    public string? ForeignKeyName;
     public List<string> Columns;
-    public string ForeignTable;
+    public string? ForeignTable;
     public List<string> ForeignColumns;
     public DalForeignKeyReference OnDelete;
     public DalForeignKeyReference OnUpdate;

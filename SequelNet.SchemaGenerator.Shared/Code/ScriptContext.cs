@@ -1,14 +1,12 @@
 using System.Collections.Generic;
 
-// Converted from VB macro, REQUIRES MAJOR REFACTORING!
-
 namespace SequelNet.SchemaGenerator;
 
 public class ScriptContext
 {
-    public string ClassName = null;
-    public string SchemaName = null;
-    public string DatabaseOwner = null;
+    public string? ClassName = null;
+    public string? SchemaName = null;
+    public string? DatabaseOwner = null;
 
     public List<DalColumn> Columns = new List<DalColumn>();
     public List<DalIndex> Indices = new List<DalIndex>();
@@ -26,12 +24,12 @@ public class ScriptContext
     public bool NullableEnabled = false;
     public bool ComponentModel = false;
 
-    public string SingleColumnPrimaryKeyName = null;
-    public string CustomBeforeInsert = null;
-    public string CustomAfterInsertQuery = null;
-    public string CustomBeforeUpdate = null;
-    public string CustomAfterUpdateQuery = null;
-    public string CustomAfterRead = null;
+    public string? SingleColumnPrimaryKeyName = null;
+    public string? CustomBeforeInsert = null;
+    public string? CustomAfterInsertQuery = null;
+    public string? CustomBeforeUpdate = null;
+    public string? CustomAfterUpdateQuery = null;
+    public string? CustomAfterRead = null;
     public string MySqlEngineName = "";
 
     public List<DalColumn> GetPrimaryKeyColumns()

@@ -6,14 +6,14 @@ public class DalIndexColumn
     {
     }
 
-    public DalIndexColumn(string name, bool literal, string sortDirection)
+    public DalIndexColumn(string? name, bool literal, string? sortDirection)
     {
         this.Name = name;
         this.SortDirection = sortDirection;
         this.Literal = literal;
     }
 
-    public string Name;
-    public string SortDirection;
+    public string? Name;
+    public string? SortDirection;
     public bool Literal;
 }
