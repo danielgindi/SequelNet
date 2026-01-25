@@ -12,7 +12,7 @@
 		<LangVersion>10.0</LangVersion>
 
 		<Authors>Daniel Cohen Gindi</Authors>
-		<Version>3.0.152</Version>
+		<Version>3.0.153</Version>
 		<RepositoryType>git</RepositoryType>
 		<NoWarn>1701;1702;1591</NoWarn>
 	</PropertyGroup>
