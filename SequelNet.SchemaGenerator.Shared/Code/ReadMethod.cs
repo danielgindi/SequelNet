@@ -169,7 +169,6 @@ public partial class GeneratorCore
 
         AppendLine(stringBuilder);
         AppendLine(stringBuilder, "MarkOld();");
-        AppendLine(stringBuilder);
 
         if (context.AtomicUpdates)
         {

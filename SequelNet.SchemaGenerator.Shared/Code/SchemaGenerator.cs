@@ -168,7 +168,6 @@ public partial class GeneratorCore
 
         if (context.AtomicUpdates)
         {
-            w.AppendLine();
             w.AppendLine("#region Static Constructor");
             w.AppendLine();
             w.AppendLine($"static {context.ClassName}()");
@@ -179,9 +178,9 @@ public partial class GeneratorCore
             w.AppendLine("}");
             w.AppendLine();
             w.AppendLine("#endregion");
+            w.AppendLine();
         }
 
-        w.AppendLine();
         w.AppendLine("#region Table Schema");
         w.AppendLine();
         WriteSchema(stringBuilder, context);
@@ -237,11 +236,10 @@ public partial class GeneratorCore
         WriteReadMethod(stringBuilder, context);
         w.AppendLine();
         w.AppendLine("#endregion");
-        w.AppendLine();
 
         WriteMutationMethods(stringBuilder, context);
-        w.AppendLine();
 
+        w.AppendLine();
         w.AppendLine("#region Helpers");
         w.AppendLine();
         WriteFetchMethods(stringBuilder, context);
