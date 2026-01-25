@@ -13,6 +13,7 @@ public class MigrationController
     public delegate System.Threading.Tasks.Task MigrationItemEventAsyncHandler(object sender, MigrationItemEventArgs args);
     public delegate Int64 MigrationVersionQueryDelegate();
     public delegate List<DecoratedMigration> MigrationFilterDelegate(Int64 fromVersion, Int64 toVersion, List<DecoratedMigration> migrations);
+    public delegate System.Threading.Tasks.Task<List<DecoratedMigration>> MigrationFilterAsyncDelegate(Int64 fromVersion, Int64 toVersion, List<DecoratedMigration> migrations);
     public delegate IMigration InstanceCreator(Type migrationType);
 
     public event MigrationVersionEventHandler MigrationVersionEvent;
@@ -143,7 +144,9 @@ public class MigrationController
         var up = targetVersion > _State.StartVersion;
 
         // Try to get a predicate from the user
-        var migrations = MigrationFilterHandler != null 
+        var migrations = MigrationFilterAsyncHandler != null
+            ? await MigrationFilterAsyncHandler(_State.StartVersion, targetVersion, new List<DecoratedMigration>(_Migrations))
+            : MigrationFilterHandler != null 
             ? MigrationFilterHandler(_State.StartVersion, targetVersion, new List<DecoratedMigration>(_Migrations))
             : null;
 
@@ -259,14 +262,19 @@ public class MigrationController
     }
 
     /// <summary>
-    /// Should return the current recorded version of the db.
+    /// Should return the current recorded version of the db (synchronously)
     /// </summary>
     public MigrationVersionQueryDelegate VersionQueryHandler { get; set; }
 
     /// <summary>
-    /// A way to supply a custom predicate for which migrations to run
+    /// A way to supply a custom predicate for which migrations to run (synchronously)
     /// </summary>
     public MigrationFilterDelegate MigrationFilterHandler { get; set; }
+
+    /// <summary>
+    /// A way to supply a custom predicate for which migrations to run (asynchronously)
+    /// </summary>
+    public MigrationFilterAsyncDelegate MigrationFilterAsyncHandler { get; set; }
 
     /// <summary>
     /// Allows you to supply a custom instance creator for a migration class.
