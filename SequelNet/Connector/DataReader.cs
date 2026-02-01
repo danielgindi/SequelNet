@@ -1155,14 +1155,21 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
 
     public DateTimeOffset? GetDateTimeOffsetOrNull(int ordinal)
     {
-        var date = GetDateTime(ordinal);
+        var date = GetValue(ordinal);
         if (date == null)
             return null;
-        if (date.Kind == DateTimeKind.Unspecified)
+
+        if (date is DateTimeOffset)
+            return (DateTimeOffset)date;
+
+        if (date is not DateTime)
+            date = GetDateTime(ordinal);
+
+        if (((DateTime)date).Kind == DateTimeKind.Unspecified)
         {
-            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            date = DateTime.SpecifyKind(((DateTime)date), DateTimeKind.Utc);
         }
-        return (DateTimeOffset)date;
+        return (DateTimeOffset)(DateTime)date;
     }
 
     public DateTimeOffset GetDateTimeOffset(int ordinal)
@@ -1175,14 +1182,21 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
 
     public DateTimeOffset? GetDateTimeOffsetOrNull(string columnName)
     {
-        var date = GetDateTime(columnName);
+        var date = GetValue(columnName);
         if (date == null)
             return null;
-        if (date.Kind == DateTimeKind.Unspecified)
+
+        if (date is DateTimeOffset)
+            return (DateTimeOffset)date;
+
+        if (date is not DateTime)
+            date = GetDateTime(columnName);
+
+        if (((DateTime)date).Kind == DateTimeKind.Unspecified)
         {
-            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            date = DateTime.SpecifyKind(((DateTime)date), DateTimeKind.Utc);
         }
-        return (DateTimeOffset)date;
+        return (DateTimeOffset)(DateTime)date;
     }
 
     public DateTimeOffset GetDateTimeOffset(string columnName)
