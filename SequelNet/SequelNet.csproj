@@ -29,7 +29,7 @@
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <Version>3.0.154</Version>
+    <Version>3.0.155</Version>
     <Company />
     <Product>SequelNet Data Access Layer</Product>
     <Copyright>Copyright Daniel Cohen Gindi (danielgindi@gmail.com) © 2009</Copyright>
