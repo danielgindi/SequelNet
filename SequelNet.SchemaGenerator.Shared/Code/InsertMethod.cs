@@ -156,15 +156,15 @@ public partial class GeneratorCore
         }
         else if (dalCol.Type == DalColumnType.TDateTimeUtc)
         {
-            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Utc)";
+            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}), DateTimeKind.Utc)";
         }
         else if (dalCol.Type == DalColumnType.TDateTimeLocal)
         {
-            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Local)";
+            valueConvertorFormat = $"DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}), DateTimeKind.Local)";
         }
         else if (dalCol.Type == DalColumnType.TDateTimeOffset)
         {
-            valueConvertorFormat = $"(DateTimeOffset)DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}),  DateTimeKind.Utc)";
+            valueConvertorFormat = $"(DateTimeOffset)DateTime.SpecifyKind(Convert.ToDateTime({valueConvertorFormat}), DateTimeKind.Utc)";
         }
         else if (dalCol.Type == DalColumnType.TDate)
         {

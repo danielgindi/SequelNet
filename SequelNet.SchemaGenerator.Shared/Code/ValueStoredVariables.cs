@@ -38,7 +38,7 @@ public partial class GeneratorCore
                 }
                 else if (dalColumn.Type == DalColumnType.TDate)
                 {
-                    defaultValue = "DateTime.UtcNow";
+                    defaultValue = "DateTime.UtcNow.Date";
                 }
                 else if (dalColumn.Type == DalColumnType.TDateTimeOffset)
                 {
