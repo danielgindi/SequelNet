@@ -112,7 +112,7 @@ public partial class GeneratorCore
             if (dalColumn.NoProperty)
                 continue;
 
-            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalColumn, context);
+            var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalColumn, context);
             var declaration = $"internal {effectiveType} _{dalColumn.PropertyName}";
 
             if ((dalColumn.DefaultValue == "null" || dalColumn.ActualDefaultValue == "null") && dalColumn.IsNullable)

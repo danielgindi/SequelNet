@@ -40,7 +40,7 @@ public partial class GeneratorCore
                 }
             }
 
-            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+            var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
 
             AppendLine(stringBuilder, $"public {virtualPrefix}{effectiveType} {dalCol.PropertyName}");
             AppendLine(stringBuilder, "{");

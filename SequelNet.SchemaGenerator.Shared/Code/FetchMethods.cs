@@ -49,7 +49,7 @@ public partial class GeneratorCore
                     first = false;
                 }
 
-                var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+                var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
                 sbParams.AppendFormat("{0} {1}", effectiveType, FirstLetterLowerCase(dalCol.PropertyName!));
                 sbParamsCall.AppendFormat("{0}", FirstLetterLowerCase(dalCol.PropertyName!));
             }

@@ -94,11 +94,11 @@ public partial class GeneratorCore
 
     private static void WriteSchemaAddColumnArguments(DalColumn dalCol, ScriptContext context, StringBuilder stringBuilder)
     {
-        var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+        var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
 
         AppendInit(stringBuilder, "Name", $"Columns.{dalCol.PropertyName}");
 
-        AppendInit(stringBuilder, "Type", $"typeof({actualType})");
+        AppendInit(stringBuilder, "Type", $"typeof({baseTypeName})");
 
         var dataTypeString = GetSchemaDataTypeLiteral(dalCol)
             ?? GetEnumUnderlyingDataTypeLiteral(dalCol)

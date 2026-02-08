@@ -216,7 +216,7 @@ public partial class GeneratorCore
             || dalCol.Type == DalColumnType.TGeographicMultiCurve
             || dalCol.Type == DalColumnType.TGeographicMultiSurface)
         {
-            var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+            var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
             valueConvertorFormat = $"conn.ReadGeometry({valueConvertorFormat}) as " + effectiveType;
         }
 

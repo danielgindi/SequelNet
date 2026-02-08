@@ -37,7 +37,7 @@ Payload: JSON; ActualType System.Text.Json.JsonDocument;
     }
 
     [Fact]
-    public void ActualType_Directive_Is_Used_In_TableSchema_Typeof()
+    public void ActualType_Directive_Is_Not_Used_In_TableSchema_Typeof()
     {
         var script = @"
 MyTable
@@ -49,7 +49,7 @@ Payload: JSON; ActualType System.Text.Json.JsonDocument;
         var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
 
         // Schema column should use typeof(<effectiveType>) where effectiveType is ActualType.
-        Assert.Contains("typeof(System.Text.Json.JsonDocument)", result.Code);
+        Assert.Contains("typeof(string)", result.Code);
     }
 
     [Fact]

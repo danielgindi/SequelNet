@@ -44,13 +44,11 @@ public partial class GeneratorCore
         return CsharpString(value);
     }
 
-    internal static (string? TypeName, string? EffectiveType, bool IsReferenceType) GetClrTypeName(DalColumn dalCol, ScriptContext context)
+    internal static (string? BaseTypeName, string? TypeName, string? EffectiveType, bool IsReferenceType) GetClrTypeName(DalColumn dalCol, ScriptContext context)
     {
-        (string? typeName, bool isReferenceType) typePair;
+        (string? baseTypeName, bool isReferenceType) typePair;
 
-        if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
-            typePair = (dalCol.EnumTypeName, false);
-        else typePair = dalCol.Type switch
+        typePair = dalCol.Type switch
         {
             DalColumnType.TBool => ("bool", false),
             DalColumnType.TGuid => ("Guid", false),
@@ -112,17 +110,27 @@ public partial class GeneratorCore
             _ => (dalCol.ActualType, false)
         };
 
-        if (!string.IsNullOrEmpty(dalCol.ActualType))
-            typePair.typeName = dalCol.ActualType;
+        string? typeName = typePair.baseTypeName;
 
-        string? fullTypeName = typePair.typeName;
+        if (!string.IsNullOrEmpty(dalCol.EnumTypeName))
+        {
+            typeName = dalCol.EnumTypeName;
+            typePair.isReferenceType = false;
+        }
+
+        if (!string.IsNullOrEmpty(dalCol.ActualType))
+        {
+            typeName = dalCol.ActualType;
+        }
+
+        string? fullTypeName = typeName;
 
         if (dalCol.IsNullable && (!typePair.isReferenceType || context.NullableEnabled))
         {
             fullTypeName += "?";
         }
 
-        return (typePair.typeName, fullTypeName, typePair.isReferenceType);
+        return (typePair.baseTypeName, typeName, fullTypeName, typePair.isReferenceType);
     }
 
     internal static string? GetSchemaDataTypeLiteral(DalColumn dalCol)

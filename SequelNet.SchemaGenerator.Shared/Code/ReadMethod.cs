@@ -81,7 +81,7 @@ public partial class GeneratorCore
                 dalCol.Type == DalColumnType.TGeographicMultiCurve ||
                 dalCol.Type == DalColumnType.TGeographicMultiSurface)
             {
-                var (actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
+                var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
                 fromReader = "reader.GetGeometry(Columns.{0}) as " + actualType;
             }
 
@@ -201,7 +201,7 @@ public partial class GeneratorCore
             case DalColumnType.TGuid: typeName = "Guid"; break;
         }
 
-        var (actualType, effectiveType, isReferenceType) = GetClrTypeName(col, context);
+        var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(col, context);
 
         if (col.IsNullable || effectiveType?.EndsWith("?") == true)
         {
