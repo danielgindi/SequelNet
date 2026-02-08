@@ -707,6 +707,7 @@ public partial class GeneratorCore
                     else if (columnKeyword.StartsWith("ActualType ", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.ActualType = columnKeyword.Substring(11).Trim();
+                        dalColumn.IsCustomType = true;
                     }
                     else if (columnKeyword.StartsWith("Computed ", StringComparison.OrdinalIgnoreCase))
                     {

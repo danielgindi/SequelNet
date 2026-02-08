@@ -70,4 +70,36 @@ Count: INT; NULLABLE; ActualType int;
         Assert.Contains("internal int? _Count", result.Code);
         Assert.Contains("typeof(int?)", result.Code);
     }
+
+    [Fact]
+    public void ActualType_With_AutoCastPrimitive()
+    {
+        var script = @"
+MyTable
+dbo.MyTable
+@NullableEnabled
+Id: PRIMARY KEY; INT;
+Count: INT32; ActualType CUSTOM_ENUM;
+";
+
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains("(CUSTOM_ENUM)reader.GetInt32(", result.Code);
+    }
+
+    [Fact]
+    public void ActualType_With_AutoCastPrimitive_Nullable()
+    {
+        var script = @"
+MyTable
+dbo.MyTable
+@NullableEnabled
+Id: PRIMARY KEY; INT;
+Count: INT32; NULLABLE; ActualType CUSTOM_ENUM;
+";
+
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains("(CUSTOM_ENUM?)reader.GetInt32OrNull(", result.Code);
+    }
 }
