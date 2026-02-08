@@ -68,7 +68,7 @@ Count: INT; NULLABLE; ActualType int;
         // With NullableEnabled, nullable value types should become int? (unless the generator treats it differently).
         Assert.Contains("int? Count", result.Code);
         Assert.Contains("internal int? _Count", result.Code);
-        Assert.Contains("typeof(int?)", result.Code);
+        Assert.Contains("typeof(int)", result.Code);
     }
 
     [Fact]

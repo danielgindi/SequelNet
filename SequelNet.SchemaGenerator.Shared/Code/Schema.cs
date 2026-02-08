@@ -98,7 +98,7 @@ public partial class GeneratorCore
 
         AppendInit(stringBuilder, "Name", $"Columns.{dalCol.PropertyName}");
 
-        AppendInit(stringBuilder, "Type", $"typeof({(isReferenceType ? actualType : effectiveType)})");
+        AppendInit(stringBuilder, "Type", $"typeof({actualType})");
 
         var dataTypeString = GetSchemaDataTypeLiteral(dalCol)
             ?? GetEnumUnderlyingDataTypeLiteral(dalCol)
