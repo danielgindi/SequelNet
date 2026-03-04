@@ -1,6 +1,8 @@
-﻿namespace SequelNet;
+﻿using System;
 
-internal static class StringUtils
+namespace SequelNet;
+
+public static class StringUtils
 {
     internal static string UnescapeStringLiteral(string str)
     {
@@ -38,5 +40,21 @@ internal static class StringUtils
         }
 
         return unescaped;
-    } 
+    }
+
+    private const string HexChars = "0123456789ABCDEF";
+
+    public static string ToHex(ReadOnlySpan<byte> bytes)
+    {
+        char[] chars = new char[bytes.Length * 2];
+
+        int i = 0;
+        foreach (byte b in bytes)
+        {
+            chars[i++] = HexChars[b >> 4];
+            chars[i++] = HexChars[b & 0xF];
+        }
+
+        return new string(chars);
+    }
 }

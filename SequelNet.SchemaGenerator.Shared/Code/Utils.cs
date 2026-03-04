@@ -69,6 +69,7 @@ public partial class GeneratorCore
             DalColumnType.TUInt64 => ("UInt64", false),
 
             DalColumnType.TString or DalColumnType.TText or DalColumnType.TLongText or DalColumnType.TMediumText or DalColumnType.TFixedString => ("string", true),
+            DalColumnType.TBinary or DalColumnType.TVarBinary => ("byte[]", true),
 
             DalColumnType.TDecimal or DalColumnType.TMoney => ("decimal", false),
             DalColumnType.TDouble => ("double", false),
@@ -144,6 +145,9 @@ public partial class GeneratorCore
             DalColumnType.TLongText => "DataType.LongText",
             DalColumnType.TMediumText => "DataType.MediumText",
             DalColumnType.TFixedString => "DataType.Char",
+
+            DalColumnType.TBinary => "DataType.Binary",
+            DalColumnType.TVarBinary => "DataType.VarBinary",
 
             DalColumnType.TMoney => "DataType.Money",
 

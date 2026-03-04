@@ -293,6 +293,12 @@ public class OleDbLanguageFactory : LanguageFactory
             case DataType.Blob:
                 typeString = "IMAGE";
                 break;
+            case DataType.Binary:
+                typeString = $"BINARY({VarCharMaxLength})";
+                break;
+            case DataType.VarBinary:
+                typeString = $"VARBINARY({VarCharMaxLength})";
+                break;
             case DataType.Guid:
                 typeString = "UNIQUEIDENTIFIER";
                 break;

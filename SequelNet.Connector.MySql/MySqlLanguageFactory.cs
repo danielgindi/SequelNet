@@ -745,6 +745,14 @@ public class MySqlLanguageFactory : LanguageFactory
                 typeString = "BLOB";
                 break;
 
+            case DataType.Binary:
+                typeString = $"BINARY({VarCharMaxLength})";
+                break;
+
+            case DataType.VarBinary:
+                typeString = $"VARBINARY({VarCharMaxLength})";
+                break;
+
             case DataType.Guid:
                 if (forCast)
                 {
@@ -1267,6 +1275,12 @@ public class MySqlLanguageFactory : LanguageFactory
     public override string PrepareValue(Guid value)
     {
         return '\'' + value.ToString(@"D") + '\'';
+    }
+
+    public override string FormatBinary(byte[] value)
+    {
+        // Default to mysql syntax of representing binary literals as hex strings
+        return $"UNHEX({StringUtils.ToHex(value)})";
     }
 
     public override string FormatDateTime(DateTime dateTime)

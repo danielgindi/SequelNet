@@ -52,6 +52,13 @@ public partial class GeneratorCore
                     fromReader = "reader.GetStringOrNull(Columns.{0})";
                 else fromDb = "(string){0}";
             }
+            else if (dalCol.Type == DalColumnType.TBinary ||
+                dalCol.Type == DalColumnType.TVarBinary)
+            {
+                if (dalCol.IsNullable)
+                    fromReader = "reader.GetBytesOrNull(Columns.{0})";
+                else fromDb = "(byte[]){0}";
+            }
             else if (dalCol.Type == DalColumnType.TGeometry ||
                 dalCol.Type == DalColumnType.TGeometryCollection ||
                 dalCol.Type == DalColumnType.TPoint ||

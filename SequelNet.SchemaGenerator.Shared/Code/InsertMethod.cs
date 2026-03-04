@@ -187,6 +187,11 @@ public partial class GeneratorCore
         {
             valueConvertorFormat = $"(string){valueConvertorFormat}";
         }
+        else if (dalCol.Type == DalColumnType.TBinary ||
+            dalCol.Type == DalColumnType.TVarBinary)
+        {
+            valueConvertorFormat = $"(byte[]){valueConvertorFormat}";
+        }
         else if (dalCol.Type == DalColumnType.TGeometry
             || dalCol.Type == DalColumnType.TGeometryCollection
             || dalCol.Type == DalColumnType.TPoint

@@ -137,6 +137,10 @@ public partial class TableSchema
             {
                 return DataType.Guid;
             }
+            else if (this.Type.Equals(typeof(byte[])) && this.MaxLength > 0)
+            {
+                return DataType.Binary;
+            }
             else if (this.Type.Equals(typeof(object)) || this.Type.Equals(typeof(byte[])))
             {
                 return DataType.Blob;

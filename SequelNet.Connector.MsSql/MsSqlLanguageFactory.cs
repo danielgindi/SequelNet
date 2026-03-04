@@ -564,6 +564,12 @@ public class MsSqlLanguageFactory : LanguageFactory
             case DataType.Blob:
                 typeString = "IMAGE";
                 break;
+            case DataType.Binary:
+                typeString = $"BINARY({VarCharMaxLength})";
+                break;
+            case DataType.VarBinary:
+                typeString = $"VARBINARY({VarCharMaxLength})";
+                break;
             case DataType.Guid:
                 typeString = "UNIQUEIDENTIFIER";
                 break;
@@ -879,7 +885,13 @@ public class MsSqlLanguageFactory : LanguageFactory
     {
         return @"N'" + EscapeString(value) + '\'';
     }
-    
+
+    public override string FormatBinary(byte[] value)
+    {
+        // Default to mysql syntax of representing binary literals as hex strings
+        return $"CONVERT(varbinary(max), '0x{StringUtils.ToHex(value)}', 1)";
+    }
+
     public override string FormatDateTime(DateTime dateTime)
     {
         return "CAST(" + dateTime.ToString(@"yyyy-MM-dd HH:mm:ss.fff") + " AS DATETIME)";

@@ -29,7 +29,8 @@ public partial class GeneratorCore
                 }
 
                 if (dalCol.MaxLength > 0 &&
-                    (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString /*|| dalCol.Type == DalColumnType.TBlob*/))
+                    (dalCol.Type == DalColumnType.TString || dalCol.Type == DalColumnType.TFixedString ||
+                    dalCol.Type == DalColumnType.TBinary || dalCol.Type == DalColumnType.TVarBinary))
                 {
                     AppendLine(stringBuilder, $"[System.ComponentModel.DataAnnotations.MaxLength({dalCol.MaxLength})]");
                 }

@@ -50,6 +50,16 @@ public enum DataType : int
     Blob,
 
     /// <summary>
+    /// byte[]
+    /// </summary>
+    Binary,
+
+    /// <summary>
+    /// byte[]
+    /// </summary>
+    VarBinary,
+
+    /// <summary>
     /// Float
     /// </summary>
     Float,

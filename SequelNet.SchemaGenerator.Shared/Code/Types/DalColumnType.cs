@@ -23,6 +23,9 @@ public enum DalColumnType
     TBool,
     TGuid,
 
+    TBinary,
+    TVarBinary,
+
     TDateTime,
     TDateTimeUtc,
     TDateTimeLocal,

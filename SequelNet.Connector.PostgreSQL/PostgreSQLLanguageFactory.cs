@@ -521,6 +521,8 @@ public class PostgreSQLLanguageFactory : LanguageFactory
                 typeString = "JSONB";
                 break;
             case DataType.Blob:
+            case DataType.Binary:
+            case DataType.VarBinary:
                 typeString = "BYTEA";
                 break;
             case DataType.Guid:
@@ -975,6 +977,12 @@ public class PostgreSQLLanguageFactory : LanguageFactory
     public override string PrepareValue(Guid value)
     {
         return '\'' + value.ToString(@"D") + '\'';
+    }
+
+    public override string FormatBinary(byte[] value)
+    {
+        // Default to mysql syntax of representing binary literals as hex strings
+        return $"decode('{StringUtils.ToHex(value)}', 'hex')";
     }
 
     public override string FormatDateTime(DateTime dateTime)

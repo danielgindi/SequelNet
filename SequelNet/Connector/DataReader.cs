@@ -201,6 +201,20 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     }
 
     /// <summary>
+    /// Reads a stream of bytes from the specified column.
+    /// </summary>
+    /// <param name="ordinal">The zero-based column ordinal.</param>
+    /// <returns>The bytes read.</returns>
+    /// <exception cref="InvalidCastException">The specified cast is not valid.</exception>
+    public byte[] GetBytes(int ordinal)
+    {
+        var length = GetBytes(ordinal, 0, null, 0, 0);
+        var buffer = new byte[length];
+        GetBytes(ordinal, 0, buffer, 0, (int)length);
+        return buffer;
+    }
+
+    /// <summary>
     /// Gets the value of the specified column as a single character.
     /// </summary>
     /// <param name="ordinal">The zero-based column ordinal.</param>
@@ -676,6 +690,14 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         var ordinal = UnderlyingReader.GetOrdinal(columnName);
         return UnderlyingReader.GetBytes(ordinal, dataOffset, buffer, bufferOffset, length);
     }
+
+    public byte[] GetBytes(string columnName)
+    {
+        var length = GetBytes(columnName, 0, null, 0, 0);
+        var buffer = new byte[length];
+        GetBytes(columnName, 0, buffer, 0, (int)length);
+        return buffer;
+    }
     
     public char GetChar(string columnName)
     {
@@ -1009,6 +1031,21 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
     {
         var ordinal = UnderlyingReader.GetOrdinal(columnName);
         return UnderlyingReader.IsDBNull(ordinal) ? String.Empty : UnderlyingReader.GetString(ordinal);
+    }
+
+    public byte[] GetBytesOrNull(string columnName)
+    {
+        var ordinal = UnderlyingReader.GetOrdinal(columnName);
+        if (UnderlyingReader.IsDBNull(ordinal))
+            return null;
+        return GetBytes(ordinal);
+    }
+
+    public byte[] GetBytesOrNull(int ordinal)
+    {
+        if (UnderlyingReader.IsDBNull(ordinal))
+            return null;
+        return GetBytes(ordinal);
     }
 
     public DateTime GetDateTimeLocal(string columnName)

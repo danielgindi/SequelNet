@@ -652,6 +652,12 @@ public class LanguageFactory
         else return '\'' + EscapeString(value) + '\'';
     }
 
+    public virtual string FormatBinary(byte[] value)
+    {
+        // Default to mysql syntax of representing binary literals as hex strings
+        return $"UNHEX({StringUtils.ToHex(value)})";
+    }
+
     public virtual string PrepareValue(ConnectorBase conn, object value, Query relatedQuery = null)
     {
         if (value == null || value is DBNull)
@@ -693,6 +699,10 @@ public class LanguageFactory
         else if (value is double)
         {
             return PrepareValue((double)value);
+        }
+        else if (value is byte[])
+        {
+            return FormatBinary((byte[])value);
         }
         else if (value is IPhrase)
         {

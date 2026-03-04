@@ -88,6 +88,10 @@ public partial class GeneratorCore
                 {
                     defaultValue = "string.Empty";
                 }
+                else if (dalColumn.Type == DalColumnType.TBinary || dalColumn.Type == DalColumnType.TVarBinary)
+                {
+                    defaultValue = "new byte[]{}";
+                }
                 else if (dalColumn.Type == DalColumnType.TDecimal || dalColumn.Type == DalColumnType.TMoney)
                 {
                     defaultValue = "0m";

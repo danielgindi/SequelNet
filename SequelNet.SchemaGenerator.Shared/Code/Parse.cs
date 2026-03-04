@@ -440,6 +440,36 @@ public partial class GeneratorCore
                         int.TryParse(columnKeyword.Substring(11, columnKeyword.IndexOf(")") - 1), out maxLength);
                         dalColumn.MaxLength = maxLength;
                     }
+                    else if (columnKeyword.StartsWith("BINARY(", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dalColumn.Type = DalColumnType.TBinary;
+                        string maxLength = columnKeyword.Substring(7, columnKeyword.IndexOf(")") - 7);
+                        if (maxLength == "MAX")
+                        {
+                            dalColumn.MaxLength = -1;
+                        }
+                        else
+                        {
+                            int iMaxLength = 0;
+                            int.TryParse(maxLength, out iMaxLength);
+                            dalColumn.MaxLength = iMaxLength;
+                        }
+                    }
+                    else if (columnKeyword.StartsWith("VARBINARY(", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dalColumn.Type = DalColumnType.TVarBinary;
+                        string maxLength = columnKeyword.Substring(10, columnKeyword.IndexOf(")") - 10);
+                        if (maxLength == "MAX")
+                        {
+                            dalColumn.MaxLength = -1;
+                        }
+                        else
+                        {
+                            int iMaxLength = 0;
+                            int.TryParse(maxLength, out iMaxLength);
+                            dalColumn.MaxLength = iMaxLength;
+                        }
+                    }
                     else if (columnKeyword.Equals("BOOL", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TBool;
