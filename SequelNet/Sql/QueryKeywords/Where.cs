@@ -201,7 +201,7 @@ public class Where
         First = value;
         FirstType = ValueObjectType.Value;
         Comparison = comparison;
-        Second = value;
+        Second = otherValue;
         SecondType = ValueObjectType.Value;
     }
 
