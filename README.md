@@ -5,6 +5,7 @@ SQL abstraction/generalization/protection layer.
 
 Current connectors available:
 * MySql
+* MySql2
 * MsSql
 * Postgre (not tested too much)
 * OleDb (requires .NET Framework).
@@ -31,7 +32,7 @@ Usage
 The use is pretty straight-forward.
 To supply a default connector, add a SequelNet.Connector key in the appSettings of web.config. Like this:
 ```xml
-    <add key="SequelNet.Connector" value="MySql" />
+    <add key="SequelNet.Connector" value="MySql2" />
 ```
 
 To supply a default connection string, add a `SequelNet` connection string in `web.config`,
