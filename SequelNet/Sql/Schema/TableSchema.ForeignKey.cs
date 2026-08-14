@@ -17,6 +17,7 @@ public partial class TableSchema
             return null;
         }
     }
+
     public enum ForeignKeyReference
     {
         None,
@@ -25,7 +26,8 @@ public partial class TableSchema
         SetNull, // Sets related data to NULL if they are nullable
         NoAction // Rejects actions if there's related data
     }
-    public class ForeignKey
+
+    public class ForeignKey : ITableElement
     {
         public string Name;
         public string[] Columns;
@@ -35,6 +37,7 @@ public partial class TableSchema
         public ForeignKeyReference OnUpdate;
 
         public ForeignKey() { }
+
         public ForeignKey(string Name, string[] Columns, string ForeignTable, string[] ForeignColumns, ForeignKeyReference OnDelete, ForeignKeyReference OnUpdate)
         {
             this.Name = Name;
@@ -44,9 +47,12 @@ public partial class TableSchema
             this.OnDelete = OnDelete;
             this.OnUpdate = OnUpdate;
         }
+
         public ForeignKey(string Name, string Column, string ForeignTable, string ForeignColumn, ForeignKeyReference OnDelete, ForeignKeyReference OnUpdate)
             : this(Name, new string[] { Column }, ForeignTable, new string[] { ForeignColumn }, OnDelete, OnUpdate)
         {
         }
+
+        TableElementType ITableElement.Type => TableElementType.ForeignKey;
     }
 }

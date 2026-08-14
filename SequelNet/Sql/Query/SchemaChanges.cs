@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Threading;
 
+#nullable enable
+
 namespace SequelNet;
 
 public partial class Query
 {
+    private TableSchema.TableElementType[] _CreateTableElements;
+
     /// <summary>
     /// Creates current table in the database.
     /// </summary>
@@ -28,7 +32,7 @@ public partial class Query
     /// Adds all indexes in this table's schema.
     /// </summary>
     /// <returns>Current <see cref="Query"/> object</returns>
-    public Query CreateIndexes()
+    public Query CreateAllTableElements(params TableSchema.TableElementType[] elements)
     {
         ClearSelect();
         ClearOrderBy();
@@ -37,9 +41,28 @@ public partial class Query
         ClearStoredProcedureParameters();
         ClearAlterTable();
 
-        this.QueryMode = QueryMode.CreateIndexes;
+        this.QueryMode = QueryMode.CreateTableElements;
+        this._CreateTableElements = elements == null || elements.Length == 0 ? new TableSchema.TableElementType[] { TableSchema.TableElementType.Index, TableSchema.TableElementType.ForeignKey } : elements;
 
         return this;
+    }
+
+    /// <summary>
+    /// Adds all indexes in this table's schema.
+    /// </summary>
+    /// <returns>Current <see cref="Query"/> object</returns>
+    public Query CreateAllIndexes()
+    {
+        return this.CreateAllTableElements(TableSchema.TableElementType.Index);
+    }
+
+    /// <summary>
+    /// Adds all foreign keys in this table's schema.
+    /// </summary>
+    /// <returns>Current <see cref="Query"/> object</returns>
+    public Query CreateAllForeignKeys()
+    {
+        return this.CreateAllTableElements(TableSchema.TableElementType.ForeignKey);
     }
 
     /// <summary>

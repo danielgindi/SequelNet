@@ -42,7 +42,7 @@ public partial class TableSchema
         Clustered
     }
 
-    public class Index
+    public class Index : ITableElement
     {
         public string Name;
         public ClusterMode Cluster;
@@ -88,6 +88,8 @@ public partial class TableSchema
 
             this.Columns = generatedColumns.ToArray();
         }
+
+        TableElementType ITableElement.Type => TableElementType.Index;
 
         public class Column
         {

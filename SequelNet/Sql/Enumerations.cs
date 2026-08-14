@@ -29,7 +29,7 @@ public enum QueryMode
     Delete,
     InsertOrUpdate,
     CreateTable,
-    CreateIndexes,
+    CreateTableElements,
     AlterTable,
     DropTable,
     ExecuteStoredProcedure

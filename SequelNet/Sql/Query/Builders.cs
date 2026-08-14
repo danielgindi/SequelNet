@@ -4,6 +4,7 @@ using System.Text;
 using System.Data;
 using System.Data.Common;
 using SequelNet.Connector;
+using System.Linq;
 
 namespace SequelNet;
 
@@ -902,22 +903,34 @@ public partial class Query
                         }
                         break;
 
-                    case QueryMode.CreateIndexes:
+                    case QueryMode.CreateTableElements:
                         {
-                            if ((Schema.Indexes.Count + Schema.ForeignKeys.Count) > 1)
-                            {
+                            var elementCount = 0;
+
+                            if (_CreateTableElements?.Contains(TableSchema.TableElementType.Index) == true)
+                                elementCount += Schema.Indexes.Count;
+
+                            if (_CreateTableElements?.Contains(TableSchema.TableElementType.ForeignKey) == true)
+                                elementCount += Schema.ForeignKeys.Count;
+
+                            if (elementCount > 1)
                                 NeedTransaction = true;
-                            }
 
                             var qry2 = Query.New(Schema);
                             qry2._SchemaAlias = _SchemaAlias;
                             qry2._SchemaName = _SchemaName;
 
-                            foreach (TableSchema.Index index in Schema.Indexes)
-                                qry2.CreateIndex(index);
+                            if (_CreateTableElements?.Contains(TableSchema.TableElementType.Index) == true)
+                            {
+                                foreach (TableSchema.Index index in Schema.Indexes)
+                                    qry2.CreateIndex(index);
+                            }
 
-                            foreach (TableSchema.ForeignKey foreignKey in Schema.ForeignKeys)
-                                qry2.CreateForeignKey(foreignKey);
+                            if (_CreateTableElements?.Contains(TableSchema.TableElementType.ForeignKey) == true)
+                            {
+                                foreach (TableSchema.ForeignKey foreignKey in Schema.ForeignKeys)
+                                    qry2.CreateForeignKey(foreignKey);
+                            }
 
                             sb.Append(qry2.BuildCommand(connection));
                         }
