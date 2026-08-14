@@ -257,7 +257,7 @@ public partial class GeneratorCore
                 AppendLine(stringBuilder);
             }
 
-            AppendLine(stringBuilder, "super.Insert(conn);");
+            AppendLine(stringBuilder, "base.Insert(conn);");
 
             AppendLine(stringBuilder, "}");
             AppendLine(stringBuilder, "}");
@@ -281,7 +281,7 @@ public partial class GeneratorCore
                 AppendLine(stringBuilder);
             }
 
-            AppendLine(stringBuilder, "super.InsertAsync(conn, cancellationToken);");
+            AppendLine(stringBuilder, "base.InsertAsync(conn, cancellationToken);");
 
             AppendLine(stringBuilder, "}");
             AppendLine(stringBuilder, "}");

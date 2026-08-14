@@ -112,7 +112,7 @@ public partial class GeneratorCore
                 AppendLine(stringBuilder);
             }
 
-            AppendLine(stringBuilder, "super.Update(conn);");
+            AppendLine(stringBuilder, "base.Update(conn);");
 
             AppendLine(stringBuilder, "}");
             AppendLine(stringBuilder, "}");
@@ -136,7 +136,7 @@ public partial class GeneratorCore
                 AppendLine(stringBuilder);
             }
 
-            AppendLine(stringBuilder, "super.UpdateAsync(conn, cancellationToken);");
+            AppendLine(stringBuilder, "base.UpdateAsync(conn, cancellationToken);");
 
             AppendLine(stringBuilder, "}");
             AppendLine(stringBuilder, "}");
