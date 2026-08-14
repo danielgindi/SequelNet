@@ -102,14 +102,25 @@ public partial class GeneratorCore
         // Start building the output classes
         var stringBuilder = new StringBuilder();
 
-        if (context.ExportCollection)
-        {
-            WriteCollection(stringBuilder, context);
-        }
-
         if (context.ExportRecord)
         {
             WriteRecord(stringBuilder, context);
+
+            if (context.Enums.Count > 0 || context.ExportCollection)
+                stringBuilder.AppendLine();
+        }
+
+        if (context.Enums.Count > 0)
+        {
+            WriteEnums(stringBuilder, context);
+
+            if (context.ExportCollection)
+                stringBuilder.AppendLine();
+        }
+
+        if (context.ExportCollection)
+        {
+            WriteCollection(stringBuilder, context);
         }
 
         return stringBuilder.ToString();
@@ -138,10 +149,21 @@ public partial class GeneratorCore
         w.AppendLine($"public partial class {context.ClassName}Collection : AbstractRecordList<{context.ClassName}, {context.ClassName}Collection>");
         w.AppendLine("{");
         w.AppendLine("}");
-        w.AppendLine();
+    }
+
+    private static void WriteEnums(StringBuilder stringBuilder, ScriptContext context)
+    {
+        var w = new CodeWriter(stringBuilder);
+
+        bool isFirst = true;
 
         foreach (DalEnum dalEn in context.Enums)
         {
+            if (isFirst)
+                isFirst = false;
+            else
+                w.AppendLine();
+
             w.AppendLine($"public enum {dalEn.Name}");
             w.AppendLine("{");
             w.Indent();
@@ -153,7 +175,6 @@ public partial class GeneratorCore
 
             w.Unindent();
             w.AppendLine("}");
-            w.AppendLine();
         }
     }
 
