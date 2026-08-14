@@ -64,14 +64,26 @@ public partial class GeneratorCore
             }
         }
 
-        var primaryKeyColumns = context.GetPrimaryKeyColumns();
-
-        bool isFirst = true;
-        foreach (var dalCol in primaryKeyColumns)
+        var queryConditionColumns = context.GetPrimaryKeyColumns();
+        foreach (var dalCol in context.Columns.FindAll(column => column.QueryBoundary))
         {
-            var whereMethod = isFirst ? "Where" : "AND";
-            AppendLine(stringBuilder, $"qry.{whereMethod}(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)});");
-            isFirst = false;
+            if (!queryConditionColumns.Contains(dalCol))
+            {
+                queryConditionColumns.Add(dalCol);
+            }
+        }
+
+        if (queryConditionColumns.Count > 0)
+        {
+            var queryConditions = new StringBuilder();
+            for (var index = 0; index < queryConditionColumns.Count; index++)
+            {
+                var dalCol = queryConditionColumns[index];
+                var queryMethod = index == 0 ? "Where" : "AND";
+                queryConditions.Append($".{queryMethod}(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)})");
+            }
+
+            AppendLine(stringBuilder, $"qry{queryConditions};");
         }
 
         if (!string.IsNullOrEmpty(context.CustomAfterUpdateQuery))

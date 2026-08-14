@@ -12,12 +12,21 @@ public partial class GeneratorCore
 
         if (primaryKeyColumns.Count > 0)
         {
+            var fetchByIdColumns = new System.Collections.Generic.List<DalColumn>(primaryKeyColumns);
+            foreach (var dalCol in context.Columns.FindAll(column => column.QueryBoundary))
+            {
+                if (!fetchByIdColumns.Contains(dalCol))
+                {
+                    fetchByIdColumns.Add(dalCol);
+                }
+            }
+
             var sbQueryCond = new StringBuilder();
             var sbQueryStart = new StringBuilder();
 
             AppendLine(sbQueryStart, "var qry = new Query(Schema)");
             var first = true;
-            foreach (var dalCol in primaryKeyColumns)
+            foreach (var dalCol in fetchByIdColumns)
             {
                 if (!first)
                 {
@@ -37,7 +46,7 @@ public partial class GeneratorCore
             var sbParams = new StringBuilder();
             var sbParamsCall = new StringBuilder();
             first = true;
-            foreach (var dalCol in primaryKeyColumns)
+            foreach (var dalCol in fetchByIdColumns)
             {
                 if (!first)
                 {

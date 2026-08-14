@@ -374,17 +374,21 @@ public abstract class AbstractRecord<T> : IRecord
 
         foreach (var column in Schema.Columns)
         {
+            var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
+            if (propInfo == null)
+                continue;
+
             if (primaryKey != null &&
                 ((hasSimplePrimaryKeyName && column.Name == (string)primaryKey) ||
-                (!hasSimplePrimaryKeyName && StringArrayContains((string[])primaryKey, column.Name)))) continue;
-
-            var propInfo = GetColumnPropInfo(__CLASS_TYPE, column.Name);
-            if (propInfo != null)
+                (!hasSimplePrimaryKeyName && StringArrayContains((string[])primaryKey, column.Name))))
             {
-                if (_AtomicUpdates && !IsAtomicUpdatesDisabled && !IsColumnMutated(column.Name)) continue;
-
-                qry.Update(column.Name, propInfo.GetValue(this, null));
+                qry.Where(column.Name, propInfo.GetValue(this, null));
+                continue;
             }
+
+            if (_AtomicUpdates && !IsAtomicUpdatesDisabled && !IsColumnMutated(column.Name)) continue;
+
+            qry.Update(column.Name, propInfo.GetValue(this, null));
         }
 
         if (!_AtomicUpdates || qry.HasInsertsOrUpdates)
@@ -392,6 +396,18 @@ public abstract class AbstractRecord<T> : IRecord
             if (__MODIFIED_ON_NAME != null)
             {
                 qry.Update(__MODIFIED_ON_NAME, DateTime.UtcNow);
+            }
+        }
+
+        if (QueryBoundaryColumns.Count > 0)
+        {
+            foreach (var col in QueryBoundaryColumns)
+            {
+                var propInfo = GetColumnPropInfo(__CLASS_TYPE, col);
+                if (propInfo == null)
+                    continue;
+
+                qry.Where(col, propInfo.GetValue(this, null));
             }
         }
 
