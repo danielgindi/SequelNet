@@ -12,6 +12,12 @@ public partial class TableSchema
     public ForeignKeyList ForeignKeys;
     public TableOptionList TableOptions;
 
+    /// <summary>
+    /// Columns which scope SELECT, UPDATE, and DELETE queries, or are assigned by INSERT and UPSERT queries.
+    /// A null value means that this schema has no query boundary, avoiding allocations and validation work.
+    /// </summary>
+    public string[] QueryBoundaryColumns { get; set; }
+
     public string DatabaseOwner
     {
         get { return _DatabaseOwner; }

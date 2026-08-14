@@ -360,6 +360,10 @@ public partial class GeneratorCore
                     {
                         dalColumn.NoSave = true;
                     }
+                    else if (columnKeyword.Equals("QueryBoundary", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dalColumn.QueryBoundary = true;
+                    }
                     else if (columnKeyword.StartsWith("PRECISION(", StringComparison.OrdinalIgnoreCase))
                     {
                         int precision = 0;

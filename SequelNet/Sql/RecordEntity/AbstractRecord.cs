@@ -20,6 +20,8 @@ namespace SequelNet;
 public abstract class AbstractRecord<T> : IRecord
     where T : AbstractRecord<T>, new()
 {
+    private static readonly string[] __NO_QUERY_BOUNDARY_COLUMNS = Array.Empty<string>();
+
     #region Static private variables, caches
 
     private static bool __LOOKED_FOR_PRIMARY_KEY_NAME = false;
@@ -149,6 +151,13 @@ public abstract class AbstractRecord<T> : IRecord
 
     [XmlIgnore]
     public static string SchemaName => Schema.Name;
+
+    /// <summary>
+    /// The columns which scope SELECT, UPDATE, and DELETE queries, or are assigned by INSERT and UPSERT queries.
+    /// Generated records populate this from columns marked <c>QueryBoundary</c> in the SchemaGenerator macro.
+    /// </summary>
+    [XmlIgnore]
+    public static IReadOnlyList<string> QueryBoundaryColumns => Schema.QueryBoundaryColumns ?? __NO_QUERY_BOUNDARY_COLUMNS;
 
     /// <summary>
     /// The primary key name for this record's schema.

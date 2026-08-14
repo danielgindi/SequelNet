@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using SequelNet.Connector;
 
@@ -6,6 +7,40 @@ namespace SequelNet;
 
 public class WhereList : List<Where>
 {
+    /// <summary>
+    /// Determines whether this WHERE list, including nested lists, references a column by name.
+    /// </summary>
+    /// <param name="columnName">The column to find.</param>
+    /// <param name="isMatchingTable">Optional predicate for limiting matches to a table or alias. It receives null for unqualified columns.</param>
+    public bool IsColumnInWhere(string columnName, Func<string, bool> isMatchingTable = null)
+    {
+        foreach (Where where in this)
+        {
+            if (IsColumnMatch(where.First, where.FirstType, where.FirstTableName, columnName, isMatchingTable) ||
+                IsColumnMatch(where.Second, where.SecondType, where.SecondTableName, columnName, isMatchingTable) ||
+                IsColumnMatch(where.Third, where.ThirdType, where.ThirdTableName, columnName, isMatchingTable))
+                return true;
+
+            if (where.First is WhereList nestedWhereList && nestedWhereList.IsColumnInWhere(columnName, isMatchingTable))
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool IsColumnMatch(
+        object value,
+        ValueObjectType valueType,
+        string tableName,
+        string columnName,
+        Func<string, bool> isMatchingTable)
+    {
+        return valueType == ValueObjectType.ColumnName &&
+            value is string candidateColumnName &&
+            string.Equals(candidateColumnName, columnName, StringComparison.Ordinal) &&
+            (isMatchingTable == null || isMatchingTable(tableName));
+    }
+
     public void BuildCommand(StringBuilder outputBuilder, Where.BuildContext context)
     {
         context = context ?? new Where.BuildContext();

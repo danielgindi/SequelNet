@@ -48,6 +48,12 @@ public partial class GeneratorCore
             w.AppendLine();
         }
 
+        var queryScopeColumns = context.Columns.FindAll(column => column.QueryBoundary);
+        if (queryScopeColumns.Count > 0)
+        {
+            w.AppendLine($"schema.QueryBoundaryColumns = new string[] {{ {string.Join(", ", queryScopeColumns.ConvertAll(column => $"Columns.{column.PropertyName}"))} }};");
+        }
+
         w.AppendLine();
         w.AppendLine("_Schema = schema;");
 

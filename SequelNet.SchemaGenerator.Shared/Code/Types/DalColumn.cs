@@ -8,6 +8,7 @@ public class DalColumn
 	public bool NoProperty;
 	public bool NoRead;
 	public bool NoSave;
+	public bool QueryBoundary;
 	public DalColumnType Type;
 	public string? LiteralType;
 	public string? EnumTypeName;

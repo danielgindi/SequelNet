@@ -1,4 +1,4 @@
-﻿##### Define a DAL class in comments like this:
+##### Define a DAL class in comments like this:
 
 ```C#
 /*  Class name
@@ -43,6 +43,7 @@
  `NoProperty` - will remove the property code for this specific column. Can be used to write a custom property  
  `NoRead` - will remove the property from the read routines  
  `NoSave` - will remove the property from the save routines  
+ `QueryBoundary` - marks a column that scopes queries: it must occur in the WHERE clause of SELECT, UPDATE, and DELETE queries, and in the INSERT values of INSERT and UPSERT queries; violations are handled by `Query.QueryBoundaryViolationHandler`
  `ActualDefault` _value_ - define a different code-based default value for the class's instance member variable  
  `ActualType` _type_ - The actual .Net type name  
  `ToDB` - Define a format to be used in Insert(...) and Update(...). Can use the {0} specifier for column value in format  

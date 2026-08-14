@@ -277,6 +277,8 @@ public partial class Query
 
     public DbCommand BuildDbCommand(ConnectorBase connection)
     {
+        ValidateQueryBoundary();
+
         if (this.QueryMode == QueryMode.ExecuteStoredProcedure)
         {
             var cmd = connection.Factory.NewCommand(_StoredProcedureName);
