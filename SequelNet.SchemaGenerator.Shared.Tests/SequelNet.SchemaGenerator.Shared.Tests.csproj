@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SequelNet.SchemaGenerator.Shared\SequelNet.SchemaGenerator.Shared.csproj" />
+    <ProjectReference Include="..\SequelNet.SchemaGenerator.Cli\SequelNet.SchemaGenerator.Cli.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using EnvDTE;
+using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -96,25 +96,62 @@ namespace SequelNet.SchemaGenerator.VSIX
             {
                 Document activeDocument = dte.ActiveDocument;
                 TextDocument textDocument = activeDocument.Object() as TextDocument;
-                string selectionText = textDocument.Selection.Text.Trim();
+                TextSelection selection = textDocument.Selection;
+                var documentStart = textDocument.StartPoint.CreateEditPoint();
+                string documentText = documentStart.GetText(textDocument.EndPoint);
+                string script;
+                int macroEndOffset;
 
-                if (selectionText.Length == 0)
+                if (!selection.IsEmpty)
                 {
-                    VsShellUtilities.ShowMessageBox(
-                        this.package,
-                        "Please select a text snippet with a DAL generation code,\nand then run this command again.",
-                        "No data",
-                        OLEMSGICON.OLEMSGICON_INFO,
-                        OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                        OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-                    return;
+                    script = MacroLocator.Normalize(selection.Text);
+                    macroEndOffset = ToDocumentOffset(documentText, selection.BottomPoint.AbsoluteCharOffset);
                 }
+                else
+                {
+                    var macro = MacroLocator.Find(documentText, ToDocumentOffset(documentText, selection.ActivePoint.AbsoluteCharOffset));
+                    if (macro == null)
+                    {
+                        VsShellUtilities.ShowMessageBox(
+                            this.package,
+                            "Select a SequelNet macro, place the cursor inside one, or keep exactly one valid macro comment in the file.",
+                            "No macro found",
+                            OLEMSGICON.OLEMSGICON_INFO,
+                            OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                            OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+                        return;
+                    }
 
-                string code = GeneratorCore.GenerateDalClass(selectionText,
-                    warning => MessageBox.Show(warning));
+                    script = macro.Script;
+                    macroEndOffset = macro.End;
+                }
+                var generated = GeneratorCore.GenerateDalClass(script);
+                foreach (var warning in generated.Warnings)
+                    MessageBox.Show(warning);
+                string code = generated.Code;
+                string recordName = generated.Context.ClassName ?? string.Empty;
 
-                // Copy result to ClipBoard
-                ClipboardHelper.SetClipboard(code);
+                // Keep the macro in the file as the source of truth, and create or
+                // update only the generated region immediately after it.
+                var change = GeneratedRegion.CreateOrUpdateAfterMacro(documentText, macroEndOffset, code, recordName);
+
+                if (change.Start < 0 || change.Length < 0 || change.Start + change.Length > documentText.Length)
+                    throw new InvalidOperationException("The generated-region edit range is outside the current document.");
+
+                var editStart = textDocument.StartPoint.CreateEditPoint();
+                editStart.MoveToAbsoluteOffset(ToDteAbsoluteOffset(documentText, change.Start));
+
+                if (change.Length == 0)
+                {
+                    editStart.Insert(change.Text);
+                }
+                else
+                {
+                    // Supplying a character count avoids moving a second DTE
+                    // point to documentLength + 1 when the generated region is
+                    // at EOF; that legacy COM call reports "Parameter is incorrect".
+                    editStart.ReplaceText(change.Length, change.Text, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
+                }
             }
             catch (Exception exception)
             {
@@ -126,6 +163,40 @@ namespace SequelNet.SchemaGenerator.VSIX
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }
+        }
+        // EnvDTE counts a CRLF sequence as one absolute character, whereas
+        // .NET string offsets count both characters. All generator offsets are
+        // string offsets, so convert at the DTE boundary in both directions.
+        private static int ToDocumentOffset(string documentText, int dteAbsoluteOffset)
+        {
+            var remaining = Math.Max(0, dteAbsoluteOffset - 1);
+            var documentOffset = 0;
+            while (documentOffset < documentText.Length && remaining > 0)
+            {
+                if (documentText[documentOffset] == '\r' &&
+                    documentOffset + 1 < documentText.Length &&
+                    documentText[documentOffset + 1] == '\n')
+                    documentOffset++;
+
+                documentOffset++;
+                remaining--;
+            }
+            return documentOffset;
+        }
+
+        private static int ToDteAbsoluteOffset(string documentText, int documentOffset)
+        {
+            var dteAbsoluteOffset = 1;
+            for (var index = 0; index < documentOffset; index++)
+            {
+                if (documentText[index] == '\r' &&
+                    index + 1 < documentOffset &&
+                    documentText[index + 1] == '\n')
+                    index++;
+
+                dteAbsoluteOffset++;
+            }
+            return dteAbsoluteOffset;
         }
     }
 }

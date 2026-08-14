@@ -8,14 +8,17 @@ namespace SequelNet.SchemaGenerator;
 public partial class GeneratorCore
 {
 
-    private static readonly char[] TrimScriptChars = new[] { ' ', '*', '\t' };
+    private static readonly char[] TrimScriptChars = new[] { ' ', '*', '\t', '\uFEFF' };
     private static readonly char[] TrimScriptAndQuotesChars = new[] { ' ', '*', '"', '\t' };
     private static readonly char[] TrimScriptAndDashChars = new[] { ' ', '*', '-', '\t' };
     private static readonly char[] TrimBracketScriptChars = new[] { ' ', '[', ']', '\t' };
 
     private static void ParseScript(ScriptContext context, string[] scriptLines)
     {
-        context.ClassName = scriptLines[0].Trim(TrimScriptChars);
+        if (scriptLines.Length < 2)
+            throw new FormatException("A SequelNet macro must contain a record name and table name.");
+
+        context.ClassName = scriptLines[0].Trim(TrimScriptChars).TrimStart('\uFEFF');
         context.SchemaName = scriptLines[1].Trim(TrimScriptChars);
 
         var schemaDotIndex = context.SchemaName.IndexOf('.');
@@ -35,6 +38,12 @@ public partial class GeneratorCore
             }
 
             string currentLineTrimmed = currentLine.Trim(TrimScriptChars);
+
+            // Some block-comment styles use a dash before the closing */. The
+            // comment normalizer leaves that as a standalone line, which is not
+            // a macro directive or column definition.
+            if (currentLineTrimmed.Length == 0 || currentLineTrimmed == "-")
+                continue;
 
             if (currentLineTrimmed.StartsWith("@Index:", StringComparison.OrdinalIgnoreCase))
             {
@@ -282,6 +291,9 @@ public partial class GeneratorCore
             else
             {
                 int startPos = currentLineTrimmed.IndexOf(":");
+                if (startPos <= 0)
+                    throw new FormatException($"Expected a column definition or supported directive, but found '{currentLineTrimmed}'.");
+
                 DalColumn dalColumn = new DalColumn();
                 dalColumn.Name = currentLineTrimmed.Substring(0, startPos).Trim();
                 dalColumn.PropertyName = StripColumnName(dalColumn.Name);
@@ -636,59 +648,73 @@ public partial class GeneratorCore
                     {
                         dalColumn.Type = DalColumnType.TMultiSurface;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographic;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHICCOLLECTION", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHICCOLLECTION", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHICCOLLECTION", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicCollection;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_POINT", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_POINT", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_POINT", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicPoint;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_LINESTRING", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_LINESTRING", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_LINESTRING", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicLineString;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_POLYGON", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_POLYGON", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_POLYGON", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicPolygon;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_LINE", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_LINE", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_LINE", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicLine;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_CURVE", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_CURVE", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_CURVE", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicCurve;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_SURFACE", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_SURFACE", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_SURFACE", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicSurface;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_LINEARRING", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_LINEARRING", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_LINEARRING", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicLinearRing;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_MULTIPOINT", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_MULTIPOINT", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_MULTIPOINT", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicMultiPoint;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_MULTILINESTRING", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_MULTILINESTRING", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_MULTILINESTRING", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicMultiLineString;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_MULTIPOLYGON", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_MULTIPOLYGON", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_MULTIPOLYGON", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicMultiPolygon;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_MULTICURVE", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_MULTICURVE", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_MULTICURVE", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicMultiCurve;
                     }
-                    else if (columnKeyword.Equals("GEOGAPHIC_MULTISURFACE", StringComparison.OrdinalIgnoreCase))
+                    else if (columnKeyword.Equals("GEOGRAPHIC_MULTISURFACE", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("GEOGAPHIC_MULTISURFACE", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TGeographicMultiSurface;
                     }

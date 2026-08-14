@@ -41,7 +41,8 @@ public partial class GeneratorCore
 
         // Avoid repeated allocations and keep trimming rules explicit.
         var scriptLines = script
-            .Trim(new[] { ' ', '*', '/', '\t', '\r', '\n' })
+            .TrimStart('\uFEFF')
+            .Trim(new[] { ' ', '*', '/', '\t', '\r', '\n', '\uFEFF' })
             .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
         ParseScript(context, scriptLines);

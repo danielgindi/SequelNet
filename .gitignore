@@ -279,3 +279,10 @@ __pycache__/
 
 # Webstorm
 **/.idea
+# VS Code extension build, test, and package artifacts
+SequelNet.SchemaGenerator.VSCode/node_modules/
+SequelNet.SchemaGenerator.VSCode/dist/
+SequelNet.SchemaGenerator.VSCode/.tmp/
+SequelNet.SchemaGenerator.VSCode/.vscode-test/
+SequelNet.SchemaGenerator.VSCode/*.vsix
+SequelNet.SchemaGenerator.VSCode/bin/
