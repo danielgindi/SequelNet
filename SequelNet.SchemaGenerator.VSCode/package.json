@@ -2,7 +2,7 @@
   "name": "sequelnet-schema-generator",
   "displayName": "SequelNet Schema Generator",
   "description": "Generates or updates SequelNet DAL code from a macro comment or selection.",
-  "version": "3.0.158",
+  "version": "3.0.159",
   "publisher": "danielgindi",
   "license": "MIT",
   "repository": {
