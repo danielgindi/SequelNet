@@ -10,13 +10,13 @@ public class GeometryTests
         var point = new Geometry.Point(32.08, 34.78, 4326);
         var invalid = new Geometry.Point(double.NaN, 34.78);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(point.IsEmpty, Is.False);
             Assert.That(point.IsValid, Is.True);
             Assert.That(point.SRID, Is.EqualTo(4326));
             Assert.That(invalid.IsValid, Is.False);
-        });
+        }
     }
 
     [Test]
@@ -27,14 +27,14 @@ public class GeometryTests
             new Geometry.Point(0, 0), new Geometry.Point(1, 0),
             new Geometry.Point(1, 1), new Geometry.Point(0, 0));
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(open.IsValid, Is.True);
             Assert.That(open.IsClosed, Is.False);
             Assert.That(open.IsValidRing, Is.False);
             Assert.That(ring.IsClosed, Is.True);
             Assert.That(ring.IsValidRing, Is.True);
-        });
+        }
     }
 
     [Test]
@@ -56,11 +56,11 @@ public class GeometryTests
     {
         var collection = new Geometry.MultiPoint(new Geometry.Point(1, 1), new Geometry.Point(2, 2));
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(collection.IsEmpty, Is.False);
             Assert.That(collection.IsValid, Is.True);
-        });
+        }
 
         collection.Geometries.Add(new Geometry.Point(double.PositiveInfinity, 3));
         Assert.That(collection.IsValid, Is.False);
@@ -71,11 +71,11 @@ public class GeometryTests
     {
         var rect = Geometry.LineString.RectForDistanceAroundRect(10, 20, 5, 15, 1);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(rect.Points, Has.Count.EqualTo(2));
             Assert.That((double)rect[0].X.Value!, Is.GreaterThan((double)rect[1].X.Value!));
             Assert.That((double)rect[0].Y.Value!, Is.GreaterThan((double)rect[1].Y.Value!));
-        });
+        }
     }
 }

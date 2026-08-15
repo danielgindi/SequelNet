@@ -96,7 +96,7 @@ public class ScalarAndSchemaCoverageTests
         var time = new TimeOnly(13, 45, 30, 123);
         var id = Guid.Parse("4ef1df1f-4d80-4a03-9d17-e8d2c6273920");
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(language.PrepareValue(null, timestamp), Is.EqualTo("'2026-08-15 13:45:30'"));
             Assert.That(language.PrepareValue(null, offsetTimestamp), Does.StartWith("'2026-08-15 13:45:30"));
@@ -104,6 +104,6 @@ public class ScalarAndSchemaCoverageTests
             Assert.That(language.PrepareValue(null, time), Is.EqualTo("TIME'13:45:30.123'"));
             Assert.That(language.PrepareValue(null, id), Is.EqualTo("'4ef1df1f-4d80-4a03-9d17-e8d2c6273920'"));
             Assert.That(language.PrepareValue(null, new byte[] { 0xDE, 0xAD }), Is.EqualTo("UNHEX(DEAD)"));
-        });
+        }
     }
 }

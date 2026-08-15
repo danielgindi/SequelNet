@@ -71,14 +71,14 @@ public class MutationAndSchemaRenderingTests
 
         var sql = query.BuildCommand(new RenderingConnector());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(sql, Does.StartWith("CREATE TABLE `orders`("));
             Assert.That(sql, Does.Contain("`id` INTEGER NOT NULL"));
             Assert.That(sql, Does.Contain("`status` TEXT DEFAULT 'pending'"));
             Assert.That(sql, Does.Contain("CONSTRAINT `PK_orders` PRIMARY KEY(`id`)"));
             Assert.That(sql, Does.EndWith(" ENGINE=InnoDB"));
-        });
+        }
     }
 
     [Test]

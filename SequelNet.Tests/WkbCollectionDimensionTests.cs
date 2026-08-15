@@ -16,13 +16,13 @@ public class WkbCollectionDimensionTests
         var multiPoint = (Geometry.MultiPoint)WkbReader.GeometryFromWkb(data);
         var point = multiPoint[0];
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(point.X.Value, Is.EqualTo(1d));
             Assert.That(point.Y.Value, Is.EqualTo(2d));
             Assert.That(point.Z.Value, Is.EqualTo(3d));
             Assert.That(point.M.Value, Is.EqualTo(4d));
             Assert.That(point.SRID, Is.EqualTo(4326));
-        });
+        }
     }
 }

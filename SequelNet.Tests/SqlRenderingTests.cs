@@ -48,14 +48,14 @@ public class SqlRenderingTests
             ValueWrapper.From("-suffix"));
         var aggregate = PhraseHelper.Count("orders", "id", distinct: true);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(Build(PhraseHelper.Add(ValueWrapper.Column("orders", "total"), ValueWrapper.From(5)), connector),
                 Is.EqualTo("`orders`.`total` + 5"));
             Assert.That(Build(expression, connector),
                 Is.EqualTo("CONCAT(COALESCE('prefix-',''),COALESCE(`orders`.`reference`,''),COALESCE('-suffix',''))"));
             Assert.That(Build(aggregate, connector), Is.EqualTo("COUNT(DISTINCT `orders`.`id`)"));
-        });
+        }
     }
 
     [Test]
@@ -69,13 +69,13 @@ public class SqlRenderingTests
 
         language.BuildCreateForeignKey(foreignKey, sql, new TestSqlConnector());
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(language.WrapFieldName("weird`name"), Is.EqualTo("`weird``name`"));
             Assert.That(language.PrepareValue("O'Brian"), Is.EqualTo("'O''Brian'"));
             Assert.That(language.FormatBinary(new byte[] { 0x01, 0xAB }), Is.EqualTo("UNHEX(01AB)"));
             Assert.That(sql.ToString(), Is.EqualTo("`FK_orders_customer` FOREIGN KEY (`customer_id`) REFERENCES customers (`id`) ON DELETE CASCADE ON UPDATE SET NULL"));
-        });
+        }
     }
 
     [Test]
@@ -85,12 +85,12 @@ public class SqlRenderingTests
 
         var list = orderBy.Then("orders", "second_column", SortDirection.DESC);
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(list, Has.Count.EqualTo(2));
             Assert.That(list[1].Value.TableName, Is.EqualTo("orders"));
             Assert.That(list[1].Value.Value, Is.EqualTo("second_column"));
-        });
+        }
     }
 
     private static string Build(IPhrase phrase, ConnectorBase connector)

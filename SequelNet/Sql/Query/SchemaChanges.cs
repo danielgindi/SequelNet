@@ -8,7 +8,7 @@ namespace SequelNet;
 
 public partial class Query
 {
-    private TableSchema.TableElementType[] _CreateTableElements;
+    private TableSchema.TableElementType[]? _CreateTableElements;
 
     /// <summary>
     /// Creates current table in the database.
@@ -100,7 +100,7 @@ public partial class Query
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateIndex(string indexName)
     {
-        return CreateIndex(Schema.Indexes.Find(indexName));
+        return CreateIndex(Schema!.Indexes.Find(indexName));
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public partial class Query
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query CreateForeignKey(string fkName)
     {
-        return CreateForeignKey(Schema.ForeignKeys.Find(fkName));
+        return CreateForeignKey(Schema!.ForeignKeys.Find(fkName));
     }
 
     /// <summary>
@@ -176,7 +176,7 @@ public partial class Query
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query AddColumn(string columnName)
     {
-        return AddColumn(Schema.Columns.Find(columnName));
+        return AddColumn(Schema!.Columns.Find(columnName));
     }
     
     /// <summary>
@@ -199,7 +199,7 @@ public partial class Query
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(string columnName)
     {
-        return ChangeColumn(Schema.Columns.Find(columnName));
+        return ChangeColumn(Schema!.Columns.Find(columnName));
     }
 
     /// <summary>
@@ -208,7 +208,7 @@ public partial class Query
     /// <param name="oldColumnName">The column's old name</param>
     /// <param name="column">The updated column's definition</param>
     /// <returns>Current <see cref="Query"/> object</returns>
-    public Query ChangeColumn(string oldColumnName, TableSchema.Column column)
+    public Query ChangeColumn(string? oldColumnName, TableSchema.Column column)
     {
         ClearSelect();
         ClearOrderBy();
@@ -239,7 +239,7 @@ public partial class Query
     /// <returns>Current <see cref="Query"/> object</returns>
     public Query ChangeColumn(string oldColumnName, string newColumnName)
     {
-        return ChangeColumn(oldColumnName, Schema.Columns.Find(newColumnName));
+        return ChangeColumn(oldColumnName, Schema!.Columns.Find(newColumnName));
     }
     
     /// <summary>
@@ -371,7 +371,7 @@ public partial class Query
     /// </summary>
     /// <param name="tableName">Table to drop</param>
     /// <param name="connection">An existing connection to use.</param>
-    public static void DropTable(string tableName, ConnectorBase connection = null)
+    public static void DropTable(string tableName, ConnectorBase? connection = null)
     {
         bool ownsConnection = false;
         if (connection == null)
@@ -412,7 +412,7 @@ public partial class Query
     /// <param name="tableName">Table to drop</param>
     /// <param name="connection">An existing connection to use.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public static async System.Threading.Tasks.Task DropTableAsync(string tableName, ConnectorBase connection = null, CancellationToken? cancellationToken = null)
+    public static async System.Threading.Tasks.Task DropTableAsync(string tableName, ConnectorBase? connection = null, CancellationToken? cancellationToken = null)
     {
         bool ownsConnection = false;
         if (connection == null)
@@ -444,7 +444,7 @@ public partial class Query
     /// <param name="cancellationToken">Cancellation token</param>
     public static System.Threading.Tasks.Task DropTableAsync(string tableName, CancellationToken? cancellationToken)
     {
-        return DropTableAsync(tableName, (ConnectorBase)null, cancellationToken);
+        return DropTableAsync(tableName, (ConnectorBase?)null, cancellationToken);
     }
 
     /// <summary>

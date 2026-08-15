@@ -12,7 +12,7 @@ public class ValueWrapperAndJsonPathTests
         var column = ValueWrapper.Column("orders", "total");
         var literal = ValueWrapper.Literal("CURRENT_TIMESTAMP");
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(nullValue.Type, Is.EqualTo(ValueObjectType.Value));
             Assert.That(nullValue.Value, Is.Null);
@@ -21,7 +21,7 @@ public class ValueWrapperAndJsonPathTests
             Assert.That(column.Value, Is.EqualTo("total"));
             Assert.That(literal.Type, Is.EqualTo(ValueObjectType.Literal));
             Assert.That(literal.Value, Is.EqualTo("CURRENT_TIMESTAMP"));
-        });
+        }
     }
 
     [Test]
@@ -32,13 +32,13 @@ public class ValueWrapperAndJsonPathTests
         var otherTable = ValueWrapper.Column("customers", "id");
         var literal = ValueWrapper.Literal("id");
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(first, Is.EqualTo(same));
             Assert.That(first.GetHashCode(), Is.EqualTo(same.GetHashCode()));
             Assert.That(first, Is.Not.EqualTo(otherTable));
             Assert.That(first, Is.Not.EqualTo(literal));
-        });
+        }
     }
 
     [Test]
@@ -51,12 +51,12 @@ public class ValueWrapperAndJsonPathTests
             JsonPathExpression.Part.Property("title"));
 
         var path = expression.GetPath();
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(path.Type, Is.EqualTo(ValueObjectType.Value));
             Assert.That(path.Value, Is.EqualTo("$.\"store name\"[4].title"));
             Assert.That(expression.IsEmpty(), Is.False);
-        });
+        }
     }
 
     [TestCase("$")]
@@ -71,13 +71,13 @@ public class ValueWrapperAndJsonPathTests
     {
         var parts = JsonPathExpression.GetPathParts("$.\"property\\\\name\"[7]");
 
-        Assert.Multiple(() =>
+        using (Assert.EnterMultipleScope())
         {
             Assert.That(parts, Has.Count.EqualTo(3));
             Assert.That(parts[1].Value.Value, Is.EqualTo("property\\name"));
             Assert.That(parts[1].Indexed, Is.False);
             Assert.That(parts[2].Value.Value, Is.EqualTo(7));
             Assert.That(parts[2].Indexed, Is.True);
-        });
+        }
     }
 }
