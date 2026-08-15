@@ -12,7 +12,7 @@ public class GeneratedRegionTests
 
         Assert.Equal(macro.Length, change.Start);
         Assert.Equal(0, change.Length);
-        Assert.Equal("\n// <sequelnet-generated>\npublic partial class MyRecord {}\n// </sequelnet-generated>", change.Text);
+        Assert.Equal("\n\n// <sequelnet-generated>\npublic partial class MyRecord {}\n// </sequelnet-generated>", change.Text);
     }
 
     [Fact]

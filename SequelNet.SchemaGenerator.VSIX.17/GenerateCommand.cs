@@ -147,12 +147,14 @@ namespace SequelNet.SchemaGenerator.VSIX
                 }
                 else
                 {
-                    // Supplying a character count avoids moving a second DTE
-                    // point to documentLength + 1 when the generated region is
-                    // at EOF; that legacy COM call reports "Parameter is incorrect".
-                    editStart.ReplaceText(change.Length, change.Text, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
+                    var editEnd = textDocument.StartPoint.CreateEditPoint();
+                    editEnd.MoveToAbsoluteOffset(ToDteAbsoluteOffset(documentText, change.Start + change.Length));
+                    editStart.ReplaceText(editEnd, change.Text, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
                 }
-            }
+
+                var updatedDocumentText = documentText.Substring(0, change.Start) + change.Text +
+                    documentText.Substring(change.Start + change.Length);
+                FormatGeneratedRegion(dte, textDocument, updatedDocumentText, change.Start, change.Text.Length);            }
             catch (Exception exception)
             {
                 VsShellUtilities.ShowMessageBox(
@@ -164,6 +166,24 @@ namespace SequelNet.SchemaGenerator.VSIX
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
             }
         }
+
+        private static void FormatGeneratedRegion(DTE2 dte, TextDocument textDocument, string documentText, int start, int length)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            try
+            {
+                var selection = textDocument.Selection;
+                selection.MoveToAbsoluteOffset(ToDteAbsoluteOffset(documentText, start), false);
+                selection.MoveToAbsoluteOffset(ToDteAbsoluteOffset(documentText, start + length), true);
+                dte.ExecuteCommand("Edit.FormatSelection");
+            }
+            catch
+            {
+                // Generation succeeds even when the active editor does not expose
+                // Visual Studio's formatting command (for example, a text editor).
+            }
+        }
+
         // EnvDTE counts a CRLF sequence as one absolute character, whereas
         // .NET string offsets count both characters. All generator offsets are
         // string offsets, so convert at the DTE boundary in both directions.

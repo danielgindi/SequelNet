@@ -45,7 +45,7 @@ public static class GeneratedRegion
             regionStart = FindAdjacentRegionStart(documentText, macroEndOffset);
 
         if (regionStart < 0)
-            return new GeneratedRegionChange(macroEndOffset, 0, newLine + Render(generatedCode, newLine, BuildStartMarker(recordName)));
+            return new GeneratedRegionChange(macroEndOffset, 0, newLine + newLine + Render(generatedCode, newLine, BuildStartMarker(recordName)));
 
         var regionEnd = FindMatchingRegionEnd(documentText, regionStart);
         return new GeneratedRegionChange(regionStart, regionEnd - regionStart, Render(generatedCode, newLine, BuildStartMarker(recordName)));
