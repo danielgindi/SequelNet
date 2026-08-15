@@ -21,11 +21,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequelNet.SchemaGenerator.V
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SequelNet.Extensions.DependencyInjection", "SequelNet.Extensions.DependencyInjection\SequelNet.Extensions.DependencyInjection.csproj", "{0C2052F3-5C13-45A6-B944-CFBB714BBC57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequelNet.SchemaGenerator.Shared.Tests", "SequelNet.SchemaGenerator.Shared.Tests\SequelNet.SchemaGenerator.Shared.Tests.csproj", "{BDC04C30-7F8E-3622-544E-CC00E730A705}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequelNet.SchemaGenerator.Cli", "SequelNet.SchemaGenerator.Cli\SequelNet.SchemaGenerator.Cli.csproj", "{F7C6F353-C6B0-49D0-9FF9-54DB16DCC32D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SequelNet.Tests", "SequelNet.Tests\SequelNet.Tests.csproj", "{AD652180-304F-FE5A-E9A2-C13110D0356D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -107,14 +107,6 @@ Global
 		{0C2052F3-5C13-45A6-B944-CFBB714BBC57}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0C2052F3-5C13-45A6-B944-CFBB714BBC57}.Release|x86.ActiveCfg = Release|Any CPU
 		{0C2052F3-5C13-45A6-B944-CFBB714BBC57}.Release|x86.Build.0 = Release|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Debug|x86.Build.0 = Debug|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Release|x86.ActiveCfg = Release|Any CPU
-		{3A4D22AC-220D-4B49-8EA2-FC5BB8CD5D81}.Release|x86.Build.0 = Release|Any CPU
 		{BDC04C30-7F8E-3622-544E-CC00E730A705}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BDC04C30-7F8E-3622-544E-CC00E730A705}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BDC04C30-7F8E-3622-544E-CC00E730A705}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -131,6 +123,14 @@ Global
 		{F7C6F353-C6B0-49D0-9FF9-54DB16DCC32D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F7C6F353-C6B0-49D0-9FF9-54DB16DCC32D}.Release|x86.ActiveCfg = Release|Any CPU
 		{F7C6F353-C6B0-49D0-9FF9-54DB16DCC32D}.Release|x86.Build.0 = Release|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Debug|x86.Build.0 = Debug|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Release|x86.ActiveCfg = Release|Any CPU
+		{AD652180-304F-FE5A-E9A2-C13110D0356D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
