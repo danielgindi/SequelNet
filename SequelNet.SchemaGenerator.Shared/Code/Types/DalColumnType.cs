@@ -32,6 +32,8 @@ public enum DalColumnType
     TDateTimeOffset,
     TDate,
     TTime,
+    TDateOnly,
+    TTimeOnly,
 
     TDecimal,
     TMoney,

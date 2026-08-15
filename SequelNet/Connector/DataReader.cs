@@ -1281,7 +1281,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return (DateOnly)value;
     }
     
-	    public DateOnly? GetDateOnlyOrNull(int ordinal)
+	public DateOnly? GetDateOnlyOrNull(int ordinal)
     {
         if (UnderlyingReader.IsDBNull(ordinal))
             return null;
@@ -1307,7 +1307,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return (DateOnly)value;
     }
 
-	    public TimeOnly GetTimeOnly(int ordinal)
+	public TimeOnly GetTimeOnly(int ordinal)
     {
         var value = UnderlyingReader.GetValue(ordinal);
         if (value is TimeSpan ts)
@@ -1318,7 +1318,7 @@ public class DataReader : IDisposable, IDataRecord, IEnumerable
         return (TimeOnly)value;
     }
 
-	    public TimeOnly? GetTimeOnlyOrNull(int ordinal)
+	public TimeOnly? GetTimeOnlyOrNull(int ordinal)
     {
         if (UnderlyingReader.IsDBNull(ordinal))
             return null;

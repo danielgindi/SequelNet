@@ -680,6 +680,18 @@ public class LanguageFactory
         {
             return '\'' + FormatDateTime((DateTimeOffset)value) + '\'';
         }
+#if NET6_0_OR_GREATER
+        else if (value is DateOnly)
+        {
+            var date = (DateOnly)value;
+            return FormatCreateDate(date.Year, date.Month, date.Day);
+        }
+        else if (value is TimeOnly)
+        {
+            var time = (TimeOnly)value;
+            return FormatCreateTime(time.Hour, time.Minute, time.Second, time.Millisecond);
+        }
+#endif
         else if (value is Guid)
         {
             return PrepareValue((Guid)value);

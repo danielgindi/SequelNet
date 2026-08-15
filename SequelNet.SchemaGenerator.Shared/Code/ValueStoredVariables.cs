@@ -44,9 +44,17 @@ public partial class GeneratorCore
                 {
                     defaultValue = "DateTimeOffset.UtcNow";
                 }
+                else if (dalColumn.Type == DalColumnType.TDateOnly)
+                {
+                    defaultValue = "DateOnly.FromDateTime(DateTime.UtcNow)";
+                }
                 else if (dalColumn.Type == DalColumnType.TTime)
                 {
                     defaultValue = "TimeSpan.Zero";
+                }
+                else if (dalColumn.Type == DalColumnType.TTimeOnly)
+                {
+                    defaultValue = "TimeOnly.MinValue";
                 }
                 else if (dalColumn.Type == DalColumnType.TInt)
                 {

@@ -56,6 +56,8 @@ public partial class GeneratorCore
             DalColumnType.TDateTime or DalColumnType.TDateTimeUtc or DalColumnType.TDateTimeLocal or DalColumnType.TDate => ("DateTime", false),
             DalColumnType.TDateTimeOffset => ("DateTimeOffset", false),
             DalColumnType.TTime => ("TimeSpan", false),
+            DalColumnType.TDateOnly => ("DateOnly", false),
+            DalColumnType.TTimeOnly => ("TimeOnly", false),
 
             DalColumnType.TInt => ("int", false),
             DalColumnType.TInt8 => ("SByte", false),
@@ -138,8 +140,8 @@ public partial class GeneratorCore
     {
         return dalCol.Type switch
         {
-            DalColumnType.TDate => "DataType.Date",
-            DalColumnType.TTime => "DataType.Time",
+            DalColumnType.TDate or DalColumnType.TDateOnly => "DataType.Date",
+            DalColumnType.TTime or DalColumnType.TTimeOnly => "DataType.Time",
 
             DalColumnType.TText => "DataType.Text",
             DalColumnType.TLongText => "DataType.LongText",

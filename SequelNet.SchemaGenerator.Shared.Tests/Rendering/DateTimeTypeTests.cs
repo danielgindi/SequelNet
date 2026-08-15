@@ -154,4 +154,26 @@ When: DATE; NULLABLE;
 
         Assert.Contains("GetDateTimeOrNull(Columns.When)", result.Code);
     }
+    [Theory]
+    [InlineData("DATEONLY", "DateOnly", "GetDateOnlyOrNull", "DataType.Date")]
+    [InlineData("DATE_ONLY", "DateOnly", "GetDateOnlyOrNull", "DataType.Date")]
+    [InlineData("TIMEONLY", "TimeOnly", "GetTimeOnlyOrNull", "DataType.Time")]
+    [InlineData("TIME_ONLY", "TimeOnly", "GetTimeOnlyOrNull", "DataType.Time")]
+    public void Read_For_NativeDateAndTimeMacros_Uses_NativeTypes(
+        string typeKeyword,
+        string clrType,
+        string readerMethod,
+        string schemaType)
+    {
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass($"""
+            MyTable
+            dbo.MyTable
+            Id: PRIMARY KEY; INT;
+            When: {typeKeyword}; NULLABLE;
+            """);
+
+        Assert.Contains($"{clrType}? When", result.Code);
+        Assert.Contains($"{readerMethod}(Columns.When)", result.Code);
+        Assert.Contains(schemaType, result.Code);
+    }
 }

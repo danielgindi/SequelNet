@@ -129,6 +129,16 @@ public partial class TableSchema
             {
                 return DataType.DateTimeOffset;
             }
+#if NET6_0_OR_GREATER
+            else if (this.Type.Equals(typeof(DateOnly)))
+            {
+                return DataType.Date;
+            }
+            else if (this.Type.Equals(typeof(TimeOnly)))
+            {
+                return DataType.Time;
+            }
+#endif
             else if (this.Type.Equals(typeof(TimeSpan)))
             {
                 return DataType.Time;

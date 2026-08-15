@@ -128,6 +128,43 @@ public partial class GeneratorCore
                 }
             }
 
+            else if (dalCol.Type == DalColumnType.TDateOnly)
+            {
+                fromReader = "reader.GetDateOnly";
+
+                if (dalCol.IsNullable)
+                {
+                    fromReader += "OrNull";
+                }
+
+                fromReader += "(Columns.{0})";
+
+                if (dalCol.IsNullable &&
+                    !string.IsNullOrEmpty(dalCol.DefaultValue) &&
+                    dalCol.DefaultValue != "null")
+                {
+                    fromReader += " ?? " + dalCol.DefaultValue;
+                }
+            }
+
+            else if (dalCol.Type == DalColumnType.TTimeOnly)
+            {
+                fromReader = "reader.GetTimeOnly";
+
+                if (dalCol.IsNullable)
+                {
+                    fromReader += "OrNull";
+                }
+
+                fromReader += "(Columns.{0})";
+
+                if (dalCol.IsNullable &&
+                    !string.IsNullOrEmpty(dalCol.DefaultValue) &&
+                    dalCol.DefaultValue != "null")
+                {
+                    fromReader += " ?? " + dalCol.DefaultValue;
+                }
+            }
             else if (dalCol.Type == DalColumnType.TTime)
             {
                 fromReader = "reader.GetTimeSpan";

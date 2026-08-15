@@ -13,6 +13,8 @@ public class ScalarAndSchemaCoverageTests
     [TestCase(typeof(bool), 0, DataType.Boolean)]
     [TestCase(typeof(DateTime), 0, DataType.DateTime)]
     [TestCase(typeof(DateTimeOffset), 0, DataType.DateTimeOffset)]
+    [TestCase(typeof(DateOnly), 0, DataType.Date)]
+    [TestCase(typeof(TimeOnly), 0, DataType.Time)]
     [TestCase(typeof(TimeSpan), 0, DataType.Time)]
     [TestCase(typeof(Guid), 0, DataType.Guid)]
     [TestCase(typeof(byte[]), 0, DataType.Blob)]
@@ -90,12 +92,16 @@ public class ScalarAndSchemaCoverageTests
         var language = new LanguageFactory();
         var timestamp = new DateTime(2026, 8, 15, 13, 45, 30, DateTimeKind.Utc);
         var offsetTimestamp = new DateTimeOffset(timestamp, TimeSpan.Zero);
+        var date = new DateOnly(2026, 8, 15);
+        var time = new TimeOnly(13, 45, 30, 123);
         var id = Guid.Parse("4ef1df1f-4d80-4a03-9d17-e8d2c6273920");
 
         Assert.Multiple(() =>
         {
             Assert.That(language.PrepareValue(null, timestamp), Is.EqualTo("'2026-08-15 13:45:30'"));
             Assert.That(language.PrepareValue(null, offsetTimestamp), Does.StartWith("'2026-08-15 13:45:30"));
+            Assert.That(language.PrepareValue(null, date), Is.EqualTo("DATE'2026-08-15'"));
+            Assert.That(language.PrepareValue(null, time), Is.EqualTo("TIME'13:45:30.123'"));
             Assert.That(language.PrepareValue(null, id), Is.EqualTo("'4ef1df1f-4d80-4a03-9d17-e8d2c6273920'"));
             Assert.That(language.PrepareValue(null, new byte[] { 0xDE, 0xAD }), Is.EqualTo("UNHEX(DEAD)"));
         });

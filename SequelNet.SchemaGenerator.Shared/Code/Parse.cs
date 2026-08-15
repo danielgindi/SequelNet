@@ -738,9 +738,19 @@ public partial class GeneratorCore
                     {
                         dalColumn.Type = DalColumnType.TDate;
                     }
+                    else if (columnKeyword.Equals("DATEONLY", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("DATE_ONLY", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dalColumn.Type = DalColumnType.TDateOnly;
+                    }
                     else if (columnKeyword.Equals("TIME", StringComparison.OrdinalIgnoreCase))
                     {
                         dalColumn.Type = DalColumnType.TTime;
+                    }
+                    else if (columnKeyword.Equals("TIMEONLY", StringComparison.OrdinalIgnoreCase) ||
+                        columnKeyword.Equals("TIME_ONLY", StringComparison.OrdinalIgnoreCase))
+                    {
+                        dalColumn.Type = DalColumnType.TTimeOnly;
                     }
                     else if (columnKeyword.StartsWith("Default ", StringComparison.OrdinalIgnoreCase))
                     {

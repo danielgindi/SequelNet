@@ -170,9 +170,17 @@ public partial class GeneratorCore
         {
             valueConvertorFormat = $"Convert.ToDateTime({valueConvertorFormat})";
         }
+        else if (dalCol.Type == DalColumnType.TDateOnly)
+        {
+            valueConvertorFormat = $"({{0}}) is DateOnly ? (DateOnly)({valueConvertorFormat}) : DateOnly.FromDateTime(Convert.ToDateTime({valueConvertorFormat}))";
+        }
         else if (dalCol.Type == DalColumnType.TTime)
         {
             valueConvertorFormat = $"({{0}}) is TimeSpan ? (TimeSpan)({valueConvertorFormat}) : TimeSpan.Parse((string)({valueConvertorFormat}))";
+        }
+        else if (dalCol.Type == DalColumnType.TTimeOnly)
+        {
+            valueConvertorFormat = $"({{0}}) is TimeOnly ? (TimeOnly)({valueConvertorFormat}) : ({{0}}) is DateTime ? TimeOnly.FromDateTime((DateTime)({valueConvertorFormat})) : TimeOnly.FromTimeSpan(({{0}}) is TimeSpan ? (TimeSpan)({valueConvertorFormat}) : TimeSpan.Parse(({valueConvertorFormat}).ToString()))";
         }
         else if (dalCol.Type == DalColumnType.TJson ||
             dalCol.Type == DalColumnType.TJsonBinary)

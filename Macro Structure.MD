@@ -61,10 +61,12 @@ All type keywords are case-insensitive. This is the complete current list.
 | Text | `STRING(length)` / `STRING(MAX)`, `FIXEDSTRING(length)` / `FIXEDSTRING(MAX)`, `TEXT` / `TEXT(length)`, `MEDIUMTEXT` / `MEDIUMTEXT(length)`, `LONGTEXT` / `LONGTEXT(length)` |
 | Binary and JSON | `BINARY(length)` / `BINARY(MAX)`, `VARBINARY(length)` / `VARBINARY(MAX)`, `JSON`, `JSON_BINARY` |
 | Basic values | `BOOL`, `GUID` |
-| Date and time | `DATETIME`, `DATETIME_UTC`, `DATETIME_LOCAL`, `DATETIMEOFFSET`, `DATE`, `TIME` |
+| Date and time | `DATETIME`, `DATETIME_UTC`, `DATETIME_LOCAL`, `DATETIMEOFFSET`, `DATE`, `TIME`, `DATEONLY` / `DATE_ONLY`, `TIMEONLY` / `TIME_ONLY` |
 | Literal/custom | `LITERALTYPE database-type` together with `ActualType dotnet-type` |
 | Geometry | `GEOMETRY`, `GEOMETRYCOLLECTION`, `POINT`, `LINESTRING`, `POLYGON`, `LINE`, `CURVE`, `SURFACE`, `LINEARRING`, `MULTIPOINT`, `MULTILINESTRING`, `MULTIPOLYGON`, `MULTICURVE`, `MULTISURFACE` |
 | Geographic | `GEOGRAPHIC`, `GEOGRAPHICCOLLECTION`, `GEOGRAPHIC_POINT`, `GEOGRAPHIC_LINESTRING`, `GEOGRAPHIC_POLYGON`, `GEOGRAPHIC_LINE`, `GEOGRAPHIC_CURVE`, `GEOGRAPHIC_SURFACE`, `GEOGRAPHIC_LINEARRING`, `GEOGRAPHIC_MULTIPOINT`, `GEOGRAPHIC_MULTILINESTRING`, `GEOGRAPHIC_MULTIPOLYGON`, `GEOGRAPHIC_MULTICURVE`, `GEOGRAPHIC_MULTISURFACE` |
+
+Use `DATEONLY` and `TIMEONLY` when generated records should expose .NET 6+ `DateOnly` and `TimeOnly` values. `DATE` and `TIME` retain their existing `DateTime` and `TimeSpan` generated types for backwards compatibility.
 
 The generator continues to accept the historical misspelling `GEOGAPHIC` and its `GEOGAPHIC_*` variants for backward compatibility, but new macros should use the correctly spelled keywords above.
 ## Directives
