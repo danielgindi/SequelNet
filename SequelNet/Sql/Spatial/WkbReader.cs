@@ -218,7 +218,7 @@ public static class WkbReader
         switch (geometryType)
         {
             case WkbGeometryTypes.WkbPoint:
-                return ReadPoint(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadPoint(reader, SRID, cs);
             case WkbGeometryTypes.WkbPointZ:
                 return ReadPoint(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbPointM:
@@ -227,7 +227,7 @@ public static class WkbReader
                 return ReadPoint(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbLineString:
-                return ReadLineString(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadLineString(reader, SRID, cs);
             case WkbGeometryTypes.WkbLineStringZ:
                 return ReadLineString(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbLineStringM:
@@ -236,7 +236,7 @@ public static class WkbReader
                 return ReadLineString(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbPolygon:
-                return ReadPolygon(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadPolygon(reader, SRID, cs);
             case WkbGeometryTypes.WkbPolygonZ:
                 return ReadPolygon(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbPolygonM:
@@ -245,7 +245,7 @@ public static class WkbReader
                 return ReadPolygon(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbMultiPoint:
-                return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadMultiPoint(reader, SRID, cs);
             case WkbGeometryTypes.WkbMultiPointZ:
                 return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbMultiPointM:
@@ -254,7 +254,7 @@ public static class WkbReader
                 return ReadMultiPoint(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbMultiLineString:
-                return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadMultiLineString(reader, SRID, cs);
             case WkbGeometryTypes.WkbMultiLineStringZ:
                 return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbMultiLineStringM:
@@ -263,7 +263,7 @@ public static class WkbReader
                 return ReadMultiLineString(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbMultiPolygon:
-                return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadMultiPolygon(reader, SRID, cs);
             case WkbGeometryTypes.WkbMultiPolygonZ:
                 return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbMultiPolygonM:
@@ -272,7 +272,7 @@ public static class WkbReader
                 return ReadMultiPolygon(reader, SRID, WkbCoordinateSystem.XYZM);
                 
             case WkbGeometryTypes.WkbGeometryCollection:
-                return ReadGeometryCollection(reader, SRID, WkbCoordinateSystem.XY);
+                return ReadGeometryCollection(reader, SRID, cs);
             case WkbGeometryTypes.WkbGeometryCollectionZ:
                 return ReadGeometryCollection(reader, SRID, WkbCoordinateSystem.XYZ);
             case WkbGeometryTypes.WkbGeometryCollectionM:
@@ -372,7 +372,7 @@ public static class WkbReader
             {
                 throw new ArgumentException("Point expected");
             }
-            points.Add(ReadPoint(reader, SRID, cs));
+            points.Add(ReadPoint(reader, SRID2 ?? SRID, cs2));
         }
 
         return multi;
@@ -397,7 +397,7 @@ public static class WkbReader
             {
                 throw new ArgumentException("LineString expected");
             }
-            lines.Add(ReadLineString(reader, SRID, cs));
+            lines.Add(ReadLineString(reader, SRID2 ?? SRID, cs2));
         }
 
         return multi;
@@ -422,7 +422,7 @@ public static class WkbReader
             {
                 throw new ArgumentException("Polygon expected");
             }
-            polygons.Add(ReadPolygon(reader, SRID, cs));
+            polygons.Add(ReadPolygon(reader, SRID2 ?? SRID, cs2));
         }
 
         return multi;

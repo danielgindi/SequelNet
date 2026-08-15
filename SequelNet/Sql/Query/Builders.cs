@@ -1032,7 +1032,7 @@ public partial class Query
                                             addAlter();
 
                                             if (shouldAddCommand)
-                                                sb.Append(language.DropColumnCommandName);
+                                                sb.Append(language.DropColumnCommandName + " ");
 
                                             sb.Append(language.WrapFieldName(step.OldItemName));
                                         }
