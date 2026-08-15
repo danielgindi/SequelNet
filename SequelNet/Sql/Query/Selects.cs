@@ -1,4 +1,6 @@
-﻿namespace SequelNet;
+﻿using System;
+
+namespace SequelNet;
 
 public partial class Query
 {
@@ -167,46 +169,55 @@ public partial class Query
         return this;
     }
 
+    [Obsolete("Use Select(...) instead.")]
     public Query AddSelect(string columnName)
     {
         return Select(columnName);
     }
 
+    [Obsolete("Use Select(...) instead.")]
     public Query AddSelect(string columnName, string alias)
     {
         return Select(columnName, alias);
     }
 
+    [Obsolete("Use Select(...) instead.")]
     public Query AddSelect(string tableName, string columnName, string alias)
     {
         return Select(tableName, columnName, alias);
     }
 
+    [Obsolete("Use Select(...) instead.")]
     public Query AddSelect(IPhrase phrase, string alias = null)
     {
         return Select(phrase, alias);
     }
 
+    [Obsolete("Use Select(...) instead.")]
     public Query AddSelect(Query query, string alias = null)
     {
         return Select(query, alias);
     }
 
+    [Obsolete("Use SelectLiteral(...) instead.")]
     public Query AddSelectLiteral(string literalExpression)
     {
         return SelectLiteral(literalExpression);
     }
 
+    [Obsolete("Use SelectLiteral(...) instead.")]
     public Query AddSelectLiteral(string literalExpression, string alias)
     {
         return SelectLiteral(literalExpression, alias);
     }
 
+    [Obsolete("Use SelectValue(...) instead.")]
     public Query AddSelectValue(object value)
     {
         return SelectValue(value);
     }
 
+    [Obsolete("Use SelectValue(...) instead.")]
     public Query AddSelectValue(object value, string alias)
     {
         return SelectValue(value, alias);
