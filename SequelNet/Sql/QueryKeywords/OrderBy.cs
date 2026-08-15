@@ -155,7 +155,7 @@ public class OrderBy
     {
         var list = new OrderByList();
         list.Add(this);
-        list.Add(new OrderBy(columnName, columnName, sortDirection));
+        list.Add(new OrderBy(tableName, columnName, sortDirection));
         return list;
     }
 
