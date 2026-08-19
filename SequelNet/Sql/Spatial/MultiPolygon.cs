@@ -4,6 +4,8 @@ public abstract partial class Geometry
 {
     public class MultiPolygon : GeometryCollection<Polygon>
     {
+        public static new MultiPolygon Empty => new MultiPolygon();
+
         public MultiPolygon()
             : base()
         {

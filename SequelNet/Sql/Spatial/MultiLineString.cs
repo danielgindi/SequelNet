@@ -4,6 +4,8 @@ public abstract partial class Geometry
 {
     public class MultiLineString : GeometryCollection<LineString>
     {
+        public static new MultiLineString Empty => new MultiLineString();
+
         public MultiLineString()
             : base()
         {

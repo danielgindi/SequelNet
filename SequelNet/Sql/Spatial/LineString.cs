@@ -9,6 +9,8 @@ public abstract partial class Geometry
 {
     public class LineString : Geometry
     {
+        public static LineString Empty => new LineString();
+
         private List<Point> _Points;
 
         public LineString()

@@ -8,6 +8,8 @@ public abstract partial class Geometry
 {
     public class Polygon : Geometry
     {
+        public static Polygon Empty => new Polygon();
+
         private LineString _Exterior;
         private List<LineString> _Holes;
 

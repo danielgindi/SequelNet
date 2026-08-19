@@ -33,7 +33,12 @@ public partial class GeneratorCore
                 dalCol.Type == DalColumnType.TDouble ||
                 dalCol.Type == DalColumnType.TFloat)
             {
-                BuildReaderStatement(dalCol, context, ref fromReader, ref fromDb);
+                BuildReaderStatement(
+                    dalCol,
+                    context,
+                    ref fromReader,
+                    ref fromDb,
+                    useNullableReader: string.IsNullOrEmpty(dalCol.EnumTypeName));
             }
             else if (dalCol.Type == DalColumnType.TJson
                 || dalCol.Type == DalColumnType.TJsonBinary)
@@ -89,7 +94,9 @@ public partial class GeneratorCore
                 dalCol.Type == DalColumnType.TGeographicMultiSurface)
             {
                 var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(dalCol, context);
-                fromReader = "reader.GetGeometry(Columns.{0}) as " + actualType;
+                fromReader = dalCol.IsNullable
+                    ? "reader.GetGeometry(Columns.{0}) as " + actualType
+                    : "(" + actualType + ")reader.GetGeometry(Columns.{0})";
             }
 
             else if (dalCol.Type == DalColumnType.TDateTime ||
@@ -222,7 +229,12 @@ public partial class GeneratorCore
         AppendLine(stringBuilder, "}");
     }
 
-    private static void BuildReaderStatement(DalColumn col, ScriptContext context, ref string fromReader, ref string fromDb)
+    private static void BuildReaderStatement(
+        DalColumn col,
+        ScriptContext context,
+        ref string fromReader,
+        ref string fromDb,
+        bool useNullableReader)
     {
         var typeName = "";
 
@@ -247,7 +259,7 @@ public partial class GeneratorCore
 
         var (baseTypeName, actualType, effectiveType, isReferenceType) = GetClrTypeName(col, context);
 
-        if (col.IsNullable || effectiveType?.EndsWith("?") == true)
+        if (useNullableReader && (col.IsNullable || effectiveType?.EndsWith("?") == true))
         {
             if (col.IsCustomType)
             {

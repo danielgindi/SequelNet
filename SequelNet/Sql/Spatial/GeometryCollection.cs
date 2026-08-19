@@ -9,6 +9,8 @@ public abstract partial class Geometry
     public class GeometryCollection<GeometryType> : Geometry
         where GeometryType : Geometry
     {
+        public static GeometryCollection<GeometryType> Empty => new GeometryCollection<GeometryType>();
+
         private List<GeometryType> _Geometries;
 
         public GeometryCollection()

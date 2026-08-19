@@ -100,7 +100,8 @@ public partial class GeneratorCore
         }
         else if (dalCol.Type == DalColumnType.TGuid)
         {
-            valueConvertorFormat = $"new Guid({valueConvertorFormat}.ToString())";
+            var nullForgivingSuffix = context.NullableEnabled ? "!" : "";
+            valueConvertorFormat = $"new Guid({valueConvertorFormat}.ToString(){nullForgivingSuffix})";
         }
         else if (dalCol.Type == DalColumnType.TInt)
         {

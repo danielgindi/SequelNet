@@ -78,4 +78,24 @@ public class GeometryTests
             Assert.That((double)rect[0].Y.Value!, Is.GreaterThan((double)rect[1].Y.Value!));
         }
     }
+
+    [Test]
+    public void EmptyGeometryFactories_ReturnIndependent_EmptyInstances()
+    {
+        var firstPoint = Geometry.Point.Empty;
+        var secondPoint = Geometry.Point.Empty;
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(firstPoint, Is.Not.SameAs(secondPoint));
+            Assert.That(firstPoint.IsEmpty, Is.True);
+            Assert.That(firstPoint.IsValid, Is.False);
+            Assert.That(Geometry.LineString.Empty.IsEmpty, Is.True);
+            Assert.That(Geometry.Polygon.Empty.IsEmpty, Is.True);
+            Assert.That(Geometry.MultiPoint.Empty.IsEmpty, Is.True);
+            Assert.That(Geometry.MultiLineString.Empty.IsEmpty, Is.True);
+            Assert.That(Geometry.MultiPolygon.Empty.IsEmpty, Is.True);
+            Assert.That(Geometry.GeometryCollection<Geometry>.Empty.IsEmpty, Is.True);
+        }
+    }
 }

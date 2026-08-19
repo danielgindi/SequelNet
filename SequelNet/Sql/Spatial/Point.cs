@@ -9,6 +9,8 @@ public abstract partial class Geometry
 {
     public class Point : Geometry
     {
+        public static Point Empty => new Point();
+
         public ValueWrapper X;
         public ValueWrapper Y;
         public ValueWrapper Z;
@@ -69,7 +71,7 @@ public abstract partial class Geometry
         {
             get
             {
-                return false;
+                return X.Value == null || Y.Value == null;
             }
         }
 
@@ -77,6 +79,7 @@ public abstract partial class Geometry
         {
             get
             {
+                if (IsEmpty) return false;
                 if (X.Value == null || (X.Value is Double xd && (
                     Double.IsNaN(xd) || Double.IsInfinity(xd)
                 ))) return false;

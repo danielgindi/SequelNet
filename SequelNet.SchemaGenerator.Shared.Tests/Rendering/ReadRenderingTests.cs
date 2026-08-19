@@ -101,4 +101,40 @@ Status: INT; NULLABLE; StatusEnum:
         Assert.Contains("(StatusEnum?)null", result.Code);
         Assert.Contains("(StatusEnum)", result.Code);
     }
+
+    [Fact]
+    public void Read_For_Nullable_Int8_Enum_Uses_NonNullable_Reader_After_Null_Check()
+    {
+        var script = @"
+MyTable
+my_table
+Id: PRIMARY KEY; INT;
+DependentTaskStatus: INT8; NULLABLE; DependentTaskStatus:
+""DependentTaskStatus""
+- None = 0
+- Complete = 1
+";
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains(
+            "reader.IsDBNull(Columns.DependentTaskStatus) ? (DependentTaskStatus?)null : (DependentTaskStatus)reader.GetSByte(Columns.DependentTaskStatus)",
+            result.Code);
+        Assert.DoesNotContain("reader.GetSByteOrNull(Columns.DependentTaskStatus)", result.Code);
+    }
+
+    [Fact]
+    public void Read_For_NonNullable_Point_Uses_Cast_And_Initializes_Empty_Point()
+    {
+        var script = @"
+MyTable
+my_table
+Id: PRIMARY KEY; INT;
+Coordinate: POINT;
+";
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains("Coordinate = (Geometry.Point)reader.GetGeometry(Columns.Coordinate)", result.Code);
+        Assert.DoesNotContain("Coordinate = reader.GetGeometry(Columns.Coordinate) as Geometry.Point", result.Code);
+        Assert.Contains("internal Geometry.Point _Coordinate = Geometry.Point.Empty;", result.Code);
+    }
 }

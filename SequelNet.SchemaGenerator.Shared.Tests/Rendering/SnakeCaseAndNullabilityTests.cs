@@ -69,4 +69,19 @@ Id: PRIMARY KEY; INT;
         // FetchById(..., ConnectorBase? conn = null)
         Assert.Contains("ConnectorBase? conn = null", result.Code);
     }
+
+    [Fact]
+    public void NullableEnabled_GuidPrimaryKey_NullForgives_ToString_Result()
+    {
+        var script = @"
+MyTable
+dbo.MyTable
+@NullableEnabled
+Id: PRIMARY KEY; GUID;
+";
+
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains("Id = new Guid(value!.ToString()!);", result.Code);
+    }
 }

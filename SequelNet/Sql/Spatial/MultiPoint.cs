@@ -4,6 +4,8 @@ public abstract partial class Geometry
 {
     public class MultiPoint : GeometryCollection<Point>
     {
+        public static new MultiPoint Empty => new MultiPoint();
+
         public MultiPoint()
             : base()
         {

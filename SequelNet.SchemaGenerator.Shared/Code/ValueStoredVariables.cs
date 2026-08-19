@@ -116,6 +116,10 @@ public partial class GeneratorCore
                 {
                     defaultValue = "null";
                 }
+                else if (GetEmptyGeometryExpression(dalColumn.Type) is string emptyGeometry)
+                {
+                    defaultValue = emptyGeometry;
+                }
             }
 
             if (!string.IsNullOrEmpty(dalColumn.ActualDefaultValue))
@@ -141,5 +145,19 @@ public partial class GeneratorCore
                 AppendLine(stringBuilder, $"{declaration};");
             }
         }
+    }
+
+    private static string? GetEmptyGeometryExpression(DalColumnType type)
+    {
+        return type switch
+        {
+            DalColumnType.TPoint or DalColumnType.TGeographicPoint => "Geometry.Point.Empty",
+            DalColumnType.TLineString or DalColumnType.TGeographicLineString => "Geometry.LineString.Empty",
+            DalColumnType.TPolygon or DalColumnType.TGeographicPolygon => "Geometry.Polygon.Empty",
+            DalColumnType.TMultiPoint or DalColumnType.TGeographicMultiPoint => "Geometry.MultiPoint.Empty",
+            DalColumnType.TMultiLineString or DalColumnType.TGeographicMultiLineString => "Geometry.MultiLineString.Empty",
+            DalColumnType.TMultiPolygon or DalColumnType.TGeographicMultiPolygon => "Geometry.MultiPolygon.Empty",
+            _ => null
+        };
     }
 }
