@@ -80,6 +80,8 @@ public partial class GeneratorCore
             {
                 var dalCol = queryConditionColumns[index];
                 var queryMethod = index == 0 ? "Where" : "AND";
+                if (index > 0)
+                    queryConditions.Append(NewLine + "    ");
                 queryConditions.Append($".{queryMethod}(Columns.{dalCol.PropertyName}, {ValueToDb(dalCol.PropertyName!, dalCol)})");
             }
 

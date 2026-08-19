@@ -42,4 +42,22 @@ Status: INT; StatusEnum:
         // Property name is Status, type likely StatusEnum.
         Assert.Contains("StatusEnum Status", result.Code);
     }
+
+    [Fact]
+    public void InlineEnumColumn_Uses_EnumType_In_TableSchema()
+    {
+        var script = @"
+MyTable
+dbo.MyTable
+Id: PRIMARY KEY; INT;
+Status: INT; StatusEnum:
+""StatusEnum""
+- A
+- B
+";
+
+        var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
+
+        Assert.Contains("Type = typeof(StatusEnum)", result.Code);
+    }
 }

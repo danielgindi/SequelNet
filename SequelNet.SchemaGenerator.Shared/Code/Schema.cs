@@ -104,7 +104,11 @@ public partial class GeneratorCore
 
         AppendInit(stringBuilder, "Name", $"Columns.{dalCol.PropertyName}");
 
-        AppendInit(stringBuilder, "Type", $"typeof({baseTypeName})");
+        var schemaTypeName = string.IsNullOrEmpty(dalCol.EnumTypeName)
+            ? baseTypeName
+            : actualType;
+
+        AppendInit(stringBuilder, "Type", $"typeof({schemaTypeName})");
 
         var dataTypeString = GetSchemaDataTypeLiteral(dalCol)
             ?? GetEnumUnderlyingDataTypeLiteral(dalCol)
