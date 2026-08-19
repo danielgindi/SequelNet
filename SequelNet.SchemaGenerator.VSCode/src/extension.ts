@@ -2,6 +2,7 @@ import { spawn } from "child_process";
 import { existsSync } from "fs";
 import { join } from "path";
 import * as vscode from "vscode";
+import { indentGeneratedRegion } from "./formatting";
 import { createOrUpdateAfterMacro } from "./generatedRegion";
 import { findMacro, normalizeMacro } from "./macro";
 
@@ -30,11 +31,32 @@ async function generateOrUpdate(context: vscode.ExtensionContext): Promise<void>
 
   const document = editor.document;
   const change = createOrUpdateAfterMacro(document.getText(), selectedMacro.end, response.code, response.recordName);
+  const changeText = indentGeneratedRegion(
+    change.text,
+    leadingWhitespace(document.lineAt(document.positionAt(change.start)).text),
+    editor.options);
   const edit = new vscode.WorkspaceEdit();
-  edit.replace(document.uri, new vscode.Range(document.positionAt(change.start), document.positionAt(change.end)), change.text);
+  edit.replace(document.uri, new vscode.Range(document.positionAt(change.start), document.positionAt(change.end)), changeText);
   if (!await vscode.workspace.applyEdit(edit)) return void vscode.window.showErrorMessage("SequelNet generated code could not be written to the editor.");
 
+  await formatGeneratedRegion(editor, change.start, changeText.length);
+
   if (response.warnings.length > 0) void vscode.window.showWarningMessage(`SequelNet generated code with warnings: ${response.warnings.join("; ")}`);
+}
+
+async function formatGeneratedRegion(editor: vscode.TextEditor, start: number, length: number): Promise<void> {
+  try {
+    editor.selection = new vscode.Selection(
+      editor.document.positionAt(start),
+      editor.document.positionAt(start + length));
+    await vscode.commands.executeCommand("editor.action.formatSelection");
+  } catch {
+    // Generation succeeds when the active editor has no selection formatter.
+  }
+}
+
+function leadingWhitespace(text: string): string {
+  return text.match(/^\s*/)?.[0] ?? "";
 }
 
 function invokeGenerator(context: vscode.ExtensionContext, script: string): Promise<GenerateResponse> {

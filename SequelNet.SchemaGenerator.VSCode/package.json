@@ -48,7 +48,7 @@
     "compile": "esbuild src/extension.ts --bundle --platform=node --external:vscode --outfile=dist/extension.js",
     "vscode:prepublish": "npm run compile",
     "package": "node scripts/package.js",
-    "test": "esbuild src/macro.ts src/generatedRegion.ts --bundle --platform=node --format=cjs --outdir=.tmp && node test/macro.test.js && node test/generatedRegion.test.js"
+    "test": "esbuild src/macro.ts src/generatedRegion.ts src/formatting.ts --bundle --platform=node --format=cjs --outdir=.tmp && node test/macro.test.js && node test/generatedRegion.test.js && node test/formatting.test.js"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.ComponentModel.Design;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Task = System.Threading.Tasks.Task;
 
@@ -134,6 +135,10 @@ namespace SequelNet.SchemaGenerator.VSIX
                 // Keep the macro in the file as the source of truth, and create or
                 // update only the generated region immediately after it.
                 var change = GeneratedRegion.CreateOrUpdateAfterMacro(documentText, macroEndOffset, code, recordName);
+                string changeText = ApplyDefaultIndentation(
+                    change.Text,
+                    LeadingWhitespaceAt(documentText, change.Start),
+                    GetIndentSize(textDocument));
 
                 if (change.Start < 0 || change.Length < 0 || change.Start + change.Length > documentText.Length)
                     throw new InvalidOperationException("The generated-region edit range is outside the current document.");
@@ -143,18 +148,19 @@ namespace SequelNet.SchemaGenerator.VSIX
 
                 if (change.Length == 0)
                 {
-                    editStart.Insert(change.Text);
+                    editStart.Insert(changeText);
                 }
                 else
                 {
                     var editEnd = textDocument.StartPoint.CreateEditPoint();
                     editEnd.MoveToAbsoluteOffset(ToDteAbsoluteOffset(documentText, change.Start + change.Length));
-                    editStart.ReplaceText(editEnd, change.Text, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
+                    editStart.ReplaceText(editEnd, changeText, (int)vsEPReplaceTextOptions.vsEPReplaceTextAutoformat);
                 }
 
-                var updatedDocumentText = documentText.Substring(0, change.Start) + change.Text +
+                var updatedDocumentText = documentText.Substring(0, change.Start) + changeText +
                     documentText.Substring(change.Start + change.Length);
-                FormatGeneratedRegion(dte, textDocument, updatedDocumentText, change.Start, change.Text.Length);            }
+                FormatGeneratedRegion(dte, textDocument, updatedDocumentText, change.Start, changeText.Length);
+            }
             catch (Exception exception)
             {
                 VsShellUtilities.ShowMessageBox(
@@ -164,6 +170,38 @@ namespace SequelNet.SchemaGenerator.VSIX
                     OLEMSGICON.OLEMSGICON_INFO,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+        }
+
+        private static string ApplyDefaultIndentation(string text, string baseIndentation, int indentSize)
+        {
+            return Regex.Replace(text, @"^([ ]*)(?=\S)", match =>
+            {
+                string indentation = match.Groups[1].Value;
+                int levels = indentation.Length / 4;
+                return baseIndentation + new string(' ', indentSize * levels) + indentation.Substring(levels * 4);
+            }, RegexOptions.Multiline);
+        }
+
+        private static string LeadingWhitespaceAt(string text, int offset)
+        {
+            int lineStart = text.LastIndexOf('\n', Math.Max(0, offset - 1)) + 1;
+            int end = lineStart;
+            while (end < text.Length && (text[end] == ' ' || text[end] == '\t'))
+                end++;
+
+            return text.Substring(lineStart, end - lineStart);
+        }
+
+        private static int GetIndentSize(TextDocument textDocument)
+        {
+            try
+            {
+                return Math.Max(1, textDocument.IndentSize);
+            }
+            catch
+            {
+                return 4;
             }
         }
 
