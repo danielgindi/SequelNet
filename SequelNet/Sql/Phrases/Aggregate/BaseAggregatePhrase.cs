@@ -13,7 +13,6 @@ public abstract class BaseAggregatePhrase : IPhrase
 
     public BaseAggregatePhrase()
     {
-        this.Value = ValueWrapper.Literal("*");
     }
 
     public BaseAggregatePhrase(string? tableName, string columnName)
@@ -24,6 +23,11 @@ public abstract class BaseAggregatePhrase : IPhrase
     public BaseAggregatePhrase(string columnName)
         : this(null, columnName)
     {
+    }
+
+    public BaseAggregatePhrase(ValueWrapper value)
+    {
+        this.Value = value;
     }
 
     public BaseAggregatePhrase(object? value, ValueObjectType valueType)

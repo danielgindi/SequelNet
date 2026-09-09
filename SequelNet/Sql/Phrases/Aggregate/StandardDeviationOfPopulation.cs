@@ -41,8 +41,6 @@ public class StandardDeviationOfPopulation : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append("STDDEV_POP(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildStandardDeviationOfPopulation(this, sb, conn, relatedQuery);
     }
 }

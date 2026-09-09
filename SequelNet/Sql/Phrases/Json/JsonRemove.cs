@@ -63,23 +63,9 @@ public class JsonRemove : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        switch (conn.TYPE)
-        {
-            case ConnectorBase.SqlServiceType.MYSQL:
-                {
-                    sb.Append("JSON_REMOVE(");
-                    sb.Append(Document.Build(conn, relatedQuery));
-                    foreach (var path in Paths)
-                    {
-                        sb.Append(", ");
-                        sb.Append(conn.Language.PrepareValue(path));
-                    }
-                    sb.Append(")");
-                }
-                break;
+        if (Paths.Count == 0)
+            throw new InvalidOperationException("JsonRemove requires at least one path");
 
-            default:
-                throw new NotSupportedException("JsonSet is not supported by current DB type");
-        }
+        conn.Language.BuildJsonRemove(this, sb, conn, relatedQuery);
     }
 }

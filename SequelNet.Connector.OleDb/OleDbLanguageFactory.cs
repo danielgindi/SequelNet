@@ -23,7 +23,19 @@ public class OleDbLanguageFactory : LanguageFactory
 
     public override string UtcNow()
     {
-        return @"now()"; // NOT UTC
+        throw new NotImplementedException(
+            "UTC timestamp retrieval has not been implemented for this connector");
+    }
+
+    public override void BuildConvertUtcToTz(
+        ValueWrapper value,
+        ValueWrapper timeZone,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "UTC time zone conversion has not been implemented for this connector");
     }
 
     public override string StringToLower(string value)
@@ -43,27 +55,124 @@ public class OleDbLanguageFactory : LanguageFactory
 
     public override string HourPartOfDateOrTime(string date)
     {
-        return @"DATEPART(hour, " + date + ")";
+        return @"HOUR(" + date + ")";
     }
 
     public override string MinutePartOfDateOrTime(string date)
     {
-        return @"DATEPART(minute, " + date + ")";
+        return @"MINUTE(" + date + ")";
     }
 
     public override string SecondPartOfDateOrTime(string date)
     {
-        return @"DATEPART(second, " + date + ")";
+        return @"SECOND(" + date + ")";
+    }
+
+    public override string DatePartOfDateTime(string date)
+    {
+        return $"DATEVALUE({date})";
+    }
+
+    public override string TimePartOfDateTime(string date)
+    {
+        return $"TIMEVALUE({date})";
     }
 
     public override string ExtractUnixTimestamp(string date)
     {
-        return $"DATEDIFF(second, '1970-01-01 00:00:00', {date})";
+        return $"DATEDIFF('s', #1970-01-01 00:00:00#, {date})";
     }
 
     public override string NullOrDefaultValue(string expression, string defaultValue)
     {
-        return $"ISNULL({expression}, {defaultValue})";
+        return $"Nz({expression}, {defaultValue})";
+    }
+
+    public override string IfEqualThenNull(string value1expr, string value2expr)
+    {
+        return $"IIF({value1expr} = {value2expr}, NULL, {value1expr})";
+    }
+
+    public override string Md5Hex(string value)
+    {
+        throw new NotSupportedException("MD5 is not supported by this connector");
+    }
+
+    public override string Md5Binary(string value)
+    {
+        throw new NotSupportedException("MD5 is not supported by this connector");
+    }
+
+    public override string Sha1Hex(string value)
+    {
+        throw new NotSupportedException("SHA1 is not supported by this connector");
+    }
+
+    public override string Sha1Binary(string value)
+    {
+        throw new NotSupportedException("SHA1 is not supported by this connector");
+    }
+
+    public override string ST_X(string pt)
+    {
+        throw new NotImplementedException("ST_X has not been implemented for this connector");
+    }
+
+    public override string ST_Y(string pt)
+    {
+        throw new NotImplementedException("ST_Y has not been implemented for this connector");
+    }
+
+    public override void BuildCeil(
+        Phrases.Ceil phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("(-INT(-(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(")))");
+    }
+
+    public override void BuildFloor(
+        Phrases.Floor phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("INT(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildGreatest(
+        Phrases.Greatest phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "GREATEST has not been implemented for this connector");
+    }
+
+    public override void BuildLeast(
+        Phrases.Least phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "LEAST has not been implemented for this connector");
+    }
+
+    public override void BuildGeographySphericalDistanceMath(
+        Phrases.GeographySphericalDistanceMath phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "Geography spherical distance has not been implemented for this connector");
     }
 
     public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
@@ -71,32 +180,167 @@ public class OleDbLanguageFactory : LanguageFactory
         switch (format)
         {
             case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
-                return $"CONVERT(nvarchar(19), {date}, 126)";
-
-            case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
-                return $"CONVERT(nvarchar(23), {date}, 126)";
-
-            case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
-                return $"CONCAT(CONVERT(nvarchar(19), {date}, 127), 'Z')";
-
-            case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
-                return $"CONCAT(CONVERT(nvarchar(23), {date}, 127), 'Z')";
+                return $@"FORMAT({date}, 'yyyy-mm-dd\Thh:nn:ss')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDate:
-                return $"CONVERT(nvarchar(10), {date}, 23)";
+                return $"FORMAT({date}, 'yyyy-mm-dd')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoTime:
-                return $"CONVERT(nvarchar(10), {date}, 114)";
-
-            case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
-                return $"CONVERT(nvarchar(14), {date}, 114)";
+                return $"FORMAT({date}, 'hh:nn:ss')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
-                return $"CONVERT(nvarchar(7), {date}, 127)";
+                return $"FORMAT({date}, 'yyyy-mm')";
 
             default:
                 throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
         }
+    }
+
+    public override string FormatCreateDate(int year, int month, int day)
+    {
+        return $"DATESERIAL({year}, {month}, {day})";
+    }
+
+    public override string FormatCreateTime(
+        int hours,
+        int minutes,
+        int seconds,
+        int milliseconds)
+    {
+        var time = $"TIMESERIAL({hours}, {minutes}, {seconds})";
+
+        if (milliseconds == 0)
+            return time;
+
+        return $"{time} + ({milliseconds} / 86400000.0)";
+    }
+
+    public override void BuildConcat(
+        Phrases.Concat phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (phrase.Values.Count == 0)
+        {
+            sb.Append(PrepareValue(""));
+            return;
+        }
+
+        var values = new string[phrase.Values.Count];
+        for (var i = 0; i < phrase.Values.Count; i++)
+            values[i] = phrase.Values[i].Build(conn, relatedQuery);
+
+        if (phrase.IgnoreNulls)
+        {
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(" & ");
+
+                sb.Append("Nz(");
+                sb.Append(values[i]);
+                sb.Append(", '')");
+            }
+
+            return;
+        }
+
+        sb.Append("IIF(");
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (i > 0)
+                sb.Append(" OR ");
+
+            sb.Append("IsNull(");
+            sb.Append(values[i]);
+            sb.Append(')');
+        }
+
+        sb.Append(", NULL, ");
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (i > 0)
+                sb.Append(" & ");
+
+            sb.Append(values[i]);
+        }
+
+        sb.Append(')');
+    }
+
+    public override void BuildDateTimeAdd(
+        Phrases.DateTimeAdd phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        var interval = GetDateInterval(phrase.Unit);
+
+        sb.Append("DATEADD('");
+        sb.Append(interval);
+        sb.Append("', ");
+        phrase.Value2.Build(sb, conn, relatedQuery);
+        sb.Append(", ");
+        phrase.Value1.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildDateTimeDiff(
+        Phrases.DateTimeDiff phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        var interval = GetDateInterval(phrase.Unit);
+
+        sb.Append("DATEDIFF('");
+        sb.Append(interval);
+        sb.Append("', ");
+        phrase.Value1.Build(sb, conn, relatedQuery);
+        sb.Append(", ");
+        phrase.Value2.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    private static string GetDateInterval(Phrases.DateTimeUnit unit)
+    {
+        return unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => throw new NotSupportedException(
+                "Access does not support microsecond date intervals"),
+            Phrases.DateTimeUnit.Millisecond => throw new NotSupportedException(
+                "Access does not support millisecond date intervals"),
+            Phrases.DateTimeUnit.Minute => "n",
+            Phrases.DateTimeUnit.Hour => "h",
+            Phrases.DateTimeUnit.Day => "d",
+            Phrases.DateTimeUnit.Week => "ww",
+            Phrases.DateTimeUnit.Month => "m",
+            Phrases.DateTimeUnit.QuarterYear => "q",
+            Phrases.DateTimeUnit.Year => "yyyy",
+            _ => "s",
+        };
+    }
+
+    public override void BuildCase(
+        Phrases.Case phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "CASE has not been implemented for this connector");
+    }
+
+    public override void BuildCast(
+        ValueWrapper value,
+        DataTypeDef typeDef,
+        StringBuilder sb,
+        ConnectorBase connection,
+        Query relatedQuery)
+    {
+        throw new NotImplementedException(
+            "CAST has not been implemented for this connector");
     }
 
     public override void BuildLimitOffset(
@@ -320,23 +564,8 @@ public class OleDbLanguageFactory : LanguageFactory
         ConnectorBase connection,
         Query relatedQuery)
     {
-        sb.Append("(");
-        value.Build(sb, connection, relatedQuery);
-        sb.Append(" COLLATE ");
-        sb.Append(collation);
-
-        switch (direction)
-        {
-            case SortDirection.ASC:
-                sb.Append(" ASC");
-                break;
-
-            case SortDirection.DESC:
-                sb.Append(" DESC");
-                break;
-        }
-
-        sb.Append(")");
+        throw new NotImplementedException(
+            "COLLATE has not been implemented for this connector");
     }
 
     public override void BuildOrderByRandom(ValueWrapper? seedValue, ConnectorBase conn, StringBuilder outputBuilder)
@@ -349,6 +578,16 @@ public class OleDbLanguageFactory : LanguageFactory
         {
             outputBuilder.Append(@"RND(NULL)");
         }
+    }
+
+    public override void BuildRandWeight(
+        Phrases.RandWeight phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("Rnd() * ");
+        phrase.Value.Build(sb, conn, relatedQuery);
     }
 
     public override string BuildFindString(
@@ -396,6 +635,97 @@ public class OleDbLanguageFactory : LanguageFactory
         ret += ")";
 
         return ret;
+    }
+
+    public override void BuildStandardDeviationOfPopulation(
+        Phrases.StandardDeviationOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("StDevP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildCount(
+        Phrases.Count phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        ThrowIfDistinctAggregate(phrase.Distinct);
+        base.BuildCount(phrase, sb, conn, relatedQuery);
+    }
+
+    public override void BuildMax(
+        Phrases.Max phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        ThrowIfDistinctAggregate(phrase.Distinct);
+        base.BuildMax(phrase, sb, conn, relatedQuery);
+    }
+
+    public override void BuildMin(
+        Phrases.Min phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        ThrowIfDistinctAggregate(phrase.Distinct);
+        base.BuildMin(phrase, sb, conn, relatedQuery);
+    }
+
+    public override void BuildSum(
+        Phrases.Sum phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        ThrowIfDistinctAggregate(phrase.Distinct);
+        base.BuildSum(phrase, sb, conn, relatedQuery);
+    }
+
+    private static void ThrowIfDistinctAggregate(bool distinct)
+    {
+        if (distinct)
+            throw new NotImplementedException(
+                "DISTINCT aggregate expressions have not been implemented for this connector");
+    }
+
+    public override void BuildStandardDeviationOfSample(
+        Phrases.StandardDeviationOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("StDev(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildStandardVarianceOfPopulation(
+        Phrases.StandardVarianceOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("VarP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildStandardVarianceOfSample(
+        Phrases.StandardVarianceOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("Var(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
     }
 
     #endregion

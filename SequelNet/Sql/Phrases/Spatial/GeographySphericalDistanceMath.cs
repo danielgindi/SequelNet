@@ -34,24 +34,6 @@ public class GeographySphericalDistanceMath : IPhrase
     
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        var fx = FromLatitude.Build(conn, relatedQuery);
-        var fy = FromLongitude.Build(conn, relatedQuery);
-        var tx = ToLatitude.Build(conn, relatedQuery);
-        var ty = ToLongitude.Build(conn, relatedQuery);
-        
-        sb.Append(@"12742.0 * ASIN(SQRT(POWER(SIN(((");
-        sb.Append(fx);
-        sb.Append(@")-(");
-        sb.Append(tx);
-        sb.Append(@")) * PI()/360.0), 2) + COS(");
-        sb.Append(fx);
-        sb.Append(@"* PI()/180.0) * COS((");
-        sb.Append(tx);
-        sb.Append(@") * PI()/180.0) * POWER(SIN((");
-        sb.Append(fy);
-        sb.Append(@"-");
-        sb.Append(ty);
-        sb.Append(@") * PI()/360.0), 2)))");
-        sb.Append(@" * 1000.0"); // Return in meters
+        conn.Language.BuildGeographySphericalDistanceMath(this, sb, conn, relatedQuery);
     }
 }

@@ -39,9 +39,7 @@ public class Ceil : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("CEIL(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(')');
+        conn.Language.BuildCeil(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

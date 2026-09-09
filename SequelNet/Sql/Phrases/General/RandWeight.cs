@@ -40,13 +40,6 @@ public class RandWeight : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        if (conn.TYPE == ConnectorBase.SqlServiceType.MSSQL)
-            sb.Append("RAND(CAST(NEWID() AS VARBINARY)) * ");
-        else if (conn.TYPE == ConnectorBase.SqlServiceType.MYSQL)
-            sb.Append("RAND() * ");
-        else // if (conn.TYPE == ConnectorBase.SqlServiceType.POSTGRESQL)
-            sb.Append("RANDOM() * ");
-
-        sb.Append(Value.Build(conn, relatedQuery));
+        conn.Language.BuildRandWeight(this, sb, conn, relatedQuery);
     }
 }

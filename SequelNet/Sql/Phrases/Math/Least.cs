@@ -78,15 +78,7 @@ public class Least : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("LEAST(");
-        
-        sb.Append(Value1.Build(conn, relatedQuery));
-
-        sb.Append(", ");
-        
-        sb.Append(Value2.Build(conn, relatedQuery));
-
-        sb.Append(')');
+        conn.Language.BuildLeast(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

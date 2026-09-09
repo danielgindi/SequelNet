@@ -50,8 +50,6 @@ public class Sum : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append(Distinct ? "SUM(DISTINCT " : "SUM(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildSum(this, sb, conn, relatedQuery);
     }
 }

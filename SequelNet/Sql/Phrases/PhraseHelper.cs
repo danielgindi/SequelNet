@@ -1532,24 +1532,24 @@ public static class PhraseHelper
         return new Subtract(value1, value2);
     }
 
-    public static Abs Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
+    public static Abs Abs(object value, ValueObjectType valueType)
     {
-        return new Abs(value, valueType, decimalPlaces);
+        return new Abs(value, valueType);
     }
 
-    public static Abs Abs(string tableName, string columnName, int decimalPlaces = 0)
+    public static Abs Abs(string tableName, string columnName)
     {
-        return new Abs(tableName, columnName, decimalPlaces);
+        return new Abs(tableName, columnName);
     }
 
-    public static Abs Abs(string columnName, int decimalPlaces = 0)
+    public static Abs Abs(string columnName)
     {
-        return new Abs(columnName, decimalPlaces);
+        return new Abs(columnName);
     }
 
-    public static Abs Abs(IPhrase phrase, int decimalPlaces = 0)
+    public static Abs Abs(IPhrase phrase)
     {
-        return new Abs(phrase, decimalPlaces);
+        return new Abs(phrase);
     }
 
     public static Abs Abs(Where where)

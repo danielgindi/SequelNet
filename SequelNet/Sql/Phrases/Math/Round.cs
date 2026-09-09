@@ -42,16 +42,7 @@ public class Round : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("ROUND(");
-
-        sb.Append(Value.Build(conn, relatedQuery));
-
-        if (DecimalPlaces != 0)
-        {
-            sb.Append(',');
-            sb.Append(DecimalPlaces);
-        }
-        sb.Append(')');
+        conn.Language.BuildRound(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

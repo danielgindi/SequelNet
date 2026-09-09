@@ -24,7 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\SequelNet.Connector.OleDb\OleDbLanguageFactory.cs"
+             Link="Providers\OleDbLanguageFactory.cs" />
     <ProjectReference Include="..\SequelNet\SequelNet.csproj" />
+    <ProjectReference Include="..\SequelNet.Connector.MsSql\SequelNet.Connector.MsSql.csproj" />
+    <ProjectReference Include="..\SequelNet.Connector.MySql\SequelNet.Connector.MySql.csproj" />
+    <ProjectReference Include="..\SequelNet.Connector.MySql2\SequelNet.Connector.MySql2.csproj" />
+    <ProjectReference Include="..\SequelNet.Connector.PostgreSQL\SequelNet.Connector.PostgreSQL.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ public class Count : BaseAggregatePhrase
 
     #region Constructors
 
-    public Count(bool distinct = false) : base()
+    public Count(bool distinct = false) : base(ValueWrapper.Literal("*"))
     {
         this.Distinct = distinct;
     }
@@ -50,8 +50,6 @@ public class Count : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append(Distinct ? "COUNT(DISTINCT " : "COUNT(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildCount(this, sb, conn, relatedQuery);
     }
 }

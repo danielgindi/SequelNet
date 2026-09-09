@@ -61,38 +61,6 @@ public class JsonArray : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        switch (conn.TYPE)
-        {
-            case ConnectorBase.SqlServiceType.MYSQL:
-                {
-                    sb.Append("JSON_ARRAY(");
-                    bool first = true;
-                    foreach (var val in Values)
-                    {
-                        if (first) first = false;
-                        else sb.Append(",");
-                        sb.Append(val.Build(conn, relatedQuery));
-                    }
-                    sb.Append(")");
-                }
-                break;
-
-            case ConnectorBase.SqlServiceType.POSTGRESQL:
-                {
-                    sb.Append("json_build_array(");
-                    bool first = true;
-                    foreach (var val in Values)
-                    {
-                        if (first) first = false;
-                        else sb.Append(",");
-                        sb.Append(val.Build(conn, relatedQuery));
-                    }
-                    sb.Append(")");
-                }
-                break;
-
-            default:
-                throw new NotSupportedException("JsonArray is not supported by current DB type");
-        }
+        conn.Language.BuildJsonArray(this, sb, conn, relatedQuery);
     }
 }

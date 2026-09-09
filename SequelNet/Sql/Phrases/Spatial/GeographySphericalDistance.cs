@@ -97,10 +97,10 @@ public class GeographySphericalDistance : IPhrase
         catch (NotImplementedException)
         {
             new GeographySphericalDistanceMath(
-                ValueWrapper.From(new ST_X(From)),
                 ValueWrapper.From(new ST_Y(From)),
-                ValueWrapper.From(new ST_X(To)),
-                ValueWrapper.From(new ST_Y(To))
+                ValueWrapper.From(new ST_X(From)),
+                ValueWrapper.From(new ST_Y(To)),
+                ValueWrapper.From(new ST_X(To))
             ).Build(sb, conn, relatedQuery);
         }
     }

@@ -17,6 +17,9 @@ public class Union : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        if (Queries.Length == 0)
+            throw new System.InvalidOperationException("Union requires at least one query");
+
         bool first = true;
         sb.Append("(");
         foreach (Query qry in Queries)

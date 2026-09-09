@@ -74,25 +74,9 @@ public class JsonArrayInsert : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        switch (conn.TYPE)
-        {
-            case ConnectorBase.SqlServiceType.MYSQL:
-                {
-                    sb.Append("JSON_ARRAY_INSERT(");
-                    sb.Append(Document.Build(conn, relatedQuery));
-                    foreach (var pair in Values)
-                    {
-                        sb.Append(", ");
-                        sb.Append(conn.Language.PrepareValue(pair.Path));
-                        sb.Append(", ");
-                        sb.Append(pair.Value.Build(conn, relatedQuery));
-                    }
-                    sb.Append(")");
-                }
-                break;
+        if (Values.Count == 0)
+            throw new InvalidOperationException("JsonArrayInsert requires at least one path/value pair");
 
-            default:
-                throw new NotSupportedException("JsonArrayInsert is not supported by current DB type");
-        }
+        conn.Language.BuildJsonArrayInsert(this, sb, conn, relatedQuery);
     }
 }

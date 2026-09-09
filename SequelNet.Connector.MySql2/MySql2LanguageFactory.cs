@@ -12,6 +12,11 @@ public class MySql2LanguageFactory : LanguageFactory
         _MySqlMode = mySqlMode;
     }
 
+    public override string LengthOfString(string value)
+    {
+        return @"CHAR_LENGTH(" + value + ")";
+    }
+
     #region Versioning
 
     private MySql2Mode _MySqlMode;
@@ -21,7 +26,7 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         if (_Is5_0_3OrLater == null)
         {
-            _Is5_0_3OrLater = _MySqlMode.Version.CompareTo("5.0.3") >= 0;
+            _Is5_0_3OrLater = IsVersionAtLeast("5.0.3");
         }
         return _Is5_0_3OrLater.Value;
     }
@@ -31,7 +36,7 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         if (_Is5_7OrLater == null)
         {
-            _Is5_7OrLater = _MySqlMode.Version.CompareTo("5.7") >= 0;
+            _Is5_7OrLater = IsVersionAtLeast("5.7");
         }
         return _Is5_7OrLater.Value;
     }
@@ -41,7 +46,7 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         if (_Is8_0OrLater == null)
         {
-            _Is8_0OrLater = _MySqlMode.Version.CompareTo("8.0") >= 0;
+            _Is8_0OrLater = IsVersionAtLeast("8.0");
         }
         return _Is8_0OrLater.Value;
     }
@@ -51,7 +56,7 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         if (_Is8_0_17OrLater == null)
         {
-            _Is8_0_17OrLater = _MySqlMode.Version.CompareTo("8.0.17") >= 0;
+            _Is8_0_17OrLater = IsVersionAtLeast("8.0.17");
         }
         return _Is8_0_17OrLater.Value;
     }
@@ -61,9 +66,34 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         if (_Is8_0_21OrLater == null)
         {
-            _Is8_0_21OrLater = _MySqlMode.Version.CompareTo("8.0.21") >= 0;
+            _Is8_0_21OrLater = IsVersionAtLeast("8.0.21");
         }
         return _Is8_0_21OrLater.Value;
+    }
+
+    private bool IsVersionAtLeast(string minimumVersion)
+    {
+        var rawVersion = _MySqlMode.Version;
+        if (string.IsNullOrWhiteSpace(rawVersion))
+            return false;
+
+        var numericLength = 0;
+        while (numericLength < rawVersion.Length &&
+            (char.IsDigit(rawVersion[numericLength]) || rawVersion[numericLength] == '.'))
+        {
+            numericLength++;
+        }
+
+        var numericVersion = rawVersion.Substring(0, numericLength).TrimEnd('.');
+        return System.Version.TryParse(numericVersion, out var current) &&
+            System.Version.TryParse(minimumVersion, out var minimum) &&
+            current >= minimum;
+    }
+
+    private void EnsureJsonSupport(string minimumVersion, string feature)
+    {
+        if (!IsVersionAtLeast(minimumVersion))
+            throw new NotSupportedException($"{feature} requires MySQL {minimumVersion} or later");
     }
 
     #endregion
@@ -127,7 +157,7 @@ public class MySql2LanguageFactory : LanguageFactory
     public override bool UpdateFromInsteadOfJoin => false;
     public override bool UpdateJoinRequiresFromLeftTable => false;
 
-    public override bool GroupBySupportsOrdering => _MySqlMode.Version.CompareTo("8.0.13") < 0;
+    public override bool GroupBySupportsOrdering => !IsVersionAtLeast("8.0.13");
 
     public override bool DeleteSupportsIgnore => true;
     public override bool InsertSupportsIgnore => true;
@@ -180,13 +210,13 @@ public class MySql2LanguageFactory : LanguageFactory
                 return $"DATE_FORMAT({date}, '%Y-%m-%dT%T')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFF:
-                return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000')";
+                return $"LEFT(DATE_FORMAT({date}, '%Y-%m-%dT%T.%f'), 23)";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeZ:
                 return $"DATE_FORMAT({date}, '%Y-%m-%dT%TZ')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDateTimeFFFZ:
-                return $"DATE_FORMAT({date}, '%Y-%m-%dT%T.000Z')";
+                return $"CONCAT(LEFT(DATE_FORMAT({date}, '%Y-%m-%dT%T.%f'), 23), 'Z')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDate:
                 return $"DATE_FORMAT({date}, '%Y-%m-%d')";
@@ -195,7 +225,7 @@ public class MySql2LanguageFactory : LanguageFactory
                 return $"DATE_FORMAT({date}, '%T')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
-                return $"DATE_FORMAT({date}, '%T.fff')";
+                return $"LEFT(DATE_FORMAT({date}, '%T.%f'), 12)";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
                 return $"DATE_FORMAT({date}, '%Y-%m')";
@@ -892,6 +922,8 @@ public class MySql2LanguageFactory : LanguageFactory
         ConnectorBase connection,
         Query relatedQuery)
     {
+        ValidateUnquotedIdentifier(collation, nameof(collation));
+
         sb.Append("(");
         value.Build(sb, connection, relatedQuery);
         sb.Append(" COLLATE ");
@@ -907,10 +939,245 @@ public class MySql2LanguageFactory : LanguageFactory
         outputBuilder.Append(@"RAND()");
     }
 
+    public override void BuildRandWeight(
+        Phrases.RandWeight phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("RAND() * ");
+        sb.Append(phrase.Value.Build(conn, relatedQuery));
+    }
+
+    public override void BuildDateTimeAdd(
+        Phrases.DateTimeAdd phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("TIMESTAMPADD(");
+        sb.Append(phrase.Unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => "MICROSECOND",
+            Phrases.DateTimeUnit.Millisecond => "MICROSECOND",
+            Phrases.DateTimeUnit.Minute => "MINUTE",
+            Phrases.DateTimeUnit.Hour => "HOUR",
+            Phrases.DateTimeUnit.Day => "DAY",
+            Phrases.DateTimeUnit.Week => "WEEK",
+            Phrases.DateTimeUnit.Month => "MONTH",
+            Phrases.DateTimeUnit.QuarterYear => "QUARTER",
+            Phrases.DateTimeUnit.Year => "YEAR",
+            _ => "SECOND",
+        });
+        sb.Append(',');
+        sb.Append(phrase.Value2.Build(conn, relatedQuery));
+
+        if (phrase.Unit == Phrases.DateTimeUnit.Millisecond)
+            sb.Append(" * 1000");
+
+        sb.Append(',');
+        sb.Append(phrase.Value1.Build(conn, relatedQuery));
+        sb.Append(')');
+    }
+
+    public override void BuildDateTimeDiff(
+        Phrases.DateTimeDiff phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("TIMESTAMPDIFF(");
+        sb.Append(phrase.Unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => "MICROSECOND",
+            Phrases.DateTimeUnit.Millisecond => "MICROSECOND",
+            Phrases.DateTimeUnit.Minute => "MINUTE",
+            Phrases.DateTimeUnit.Hour => "HOUR",
+            Phrases.DateTimeUnit.Day => "DAY",
+            Phrases.DateTimeUnit.Week => "WEEK",
+            Phrases.DateTimeUnit.Month => "MONTH",
+            Phrases.DateTimeUnit.QuarterYear => "QUARTER",
+            Phrases.DateTimeUnit.Year => "YEAR",
+            _ => "SECOND",
+        });
+        sb.Append(',');
+        sb.Append(phrase.Value1.Build(conn, relatedQuery));
+        sb.Append(',');
+        sb.Append(phrase.Value2.Build(conn, relatedQuery));
+        sb.Append(')');
+
+        if (phrase.Unit == Phrases.DateTimeUnit.Millisecond)
+            sb.Append(" DIV 1000");
+    }
+
+    public override void BuildJsonArray(
+        Phrases.JsonArray phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_ARRAY");
+        sb.Append("JSON_ARRAY(");
+
+        bool first = true;
+        foreach (var value in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            sb.Append(value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonArrayInsert(
+        Phrases.JsonArrayInsert phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_ARRAY_INSERT");
+        sb.Append("JSON_ARRAY_INSERT(");
+        sb.Append(phrase.Document.Build(conn, relatedQuery));
+
+        foreach (var pair in phrase.Values)
+        {
+            sb.Append(", ");
+            sb.Append(PrepareValue(pair.Path));
+            sb.Append(", ");
+            sb.Append(pair.Value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonArrayAppend(
+        Phrases.JsonArrayAppend phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.9", "JSON_ARRAY_APPEND");
+        sb.Append("JSON_ARRAY_APPEND(");
+        sb.Append(phrase.Document.Build(conn, relatedQuery));
+
+        for (int i = 0, len = phrase.Values.Count; i < len; i++)
+        {
+            sb.Append(", ");
+            sb.Append(PrepareValue(phrase.Path));
+            sb.Append(", ");
+            sb.Append(phrase.Values[i].Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonInsert(
+        Phrases.JsonInsert phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_INSERT");
+        sb.Append("JSON_INSERT(");
+        sb.Append(phrase.Document.Build(conn, relatedQuery));
+
+        foreach (var pair in phrase.Values)
+        {
+            sb.Append(", ");
+            sb.Append(PrepareValue(pair.Path));
+            sb.Append(", ");
+            sb.Append(pair.Value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonLength(
+        Phrases.JsonLength phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_LENGTH");
+        sb.Append("JSON_LENGTH(");
+        sb.Append(phrase.Value.Build(conn, relatedQuery));
+        sb.Append(")");
+    }
+
+    public override void BuildJsonObject(
+        Phrases.JsonObject phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_OBJECT");
+        sb.Append("JSON_OBJECT(");
+
+        bool first = true;
+        foreach (var pair in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            sb.Append(pair.Key.Build(conn, relatedQuery));
+            sb.Append(",");
+            sb.Append(pair.Value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonSet(
+        Phrases.JsonSet phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_SET");
+        sb.Append("JSON_SET(");
+        sb.Append(phrase.Document.Build(conn, relatedQuery));
+
+        foreach (var pair in phrase.Values)
+        {
+            sb.Append(", ");
+            sb.Append(PrepareValue(pair.Path));
+            sb.Append(", ");
+            sb.Append(pair.Value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonRemove(
+        Phrases.JsonRemove phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        EnsureJsonSupport("5.7.8", "JSON_REMOVE");
+        sb.Append("JSON_REMOVE(");
+        sb.Append(phrase.Document.Build(conn, relatedQuery));
+
+        foreach (var path in phrase.Paths)
+        {
+            sb.Append(", ");
+            sb.Append(PrepareValue(path));
+        }
+
+        sb.Append(")");
+    }
+
     public override void BuildJsonExtract(
         ValueWrapper value, JsonPathExpression path, bool unquote,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("5.7.8", "JSON_EXTRACT");
         var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, ";
         phrase += path.GetPath().Build(conn, relatedQuery);
         phrase += ")";
@@ -933,6 +1200,7 @@ public class MySql2LanguageFactory : LanguageFactory
         ValueWrapper target, ValueWrapper candidate, JsonPathExpression path,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("5.7.8", "JSON_CONTAINS");
         sb.Append("JSON_CONTAINS(");
         target.Build(sb, conn, relatedQuery);
         sb.Append(", ");
@@ -951,6 +1219,7 @@ public class MySql2LanguageFactory : LanguageFactory
         ValueWrapper value, ValueWrapper array,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("8.0.17", "MEMBER OF");
         sb.Append("(");
 
         value.Build(sb, conn, relatedQuery);
@@ -969,6 +1238,7 @@ public class MySql2LanguageFactory : LanguageFactory
         Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("5.7.8", "JSON_VALUE");
         if (Is8_0_21OrLater())
         {
             sb.Append("JSON_VALUE(");
@@ -1000,6 +1270,14 @@ public class MySql2LanguageFactory : LanguageFactory
         }
         else
         {
+            if (onEmptyAction == Phrases.JsonValue.DefaultAction.Error ||
+                onErrorAction == Phrases.JsonValue.DefaultAction.Error ||
+                onErrorValue != null)
+            {
+                throw new NotSupportedException(
+                    "JSON_VALUE default actions require MySQL 8.0.21 or later");
+            }
+
             var phrase = $"JSON_EXTRACT({value.Build(conn, relatedQuery)}, {path.GetPath().Build(conn, relatedQuery)})";
 
             if (returnType != null)
@@ -1046,6 +1324,7 @@ public class MySql2LanguageFactory : LanguageFactory
         ValueWrapper value, bool isBinary,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("5.7.22", "JSON_ARRAYAGG");
         sb.Append("JSON_ARRAYAGG(");
         sb.Append(value.Build(conn, relatedQuery));
         sb.Append(")");
@@ -1055,6 +1334,7 @@ public class MySql2LanguageFactory : LanguageFactory
         ValueWrapper key, ValueWrapper value, bool isBinary,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        EnsureJsonSupport("5.7.22", "JSON_OBJECTAGG");
         sb.Append("JSON_OBJECTAGG(");
         sb.Append(key.Build(conn, relatedQuery));
         sb.Append(",");

@@ -104,7 +104,7 @@ public class LanguageFactory
 
     public virtual string SecondPartOfDateOrTime(string date)
     {
-        return @"SECONDS(" + date + ")";
+        return @"SECOND(" + date + ")";
     }
 
     public virtual string DatePartOfDateTime(string date)
@@ -155,6 +155,109 @@ public class LanguageFactory
     public virtual string Sha1Binary(string value)
     {
         return @"UNHEX(SHA1(" + value + "))";
+    }
+
+    public virtual void BuildAbs(
+        Phrases.Abs phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("ABS(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildCeil(
+        Phrases.Ceil phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("CEIL(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildFloor(
+        Phrases.Floor phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("FLOOR(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildRound(
+        Phrases.Round phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("ROUND(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+
+        if (phrase.DecimalPlaces != 0)
+        {
+            sb.Append(',');
+            sb.Append(phrase.DecimalPlaces);
+        }
+
+        sb.Append(')');
+    }
+
+    public virtual void BuildGreatest(
+        Phrases.Greatest phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("GREATEST(");
+        phrase.Value1.Build(sb, conn, relatedQuery);
+        sb.Append(", ");
+        phrase.Value2.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildLeast(
+        Phrases.Least phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("LEAST(");
+        phrase.Value1.Build(sb, conn, relatedQuery);
+        sb.Append(", ");
+        phrase.Value2.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildGeographySphericalDistanceMath(
+        Phrases.GeographySphericalDistanceMath phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        var fromLatitude = phrase.FromLatitude.Build(conn, relatedQuery);
+        var fromLongitude = phrase.FromLongitude.Build(conn, relatedQuery);
+        var toLatitude = phrase.ToLatitude.Build(conn, relatedQuery);
+        var toLongitude = phrase.ToLongitude.Build(conn, relatedQuery);
+
+        sb.Append(@"12742.0 * ASIN(SQRT(POWER(SIN(((");
+        sb.Append(fromLatitude);
+        sb.Append(@")-(");
+        sb.Append(toLatitude);
+        sb.Append(@")) * PI()/360.0), 2) + COS(");
+        sb.Append(fromLatitude);
+        sb.Append(@"* PI()/180.0) * COS((");
+        sb.Append(toLatitude);
+        sb.Append(@") * PI()/180.0) * POWER(SIN((");
+        sb.Append(fromLongitude);
+        sb.Append("-");
+        sb.Append(toLongitude);
+        sb.Append(@") * PI()/360.0), 2))) * 1000.0");
     }
 
     public virtual string ST_X(string pt)
@@ -361,6 +464,8 @@ public class LanguageFactory
         ConnectorBase connection,
         Query relatedQuery)
     {
+        ValidateUnquotedIdentifier(collation, nameof(collation));
+
         sb.Append("(");
         value.Build(sb, connection, relatedQuery);
         sb.Append(" COLLATE ");
@@ -369,6 +474,26 @@ public class LanguageFactory
         // COLLATE ASC/DESC not supported in most RDBMSes
 
         sb.Append(")");
+    }
+
+    protected static void ValidateUnquotedIdentifier(string identifier, string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+        {
+            throw new ArgumentException(
+                "Unquoted identifiers may contain only letters, digits, and underscores",
+                parameterName);
+        }
+
+        foreach (var character in identifier)
+        {
+            if (char.IsLetterOrDigit(character) || character == '_')
+                continue;
+
+            throw new ArgumentException(
+                "Unquoted identifiers may contain only letters, digits, and underscores",
+                parameterName);
+        }
     }
 
     public virtual void BuildCast(
@@ -464,6 +589,220 @@ public class LanguageFactory
         outputBuilder.Append(@"RAND()");
     }
 
+    public virtual void BuildConcat(
+        Phrases.Concat phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (phrase.Values.Count == 0)
+        {
+            sb.Append(PrepareValue(""));
+            return;
+        }
+
+        sb.Append("CONCAT(");
+
+        bool first = true;
+        foreach (var value in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            if (phrase.IgnoreNulls)
+            {
+                sb.Append("COALESCE(");
+                sb.Append(value.Build(conn, relatedQuery));
+                sb.Append(",'')");
+            }
+            else
+            {
+                sb.Append(value.Build(conn, relatedQuery));
+            }
+        }
+
+        sb.Append(")");
+    }
+
+    public virtual void BuildCase(
+        Phrases.Case phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (phrase.Conditions.Count == 0)
+            throw new InvalidOperationException("CASE requires at least one WHEN condition");
+
+        sb.Append("CASE");
+
+        if (phrase.Value != null)
+        {
+            sb.Append(' ');
+            phrase.Value.Value.Build(sb, conn, relatedQuery);
+        }
+
+        foreach (var when in phrase.Conditions)
+        {
+            sb.Append(" WHEN ");
+            if (when.When == null)
+                sb.Append("NULL");
+            else
+                when.When.Value.Build(sb, conn, relatedQuery);
+
+            sb.Append(" THEN ");
+            if (when.Then == null)
+                sb.Append("NULL");
+            else
+                when.Then.Value.Build(sb, conn, relatedQuery);
+        }
+
+        if (phrase.ElseValue != null)
+        {
+            sb.Append(" ELSE ");
+            phrase.ElseValue.Value.Build(sb, conn, relatedQuery);
+        }
+
+        sb.Append(" END");
+    }
+
+    public virtual void BuildRandWeight(
+        Phrases.RandWeight phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("RANDOM() * ");
+        sb.Append(phrase.Value.Build(conn, relatedQuery));
+    }
+
+    public virtual void BuildDateTimeAdd(
+        Phrases.DateTimeAdd phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("DATEADD(");
+        sb.Append(phrase.Unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => "microsecond",
+            Phrases.DateTimeUnit.Millisecond => "millisecond",
+            Phrases.DateTimeUnit.Minute => "minute",
+            Phrases.DateTimeUnit.Hour => "hour",
+            Phrases.DateTimeUnit.Day => "day",
+            Phrases.DateTimeUnit.Week => "week",
+            Phrases.DateTimeUnit.Month => "month",
+            Phrases.DateTimeUnit.QuarterYear => "quarter",
+            Phrases.DateTimeUnit.Year => "year",
+            _ => "second",
+        });
+        sb.Append(',');
+        sb.Append(phrase.Value2.Build(conn, relatedQuery));
+        sb.Append(',');
+        sb.Append(phrase.Value1.Build(conn, relatedQuery));
+        sb.Append(')');
+    }
+
+    public virtual void BuildDateTimeDiff(
+        Phrases.DateTimeDiff phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("DATEDIFF(");
+        sb.Append(phrase.Unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => "microsecond",
+            Phrases.DateTimeUnit.Millisecond => "millisecond",
+            Phrases.DateTimeUnit.Minute => "minute",
+            Phrases.DateTimeUnit.Hour => "hour",
+            Phrases.DateTimeUnit.Day => "day",
+            Phrases.DateTimeUnit.Week => "week",
+            Phrases.DateTimeUnit.Month => "month",
+            Phrases.DateTimeUnit.QuarterYear => "quarter",
+            Phrases.DateTimeUnit.Year => "year",
+            _ => "second",
+        });
+        sb.Append(',');
+        sb.Append(phrase.Value1.Build(conn, relatedQuery));
+        sb.Append(',');
+        sb.Append(phrase.Value2.Build(conn, relatedQuery));
+        sb.Append(')');
+    }
+
+    public virtual void BuildJsonArray(
+        Phrases.JsonArray phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonArray is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonArrayInsert(
+        Phrases.JsonArrayInsert phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonArrayInsert is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonArrayAppend(
+        Phrases.JsonArrayAppend phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonArrayAppend is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonInsert(
+        Phrases.JsonInsert phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonInsert is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonLength(
+        Phrases.JsonLength phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonLength is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonObject(
+        Phrases.JsonObject phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonObject is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonSet(
+        Phrases.JsonSet phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonSet is not supported by current DB type");
+    }
+
+    public virtual void BuildJsonRemove(
+        Phrases.JsonRemove phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        throw new NotSupportedException("JsonRemove is not supported by current DB type");
+    }
+
     public virtual void BuildJsonExtract(
         ValueWrapper value, JsonPathExpression path, bool unquote,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
@@ -517,6 +856,105 @@ public class LanguageFactory
     public virtual string Aggregate_Every(string rawExpression)
     {
         throw new NotImplementedException("EVERY has not been implemented for this connector");
+    }
+
+    public virtual void BuildAvg(
+        Phrases.Avg phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("AVG(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildCount(
+        Phrases.Count phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append(phrase.Distinct ? "COUNT(DISTINCT " : "COUNT(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildMax(
+        Phrases.Max phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append(phrase.Distinct ? "MAX(DISTINCT " : "MAX(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildMin(
+        Phrases.Min phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append(phrase.Distinct ? "MIN(DISTINCT " : "MIN(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildSum(
+        Phrases.Sum phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append(phrase.Distinct ? "SUM(DISTINCT " : "SUM(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildStandardDeviationOfPopulation(
+        Phrases.StandardDeviationOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("STDDEV_POP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildStandardDeviationOfSample(
+        Phrases.StandardDeviationOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("STDDEV_SAMP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildStandardVarianceOfPopulation(
+        Phrases.StandardVarianceOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("VAR_POP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public virtual void BuildStandardVarianceOfSample(
+        Phrases.StandardVarianceOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("VAR_SAMP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
     }
 
     public virtual string GroupConcat(bool distinct, string rawExpression, string rawOrderBy, string separator)

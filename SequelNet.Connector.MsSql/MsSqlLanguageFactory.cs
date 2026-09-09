@@ -62,6 +62,19 @@ public class MsSqlLanguageFactory : LanguageFactory
         return @"GETUTCDATE()";
     }
 
+    public override void BuildConvertUtcToTz(
+        ValueWrapper value,
+        ValueWrapper timeZone,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (_MsSqlVersion.MajorVersion < 13)
+            throw new NotSupportedException("AT TIME ZONE requires SQL Server 2016 or later");
+
+        base.BuildConvertUtcToTz(value, timeZone, sb, conn, relatedQuery);
+    }
+
     public override string HourPartOfDateOrTime(string date)
     {
         return @"DATEPART(hour, " + date + ")";
@@ -99,6 +112,9 @@ public class MsSqlLanguageFactory : LanguageFactory
 
     public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
     {
+        if (_MsSqlVersion.MajorVersion < 11)
+            throw new NotSupportedException("FORMAT requires SQL Server 2012 or later");
+
         switch (format)
         {
             case Phrases.DateTimeFormat.FormatOptions.IsoDateTime:
@@ -123,7 +139,7 @@ public class MsSqlLanguageFactory : LanguageFactory
                 return $"FORMAT({date}, 'HH:mm:ss.fff')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
-                return $"to_char ({date}, 'yyyy-MM";
+                return $"FORMAT({date}, 'yyyy-MM')";
 
             default:
                 throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
@@ -146,12 +162,23 @@ public class MsSqlLanguageFactory : LanguageFactory
     {
         if (_MsSqlVersion.MajorVersion < 10)
         {
-            return @"SUBSTRING(sys.fn_sqlvarbasetostr(HASHBYTES('SHA1', " + value + ")), 3, 32)";
+            return @"SUBSTRING(sys.fn_sqlvarbasetostr(HASHBYTES('SHA1', " + value + ")), 3, 40)";
         }
         else
         {
-            return @"CONVERT(VARCHAR(32), HASHBYTES('SHA1', " + value + "), 2)";
+            return @"CONVERT(VARCHAR(40), HASHBYTES('SHA1', " + value + "), 2)";
         }
+    }
+
+    public override void BuildCeil(
+        Phrases.Ceil phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("CEILING(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
     }
 
     public override string Md5Binary(string value)
@@ -167,6 +194,132 @@ public class MsSqlLanguageFactory : LanguageFactory
     public override string LengthOfString(string value)
     {
         return @"LEN(" + value + ")";
+    }
+
+    public override void BuildRound(
+        Phrases.Round phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("ROUND(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(',');
+        sb.Append(phrase.DecimalPlaces);
+        sb.Append(')');
+    }
+
+    public override void BuildGreatest(
+        Phrases.Greatest phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (_MsSqlVersion.MajorVersion < 16)
+            throw new NotSupportedException("GREATEST requires SQL Server 2022 or later");
+
+        base.BuildGreatest(phrase, sb, conn, relatedQuery);
+    }
+
+    public override void BuildLeast(
+        Phrases.Least phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (_MsSqlVersion.MajorVersion < 16)
+            throw new NotSupportedException("LEAST requires SQL Server 2022 or later");
+
+        base.BuildLeast(phrase, sb, conn, relatedQuery);
+    }
+
+    public override void BuildConcat(
+        Phrases.Concat phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (phrase.Values.Count == 0)
+        {
+            base.BuildConcat(phrase, sb, conn, relatedQuery);
+            return;
+        }
+
+        if (_MsSqlVersion.MajorVersion < 11)
+            throw new NotSupportedException("CONCAT requires SQL Server 2012 or later");
+
+        if (phrase.Values.Count > 254)
+        {
+            throw new NotSupportedException(
+                "SQL Server CONCAT supports at most 254 arguments");
+        }
+
+        var values = new string[phrase.Values.Count];
+        for (var i = 0; i < phrase.Values.Count; i++)
+            values[i] = phrase.Values[i].Build(conn, relatedQuery);
+
+        if (!phrase.IgnoreNulls)
+        {
+            sb.Append("(SELECT CASE WHEN ");
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(" OR ");
+
+                sb.Append("value");
+                sb.Append(i);
+                sb.Append(" IS NULL");
+            }
+
+            sb.Append(" THEN NULL ELSE CONCAT(");
+            if (values.Length == 1)
+                sb.Append("N'',");
+
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+
+                sb.Append("value");
+                sb.Append(i);
+            }
+
+            sb.Append(") END FROM (VALUES (");
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+
+                sb.Append(values[i]);
+            }
+
+            sb.Append(")) AS concat_values(");
+            for (var i = 0; i < values.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(',');
+
+                sb.Append("value");
+                sb.Append(i);
+            }
+
+            sb.Append("))");
+            return;
+        }
+
+        sb.Append("CONCAT(");
+        if (values.Length == 1)
+            sb.Append("N'',");
+
+        for (var i = 0; i < values.Length; i++)
+        {
+            if (i > 0)
+                sb.Append(',');
+
+            sb.Append(values[i]);
+        }
+
+        sb.Append(')');
     }
 
     public override string ST_X(string pt)
@@ -675,22 +828,12 @@ public class MsSqlLanguageFactory : LanguageFactory
         ConnectorBase connection,
         Query relatedQuery)
     {
+        ValidateUnquotedIdentifier(collation, nameof(collation));
+
         sb.Append("(");
         value.Build(sb, connection, relatedQuery);
         sb.Append(" COLLATE ");
         sb.Append(collation);
-
-        switch (direction)
-        {
-            case SortDirection.ASC:
-                sb.Append(" ASC");
-                break;
-
-            case SortDirection.DESC:
-                sb.Append(" DESC");
-                break;
-        }
-
         sb.Append(")");
     }
 
@@ -699,10 +842,27 @@ public class MsSqlLanguageFactory : LanguageFactory
         outputBuilder.Append(@"NEWID()");
     }
 
+    public override void BuildRandWeight(
+        Phrases.RandWeight phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("RAND(CAST(NEWID() AS VARBINARY)) * ");
+        sb.Append(phrase.Value.Build(conn, relatedQuery));
+    }
+
     public override void BuildJsonExtract(
         ValueWrapper value, JsonPathExpression path, bool unquote,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        if (_MsSqlVersion.MajorVersion < 13)
+            throw new NotSupportedException("JSON_VALUE requires SQL Server 2016 or later");
+
+        if (!unquote)
+            throw new NotSupportedException(
+                "SQL Server cannot return raw JSON for a path that may identify a scalar value");
+
         sb.Append("JSON_VALUE(");
         value.Build(sb, conn, relatedQuery);
         sb.Append(", ");
@@ -717,6 +877,18 @@ public class MsSqlLanguageFactory : LanguageFactory
         Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        if (_MsSqlVersion.MajorVersion < 13)
+            throw new NotSupportedException("JSON_VALUE requires SQL Server 2016 or later");
+
+        if (onEmptyAction != Phrases.JsonValue.DefaultAction.Value ||
+            onEmptyValue != null ||
+            onErrorAction != Phrases.JsonValue.DefaultAction.Value ||
+            onErrorValue != null)
+        {
+            throw new NotSupportedException(
+                "JSON_VALUE default actions are not supported by the SQL Server provider");
+        }
+
         if (returnType != null)
         {
             var (typeString, _) = BuildDataTypeDef(returnType);
@@ -757,12 +929,56 @@ public class MsSqlLanguageFactory : LanguageFactory
 
     public override string Aggregate_Some(string rawExpression)
     {
-        return $"(SUM({rawExpression}) > 0)";
+        return $"(MAX(CAST({rawExpression} AS INT)) > 0)";
     }
 
     public override string Aggregate_Every(string rawExpression)
     {
-        return $"(COUNT({rawExpression}) = COUNT(*))";
+        return $"(MIN(CAST({rawExpression} AS INT)) > 0)";
+    }
+
+    public override void BuildStandardDeviationOfPopulation(
+        Phrases.StandardDeviationOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("STDEVP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildStandardDeviationOfSample(
+        Phrases.StandardDeviationOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("STDEV(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildStandardVarianceOfPopulation(
+        Phrases.StandardVarianceOfPopulation phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("VARP(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
+    }
+
+    public override void BuildStandardVarianceOfSample(
+        Phrases.StandardVarianceOfSample phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("VAR(");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(')');
     }
 
     public override void BuildChangeColumn(AlterTableQueryData alterData, StringBuilder sb, ConnectorBase conn, Query relatedQuery)

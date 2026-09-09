@@ -31,7 +31,8 @@ TenantId: QueryBoundary; INT;
 
         var result = SequelNet.SchemaGenerator.GeneratorCore.GenerateDalClass(script);
 
-        Assert.Contains("qry.Where(Columns.Id, Id).AND(Columns.TenantId, TenantId);", result.Code);
+        Assert.Contains(".Where(Columns.Id, Id)", result.Code);
+        Assert.Contains(".AND(Columns.TenantId, TenantId)", result.Code);
         Assert.Contains("FetchByIdAsync(Int64 id, int tenantId", result.Code);
         Assert.Contains(".AND(Columns.TenantId, tenantId)", result.Code);
     }

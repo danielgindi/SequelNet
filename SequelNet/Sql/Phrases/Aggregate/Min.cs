@@ -50,8 +50,6 @@ public class Min : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append(Distinct ? "MIN(DISTINCT " : "MIN(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildMin(this, sb, conn, relatedQuery);
     }
 }

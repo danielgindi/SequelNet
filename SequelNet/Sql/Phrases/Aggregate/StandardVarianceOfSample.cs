@@ -41,8 +41,6 @@ public class StandardVarianceOfSample : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append("VAR_SAMP(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildStandardVarianceOfSample(this, sb, conn, relatedQuery);
     }
 }

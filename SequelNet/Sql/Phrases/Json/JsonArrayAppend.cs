@@ -88,25 +88,9 @@ public class JsonArrayAppend : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        switch (conn.TYPE)
-        {
-            case ConnectorBase.SqlServiceType.MYSQL:
-                {
-                    sb.Append("JSON_ARRAY_APPEND(");
-                    sb.Append(Document.Build(conn, relatedQuery));
-                    for (int i = 0, len = Values.Count; i < len; i++)
-                    {
-                        sb.Append(", ");
-                        sb.Append(conn.Language.PrepareValue(Path));
-                        sb.Append(", ");
-                        sb.Append(Values[i].Build(conn, relatedQuery));
-                    }
-                    sb.Append(")");
-                }
-                break;
+        if (Values.Count == 0)
+            throw new InvalidOperationException("JsonArrayAppend requires at least one value");
 
-            default:
-                throw new NotSupportedException("JsonArrayAppend is not supported by current DB type");
-        }
+        conn.Language.BuildJsonArrayAppend(this, sb, conn, relatedQuery);
     }
 }

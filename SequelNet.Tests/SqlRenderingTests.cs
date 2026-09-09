@@ -69,7 +69,7 @@ public class SqlRenderingTests
         using (Assert.EnterMultipleScope())
         {
             Assert.That(Build(PhraseHelper.Add(ValueWrapper.Column("orders", "total"), ValueWrapper.From(5)), connector),
-                Is.EqualTo("`orders`.`total` + 5"));
+                Is.EqualTo("(`orders`.`total` + 5)"));
             Assert.That(Build(expression, connector),
                 Is.EqualTo("CONCAT(COALESCE('prefix-',''),COALESCE(`orders`.`reference`,''),COALESCE('-suffix',''))"));
             Assert.That(Build(aggregate, connector), Is.EqualTo("COUNT(DISTINCT `orders`.`id`)"));

@@ -40,7 +40,7 @@ public class PostgreSQLLanguageFactory : LanguageFactory
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
         value.Build(sb, conn, relatedQuery);
-        sb.Append(" AT TIME ZONE ");
+        sb.Append(" AT TIME ZONE 'UTC' AT TIME ZONE ");
         timeZone.Build(sb, conn, relatedQuery);
     }
 
@@ -89,6 +89,11 @@ public class PostgreSQLLanguageFactory : LanguageFactory
         return $"EXTRACT(epoch FROM {date})";
     }
 
+    public override string NullOrDefaultValue(string expression, string defaultValue)
+    {
+        return $"COALESCE({expression}, {defaultValue})";
+    }
+
     public override string DateTimeFormat(string date, Phrases.DateTimeFormat.FormatOptions format)
     {
         switch (format)
@@ -106,16 +111,16 @@ public class PostgreSQLLanguageFactory : LanguageFactory
                 return $"to_char ({date}::timestamptz at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoDate:
-                return $"to_char ({date}, 'YYYY-MM-DD";
+                return $"to_char ({date}, 'YYYY-MM-DD')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoTime:
-                return $"to_char ({date}, 'HH24:MI:SS";
+                return $"to_char ({date}, 'HH24:MI:SS')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoTimeFFF:
-                return $"to_char ({date}, 'HH24:MI:SS.MS";
+                return $"to_char ({date}, 'HH24:MI:SS.MS')";
 
             case Phrases.DateTimeFormat.FormatOptions.IsoYearMonth:
-                return $"to_char ({date}, 'YYYY-MM";
+                return $"to_char ({date}, 'YYYY-MM')";
 
             default:
                 throw new NotImplementedException($"DateTimeFormat with format {format} has not been implemented for this connector");
@@ -164,7 +169,7 @@ public class PostgreSQLLanguageFactory : LanguageFactory
 
     public override string ST_Distance_Sphere(string g1, string g2)
     {
-        return "ST_Distance_Sphere(" + g1 + ", " + g2 + ")";
+        return "ST_DistanceSphere(" + g1 + ", " + g2 + ")";
     }
 
     public override string ST_GeomFromText(string text, string srid = null, bool literalText = false)
@@ -633,7 +638,7 @@ public class PostgreSQLLanguageFactory : LanguageFactory
         sb.Append("(");
         value.Build(sb, connection, relatedQuery);
         sb.Append(" COLLATE ");
-        sb.Append(PrepareValue(collation));
+        AppendQualifiedIdentifier(sb, collation, nameof(collation));
 
         // COLLATE ASC/DESC not supported in PG
 
@@ -643,6 +648,238 @@ public class PostgreSQLLanguageFactory : LanguageFactory
     public override void BuildOrderByRandom(ValueWrapper? seedValue, ConnectorBase conn, StringBuilder outputBuilder)
     {
         outputBuilder.Append(@"RANDOM()");
+    }
+
+    public override void BuildConcat(
+        Phrases.Concat phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        if (phrase.Values.Count == 0)
+        {
+            base.BuildConcat(phrase, sb, conn, relatedQuery);
+            return;
+        }
+
+        bool first = true;
+        if (!phrase.IgnoreNulls)
+        {
+            foreach (var value in phrase.Values)
+            {
+                if (first)
+                    first = false;
+                else
+                    sb.Append(" || ");
+
+                sb.Append(value.Build(conn, relatedQuery));
+            }
+
+            return;
+        }
+
+        sb.Append("CONCAT(");
+        foreach (var value in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            sb.Append(value.Build(conn, relatedQuery));
+        }
+        sb.Append(")");
+    }
+
+    private void AppendQualifiedIdentifier(
+        StringBuilder sb,
+        string identifier,
+        string parameterName)
+    {
+        if (string.IsNullOrWhiteSpace(identifier))
+            throw new ArgumentException("Identifier cannot be empty", parameterName);
+
+        var parts = identifier.Split('.');
+        for (var i = 0; i < parts.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(parts[i]))
+                throw new ArgumentException("Identifier parts cannot be empty", parameterName);
+
+            if (i > 0)
+                sb.Append('.');
+
+            sb.Append(WrapFieldName(parts[i].Replace("\"", "\"\"")));
+        }
+    }
+
+    public override void BuildDateTimeAdd(
+        Phrases.DateTimeAdd phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append(phrase.Value1.Build(conn, relatedQuery));
+        sb.Append(" + (");
+        sb.Append(phrase.Value2.Build(conn, relatedQuery));
+        sb.Append(" * INTERVAL '");
+        sb.Append(phrase.Unit switch
+        {
+            Phrases.DateTimeUnit.Microsecond => "1 microsecond",
+            Phrases.DateTimeUnit.Millisecond => "1 millisecond",
+            Phrases.DateTimeUnit.Minute => "1 minute",
+            Phrases.DateTimeUnit.Hour => "1 hour",
+            Phrases.DateTimeUnit.Day => "1 day",
+            Phrases.DateTimeUnit.Week => "1 week",
+            Phrases.DateTimeUnit.Month => "1 month",
+            Phrases.DateTimeUnit.QuarterYear => "3 months",
+            Phrases.DateTimeUnit.Year => "1 year",
+            _ => "1 second",
+        });
+        sb.Append("')");
+    }
+
+    public override void BuildDateTimeDiff(
+        Phrases.DateTimeDiff phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        var startValue = phrase.Value1.Build(conn, relatedQuery);
+        var endValue = phrase.Value2.Build(conn, relatedQuery);
+
+        switch (phrase.Unit)
+        {
+            case Phrases.DateTimeUnit.Microsecond:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) * 1000000)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Millisecond:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) * 1000)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Minute:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) / 60)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Hour:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) / 3600)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Day:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) / 86400)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Week:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})) / 604800)",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Month:
+                sb.AppendFormat(
+                    @"(DATE_PART('year', {0}) - DATE_PART('year', {1})) * 12 + (DATE_PART('month', {0}) - DATE_PART('month', {1}))",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.QuarterYear:
+                sb.AppendFormat(
+                    @"(DATE_PART('year', {0}) - DATE_PART('year', {1})) * 4 + (DATE_PART('quarter', {0}) - DATE_PART('quarter', {1}))",
+                    endValue,
+                    startValue);
+                break;
+
+            case Phrases.DateTimeUnit.Year:
+                sb.AppendFormat(
+                    @"DATE_PART('year', {0}) - DATE_PART('year', {1})",
+                    endValue,
+                    startValue);
+                break;
+
+            default:
+                sb.AppendFormat(
+                    @"TRUNC(EXTRACT(EPOCH FROM ({0} - {1})))",
+                    endValue,
+                    startValue);
+                break;
+        }
+    }
+
+    public override void BuildJsonArray(
+        Phrases.JsonArray phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("json_build_array(");
+
+        bool first = true;
+        foreach (var value in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            sb.Append(value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
+    }
+
+    public override void BuildJsonLength(
+        Phrases.JsonLength phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("(SELECT CASE WHEN json_value IS NULL THEN NULL ");
+        sb.Append("WHEN jsonb_typeof(json_value) = 'array' THEN jsonb_array_length(json_value) ");
+        sb.Append("WHEN jsonb_typeof(json_value) = 'object' THEN ");
+        sb.Append("(SELECT COUNT(*) FROM jsonb_object_keys(json_value)) ELSE 1 END ");
+        sb.Append("FROM (SELECT (");
+        phrase.Value.Build(sb, conn, relatedQuery);
+        sb.Append(")::jsonb AS json_value OFFSET 0) AS json_input)");
+    }
+
+    public override void BuildJsonObject(
+        Phrases.JsonObject phrase,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append("json_build_object(");
+
+        bool first = true;
+        foreach (var pair in phrase.Values)
+        {
+            if (first)
+                first = false;
+            else
+                sb.Append(",");
+
+            sb.Append(pair.Key.Build(conn, relatedQuery));
+            sb.Append(",");
+            sb.Append(pair.Value.Build(conn, relatedQuery));
+        }
+
+        sb.Append(")");
     }
 
     public override void BuildJsonExtract(
@@ -658,18 +895,47 @@ public class PostgreSQLLanguageFactory : LanguageFactory
             parts.RemoveAt(0);
         }
 
-        var pgPath = "";
-        foreach (var part in parts)
+        if (parts.Count == 0)
         {
-            if (pgPath.Length > 0)
-                pgPath += $", ";
-            pgPath += part.Value.Build(conn, relatedQuery);
+            if (unquote)
+            {
+                sb.Append('(');
+                value.Build(sb, conn, relatedQuery);
+                sb.Append(" #>> '{}')");
+            }
+            else
+            {
+                value.Build(sb, conn, relatedQuery);
+            }
+
+            return;
         }
 
-        sb.Append("json_extract_path_text(");
+        BuildJsonPathExtraction(value, parts, unquote, sb, conn, relatedQuery);
+    }
+
+    private static void BuildJsonPathExtraction(
+        ValueWrapper value,
+        System.Collections.Generic.IReadOnlyList<JsonPathExpression.Part> parts,
+        bool unquote,
+        StringBuilder sb,
+        ConnectorBase conn,
+        Query relatedQuery)
+    {
+        sb.Append('(');
         value.Build(sb, conn, relatedQuery);
-        sb.Append($", {pgPath}");
-        sb.Append(")");
+        sb.Append(unquote ? " #>> ARRAY[" : " #> ARRAY[");
+
+        for (var i = 0; i < parts.Count; i++)
+        {
+            if (i > 0)
+                sb.Append(", ");
+
+            parts[i].Value.Build(sb, conn, relatedQuery);
+            sb.Append("::text");
+        }
+
+        sb.Append("])");
     }
 
     public override void BuildJsonContains(
@@ -700,8 +966,9 @@ public class PostgreSQLLanguageFactory : LanguageFactory
                     pgPath += part.Value.Build(conn, relatedQuery);
                 }
 
-                sb.Append("json_extract_path(");
+                sb.Append("jsonb_extract_path((");
                 target.Build(sb, conn, relatedQuery);
+                sb.Append(")::jsonb");
                 sb.Append($", {pgPath}");
                 sb.Append(")");
 
@@ -710,11 +977,17 @@ public class PostgreSQLLanguageFactory : LanguageFactory
         }
 
         if (!hasPath)
+        {
+            sb.Append('(');
             target.Build(sb, conn, relatedQuery);
+            sb.Append(")::jsonb");
+        }
 
         sb.Append(" @> ");
 
+        sb.Append('(');
         candidate.Build(sb, conn, relatedQuery);
+        sb.Append(")::jsonb");
         sb.Append(")");
     }
 
@@ -725,6 +998,15 @@ public class PostgreSQLLanguageFactory : LanguageFactory
         Phrases.JsonValue.DefaultAction onErrorAction, object onErrorValue,
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
+        if (onEmptyAction != Phrases.JsonValue.DefaultAction.Value ||
+            onEmptyValue != null ||
+            onErrorAction != Phrases.JsonValue.DefaultAction.Value ||
+            onErrorValue != null)
+        {
+            throw new NotSupportedException(
+                "JSON_VALUE default actions are not supported by the PostgreSQL provider");
+        }
+
         // No support for returning "self". Postgres works with actual json Objects.
         var parts = path.GetParts();
         if (parts.Count > 0 &&
@@ -734,12 +1016,20 @@ public class PostgreSQLLanguageFactory : LanguageFactory
             parts.RemoveAt(0);
         }
 
-        var pgPath = "";
-        foreach (var part in parts)
+        if (parts.Count == 0)
         {
-            if (pgPath.Length > 0)
-                pgPath += ", ";
-            pgPath += part.Value.Build(conn, relatedQuery);
+            sb.Append('(');
+            value.Build(sb, conn, relatedQuery);
+            sb.Append(" #>> '{}')");
+
+            if (returnType != null)
+            {
+                var (rootTypeString, _) = BuildDataTypeDef(returnType);
+                if (rootTypeString != null)
+                    sb.Append($"::{rootTypeString}");
+            }
+
+            return;
         }
 
         if (returnType != null)
@@ -747,18 +1037,13 @@ public class PostgreSQLLanguageFactory : LanguageFactory
             var (typeString, _) = BuildDataTypeDef(returnType);
             if (typeString != null)
             {
-                sb.Append("json_extract_path_text(");
-                sb.Append(value.Build(conn, relatedQuery));
-                sb.Append($", {pgPath}");
-                sb.Append($")::{typeString}");
+                BuildJsonPathExtraction(value, parts, true, sb, conn, relatedQuery);
+                sb.Append($"::{typeString}");
                 return;
             }
         }
 
-        sb.Append("json_extract_path_text(");
-        sb.Append(value.Build(conn, relatedQuery));
-        sb.Append($", {pgPath}");
-        sb.Append($")");
+        BuildJsonPathExtraction(value, parts, true, sb, conn, relatedQuery);
     }
 
     public override void BuildJsonArrayAggregate(

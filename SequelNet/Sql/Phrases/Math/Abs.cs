@@ -7,29 +7,26 @@ namespace SequelNet.Phrases;
 public class Abs : IPhrase
 {
     public ValueWrapper Value;
-    public int DecimalPlaces;
 
     #region Constructors
     
-    public Abs(object value, ValueObjectType valueType, int decimalPlaces = 0)
+    public Abs(object value, ValueObjectType valueType)
     {
         this.Value = ValueWrapper.Make(value, valueType);
-        this.DecimalPlaces = decimalPlaces;
     }
 
-    public Abs(string tableName, string columnName, int decimalPlaces = 0)
+    public Abs(string tableName, string columnName)
     {
         this.Value = ValueWrapper.Column(tableName, columnName);
-        this.DecimalPlaces = decimalPlaces;
     }
 
-    public Abs(string columnName, int decimalPlaces = 0)
-        : this(null, columnName, decimalPlaces)
+    public Abs(string columnName)
+        : this(null, columnName)
     {
     }
 
-    public Abs(IPhrase phrase, int decimalPlaces = 0)
-        : this(phrase, ValueObjectType.Value, decimalPlaces)
+    public Abs(IPhrase phrase)
+        : this(phrase, ValueObjectType.Value)
     {
     }
 
@@ -42,16 +39,7 @@ public class Abs : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("ABS(");
-
-        sb.Append(Value.Build(conn, relatedQuery));
-
-        if (DecimalPlaces != 0)
-        {
-            sb.Append(',');
-            sb.Append(DecimalPlaces);
-        }
-        sb.Append(')');
+        conn.Language.BuildAbs(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

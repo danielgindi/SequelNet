@@ -134,6 +134,10 @@ public class Add : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
+        if (Values.Count == 0)
+            throw new InvalidOperationException("Add requires at least one value");
+
+        sb.Append('(');
         bool first = true;
 
         foreach (var value in Values)
@@ -143,6 +147,8 @@ public class Add : IPhrase
 
             sb.Append(value.Build(conn, relatedQuery));
         }
+
+        sb.Append(')');
     }
 
     #region Multiply operators

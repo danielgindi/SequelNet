@@ -78,15 +78,7 @@ public class Greatest : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("GREATEST(");
-        
-        sb.Append(Value1.Build(conn, relatedQuery));
-
-        sb.Append(", ");
-        
-        sb.Append(Value2.Build(conn, relatedQuery));
-
-        sb.Append(')');
+        conn.Language.BuildGreatest(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

@@ -39,9 +39,7 @@ public class Floor : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
-        sb.Append("FLOOR(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(')');
+        conn.Language.BuildFloor(this, sb, conn, relatedQuery);
     }
 
     #region Multiply operators

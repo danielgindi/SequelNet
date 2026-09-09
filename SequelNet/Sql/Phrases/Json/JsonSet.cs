@@ -96,25 +96,9 @@ public class JsonSet : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        switch (conn.TYPE)
-        {
-            case ConnectorBase.SqlServiceType.MYSQL:
-                {
-                    sb.Append("JSON_SET(");
-                    sb.Append(Document.Build(conn, relatedQuery));
-                    foreach (var pair in Values)
-                    {
-                        sb.Append(", ");
-                        sb.Append(conn.Language.PrepareValue(pair.Path));
-                        sb.Append(", ");
-                        sb.Append(pair.Value.Build(conn, relatedQuery));
-                    }
-                    sb.Append(")");
-                }
-                break;
+        if (Values.Count == 0)
+            throw new InvalidOperationException("JsonSet requires at least one path/value pair");
 
-            default:
-                throw new NotSupportedException("JsonSet is not supported by current DB type");
-        }
+        conn.Language.BuildJsonSet(this, sb, conn, relatedQuery);
     }
 }

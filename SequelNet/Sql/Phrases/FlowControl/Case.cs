@@ -145,24 +145,6 @@ public class Case : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append("CASE");
-
-        if (Value != null)
-        {
-            sb.Append(" " + Value?.Build(conn, relatedQuery));
-        }
-
-        foreach (var when in Conditions)
-        {
-            sb.Append(" WHEN " + (when.When == null ? "NULL" : when.When?.Build(conn, relatedQuery)));
-            sb.Append(" THEN " + (when.Then == null ? "NULL" : when.Then?.Build(conn, relatedQuery)));
-        }
-
-        if (ElseValue != null)
-        {
-            sb.Append(" ELSE " + ElseValue?.Build(conn, relatedQuery));
-        }
-
-        sb.Append(" END");
+        conn.Language.BuildCase(this, sb, conn, relatedQuery);
     }
 }

@@ -116,9 +116,11 @@ public class Subtract : IPhrase
 
     public void Build(StringBuilder sb, ConnectorBase conn, Query relatedQuery = null)
     {
+        sb.Append('(');
         sb.Append(Value1.Build(conn, relatedQuery));
         sb.Append(@"-");
         sb.Append(Value2.Build(conn, relatedQuery));
+        sb.Append(')');
     }
 
     #region Multiply operators

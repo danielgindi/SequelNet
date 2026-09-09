@@ -58,7 +58,7 @@ public class JsonPathExpression
             return ValueWrapper.From(this._Path!);
         }
 
-        if (_Parts != null && _Parts.Any(x => x.Value.Type == ValueObjectType.Value))
+        if (_Parts != null && _Parts.All(IsStaticPathPart))
         {
             var sb = new StringBuilder("$");
 
@@ -128,7 +128,7 @@ public class JsonPathExpression
                         parts.Add(ValueWrapper.From("["));
                     else parts.Add(ValueWrapper.From("."));
 
-                    if (part.Value.Type == ValueObjectType.Value)
+                    if (IsStaticPathPart(part))
                     {
                         var v = part.Value.Value!.ToString()!;
 
@@ -162,6 +162,7 @@ public class JsonPathExpression
                         }
                         else
                         {
+                            parts.Add(ValueWrapper.From("\""));
                             parts.Add(ValueWrapper.From(
                                 PhraseHelper.Replace(
                                     ValueWrapper.From(
@@ -170,6 +171,7 @@ public class JsonPathExpression
                                     ValueWrapper.From("\""), ValueWrapper.From("\\\"")
                                 )
                             ));
+                            parts.Add(ValueWrapper.From("\""));
                         }
                     }
 
@@ -180,6 +182,17 @@ public class JsonPathExpression
 
             return ValueWrapper.From(PhraseHelper.Concat(parts.ToArray()));
         }
+    }
+
+    private static bool IsStaticPathPart(Part part)
+    {
+        return part.Value.Type == ValueObjectType.Value &&
+            part.Value.Value is not IPhrase &&
+            part.Value.Value is not Query &&
+            part.Value.Value is not ValueWrapper &&
+            part.Value.Value is not Where &&
+            part.Value.Value is not WhereList &&
+            part.Value.Value is not Geometry;
     }
 
     public List<Part> GetParts()

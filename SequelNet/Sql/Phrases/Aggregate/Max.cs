@@ -50,8 +50,6 @@ public class Max : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
-        sb.Append(Distinct ? "MAX(DISTINCT " : "MAX(");
-        sb.Append(Value.Build(conn, relatedQuery));
-        sb.Append(")");
+        conn.Language.BuildMax(this, sb, conn, relatedQuery);
     }
 }
