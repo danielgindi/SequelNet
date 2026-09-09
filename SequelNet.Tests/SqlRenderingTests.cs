@@ -23,6 +23,24 @@ public class SqlRenderingTests
     }
 
     [Test]
+    public void SelectAs_RendersAliasAndPreservesLegacySelectBehavior()
+    {
+        var query = new Query("orders").SelectAs("id", "order_id");
+#pragma warning disable CS0618 // Verify compatibility during the Select(columnName, alias) migration.
+        var legacyQuery = new Query("orders").Select("id", "order_id");
+#pragma warning restore CS0618
+        var connector = new TestSqlConnector();
+
+        using (Assert.EnterMultipleScope())
+        {
+            Assert.That(query.BuildCommand(connector),
+                Is.EqualTo(" SELECT `id` AS `order_id` FROM `orders`"));
+            Assert.That(legacyQuery.BuildCommand(connector),
+                Is.EqualTo(" SELECT `id` AS `order_id` FROM `orders`"));
+        }
+    }
+
+    [Test]
     public void Query_BuildsNestedWhereAndBetweenConditions()
     {
         var nested = new WhereList().Where("is_deleted", false).OR("is_deleted", null);

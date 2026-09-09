@@ -70,7 +70,13 @@ public partial class Query
         return this;
     }
 
+    [Obsolete("Select(columnName, alias) is ambiguous and will change meaning in SequelNet 4.0. Use SelectAs(columnName, alias) instead.")]
     public Query Select(string columnName, string alias)
+    {
+        return SelectAs(columnName, alias);
+    }
+
+    public Query SelectAs(string columnName, string alias)
     {
         this.QueryMode = QueryMode.Select;
         if (_ListSelect == null) _ListSelect = new SelectColumnList();
@@ -175,10 +181,10 @@ public partial class Query
         return Select(columnName);
     }
 
-    [Obsolete("Use Select(...) instead.")]
+    [Obsolete("Use SelectAs(...) instead.")]
     public Query AddSelect(string columnName, string alias)
     {
-        return Select(columnName, alias);
+        return SelectAs(columnName, alias);
     }
 
     [Obsolete("Use Select(...) instead.")]

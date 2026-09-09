@@ -19,13 +19,19 @@ public class LegacyBuilderApiTests
             var obsolete = method.GetCustomAttribute<ObsoleteAttribute>();
 
             Assert.That(obsolete, Is.Not.Null, method.ToString());
-            Assert.That(obsolete!.Message, Is.EqualTo(GetReplacementMessage(method.Name)));
+            Assert.That(obsolete!.Message, Is.EqualTo(GetReplacementMessage(method)));
         }
     }
 
-    private static string GetReplacementMessage(string methodName)
+    private static string GetReplacementMessage(MethodInfo method)
     {
-        return methodName switch
+        var parameters = method.GetParameters();
+        if (method.Name == "AddSelect" &&
+            parameters.Length == 2 &&
+            parameters.All(parameter => parameter.ParameterType == typeof(string)))
+            return "Use SelectAs(...) instead.";
+
+        return method.Name switch
         {
             "AddSelectLiteral" => "Use SelectLiteral(...) instead.",
             "AddSelectValue" => "Use SelectValue(...) instead.",
