@@ -41,6 +41,7 @@ public class StandardDeviationOfSample : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         conn.Language.BuildStandardDeviationOfSample(this, sb, conn, relatedQuery);
     }
 }

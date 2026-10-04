@@ -50,6 +50,7 @@ public class Min : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         conn.Language.BuildMin(this, sb, conn, relatedQuery);
     }
 }

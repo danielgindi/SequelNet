@@ -50,6 +50,7 @@ public class Sum : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         conn.Language.BuildSum(this, sb, conn, relatedQuery);
     }
 }

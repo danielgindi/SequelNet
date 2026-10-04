@@ -41,6 +41,7 @@ public class StandardVarianceOfPopulation : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         conn.Language.BuildStandardVarianceOfPopulation(this, sb, conn, relatedQuery);
     }
 }

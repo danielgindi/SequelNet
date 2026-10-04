@@ -41,6 +41,7 @@ public class Every : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         sb.Append(conn.Language.Aggregate_Every(Value.Build(conn, relatedQuery)));
     }
 }

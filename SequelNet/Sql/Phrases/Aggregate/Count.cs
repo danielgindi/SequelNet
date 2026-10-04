@@ -50,6 +50,7 @@ public class Count : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue(!Distinct);
         conn.Language.BuildCount(this, sb, conn, relatedQuery);
     }
 }

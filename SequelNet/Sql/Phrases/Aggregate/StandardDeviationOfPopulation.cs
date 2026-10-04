@@ -41,6 +41,7 @@ public class StandardDeviationOfPopulation : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         conn.Language.BuildStandardDeviationOfPopulation(this, sb, conn, relatedQuery);
     }
 }

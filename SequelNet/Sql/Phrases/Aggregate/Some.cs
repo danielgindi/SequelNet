@@ -41,6 +41,7 @@ public class Some : BaseAggregatePhrase
 
     public override void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
+        ValidateValue();
         sb.Append(conn.Language.Aggregate_Some(Value.Build(conn, relatedQuery)));
     }
 }

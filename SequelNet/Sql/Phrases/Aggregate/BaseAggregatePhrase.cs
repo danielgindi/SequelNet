@@ -53,6 +53,15 @@ public abstract class BaseAggregatePhrase : IPhrase
 
     #endregion
 
+    protected void ValidateValue(bool allowWildcard = false)
+    {
+        if (!allowWildcard &&
+            Value.Type == ValueObjectType.Literal &&
+            Value.Value is string literal &&
+            string.Equals(literal, "*", StringComparison.Ordinal))
+            throw new InvalidOperationException("Only non-distinct COUNT supports a wildcard value");
+    }
+
     public virtual void Build(StringBuilder sb, ConnectorBase conn, Query? relatedQuery = null)
     {
         throw new NotImplementedException();
