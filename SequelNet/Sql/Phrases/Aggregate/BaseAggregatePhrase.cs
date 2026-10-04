@@ -13,6 +13,7 @@ public abstract class BaseAggregatePhrase : IPhrase
 
     public BaseAggregatePhrase()
     {
+        this.Value = ValueWrapper.Literal("*");
     }
 
     public BaseAggregatePhrase(string? tableName, string columnName)
