@@ -10,6 +10,25 @@ namespace SequelNet.Connector;
 
 public class PostgreSQLConnector : ConnectorBase
 {
+    public override DatabaseError GetDatabaseError(Exception exception)
+    {
+        if (exception is not PostgresException postgresException)
+            return DatabaseError.Unknown;
+
+        return postgresException.SqlState switch
+        {
+            PostgresErrorCodes.UniqueViolation => DatabaseError.UniqueViolation,
+            PostgresErrorCodes.ForeignKeyViolation => DatabaseError.ForeignKeyViolation,
+            PostgresErrorCodes.DuplicateColumn => DatabaseError.DuplicateColumn,
+            PostgresErrorCodes.DuplicateTable => DatabaseError.DuplicateTable,
+            PostgresErrorCodes.DuplicateObject => DatabaseError.DuplicateObject,
+            PostgresErrorCodes.UndefinedColumn => DatabaseError.UndefinedColumn,
+            PostgresErrorCodes.UndefinedTable => DatabaseError.UndefinedTable,
+            PostgresErrorCodes.UndefinedObject => DatabaseError.UndefinedObject,
+            _ => DatabaseError.Unknown
+        };
+    }
+
     #region Instancing
 
     private PostgreSQLFactory _Factory;

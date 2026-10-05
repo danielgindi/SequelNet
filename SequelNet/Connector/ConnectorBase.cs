@@ -188,6 +188,19 @@ public abstract class ConnectorBase : IDisposable
 
     public virtual LanguageFactory Language => _LanguageFactory;
 
+    /// <summary>
+    /// Classifies an exception using this connector's provider, for example in a catch filter.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see cref="DatabaseError.Unknown"/> for null, unrecognized exceptions,
+    /// or providers that do not implement classification.
+    /// Only the supplied exception is inspected; inner exceptions are not unwrapped.
+    /// </remarks>
+    public virtual DatabaseError GetDatabaseError(Exception exception)
+    {
+        return DatabaseError.Unknown;
+    }
+
     #endregion
 
     #region IDisposable

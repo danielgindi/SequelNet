@@ -9,6 +9,40 @@ namespace SequelNet.Connector;
 
 public class OleDbConnector : ConnectorBase
 {
+    public override DatabaseError GetDatabaseError(Exception exception)
+    {
+        if (exception is not OleDbException oleDbException)
+            return DatabaseError.Unknown;
+
+        foreach (OleDbError error in oleDbException.Errors)
+        {
+            // Jet exposes Access error numbers through SQLState, not NativeError.
+            // Restrict the mapping to Jet/ACE error records, including for linked tables.
+            if (!string.Equals(error.Source, "Microsoft JET Database Engine", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(error.Source, "Microsoft Access Database Engine", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var category = error.SQLState switch
+            {
+                "3022" => DatabaseError.UniqueViolation,
+                "3200" or "3201" => DatabaseError.ForeignKeyViolation,
+                "3191" or "3380" => DatabaseError.DuplicateColumn,
+                "3010" => DatabaseError.DuplicateTable,
+                "3284" or "3375" => DatabaseError.DuplicateIndex,
+                "3012" or "3283" => DatabaseError.DuplicateObject,
+                "3372" => DatabaseError.UndefinedObject,
+                "3381" => DatabaseError.UndefinedColumn,
+                "3376" => DatabaseError.UndefinedTable,
+                _ => DatabaseError.Unknown
+            };
+
+            if (category != DatabaseError.Unknown)
+                return category;
+        }
+
+        return DatabaseError.Unknown;
+    }
+
     #region Instancing
 
     private OleDbFactory _Factory;

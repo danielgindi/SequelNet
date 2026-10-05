@@ -11,6 +11,24 @@ namespace SequelNet.Connector;
 
 public class MySqlConnector : ConnectorBase
 {
+    public override DatabaseError GetDatabaseError(Exception exception)
+    {
+        if (exception is not MySql.Data.MySqlClient.MySqlException mySqlException)
+            return DatabaseError.Unknown;
+
+        return mySqlException.Number switch
+        {
+            1062 => DatabaseError.UniqueViolation,
+            1452 => DatabaseError.ForeignKeyViolation,
+            1091 => DatabaseError.UndefinedObject,
+            1060 => DatabaseError.DuplicateColumn,
+            1050 => DatabaseError.DuplicateTable,
+            1054 => DatabaseError.UndefinedColumn,
+            1061 => DatabaseError.DuplicateIndex,
+            _ => DatabaseError.Unknown
+        };
+    }
+
     #region Instancing
 
     private MySqlFactory _Factory;

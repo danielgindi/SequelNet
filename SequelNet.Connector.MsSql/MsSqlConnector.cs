@@ -11,6 +11,32 @@ namespace SequelNet.Connector;
 
 public class MsSqlConnector : ConnectorBase
 {
+    public override DatabaseError GetDatabaseError(Exception exception)
+    {
+        if (exception is not SqlException sqlException)
+            return DatabaseError.Unknown;
+
+        // A batch may report the specific error alongside a generic failure.
+        foreach (SqlError error in sqlException.Errors)
+        {
+            var category = error.Number switch
+            {
+                2601 or 2627 => DatabaseError.UniqueViolation,
+                547 => DatabaseError.ConstraintViolation,
+                3728 => DatabaseError.UndefinedObject,
+                2705 => DatabaseError.DuplicateColumn,
+                1913 or 2714 => DatabaseError.DuplicateObject,
+                207 or 4924 => DatabaseError.UndefinedColumn,
+                _ => DatabaseError.Unknown
+            };
+
+            if (category != DatabaseError.Unknown)
+                return category;
+        }
+
+        return DatabaseError.Unknown;
+    }
+
     #region Instancing
 
     private MsSqlFactory _Factory;

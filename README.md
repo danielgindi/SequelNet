@@ -49,6 +49,67 @@ Structure of this library
 * `TableSchema` is a class representing the an actual db schema. This assists the `Query` in converting values where necessary, bulding queries or even building `CREATE TABLE`, `ALTER TABLE` and `CREATE INDEX` queries...
 * There's a namespace `Phrases` which includes many objects that wrap native sql functions. You can add your own, based on the `IPhrase` class.
 
+Detecting database errors
+-------------------------
+
+Use `ConnectorBase.GetDatabaseError(exception)` to detect database errors without
+referencing a driver exception type or checking numeric error codes:
+
+```csharp
+using SequelNet.Connector;
+
+try
+{
+    query.Execute(connector);
+}
+catch (Exception ex) when (connector.GetDatabaseError(ex) == DatabaseError.UniqueViolation)
+{
+    // Handle a primary-key or unique-key collision.
+}
+```
+
+`UniqueViolation` means duplicate values in a primary key or unique key.
+The `Duplicate*` categories mean duplicate names or definitions; `Undefined*`
+categories mean missing objects, including missing drop targets.
+
+| Category | MySQL (both drivers) | SQL Server | PostgreSQL SQLSTATE | Jet/ACE SQLState |
+| --- | --- | --- | --- | --- |
+| `UniqueViolation` | 1062 | 2601, 2627 | 23505 | 3022 |
+| `ForeignKeyViolation` | 1452 | See `ConstraintViolation` | 23503 | 3200, 3201 |
+| `ConstraintViolation` | — | 547 | — | — |
+| `DuplicateColumn` | 1060 | 2705 | 42701 | 3191, 3380 |
+| `DuplicateTable` | 1050 | — | 42P07 | 3010 |
+| `DuplicateIndex` | 1061 | — | — | 3284, 3375 |
+| `DuplicateObject` | — | 1913, 2714 | 42710 | 3012, 3283 |
+| `UndefinedColumn` | 1054 | 207, 4924 | 42703 | 3381 |
+| `UndefinedTable` | — | — | 42P01 | 3376 |
+| `UndefinedObject` | 1091 | 3728 | 42704 | 3372 |
+
+Some provider conditions have broader meanings:
+
+- PostgreSQL 42P07 maps to `DuplicateTable`, matching its native condition name,
+  but also covers duplicate indexes and other relations. 42710 maps separately to
+  `DuplicateObject`. See PostgreSQL's [error codes](https://www.postgresql.org/docs/current/errcodes-appendix.html)
+  and [index creation source](https://github.com/postgres/postgres/blob/REL_17_STABLE/src/backend/catalog/index.c).
+- SQL Server 547 covers foreign-key and check constraints, so it returns
+  `ConstraintViolation`. 1913 covers both indexes and statistics, and 2714 covers
+  multiple object kinds, so both return `DuplicateObject`. See Microsoft's
+  [error reference](https://learn.microsoft.com/en-us/sql/relational-databases/errors-events/database-engine-events-and-errors).
+- OleDb examines Jet/ACE engine error records and reads Access error numbers from
+  `OleDbError.SQLState`. `NativeError` may contain a different internal number.
+  Error records from other OLE DB providers remain `Unknown`. Jet's generic
+  missing-parameter errors also remain `Unknown`, since they do not uniquely
+  identify a missing column. See the [Access error catalogue](https://docs.oracle.com/cd/E39885_01/doc.40/e18459/errors_access.htm).
+
+SQL Server and OleDb return the first recognized category from their error collection.
+The Jet 4.0 mappings were exercised against a real temporary database; ACE was not
+installed on the validation machine.
+
+Classification does not open a connection or change the exception. Null, unrecognized
+errors, exceptions from other drivers, and connectors without a classification
+implementation return `DatabaseError.Unknown`. Wrapped exceptions are not unwrapped;
+pass the underlying provider exception explicitly if needed.
+
 Bonus
 -----
 
