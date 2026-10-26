@@ -66,20 +66,25 @@ public class MySql2Connector : ConnectorBase
 
     private static ConcurrentDictionary<MySql2Mode, MySql2LanguageFactory> _LanguageFactories = new ConcurrentDictionary<MySql2Mode, MySql2LanguageFactory>();
     private MySql2LanguageFactory _LanguageFactory = null;
+    private MySql2Mode? _LanguageMode = null;
 
     public override LanguageFactory Language
     {
         get
         {
-            if (_LanguageFactory == null)
+            var sqlMode = GetMySqlMode();
+            if (_LanguageFactory == null || _LanguageMode != sqlMode)
             {
-                if (!_LanguageFactories.TryGetValue(GetMySqlMode(), out var factory))
+                if (!sqlMode.IsVersionKnown || !_LanguageFactories.TryGetValue(sqlMode, out var factory))
                 {
-                    factory = new MySql2LanguageFactory(GetMySqlMode());
-                    _LanguageFactories[GetMySqlMode()] = factory;
+                    factory = new MySql2LanguageFactory(sqlMode);
+
+                    if (sqlMode.IsVersionKnown)
+                        _LanguageFactories[sqlMode] = factory;
                 }
 
                 _LanguageFactory = factory;
+                _LanguageMode = sqlMode;
             }
 
             return _LanguageFactory;
@@ -110,7 +115,7 @@ public class MySql2Connector : ConnectorBase
 
     public MySql2Mode GetMySqlMode()
     {
-        if (_MySqlMode == null)
+        if (_MySqlMode == null || !_MySqlMode.Value.IsVersionKnown)
         {
             if (_Map_ConnStr_SqlMode.TryGetValue(Connection.ConnectionString, out var sqlMode))
             {
@@ -127,9 +132,9 @@ public class MySql2Connector : ConnectorBase
                         _MySqlMode = sqlMode;
                 }
 
-                if (_MySqlMode == null)
+                if (_MySqlMode == null || !_MySqlMode.Value.IsVersionKnown)
                 {
-                    sqlMode = new MySql2Mode();
+                    sqlMode = _MySqlMode ?? new MySql2Mode();
 
                     try
                     {
@@ -143,7 +148,10 @@ public class MySql2Connector : ConnectorBase
                     }
                     catch { }
 
-                    _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
+                    // Retry unknown versions on a later call instead of sharing the failure.
+                    if (sqlMode.IsVersionKnown)
+                        _Map_ConnStr_SqlMode[Connection.ConnectionString] = sqlMode;
+
                     _MySqlMode = sqlMode;
                 }
             }

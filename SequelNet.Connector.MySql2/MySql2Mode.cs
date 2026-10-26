@@ -17,7 +17,34 @@ public struct MySql2Mode
     public string Version
     {
         get { return _Version; }
-        set { _Version = value; }
+        set
+        {
+            _Version = value;
+            ParsedVersion = ParseVersion(value);
+        }
+    }
+
+    /// <summary>
+    /// Whether the detected server version can be used for feature checks.
+    /// </summary>
+    public bool IsVersionKnown => ParsedVersion != null;
+
+    internal System.Version ParsedVersion { get; private set; }
+
+    private static System.Version ParseVersion(string rawVersion)
+    {
+        if (string.IsNullOrWhiteSpace(rawVersion))
+            return null;
+
+        var numericLength = 0;
+        while (numericLength < rawVersion.Length &&
+            (char.IsDigit(rawVersion[numericLength]) || rawVersion[numericLength] == '.'))
+        {
+            numericLength++;
+        }
+
+        var numericVersion = rawVersion.Substring(0, numericLength).TrimEnd('.');
+        return System.Version.TryParse(numericVersion, out var version) ? version : null;
     }
 
     public bool NoBackSlashes

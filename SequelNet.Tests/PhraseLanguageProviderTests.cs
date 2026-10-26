@@ -1245,6 +1245,31 @@ public class PhraseLanguageProviderTests
         }
     }
 
+    [TestCase(null)]
+    [TestCase("")]
+    [TestCase("unknown")]
+    [TestCase("8")]
+    public void MySqlJsonPhrases_AllowUnknownServerVersions(string? version)
+    {
+        foreach (var provider in MySqlProviders(version!))
+        {
+            var connector = new TestConnector(ConnectorBase.SqlServiceType.MYSQL, provider);
+
+            AssertSql(
+                new JsonArrayAggregate(Literal("value")),
+                "JSON_ARRAYAGG(value)",
+                connector);
+            AssertSql(
+                new JsonObjectAggregate(Literal("key"), Literal("value")),
+                "JSON_OBJECTAGG(key,value)",
+                connector);
+            AssertSql(
+                new JsonValue("doc", ValueObjectType.Literal, "$.key"),
+                "JSON_VALUE(doc, '$.key' NULL ON EMPTY NULL ON ERROR)",
+                connector);
+        }
+    }
+
     [Test]
     public void MySqlJsonPhrases_RejectServerVersionsBeforeFeatureIntroduction()
     {

@@ -21,78 +21,68 @@ public class MySql2LanguageFactory : LanguageFactory
 
     private MySql2Mode _MySqlMode;
 
-    bool? _Is5_0_3OrLater = null;
-    private bool Is5_0_3OrLater()
+    bool? _IsBefore5_0_3 = null;
+    private bool IsBefore5_0_3()
     {
-        if (_Is5_0_3OrLater == null)
+        if (_IsBefore5_0_3 == null)
         {
-            _Is5_0_3OrLater = IsVersionAtLeast("5.0.3");
+            _IsBefore5_0_3 = IsVersionBefore("5.0.3");
         }
-        return _Is5_0_3OrLater.Value;
+        return _IsBefore5_0_3.Value;
     }
 
-    bool? _Is5_7OrLater = null;
-    private bool Is5_7OrLater()
+    bool? _IsBefore5_7 = null;
+    private bool IsBefore5_7()
     {
-        if (_Is5_7OrLater == null)
+        if (_IsBefore5_7 == null)
         {
-            _Is5_7OrLater = IsVersionAtLeast("5.7");
+            _IsBefore5_7 = IsVersionBefore("5.7");
         }
-        return _Is5_7OrLater.Value;
+        return _IsBefore5_7.Value;
     }
 
-    bool? _Is8_0OrLater = null;
-    private bool Is8_0OrLater()
+    bool? _IsBefore8_0 = null;
+    private bool IsBefore8_0()
     {
-        if (_Is8_0OrLater == null)
+        if (_IsBefore8_0 == null)
         {
-            _Is8_0OrLater = IsVersionAtLeast("8.0");
+            _IsBefore8_0 = IsVersionBefore("8.0");
         }
-        return _Is8_0OrLater.Value;
+        return _IsBefore8_0.Value;
     }
 
-    bool? _Is8_0_17OrLater = null;
-    private bool Is8_0_17OrLater()
+    bool? _IsBefore8_0_17 = null;
+    private bool IsBefore8_0_17()
     {
-        if (_Is8_0_17OrLater == null)
+        if (_IsBefore8_0_17 == null)
         {
-            _Is8_0_17OrLater = IsVersionAtLeast("8.0.17");
+            _IsBefore8_0_17 = IsVersionBefore("8.0.17");
         }
-        return _Is8_0_17OrLater.Value;
+        return _IsBefore8_0_17.Value;
     }
 
-    bool? _Is8_0_21OrLater = null;
-    private bool Is8_0_21OrLater()
+    bool? _IsBefore8_0_21 = null;
+    private bool IsBefore8_0_21()
     {
-        if (_Is8_0_21OrLater == null)
+        if (_IsBefore8_0_21 == null)
         {
-            _Is8_0_21OrLater = IsVersionAtLeast("8.0.21");
+            _IsBefore8_0_21 = IsVersionBefore("8.0.21");
         }
-        return _Is8_0_21OrLater.Value;
+        return _IsBefore8_0_21.Value;
     }
 
-    private bool IsVersionAtLeast(string minimumVersion)
+    private bool IsVersionBefore(string version)
     {
-        var rawVersion = _MySqlMode.Version;
-        if (string.IsNullOrWhiteSpace(rawVersion))
-            return false;
+        var current = _MySqlMode.ParsedVersion;
 
-        var numericLength = 0;
-        while (numericLength < rawVersion.Length &&
-            (char.IsDigit(rawVersion[numericLength]) || rawVersion[numericLength] == '.'))
-        {
-            numericLength++;
-        }
-
-        var numericVersion = rawVersion.Substring(0, numericLength).TrimEnd('.');
-        return System.Version.TryParse(numericVersion, out var current) &&
-            System.Version.TryParse(minimumVersion, out var minimum) &&
-            current >= minimum;
+        // An unknown version cannot establish that the server predates a feature.
+        return current != null &&
+            System.Version.TryParse(version, out var threshold) && current < threshold;
     }
 
     private void EnsureJsonSupport(string minimumVersion, string feature)
     {
-        if (!IsVersionAtLeast(minimumVersion))
+        if (IsVersionBefore(minimumVersion))
             throw new NotSupportedException($"{feature} requires MySQL {minimumVersion} or later");
     }
 
@@ -157,7 +147,7 @@ public class MySql2LanguageFactory : LanguageFactory
     public override bool UpdateFromInsteadOfJoin => false;
     public override bool UpdateJoinRequiresFromLeftTable => false;
 
-    public override bool GroupBySupportsOrdering => !IsVersionAtLeast("8.0.13");
+    public override bool GroupBySupportsOrdering => IsVersionBefore("8.0.13");
 
     public override bool DeleteSupportsIgnore => true;
     public override bool InsertSupportsIgnore => true;
@@ -175,7 +165,7 @@ public class MySql2LanguageFactory : LanguageFactory
     {
         get
         {
-            if (Is5_0_3OrLater())
+            if (!IsBefore5_0_3())
             {
                 return 21845;
             }
@@ -237,7 +227,7 @@ public class MySql2LanguageFactory : LanguageFactory
 
     public override string ST_X(string pt)
     {
-        if (Is5_7OrLater())
+        if (!IsBefore5_7())
         {
             return "ST_X(" + pt + ")";
         }
@@ -249,7 +239,7 @@ public class MySql2LanguageFactory : LanguageFactory
 
     public override string ST_Y(string pt)
     {
-        if (Is5_7OrLater())
+        if (!IsBefore5_7())
         {
             return "ST_Y(" + pt + ")";
         }
@@ -261,7 +251,7 @@ public class MySql2LanguageFactory : LanguageFactory
 
     public override string ST_Contains(string g1, string g2)
     {
-        if (Is5_7OrLater())
+        if (!IsBefore5_7())
         {
             return "ST_Contains(" + g1 + ", " + g2 + ")";
         }
@@ -286,7 +276,7 @@ public class MySql2LanguageFactory : LanguageFactory
         if (!literalText)
             text = PrepareValue(text);
 
-        if (Is5_7OrLater())
+        if (!IsBefore5_7())
         {
             return "ST_GeomFromText(" + text + (string.IsNullOrEmpty(srid) ? "" : "," + srid) + ")";
         }
@@ -640,7 +630,7 @@ public class MySql2LanguageFactory : LanguageFactory
                 break;
 
             case DataType.Float:
-                if (typeDef.Precision > 0 && !Is8_0_17OrLater() && !forCast)
+                if (typeDef.Precision > 0 && IsBefore8_0_17() && !forCast)
                 {
                     typeString = $"FLOAT({typeDef.Precision}, {typeDef.Scale})";
                 }
@@ -651,7 +641,7 @@ public class MySql2LanguageFactory : LanguageFactory
                 break;
 
             case DataType.Double:
-                if (typeDef.Precision > 0 && !Is8_0_17OrLater() && !forCast)
+                if (typeDef.Precision > 0 && IsBefore8_0_17() && !forCast)
                 {
                     typeString = $"DOUBLE({typeDef.Precision}, {typeDef.Scale})";
                 }
@@ -1239,7 +1229,7 @@ public class MySql2LanguageFactory : LanguageFactory
         StringBuilder sb, ConnectorBase conn, Query relatedQuery)
     {
         EnsureJsonSupport("5.7.8", "JSON_VALUE");
-        if (Is8_0_21OrLater())
+        if (!IsBefore8_0_21())
         {
             sb.Append("JSON_VALUE(");
             value.Build(sb, conn, relatedQuery);
